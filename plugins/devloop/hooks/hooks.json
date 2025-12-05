@@ -1,0 +1,41 @@
+{
+  "description": "Feature-dev workflow hooks for context loading, validation, and enforcement",
+  "hooks": {
+    "SessionStart": [
+      {
+        "matcher": ".*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash ${CLAUDE_PLUGIN_ROOT}/hooks/session-start.sh",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "Write|Edit|MultiEdit",
+        "hooks": [
+          {
+            "type": "prompt",
+            "prompt": "You are validating a file write operation. Briefly check if this change follows good practices:\n\n1. Does it follow project conventions (if CLAUDE.md exists)?\n2. Does it avoid obvious security issues (no secrets, no SQL injection patterns)?\n3. Is the change reasonable for the current task?\n\nIf everything looks fine, respond with just: {\"decision\": \"approve\"}\n\nIf there's a concern, respond with: {\"decision\": \"warn\", \"message\": \"Brief explanation of concern\"}\n\nOnly use \"deny\" for serious security issues: {\"decision\": \"deny\", \"message\": \"Reason\"}",
+            "timeout": 15
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "matcher": ".*",
+        "hooks": [
+          {
+            "type": "prompt",
+            "prompt": "Before stopping, verify the work is complete:\n\n1. Were all user-requested tasks addressed?\n2. Are there any obvious unfinished items (incomplete code, missing imports, syntax errors)?\n3. If tests were written, do they appear to pass?\n\nIf work appears complete, respond: {\"decision\": \"approve\"}\n\nIf there are obvious incomplete items, respond: {\"decision\": \"block\", \"message\": \"Brief description of what seems incomplete\"}",
+            "timeout": 20
+          }
+        ]
+      }
+    ]
+  }
+}

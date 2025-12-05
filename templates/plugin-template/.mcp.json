@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "example-server": {
+      "command": "node",
+      "args": ["${CLAUDE_PLUGIN_ROOT}/path/to/mcp-server.js"],
+      "env": {
+        "API_KEY": "${YOUR_API_KEY_ENV_VAR}"
+      }
+    }
+  }
+}

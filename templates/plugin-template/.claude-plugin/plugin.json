@@ -1,0 +1,10 @@
+{
+  "name": "your-plugin-name",
+  "version": "0.1.0",
+  "description": "A brief description of what your plugin does",
+  "author": "Your Name",
+  "homepage": "https://github.com/YOUR_USERNAME/cc-plugins",
+  "repository": "https://github.com/YOUR_USERNAME/cc-plugins",
+  "license": "MIT",
+  "keywords": ["claude-code", "plugin"]
+}

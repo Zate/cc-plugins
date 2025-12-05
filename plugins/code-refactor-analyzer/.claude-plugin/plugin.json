@@ -1,0 +1,23 @@
+{
+  "name": "code-refactor-analyzer",
+  "version": "1.0.0",
+  "description": "Analyzes codebases for refactoring opportunities across Go, Python, TypeScript/React and other languages. Identifies large files, complex code, poor organization, and provides actionable recommendations.",
+  "author": {
+    "name": "cc-plugins"
+  },
+  "homepage": "https://github.com/Zate/cc-plugins",
+  "repository": "https://github.com/Zate/cc-plugins",
+  "license": "MIT",
+  "keywords": [
+    "claude-code",
+    "plugin",
+    "refactoring",
+    "code-analysis",
+    "code-quality",
+    "technical-debt",
+    "golang",
+    "python",
+    "typescript",
+    "react"
+  ]
+}

@@ -1,0 +1,9 @@
+{
+  "name": "devloop",
+  "version": "1.0.0",
+  "description": "Token-conscious feature development workflow with specialized agents, strategic model selection (opus/sonnet/haiku), language-specific skills, and automated hooks for Go, React, and Java projects",
+  "author": {
+    "name": "Zate",
+    "email": "zate75+claude-code-plugins@gmail.com"
+  }
+}
