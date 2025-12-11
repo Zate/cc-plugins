@@ -4,53 +4,48 @@ argument-hint: Optional feature description
 allowed-tools: ["Read", "Write", "Edit", "Grep", "Glob", "Bash", "Task", "AskUserQuestion", "TodoWrite", "Skill", "WebSearch", "WebFetch"]
 ---
 
-# Feature Development
+# Devloop - Complete Feature Development Workflow
 
-You are helping a developer implement a new feature. Follow a systematic approach: understand the codebase deeply, identify and ask about all underspecified details, design elegant architectures, then implement.
+A comprehensive, token-conscious workflow for feature development from requirements through deployment.
 
 ## Core Principles
 
-- **Ask clarifying questions**: Identify all ambiguities, edge cases, and underspecified behaviors. Use the AskUserQuestion tool for structured decisions. Wait for user answers before proceeding with implementation.
+- **Ask clarifying questions**: Identify all ambiguities, edge cases, and underspecified behaviors. Use AskUserQuestion for structured decisions. Wait for answers before proceeding.
 - **Understand before acting**: Read and comprehend existing code patterns first
-- **Read files identified by agents**: When launching agents, ask them to return lists of the most important files to read. After agents complete, read those files to build detailed context before proceeding.
+- **Read files identified by agents**: After agents complete, read the key files they identify to build detailed context
 - **Simple and elegant**: Prioritize readable, maintainable, architecturally sound code
-- **Use TodoWrite**: Track all progress throughout
+- **Use TodoWrite**: Track all progress throughout every phase
 - **Token conscious**: Use appropriate models for each task (haiku for simple, sonnet for balanced, opus for complex)
 
 ## Environment Context
 
-The SessionStart hook sets these environment variables (available to all agents):
+The SessionStart hook sets these environment variables:
 - `$FEATURE_DEV_PROJECT_LANGUAGE` - Detected language (go, typescript, java, python, etc.)
 - `$FEATURE_DEV_FRAMEWORK` - Detected framework (react, vue, spring, etc.)
 - `$FEATURE_DEV_TEST_FRAMEWORK` - Detected test framework (jest, go-test, junit, pytest, etc.)
 
-Use these to conditionally invoke language-specific agents and skills.
-
 ---
 
-## Phase 0 (Optional): Workflow Detection
+## Phase 0: Triage
 
-**Goal**: Determine optimal workflow type based on task characteristics
+**Goal**: Classify the task and determine optimal workflow
 
-**When to Use**: If the task type is unclear or could be handled multiple ways.
+**Model**: haiku
 
 **Actions**:
-1. If task is clearly a new feature, skip to Phase 1
-2. If task type is ambiguous, launch workflow-detector agent (haiku model) to classify:
-   - **Feature**: New functionality → Full 7-phase workflow
-   - **Bug Fix**: Defect correction → Streamlined 5-phase (skip architecture)
-   - **Refactor**: Code improvement → Focus on analysis and validation
-   - **QA**: Test development → Jump to qa-agent workflow
+1. Analyze the initial request: $ARGUMENTS
+2. Launch workflow-detector agent (haiku) if task type unclear
+3. Determine workflow path:
 
-3. For guidance on workflow selection, invoke:
-   ```
-   Skill: workflow-selection
-   ```
+   | Task Type | Workflow | Use Command |
+   |-----------|----------|-------------|
+   | Simple/clear fix | Quick | `/devloop:quick` |
+   | Unknown feasibility | Spike | `/devloop:spike` |
+   | Code review | Review | `/devloop:review` |
+   | Ready to commit | Ship | `/devloop:ship` |
+   | New feature | Full workflow | Continue below |
 
-4. Based on classification, adapt phases accordingly:
-   - Bug fixes may skip Phase 4 (Architecture Design)
-   - Refactors may have extended Phase 2 (Exploration)
-   - QA tasks may start with qa-agent
+4. For guidance: `Skill: workflow-selection`
 
 ---
 
@@ -58,258 +53,429 @@ Use these to conditionally invoke language-specific agents and skills.
 
 **Goal**: Understand what needs to be built
 
-Initial request: $ARGUMENTS
+**Model**: haiku/sonnet
 
 **Actions**:
-1. Create todo list with all phases
-2. If feature unclear, use AskUserQuestion to gather requirements:
+1. Create todo list with all workflow phases
+2. If feature is vague or complex, launch requirements-gatherer agent (sonnet):
+   - Gather user stories with acceptance criteria
+   - Define scope boundaries (in/out)
+   - Identify edge cases and error scenarios
+   - Document non-functional requirements
 
+3. If requirements are clear, summarize understanding:
    ```
    Use AskUserQuestion:
-   - question: "What problem are you trying to solve?"
-   - header: "Problem"
-   - options based on common patterns detected
+   - question: "Is this understanding correct? [summary of feature]"
+   - header: "Confirm"
+   - options:
+     - Yes, proceed (Continue to exploration)
+     - Adjust (Let me clarify some points)
+     - More detail needed (Launch requirements-gatherer)
    ```
-
-3. Summarize understanding and confirm with user
 
 ---
 
-## Phase 2: Codebase Exploration
+## Phase 2: Complexity Assessment
 
-**Goal**: Understand relevant existing code and patterns at both high and low levels
+**Goal**: Estimate effort and identify risks early
 
-**Model Selection**: Use sonnet for exploration agents (balanced speed and understanding)
+**Model**: haiku
 
 **Actions**:
-1. Launch 2-3 code-explorer agents in parallel (model: sonnet). Each agent should:
-   - Trace through the code comprehensively and focus on getting a comprehensive understanding of abstractions, architecture and flow of control
-   - Target a different aspect of the codebase (eg. similar features, high level understanding, architectural understanding, user experience, etc)
-   - Include a list of 5-10 key files to read
+1. Launch complexity-estimator agent (haiku, plan mode):
+   - Analyze codebase impact
+   - Score complexity factors (1-5 each)
+   - Generate T-shirt size (XS/S/M/L/XL)
+   - Identify risks and dependencies
 
-   **Example agent prompts**:
-   - "Find features similar to [feature] and trace through their implementation comprehensively"
-   - "Map the architecture and abstractions for [feature area], tracing through the code comprehensively"
-   - "Analyze the current implementation of [existing feature/area], tracing through the code comprehensively"
-   - "Identify UI patterns, testing approaches, or extension points relevant to [feature]"
+2. If complexity is L or XL, or uncertainty is high:
+   ```
+   Use AskUserQuestion:
+   - question: "This appears complex (size: [X]). Should we do a spike first?"
+   - header: "Complexity"
+   - options:
+     - Do spike (Explore feasibility with /devloop:spike)
+     - Proceed anyway (Accept complexity and continue)
+     - Reduce scope (Let's simplify the requirements)
+   ```
 
-2. Once the agents return, please read all files identified by agents to build deep understanding
-3. Present comprehensive summary of findings and patterns discovered
+3. For guidance: `Skill: complexity-estimation`
 
 ---
 
-## Phase 3: Clarifying Questions
+## Phase 3: Exploration
 
-**Goal**: Fill in gaps and resolve all ambiguities before designing
+**Goal**: Deep understanding of existing code and patterns
 
-**CRITICAL**: This is one of the most important phases. DO NOT SKIP.
+**Model**: sonnet
 
 **Actions**:
-1. Review the codebase findings and original feature request
-2. Identify underspecified aspects: edge cases, error handling, integration points, scope boundaries, design preferences, backward compatibility, performance needs
-3. **Use AskUserQuestion tool** to ask all clarifying questions in a structured way:
+1. Launch 2-3 code-explorer agents in parallel (sonnet):
+   - Agent 1: Find similar features, trace implementation patterns
+   - Agent 2: Map architecture and abstractions for the feature area
+   - Agent 3: Identify integration points, testing approaches, extension patterns
 
+2. Each agent should return 5-10 key files to read
+3. **Read all identified files** to build deep understanding
+4. Present comprehensive summary of findings
+
+---
+
+## Phase 4: Clarification
+
+**Goal**: Resolve all ambiguities before designing
+
+**CRITICAL**: Do not skip this phase
+
+**Model**: sonnet
+
+**Actions**:
+1. Review codebase findings and requirements
+2. Identify underspecified aspects:
+   - Edge cases and error handling
+   - Integration points and data flow
+   - Scope boundaries and backward compatibility
+   - Design preferences and performance needs
+
+3. **Use AskUserQuestion** for all clarifying questions (up to 4 per call):
    ```
-   Use AskUserQuestion with up to 4 questions:
-
-   Question 1:
-   - question: "How should we handle [specific edge case]?"
+   Use AskUserQuestion:
+   - question: "How should we handle [edge case]?"
    - header: "Edge Cases"
-   - options: [Option A with description, Option B with description, ...]
-
-   Question 2:
-   - question: "Which integration approach do you prefer?"
-   - header: "Integration"
-   - options: [Approach 1, Approach 2, ...]
-
-   Question 3 (if applicable):
-   - question: "What features are required vs nice-to-have?"
-   - header: "Scope"
-   - multiSelect: true
-   - options: [Feature list...]
+   - options: [Approach A, Approach B, ...]
+   - multiSelect: false
    ```
 
-4. **Wait for answers before proceeding to architecture design**
-
-If the user says "whatever you think is best", provide your recommendation and use AskUserQuestion to get explicit confirmation:
-```
-Use AskUserQuestion:
-- question: "I recommend [approach]. Does this work for you?"
-- header: "Confirm"
-- options:
-  - Yes (Proceed with recommendation)
-  - No (Let me specify differently)
-```
+4. **Wait for all answers before proceeding**
 
 ---
 
-## Phase 4: Architecture Design
+## Phase 5: Architecture
 
-**Goal**: Design multiple implementation approaches with different trade-offs
+**Goal**: Design implementation approach with trade-offs
 
-**Model Selection**:
-- For standard features: Use sonnet for architect agents
-- For complex/high-stakes features: Use opus with thinking enabled
-- Invoke `Skill: model-selection-guide` if unsure
+**Model**: sonnet (opus for complex/high-stakes)
 
 **Actions**:
-1. Invoke architecture-patterns skill for language-specific guidance:
-   ```
-   Skill: architecture-patterns
-   ```
+1. Invoke architecture skill: `Skill: architecture-patterns`
+2. Invoke language-specific skill if applicable:
+   - `Skill: go-patterns`
+   - `Skill: react-patterns`
+   - `Skill: java-patterns`
+   - `Skill: python-patterns`
 
-2. Launch 2-3 code-architect agents in parallel with different focuses:
-   - **Minimal changes**: Smallest change, maximum reuse of existing code
-   - **Clean architecture**: Maintainability, elegant abstractions, testability
-   - **Pragmatic balance**: Speed + quality, practical trade-offs
+3. Launch 2-3 code-architect agents in parallel:
+   - **Minimal**: Smallest change, maximum reuse
+   - **Clean**: Best architecture, maintainability
+   - **Pragmatic**: Balance of speed and quality
 
-3. Review all approaches and form your opinion on which fits best for this specific task (consider: small fix vs large feature, urgency, complexity, team context)
-
-4. Present comparison to user and **use AskUserQuestion** to get their choice:
-
+4. Review approaches and form recommendation
+5. Present comparison with AskUserQuestion:
    ```
    Use AskUserQuestion:
-   - question: "Which architecture approach should we use?"
+   - question: "Which architecture approach?"
    - header: "Approach"
    - options:
-     - Minimal (Extend existing [X], fast implementation, lower risk)
-     - Clean (New [Y] abstraction, better long-term maintainability)
-     - Pragmatic (Balance of [Z], recommended for this task)
+     - Minimal (Recommended) (Fast, low risk, extends existing patterns)
+     - Clean architecture (Better long-term, more work)
+     - Pragmatic balance (Middle ground)
    ```
-
-5. Once user selects, proceed to implementation with chosen approach
 
 ---
 
-## Phase 5: Implementation
+## Phase 6: Planning
+
+**Goal**: Break architecture into actionable tasks
+
+**Model**: sonnet
+
+**Actions**:
+1. Launch task-planner agent (sonnet):
+   - Create ordered task list with dependencies
+   - Define acceptance criteria per task
+   - Specify test requirements per task
+   - Estimate complexity per task
+   - Group into phases/milestones
+
+2. Write all tasks to TodoWrite
+
+3. **Save plan to project** for later resumption with `/devloop:continue`:
+   ```bash
+   mkdir -p .claude
+   ```
+   Write plan to `.claude/devloop-plan.md` with format:
+   ```markdown
+   # Devloop Plan: [Feature Name]
+
+   **Created**: [Date]
+   **Status**: In Progress
+   **Current Phase**: Planning
+
+   ## Overview
+   [Feature description from requirements]
+
+   ## Architecture
+   [Chosen approach summary]
+
+   ## Tasks
+
+   ### Phase 1: [Phase Name]
+   - [ ] Task 1.1: [Description]
+     - Acceptance: [Criteria]
+     - Files: [Expected files]
+   - [ ] Task 1.2: [Description]
+     ...
+
+   ### Phase 2: [Phase Name]
+   ...
+
+   ## Progress Log
+   - [Date]: Plan created
+   ```
+
+4. Invoke: `Skill: testing-strategies` for test planning
+
+5. Present plan for approval:
+   ```
+   Use AskUserQuestion:
+   - question: "Implementation plan ready ([N] tasks). Proceed?"
+   - header: "Plan"
+   - options:
+     - Start implementation (Begin Phase 7)
+     - Review plan (Show detailed breakdown)
+     - Adjust (Modify the plan)
+     - Save and stop (Save plan for later with /devloop:continue)
+   ```
+
+---
+
+## Phase 7: Implementation
 
 **Goal**: Build the feature
 
 **DO NOT START WITHOUT USER APPROVAL**
 
-**Model Selection**: Use sonnet for implementation (balanced capability and speed)
+**Model**: sonnet
 
 **Actions**:
 1. Wait for explicit user approval
-2. Read all relevant files identified in previous phases
-3. Implement following chosen architecture
-4. Follow codebase conventions strictly (check CLAUDE.md if exists)
-5. Write clean, well-documented code
-6. Update todos as you progress
-7. If working on frontend, consider invoking:
+2. Read all relevant files from exploration phase
+3. Implement following chosen architecture:
+   - Follow codebase conventions (check CLAUDE.md)
+   - Write clean, well-documented code
+   - Update todos as you progress
+   - Commit logical checkpoints mentally
+
+4. For frontend work: `Skill: frontend-design:frontend-design`
+5. For API work: `Skill: api-design`
+6. For database work: `Skill: database-patterns`
+
+---
+
+## Phase 8: Testing
+
+**Goal**: Ensure code works correctly
+
+**Model**: haiku/sonnet
+
+**Actions**:
+1. Launch test-generator agent (haiku) if tests needed:
+   - Generate unit tests following project patterns
+   - Generate integration tests for key flows
+   - Follow: `Skill: testing-strategies`
+
+2. Launch test-runner agent (haiku):
+   - Execute test suite
+   - Parse and analyze results
+   - Identify failing tests
+
+3. If tests fail:
    ```
-   Skill: frontend-design:frontend-design
+   Use AskUserQuestion:
+   - question: "Tests found [N] failures. How to proceed?"
+   - header: "Tests"
+   - options:
+     - Fix all (Apply suggested fixes)
+     - Review each (Decide per failure)
+     - Skip (Proceed without fixing)
    ```
 
 ---
 
-## Phase 6: Quality Review
+## Phase 9: Review
 
-**Goal**: Ensure code is simple, DRY, elegant, easy to read, and functionally correct
+**Goal**: Quality assurance and code review
 
-**Model Selection**: Use opus for code-reviewer (catches subtle bugs that sonnet might miss)
+**Model**: sonnet (opus for critical code)
 
 **Actions**:
-1. Launch review agents in parallel based on project context:
+1. Launch code-reviewer agents in parallel:
+   - Focus: Correctness, bugs, logic errors
+   - Focus: Code quality, DRY, readability
+   - Focus: Project conventions, abstractions
 
-   **Always launch (3 agents with opus):**
-   - code-reviewer focused on simplicity/DRY/elegance
-   - code-reviewer focused on bugs/functional correctness
-   - code-reviewer focused on project conventions/abstractions
+2. Launch security-scanner agent (haiku, plan mode):
+   - OWASP Top 10 checks
+   - Hardcoded secrets detection
+   - Injection vulnerability patterns
 
-   **Conditionally launch based on detected language/framework:**
-   - If `$FEATURE_DEV_PROJECT_LANGUAGE == "go"`: Include Go-specific review patterns
-   - If `$FEATURE_DEV_FRAMEWORK == "react"`: Include React-specific review patterns
-   - If `$FEATURE_DEV_PROJECT_LANGUAGE == "java"`: Include Java-specific review patterns
-
-   **Additional specialized reviewers (optional):**
-   - silent-failure-hunter: Check error handling and logging
-   - code-simplifier: Suggest complexity reductions
-
-2. Consolidate findings from all agents and identify highest severity issues
-
-3. **Use AskUserQuestion** to ask user what they want to do:
-
+3. Consolidate findings by severity
+4. Present results:
    ```
    Use AskUserQuestion:
-   - question: "Code review found [N] issues ([X] critical, [Y] important). What would you like to do?"
+   - question: "Review found [N] issues. How to proceed?"
    - header: "Review"
    - options:
-     - Fix now (Address critical and important issues immediately)
-     - Fix critical only (Fix critical issues, defer important ones)
-     - Fix later (Create TODO list for all issues)
-     - Proceed as-is (Accept findings and continue to summary)
+     - Fix all (Address all issues)
+     - Critical only (Fix blockers only)
+     - Acknowledge (Proceed with known issues)
    ```
-
-4. Address issues based on user decision
-
-5. **Optional QA validation**: Ask if user wants deployment readiness check:
-   ```
-   Use AskUserQuestion:
-   - question: "Would you like a deployment readiness check?"
-   - header: "QA Check"
-   - options:
-     - Yes (Run qa-agent for deployment validation)
-     - No (Skip to summary)
-   ```
-
-   If yes, launch qa-agent to validate:
-   - Tests pass
-   - Build succeeds
-   - No TODOs/FIXMEs in production code
-   - Documentation updated
 
 ---
 
-## Phase 7: Summary
+## Phase 10: Validation (Definition of Done)
 
-**Goal**: Document what was accomplished
+**Goal**: Verify all completion criteria are met
 
-**Model Selection**: Use haiku for summary (fast, formulaic task)
+**Model**: haiku
 
 **Actions**:
-1. Mark all todos complete
-2. Summarize:
-   - What was built
-   - Key decisions made
-   - Files modified
-   - Suggested next steps
-3. If tests were generated, confirm they pass
-4. Suggest follow-up actions (additional tests, documentation, etc.)
+1. Launch dod-validator agent (haiku):
+   - Code criteria: Tasks done, conventions followed, no TODOs
+   - Test criteria: Tests exist and pass
+   - Quality criteria: Review passed, no critical issues
+   - Documentation criteria: Docs updated as needed
+   - Integration criteria: Ready for commit
+
+2. Check for project-specific DoD in `.claude/devloop.local.md`
+3. If validation fails:
+   ```
+   Use AskUserQuestion:
+   - question: "DoD validation: [status]. Proceed?"
+   - header: "DoD"
+   - options:
+     - Fix blockers (Address failing criteria)
+     - Override (Proceed with exceptions documented)
+     - Review details (Show specific issues)
+   ```
+
+---
+
+## Phase 11: Integration (Git)
+
+**Goal**: Commit changes and create PR if needed
+
+**Model**: haiku
+
+**Actions**:
+1. Launch git-manager agent (haiku):
+   - Stage appropriate files
+   - Generate conventional commit message
+   - Create commit
+
+2. If PR requested:
+   - Generate PR description
+   - Create PR via `gh pr create`
+   - Return PR URL
+
+3. For guidance: `Skill: git-workflows`
+
+---
+
+## Phase 12: Summary
+
+**Goal**: Document completion and handoff
+
+**Model**: haiku
+
+**Actions**:
+1. Launch summary-generator agent (haiku):
+   - Document what was built
+   - Record key decisions made
+   - List files modified
+   - Note any follow-up items
+
+2. Mark all todos complete
+3. Present summary to user
+4. Suggest follow-up actions if needed
 
 ---
 
 ## Model Selection Reference
 
-Throughout this workflow, use appropriate models:
+| Phase | Model | Rationale |
+|-------|-------|-----------|
+| 0. Triage | haiku | Simple classification |
+| 1. Discovery | haiku/sonnet | Depends on complexity |
+| 2. Complexity | haiku | Scoring is formulaic |
+| 3. Exploration | sonnet | Need deep understanding |
+| 4. Clarification | sonnet | Context-aware questions |
+| 5. Architecture | sonnet/opus | Depends on stakes |
+| 6. Planning | sonnet | Task breakdown needs context |
+| 7. Implementation | sonnet | Balanced capability |
+| 8. Testing | haiku | Formulaic patterns |
+| 9. Review | sonnet/opus | Must catch subtle bugs |
+| 10. Validation | haiku | Checklist verification |
+| 11. Integration | haiku | Git ops are formulaic |
+| 12. Summary | haiku | Simple documentation |
 
-| Task | Model | Rationale |
-|------|-------|-----------|
-| Workflow detection | haiku | Simple classification |
-| Code exploration | sonnet | Balanced understanding |
-| Architecture design (simple) | sonnet | Standard features |
-| Architecture design (complex) | opus | High-stakes decisions |
-| Implementation | sonnet | Balanced capability |
-| Code review | opus | Must catch subtle bugs |
-| Test generation | haiku | Formulaic patterns |
-| Summary | haiku | Simple task |
-
-For detailed model selection guidance: `Skill: model-selection-guide`
+For detailed guidance: `Skill: model-selection-guide`
 
 ---
 
 ## Available Skills
 
-Invoke these skills as needed throughout the workflow:
+Invoke as needed throughout workflow:
 
+**Architecture & Design:**
 - `Skill: architecture-patterns` - Design patterns by language
-- `Skill: testing-strategies` - Test design guidance
-- `Skill: deployment-readiness` - Deployment validation checklist
-- `Skill: model-selection-guide` - When to use opus/sonnet/haiku
-- `Skill: workflow-selection` - Workflow type guidance
-- `Skill: frontend-design:frontend-design` - Frontend design patterns (from frontend-design plugin)
-- `Skill: go-patterns` - Go-specific best practices
+- `Skill: api-design` - API design best practices
+- `Skill: database-patterns` - Database design and optimization
+
+**Language-Specific:**
+- `Skill: go-patterns` - Go best practices
 - `Skill: react-patterns` - React/TypeScript patterns
 - `Skill: java-patterns` - Java/Spring patterns
+- `Skill: python-patterns` - Python patterns
+
+**Quality & Testing:**
+- `Skill: testing-strategies` - Test design guidance
+- `Skill: security-checklist` - Security best practices
+- `Skill: deployment-readiness` - Deployment validation
+
+**Workflow:**
+- `Skill: workflow-selection` - Choose workflow type
+- `Skill: model-selection-guide` - Choose opus/sonnet/haiku
+- `Skill: complexity-estimation` - Estimate effort
+- `Skill: requirements-patterns` - Requirements gathering
+- `Skill: git-workflows` - Git best practices
+
+**UI/Frontend:**
+- `Skill: frontend-design:frontend-design` - Frontend design patterns
+
+---
+
+## Quick Reference: Related Commands
+
+| Command | Use When |
+|---------|----------|
+| `/devloop:quick` | Small, well-defined tasks |
+| `/devloop:spike` | Need to explore feasibility first |
+| `/devloop:review` | Review existing code/PR |
+| `/devloop:ship` | Ready to commit/PR |
+| `/devloop:continue` | Resume from an existing plan |
+| `/devloop:bug` | Report a bug for later fixing |
+| `/devloop:bugs` | View and manage tracked bugs |
+
+---
+
+## Plan Management
+
+All devloop workflows save plans to `.claude/devloop-plan.md`. For plan format details and update procedures, invoke: `Skill: plan-management`
+
+## Bug Tracking
+
+Non-critical issues can be tracked in `.claude/bugs/` for later fixing. Agents can log bugs during review/testing, or use `/devloop:bug` to report manually. For details, invoke: `Skill: bug-tracking`
 
 ---

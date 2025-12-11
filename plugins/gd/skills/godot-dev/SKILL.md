@@ -1,7 +1,7 @@
 ---
 name: godot-development
 description: Expert knowledge of Godot Engine game development including scene creation, node management, GDScript programming, and project structure. Use when working with Godot projects, creating or modifying scenes, adding nodes, writing game scripts, or solving Godot-specific problems.
-allowed-tools:
+allowed_tools:
   - mcp__godot__*
   - Read
   - Write

@@ -1,5 +1,5 @@
 {
-  "description": "Feature-dev workflow hooks for context loading, validation, and enforcement",
+  "description": "Devloop workflow hooks for context loading, validation, progress tracking, and notifications",
   "hooks": {
     "SessionStart": [
       {
@@ -23,6 +23,38 @@
             "timeout": 15
           }
         ]
+      },
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "prompt",
+            "prompt": "You are validating a bash command. Check for safety:\n\n1. Is this a destructive command (rm -rf, drop database, etc.)?\n2. Does it contain obvious security risks?\n3. Is it appropriate for a development workflow?\n\nApprove safe commands: {\"decision\": \"approve\"}\nWarn on risky but possibly intentional: {\"decision\": \"warn\", \"message\": \"Brief concern\"}\nDeny dangerous commands: {\"decision\": \"deny\", \"message\": \"Reason\"}",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "prompt",
+            "prompt": "Analyze the bash command result:\n\n1. Did the command succeed or fail?\n2. If it failed, is this expected or unexpected?\n3. Are there warning signs in the output (deprecation warnings, permission issues, etc.)?\n\nProvide brief analysis in this format:\n{\"status\": \"success|warning|error\", \"summary\": \"One line summary\", \"action\": \"none|retry|investigate\"}",
+            "timeout": 10
+          }
+        ]
+      },
+      {
+        "matcher": "Task",
+        "hooks": [
+          {
+            "type": "prompt",
+            "prompt": "An agent task has completed. Briefly assess:\n\n1. Did the agent accomplish its goal?\n2. Were there any issues or warnings?\n3. Are follow-up actions needed?\n\nRespond with: {\"completed\": true|false, \"summary\": \"Brief outcome\", \"followUp\": \"none|action needed\"}",
+            "timeout": 15
+          }
+        ]
       }
     ],
     "Stop": [
@@ -31,8 +63,42 @@
         "hooks": [
           {
             "type": "prompt",
-            "prompt": "Before stopping, verify the work is complete:\n\n1. Were all user-requested tasks addressed?\n2. Are there any obvious unfinished items (incomplete code, missing imports, syntax errors)?\n3. If tests were written, do they appear to pass?\n\nIf work appears complete, respond: {\"decision\": \"approve\"}\n\nIf there are obvious incomplete items, respond: {\"decision\": \"block\", \"message\": \"Brief description of what seems incomplete\"}",
+            "prompt": "Before stopping, verify the work is complete:\n\n1. Were all user-requested tasks addressed?\n2. Are there any obvious unfinished items (incomplete code, missing imports, syntax errors)?\n3. If tests were written, do they appear to pass?\n4. Is the todo list up to date with completed items marked?\n\nIf work appears complete, respond: {\"decision\": \"approve\"}\n\nIf there are obvious incomplete items, respond: {\"decision\": \"block\", \"message\": \"Brief description of what seems incomplete\"}",
             "timeout": 20
+          }
+        ]
+      }
+    ],
+    "Notification": [
+      {
+        "matcher": ".*test.*fail.*|.*error.*|.*exception.*",
+        "hooks": [
+          {
+            "type": "prompt",
+            "prompt": "A potential issue was detected. Analyze the notification:\n\n1. Is this a test failure, error, or exception?\n2. What's the severity (critical, warning, info)?\n3. Should the user be alerted?\n\nRespond with: {\"severity\": \"critical|warning|info\", \"summary\": \"Brief description\", \"alert\": true|false}",
+            "timeout": 10
+          }
+        ]
+      },
+      {
+        "matcher": ".*build.*complete.*|.*deploy.*success.*",
+        "hooks": [
+          {
+            "type": "prompt",
+            "prompt": "A milestone notification was received. Summarize:\n\n{\"type\": \"milestone\", \"summary\": \"Brief description of what completed\"}",
+            "timeout": 5
+          }
+        ]
+      }
+    ],
+    "UserPromptSubmit": [
+      {
+        "matcher": ".*",
+        "hooks": [
+          {
+            "type": "prompt",
+            "prompt": "A new user prompt was submitted. Briefly classify the intent:\n\n1. Is this a new task, continuation, or question?\n2. Does it relate to the current workflow phase?\n3. Should we update the todo list?\n\nRespond with: {\"intent\": \"new_task|continuation|question|clarification\", \"updateTodos\": true|false}",
+            "timeout": 10
           }
         ]
       }
