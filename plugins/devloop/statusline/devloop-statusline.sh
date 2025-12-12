@@ -1,6 +1,6 @@
 #!/bin/bash
 # Devloop statusline for Claude Code
-# Displays: Model | Path | Git Branch | Plan Progress | Bugs | Context Usage
+# Displays: Model | Path | Git Branch | Plan Progress | Bugs
 
 set -euo pipefail
 
@@ -10,7 +10,6 @@ BOLD="\033[1m"
 DIM="\033[2m"
 CYAN="\033[36m"
 YELLOW="\033[33m"
-GREEN="\033[32m"
 RED="\033[31m"
 MAGENTA="\033[35m"
 BLUE="\033[34m"
@@ -33,44 +32,11 @@ if ! command -v jq &> /dev/null; then
     # Basic extraction without jq (limited functionality)
     CURRENT_DIR=$(echo "$input" | grep -o '"current_dir"[[:space:]]*:[[:space:]]*"[^"]*"' | head -1 | sed 's/.*:[[:space:]]*"\([^"]*\)".*/\1/' || echo "")
     PROJECT_DIR=$(echo "$input" | grep -o '"project_dir"[[:space:]]*:[[:space:]]*"[^"]*"' | head -1 | sed 's/.*:[[:space:]]*"\([^"]*\)".*/\1/' || echo "")
-    INPUT_TOKENS=$(echo "$input" | grep -o '"total_input_tokens"[[:space:]]*:[[:space:]]*[0-9]*' | head -1 | sed 's/.*:[[:space:]]*//' || echo "0")
-    OUTPUT_TOKENS=$(echo "$input" | grep -o '"total_output_tokens"[[:space:]]*:[[:space:]]*[0-9]*' | head -1 | sed 's/.*:[[:space:]]*//' || echo "0")
-    CONTEXT_SIZE=$(echo "$input" | grep -o '"context_window_size"[[:space:]]*:[[:space:]]*[0-9]*' | head -1 | sed 's/.*:[[:space:]]*//' || echo "200000")
 else
     # Extract values using jq
     MODEL_DISPLAY=$(echo "$input" | jq -r '.model.display_name // "Unknown"')
     CURRENT_DIR=$(echo "$input" | jq -r '.workspace.current_dir // ""')
     PROJECT_DIR=$(echo "$input" | jq -r '.workspace.project_dir // ""')
-    INPUT_TOKENS=$(echo "$input" | jq -r '.context_window.total_input_tokens // 0')
-    OUTPUT_TOKENS=$(echo "$input" | jq -r '.context_window.total_output_tokens // 0')
-    CONTEXT_SIZE=$(echo "$input" | jq -r '.context_window.context_window_size // 200000')
-fi
-
-# Ensure numeric values for arithmetic
-INPUT_TOKENS=${INPUT_TOKENS:-0}
-OUTPUT_TOKENS=${OUTPUT_TOKENS:-0}
-CONTEXT_SIZE=${CONTEXT_SIZE:-200000}
-
-# Handle empty or non-numeric values
-[[ "$INPUT_TOKENS" =~ ^[0-9]+$ ]] || INPUT_TOKENS=0
-[[ "$OUTPUT_TOKENS" =~ ^[0-9]+$ ]] || OUTPUT_TOKENS=0
-[[ "$CONTEXT_SIZE" =~ ^[0-9]+$ ]] || CONTEXT_SIZE=200000
-
-# Calculate context usage percentage
-TOTAL_TOKENS=$((INPUT_TOKENS + OUTPUT_TOKENS))
-if [ "$CONTEXT_SIZE" -gt 0 ]; then
-    PERCENT_USED=$((TOTAL_TOKENS * 100 / CONTEXT_SIZE))
-else
-    PERCENT_USED=0
-fi
-
-# Color context percentage based on usage
-if [ "$PERCENT_USED" -lt 50 ]; then
-    CTX_COLOR="$GREEN"
-elif [ "$PERCENT_USED" -lt 75 ]; then
-    CTX_COLOR="$YELLOW"
-else
-    CTX_COLOR="$RED"
 fi
 
 # Get shortened path (last 2 directories)
@@ -134,9 +100,6 @@ fi
 if [ -n "$BUG_COUNT" ]; then
     OUTPUT="${OUTPUT} ${DIM}|${RESET} Bugs:${BUG_COUNT}"
 fi
-
-# Context usage (always shown)
-OUTPUT="${OUTPUT} ${DIM}|${RESET} ${CTX_COLOR}${PERCENT_USED}%${RESET}"
 
 # Output the statusline
 echo -e "$OUTPUT"
