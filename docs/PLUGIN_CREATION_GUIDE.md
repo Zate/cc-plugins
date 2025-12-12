@@ -509,6 +509,197 @@ exit 0
 
 ---
 
+## Quality Standards
+
+This section defines the quality bar for plugins in this marketplace, based on lessons learned from code reviews.
+
+### Skill Quality Standards
+
+Every skill MUST include:
+
+1. **Frontmatter with name and description**:
+   ```yaml
+   ---
+   name: skill-name
+   description: Clear description including when to invoke. Use when [specific triggers].
+   ---
+   ```
+
+2. **"When NOT to Use" section** (REQUIRED):
+   ```markdown
+   ## When NOT to Use This Skill
+
+   - **Scenario 1**: Reason not to use
+   - **Scenario 2**: Reason not to use
+   - **Alternative**: Use X skill instead for Y
+   ```
+
+3. **Version notes for language-specific skills**:
+   ```markdown
+   **Python Version**: These patterns target Python 3.10+.
+   ```
+
+4. **Quick Reference table** (recommended for complex skills):
+   ```markdown
+   | Pattern | Use When | Avoid When |
+   |---------|----------|------------|
+   ```
+
+### Agent Quality Standards
+
+Every agent MUST include:
+
+1. **Clear description with invocation triggers**:
+   ```yaml
+   description: Does X. Use when Y happens or user asks Z.
+   ```
+
+2. **Appropriate model selection**:
+   | Task Type | Model |
+   |-----------|-------|
+   | Simple classification, formulaic patterns | haiku |
+   | Code generation, analysis, implementation | sonnet |
+   | Security review, complex architecture | opus |
+
+3. **Differentiation from similar agents**:
+   If overlap exists with another agent, add a comparison table:
+   ```markdown
+   ## When to Use vs. other-agent
+
+   | Scenario | Use This | Use other-agent |
+   |----------|----------|-----------------|
+   ```
+
+4. **Tools matching actual needs**:
+   - Don't include tools the agent won't use
+   - Don't omit tools the agent needs
+   - Review tool list against agent's workflow
+
+### Command Quality Standards
+
+Every command MUST include:
+
+1. **Complete frontmatter**:
+   ```yaml
+   ---
+   description: Clear description of what the command does
+   argument-hint: What arguments the command accepts (or "None required")
+   allowed-tools: [List of tools needed]
+   ---
+   ```
+
+2. **Standard section order** (recommended):
+   1. Title + Brief intro
+   2. Plan Integration (if applicable)
+   3. When to Use
+   4. When NOT to Use (if helpful)
+   5. Workflow
+   6. Output format / Examples
+   7. Model Usage (if varies)
+
+3. **Tool permissions matching workflow**:
+   - List only tools actually used in the command
+   - Include all tools referenced in the workflow
+
+### Hook & Script Quality Standards
+
+#### Shell Scripts
+
+1. **Use `set -euo pipefail`** for strict error handling
+2. **Check for dependencies** before using them:
+   ```bash
+   if ! command -v jq &> /dev/null; then
+       echo "Warning: jq not installed"
+       # fallback logic
+   fi
+   ```
+
+3. **Proper JSON escaping** - use jq when available:
+   ```bash
+   if command -v jq &> /dev/null; then
+       ESCAPED=$(printf '%s' "$VALUE" | jq -Rs '.')
+   else
+       # robust fallback
+   fi
+   ```
+
+4. **Performance optimization**:
+   - Combine multiple `find` commands into single pass
+   - Avoid unnecessary subshells
+   - Use efficient patterns for large codebases
+
+5. **Quote all variables**:
+   ```bash
+   # Good
+   if [ -d "$SOME_DIR" ]; then
+
+   # Bad
+   if [ -d $SOME_DIR ]; then
+   ```
+
+6. **Use explicit grouping for complex conditionals**:
+   ```bash
+   # Good - explicit precedence
+   if { [ -n "$VAR" ] && [ -d "$VAR" ]; } || some_command; then
+
+   # Bad - ambiguous precedence
+   if [ -n "$VAR" ] && [ -d "$VAR" ] || some_command; then
+   ```
+
+#### Hook Configuration
+
+1. **Appropriate timeouts**:
+   - SessionStart: 30s for large projects
+   - PreToolUse: 10-15s
+   - PostToolUse: 10s
+   - Stop: 20s
+
+2. **Non-blocking by default**:
+   - Hooks should not fail the operation unless critical
+   - Use warnings instead of errors for non-critical issues
+
+### Consistency Guidelines
+
+#### Formatting Standards
+
+1. **Tables**: Use aligned columns for readability
+   ```markdown
+   | Column 1 | Column 2 | Column 3 |
+   |----------|----------|----------|
+   | Value    | Value    | Value    |
+   ```
+
+2. **Code blocks**: Always specify language
+   ```markdown
+   ```bash  # Good
+   ```      # Bad - no language
+   ```
+
+3. **Section headers**: Use consistent capitalization
+   - `## When to Use` (not "When To Use" or "WHEN TO USE")
+
+#### Naming Standards
+
+1. **Files**: kebab-case (`my-command.md`, not `myCommand.md`)
+2. **Skills**: kebab-case directories (`skill-name/SKILL.md`)
+3. **Agents**: kebab-case (`code-reviewer.md`)
+4. **JSON keys**: snake_case for data, camelCase for config
+
+### Pre-Release Checklist
+
+Before releasing a plugin update:
+
+- [ ] All skills have "When NOT to Use" sections
+- [ ] All agents have appropriate model selection
+- [ ] All commands have complete frontmatter
+- [ ] Shell scripts handle missing dependencies gracefully
+- [ ] JSON output is properly escaped
+- [ ] Similar components are differentiated clearly
+- [ ] Version has been bumped appropriately
+- [ ] All changes tested locally
+
+---
+
 ## Best Practices
 
 ### General Guidelines
