@@ -7,6 +7,16 @@ description: Java and Spring best practices including dependency injection, stre
 
 Modern Java and Spring patterns for building robust applications.
 
+**Java Version**: These patterns target Java 17+ LTS. Records require Java 16+, pattern matching requires Java 21+.
+
+## When NOT to Use This Skill
+
+- **Non-Java code**: Use language-specific skills for Go, Python, TypeScript, etc.
+- **Legacy Java 8**: Different patterns for older Java versions
+- **Non-Spring projects**: Some patterns are Spring-specific
+- **Android development**: Android has its own conventions
+- **Kotlin codebase**: Kotlin has different idioms even on JVM
+
 ## Quick Reference
 
 | Pattern | Use Case | Example |

@@ -7,6 +7,16 @@ description: Python-specific best practices including type hints, async patterns
 
 Best practices for Python development.
 
+**Python Version**: These patterns target Python 3.10+. Type syntax like `X | Y` requires 3.10+, `match` statements require 3.10+.
+
+## When NOT to Use This Skill
+
+- **Non-Python code**: Use language-specific skills for Go, Java, TypeScript, etc.
+- **Python 2**: Legacy Python has different patterns (avoid if possible)
+- **Jupyter notebooks**: Data science workflows have different conventions
+- **MicroPython/CircuitPython**: Embedded Python has constraints
+- **Quick scripts**: Don't over-engineer one-off automation
+
 ## Type Hints
 
 ### Basic Types

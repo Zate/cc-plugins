@@ -7,6 +7,16 @@ description: Go-specific best practices including interfaces, error handling, go
 
 Idiomatic Go patterns and best practices for writing clean, efficient Go code.
 
+**Go Version**: These patterns target Go 1.21+. Some features (iterators, range-over-func) require Go 1.22+.
+
+## When NOT to Use This Skill
+
+- **Non-Go code**: Use language-specific skills for Python, Java, TypeScript, etc.
+- **Existing codebase style**: Match existing patterns even if not "idiomatic"
+- **Performance-critical hot paths**: Profile first, optimize with benchmarks
+- **CGo interop**: C integration has different patterns and constraints
+- **Quick scripts**: Over-engineering for one-off tooling
+
 ## Quick Reference
 
 | Pattern | Use Case | Example |

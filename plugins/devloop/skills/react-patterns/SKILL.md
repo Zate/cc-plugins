@@ -7,6 +7,16 @@ description: React and TypeScript best practices including hooks, component desi
 
 Modern React patterns and best practices for building maintainable applications.
 
+**React Version**: These patterns target React 18+. Concurrent features and automatic batching require React 18+.
+
+## When NOT to Use This Skill
+
+- **Non-React code**: Use Vue, Angular, or Svelte-specific patterns instead
+- **React Native**: Mobile has different patterns and constraints
+- **Class components**: Legacy patterns - prefer hooks for new code
+- **Server components only**: RSC has different patterns (data fetching, etc.)
+- **Simple static sites**: Over-engineering for basic HTML/CSS pages
+
 ## Quick Reference
 
 | Pattern | Use Case | Example |
