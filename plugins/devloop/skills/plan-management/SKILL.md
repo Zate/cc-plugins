@@ -7,6 +7,14 @@ description: Central reference for devloop plan file location, format, and updat
 
 **CRITICAL**: All devloop agents and commands MUST follow these conventions to ensure plan consistency.
 
+## When NOT to Use This Skill
+
+- **Quick tasks**: Simple fixes don't need formal plans - use `/devloop:quick`
+- **No existing plan**: If starting fresh, let `/devloop` create the plan
+- **Read-only agents**: Agents with `permissionMode: plan` can't update plans
+- **Bug fixes**: Use bug tracking, not the feature plan
+- **Exploratory work**: Spikes create reports, not plans
+
 ## Plan File Location
 
 The canonical plan location is:

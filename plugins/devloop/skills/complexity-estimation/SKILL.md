@@ -7,6 +7,14 @@ description: Framework for estimating task complexity using T-shirt sizing. Prov
 
 Framework for estimating software task complexity and identifying risks.
 
+## When NOT to Use This Skill
+
+- **Well-understood tasks**: Clear requirements, familiar patterns - just start
+- **Bug fixes**: The bug itself defines the scope
+- **Trivial changes**: Config updates, typo fixes, small tweaks
+- **Already estimated**: Don't re-estimate mid-implementation
+- **Spike results pending**: Wait until exploration is complete
+
 ## T-Shirt Size Reference
 
 | Size | Score Range | Characteristics |

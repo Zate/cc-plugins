@@ -7,6 +7,14 @@ description: Comprehensive deployment validation checklist and test design for p
 
 Comprehensive checklist and guidance for validating production readiness.
 
+## When NOT to Use This Skill
+
+- **Local development**: Dev environments don't need full production checks
+- **Spike/POC work**: Prototypes aren't meant for deployment
+- **Draft PRs**: Work-in-progress doesn't need deployment validation
+- **Partial features**: Behind feature flags - validate when flag is removed
+- **Already deployed**: Use monitoring/observability, not this checklist
+
 ## Quick Checklist
 
 ### Code Quality

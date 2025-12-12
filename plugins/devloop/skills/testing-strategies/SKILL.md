@@ -7,6 +7,14 @@ description: Design comprehensive test strategies including unit tests, integrat
 
 Comprehensive guidance for designing and implementing effective test strategies.
 
+## When NOT to Use This Skill
+
+- **Prototype/spike code**: Throwaway code doesn't need tests
+- **Config changes**: Environment variables, feature flags don't need unit tests
+- **Pure refactoring**: Existing tests should cover refactored code
+- **Third-party code**: Don't write tests for dependencies
+- **Generated code**: Auto-generated code is tested by the generator
+
 ## Quick Reference: Test Pyramid
 
 ```

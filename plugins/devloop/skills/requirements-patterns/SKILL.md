@@ -7,6 +7,14 @@ description: Patterns for gathering, documenting, and validating software requir
 
 Patterns and templates for effective requirements gathering and documentation.
 
+## When NOT to Use This Skill
+
+- **Clear requirements**: User already provided detailed specs - just implement
+- **Bug fixes**: The bug report IS the requirement
+- **Refactoring**: Technical improvements don't need user stories
+- **Spike/exploration**: Discovery work, not requirements gathering
+- **Trivial features**: Over-documenting simple changes wastes time
+
 ## User Story Format
 
 ### Standard Format

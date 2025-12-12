@@ -7,6 +7,14 @@ description: Guide architecture decisions with proven patterns for Go, TypeScrip
 
 Comprehensive guidance for making sound architectural decisions across different languages and frameworks.
 
+## When NOT to Use This Skill
+
+- **Simple CRUD**: Don't over-architect basic data operations
+- **Prototypes/spikes**: Architecture decisions come after validation
+- **Existing patterns**: Match codebase conventions, don't introduce new patterns
+- **Micro-optimizations**: Architecture is about structure, not performance tuning
+- **Bug fixes**: Fix the bug, don't redesign the architecture
+
 ## Quick Reference: Common Patterns
 
 | Pattern | Use When | Avoid When |

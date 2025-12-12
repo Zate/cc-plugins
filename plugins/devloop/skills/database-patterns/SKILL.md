@@ -7,6 +7,14 @@ description: Database design patterns including schema design, indexing strategi
 
 Best practices for database design, optimization, and maintenance.
 
+## When NOT to Use This Skill
+
+- **In-memory data structures**: This is for persistent storage, not runtime data
+- **File-based storage**: JSON/YAML configs don't need database patterns
+- **Existing schema**: When schema is locked and you're just querying
+- **NoSQL key-value**: Simple key-value stores have different patterns
+- **ORM handles it**: When your framework abstracts the database layer
+
 ## Schema Design Principles
 
 ### Normalization Levels

@@ -7,6 +7,14 @@ description: Best practices for designing RESTful and GraphQL APIs. Covers endpo
 
 Best practices for designing clean, consistent, and developer-friendly APIs.
 
+## When NOT to Use This Skill
+
+- **Internal functions**: This is for HTTP/GraphQL APIs, not internal code interfaces
+- **CLI design**: Command-line interfaces have different conventions
+- **Existing API patterns**: When extending an API that already has established conventions
+- **Database schema**: Use `Skill: database-patterns` instead
+- **Quick prototypes**: Over-engineering early can slow iteration
+
 ## REST API Conventions
 
 ### URL Structure

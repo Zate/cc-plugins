@@ -7,6 +7,14 @@ description: Git workflow patterns including branching strategies, commit conven
 
 Best practices for git workflows, branching, and collaboration.
 
+## When NOT to Use This Skill
+
+- **Simple commits**: Standard add/commit/push doesn't need workflow guidance
+- **Solo projects**: Team workflows are overkill for personal projects
+- **Established conventions**: Don't override existing team git practices
+- **Non-git VCS**: Different patterns for SVN, Mercurial, etc.
+- **Trivial changes**: Typo fixes don't need feature branches
+
 ## Branching Strategies
 
 ### Git Flow

@@ -7,6 +7,14 @@ description: Guide users in selecting the optimal development workflow based on 
 
 Guidance for choosing the right development workflow based on task characteristics.
 
+## When NOT to Use This Skill
+
+- **Explicit user choice**: User already specified `/devloop:quick`, `/devloop:spike`, etc.
+- **Obvious task type**: Clear feature request or bug fix - just start
+- **Continuation**: Using `/devloop:continue` to resume existing work
+- **Review/ship phases**: These are post-implementation, not workflow selection
+- **Documentation only**: Doc updates don't need full workflow analysis
+
 ## Quick Reference
 
 | Task Type | Workflow | Phases | When to Use |

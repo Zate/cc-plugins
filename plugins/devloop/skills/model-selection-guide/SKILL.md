@@ -7,6 +7,13 @@ description: Guidelines for choosing the optimal model (opus/sonnet/haiku) for d
 
 Strategic guidance for selecting the right model (opus, sonnet, or haiku) based on task characteristics.
 
+## When NOT to Use This Skill
+
+- **Simple tasks**: Don't invoke for trivial operations where haiku is obviously correct
+- **User-specified model**: When the user explicitly requests a specific model
+- **Single-step operations**: Reading a file, running a command - just use default
+- **Already in an agent**: Agents have pre-assigned models; don't second-guess unless escalating
+
 ## Quick Reference
 
 | Task Type | Model | Thinking | Rationale |

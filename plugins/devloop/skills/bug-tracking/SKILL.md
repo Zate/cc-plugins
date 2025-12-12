@@ -15,6 +15,14 @@ A lightweight, file-based bug tracking system integrated into the devloop workfl
 - Formatting issues, minor logic errors, tech debt items
 - Any issue worth remembering but not worth stopping for
 
+## When NOT to Use This Skill
+
+- **Blocking bugs**: Fix critical issues immediately, don't track them
+- **Feature requests**: These belong in a backlog, not bug tracker
+- **External issues**: Bugs in third-party dependencies - file upstream
+- **Already tracked**: Check existing bugs before creating duplicates
+- **Trivial fixes**: If it takes <2 minutes to fix, just fix it
+
 ## Bug Storage Location
 
 ```

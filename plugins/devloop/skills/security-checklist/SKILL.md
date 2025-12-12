@@ -7,6 +7,14 @@ description: Security checklist covering OWASP Top 10, authentication, authoriza
 
 Comprehensive security checklist for application development.
 
+## When NOT to Use This Skill
+
+- **Internal tools**: Lower security bar for internal-only applications
+- **Prototypes/spikes**: Don't security-audit throwaway code
+- **Static content**: Read-only sites with no user input
+- **Already audited**: Don't re-audit recently reviewed code
+- **Third-party code**: Report upstream, don't try to fix dependencies
+
 ## OWASP Top 10 (2021)
 
 ### A01: Broken Access Control
