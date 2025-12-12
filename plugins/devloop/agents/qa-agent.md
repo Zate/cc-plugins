@@ -22,7 +22,7 @@ Use qa-agent for pre-PR validation to catch issues before they reach code review
 
 tools: Bash, Read, Write, Edit, Grep, Glob, TodoWrite, Skill, AskUserQuestion, Task, WebFetch
 model: sonnet
-color: blue
+color: green
 skills: testing-strategies, deployment-readiness
 ---
 

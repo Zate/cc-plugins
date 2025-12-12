@@ -22,7 +22,7 @@ Use code-architect for structural decisions that need to align with existing pat
 
 tools: Glob, Grep, Read, NotebookRead, WebFetch, TodoWrite, WebSearch, AskUserQuestion, Skill, Task
 model: sonnet
-color: green
+color: indigo
 skills: architecture-patterns, go-patterns, react-patterns, java-patterns
 ---
 

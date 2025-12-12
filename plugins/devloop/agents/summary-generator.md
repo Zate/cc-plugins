@@ -21,7 +21,7 @@ Proactively use summary-generator for complex multi-session work.
 
 tools: Read, Write, Edit, Grep, Glob, Bash, TodoWrite
 model: haiku
-color: purple
+color: teal
 skills: plan-management
 ---
 

@@ -22,7 +22,7 @@ Even seemingly simple tasks can have hidden complexity worth identifying early.
 
 tools: Glob, Grep, Read, AskUserQuestion
 model: haiku
-color: gray
+color: blue
 skills: complexity-estimation, plan-management
 permissionMode: plan
 ---
