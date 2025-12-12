@@ -41,12 +41,34 @@ detect_language() {
         return
     fi
 
-    # Check by file extension prevalence
-    local go_count=$(find . -maxdepth 3 -name "*.go" 2>/dev/null | wc -l | tr -d ' ')
-    local ts_count=$(find . -maxdepth 3 \( -name "*.ts" -o -name "*.tsx" \) 2>/dev/null | wc -l | tr -d ' ')
-    local js_count=$(find . -maxdepth 3 \( -name "*.js" -o -name "*.jsx" \) 2>/dev/null | wc -l | tr -d ' ')
-    local java_count=$(find . -maxdepth 3 -name "*.java" 2>/dev/null | wc -l | tr -d ' ')
-    local py_count=$(find . -maxdepth 3 -name "*.py" 2>/dev/null | wc -l | tr -d ' ')
+    # Check by file extension prevalence - single find pass for performance
+    local counts
+    counts=$(find . -maxdepth 3 \( \
+        -name "*.go" -o \
+        -name "*.ts" -o -name "*.tsx" -o \
+        -name "*.js" -o -name "*.jsx" -o \
+        -name "*.java" -o \
+        -name "*.py" \
+    \) 2>/dev/null | awk -F. '{ext=tolower($NF); count[ext]++} END {
+        print "go=" (count["go"]+0)
+        print "ts=" (count["ts"]+0) + (count["tsx"]+0)
+        print "js=" (count["js"]+0) + (count["jsx"]+0)
+        print "java=" (count["java"]+0)
+        print "py=" (count["py"]+0)
+    }')
+
+    local go_count=$(echo "$counts" | grep "^go=" | cut -d= -f2)
+    local ts_count=$(echo "$counts" | grep "^ts=" | cut -d= -f2)
+    local js_count=$(echo "$counts" | grep "^js=" | cut -d= -f2)
+    local java_count=$(echo "$counts" | grep "^java=" | cut -d= -f2)
+    local py_count=$(echo "$counts" | grep "^py=" | cut -d= -f2)
+
+    # Default to 0 if empty
+    go_count=${go_count:-0}
+    ts_count=${ts_count:-0}
+    js_count=${js_count:-0}
+    java_count=${java_count:-0}
+    py_count=${py_count:-0}
 
     local max=$go_count
     local lang="go"
@@ -470,14 +492,30 @@ CONTEXT_MSG="$CONTEXT_MSG
 
 **Available Commands**: /devloop, /devloop:continue, /devloop:quick, /devloop:spike, /devloop:review, /devloop:ship, /devloop:bug, /devloop:bugs"
 
-# Escape for JSON (macOS compatible)
-ESCAPED_MSG=$(printf '%s' "$CONTEXT_MSG" | awk '{gsub(/"/, "\\\""); printf "%s\\n", $0}' | sed '$ s/\\n$//')
-
-# Output for Claude
-cat <<EOF
+# Escape for JSON - use jq if available, fallback to more robust escaping
+if command -v jq &> /dev/null; then
+    # Use jq for proper JSON encoding
+    ESCAPED_MSG=$(printf '%s' "$CONTEXT_MSG" | jq -Rs '.')
+    # Output for Claude (jq already adds quotes)
+    echo "{\"systemMessage\": ${ESCAPED_MSG}}"
+else
+    # Fallback: escape backslashes, quotes, and control characters
+    ESCAPED_MSG=$(printf '%s' "$CONTEXT_MSG" | awk '
+        BEGIN { ORS = "\\n" }
+        {
+            gsub(/\\/, "\\\\")    # Escape backslashes first
+            gsub(/"/, "\\\"")      # Escape double quotes
+            gsub(/\t/, "\\t")      # Escape tabs
+            gsub(/\r/, "\\r")      # Escape carriage returns
+            print
+        }
+    ' | sed '$ s/\\n$//')
+    # Output for Claude
+    cat <<EOF
 {
   "systemMessage": "$ESCAPED_MSG"
 }
 EOF
+fi
 
 exit 0
