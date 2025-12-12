@@ -2,9 +2,7 @@
 
 **A curated marketplace of high-quality Claude Code plugins for professional development workflows.**
 
-[![Plugins](https://img.shields.io/badge/plugins-3-blue)](.claude-plugin/marketplace.json)
-[![Claude Code](https://img.shields.io/badge/Claude%20Code-compatible-green)](https://code.claude.com)
-[![License](https://img.shields.io/badge/license-MIT-purple)](LICENSE)
+[![Plugins](https://img.shields.io/badge/plugins-3-blue)](.claude-plugin/marketplace.json) [![Claude Code](https://img.shields.io/badge/Claude%20Code-compatible-green)](https://code.claude.com) [![License](https://img.shields.io/badge/license-MIT-purple)](LICENSE)
 
 ---
 
