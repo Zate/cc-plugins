@@ -202,3 +202,5 @@ When working in this repository:
 ---
 
 **Remember**: Build plugins that solve real problems and that you would want to use yourself.
+- When we make changes, we should increment the minor, or major version numbers as required.  This will help with ensuring the plugin isnt cached.
+- When updating, only use the 3rd number in the version unless its a bigger update.  For smaller changes, go from 1.2.0 to 1.2.1 etc.

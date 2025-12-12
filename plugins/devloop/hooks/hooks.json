@@ -90,18 +90,6 @@
           }
         ]
       }
-    ],
-    "UserPromptSubmit": [
-      {
-        "matcher": ".*",
-        "hooks": [
-          {
-            "type": "prompt",
-            "prompt": "A new user prompt was submitted. Briefly classify the intent:\n\n1. Is this a new task, continuation, or question?\n2. Does it relate to the current workflow phase?\n3. Should we update the todo list?\n\nRespond with: {\"intent\": \"new_task|continuation|question|clarification\", \"updateTodos\": true|false}",
-            "timeout": 10
-          }
-        ]
-      }
     ]
   }
 }
