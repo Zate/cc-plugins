@@ -20,7 +20,7 @@ Use test-runner for validation during development.
 </example>
 
 tools: Bash, Read, Grep, Glob, TodoWrite, AskUserQuestion, Task
-model: haiku
+model: sonnet
 color: cyan
 skills: bug-tracking
 ---

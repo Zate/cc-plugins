@@ -20,7 +20,7 @@ Proactively use test-generator after implementation to ensure coverage.
 </example>
 
 tools: Read, Write, Edit, Grep, Glob, Skill, Bash, AskUserQuestion, TodoWrite, WebFetch
-model: haiku
+model: sonnet
 color: cyan
 skills: testing-strategies
 ---

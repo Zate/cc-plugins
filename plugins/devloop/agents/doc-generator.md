@@ -20,7 +20,7 @@ Use doc-generator when code changes affect public interfaces.
 </example>
 
 tools: Read, Write, Edit, Grep, Glob, TodoWrite
-model: haiku
+model: sonnet
 color: teal
 ---
 
