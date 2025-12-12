@@ -575,6 +575,24 @@ Every agent MUST include:
    - Don't omit tools the agent needs
    - Review tool list against agent's workflow
 
+5. **Color coding for visual identification**:
+   The `color` frontmatter field displays when the agent is invoked, helping users identify agent categories:
+   ```yaml
+   color: indigo
+   ```
+
+   Recommended color scheme:
+   | Color | Category | Use For |
+   |-------|----------|---------|
+   | yellow | Exploration | Discovery, investigation agents |
+   | indigo | Architecture | Design, planning agents |
+   | red | Critical | Review, security agents |
+   | cyan | Testing | Test generation, execution |
+   | green | Validation | QA, approval gate agents |
+   | blue | Requirements | Analysis, assessment agents |
+   | orange | Integration | Git, issue tracking agents |
+   | teal | Documentation | Docs, summary agents |
+
 ### Command Quality Standards
 
 Every command MUST include:

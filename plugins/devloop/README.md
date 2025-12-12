@@ -99,43 +99,56 @@ devloop provides a 12-phase workflow that mirrors how senior engineers approach 
 
 ## Agents
 
-devloop includes 16 specialized agents, each optimized for a specific task:
+devloop includes 16 specialized agents, each optimized for a specific task. Agents are color-coded by category for easy visual identification when invoked.
+
+### Color Scheme
+
+| Color | Category | Agents |
+|-------|----------|--------|
+| 🟡 yellow | Exploration | code-explorer, workflow-detector |
+| 🟣 indigo | Architecture | code-architect, task-planner |
+| 🔴 red | Critical Review | code-reviewer, security-scanner |
+| 🔵 cyan | Testing | test-generator, test-runner |
+| 🟢 green | Validation | qa-agent, dod-validator |
+| 🔵 blue | Requirements | requirements-gatherer, complexity-estimator |
+| 🟠 orange | Integration | git-manager, bug-catcher |
+| 🔷 teal | Documentation | doc-generator, summary-generator |
 
 ### Core Development
 
-| Agent | Model | Purpose |
-|-------|-------|---------|
-| `code-explorer` | sonnet | Deep codebase analysis, traces execution paths |
-| `code-architect` | sonnet | Architecture design and implementation blueprints |
-| `code-reviewer` | sonnet | Quality review with confidence-based filtering |
-| `task-planner` | sonnet | Break architecture into ordered, actionable tasks |
+| Agent | Color | Model | Purpose |
+|-------|-------|-------|---------|
+| `code-explorer` | yellow | sonnet | Deep codebase analysis, traces execution paths |
+| `code-architect` | indigo | sonnet | Architecture design and implementation blueprints |
+| `code-reviewer` | red | sonnet | Quality review with confidence-based filtering |
+| `task-planner` | indigo | sonnet | Break architecture into ordered, actionable tasks |
 
 ### Testing & Quality
 
-| Agent | Model | Purpose |
-|-------|-------|---------|
-| `test-generator` | sonnet | Generate tests following project patterns |
-| `test-runner` | sonnet | Execute tests and analyze failures |
-| `qa-agent` | sonnet | Deployment readiness validation |
-| `dod-validator` | haiku | Definition of Done checklist verification |
-| `security-scanner` | haiku | OWASP Top 10, secrets, injection vulnerabilities |
+| Agent | Color | Model | Purpose |
+|-------|-------|-------|---------|
+| `test-generator` | cyan | sonnet | Generate tests following project patterns |
+| `test-runner` | cyan | sonnet | Execute tests and analyze failures |
+| `qa-agent` | green | sonnet | Deployment readiness validation |
+| `dod-validator` | green | haiku | Definition of Done checklist verification |
+| `security-scanner` | red | haiku | OWASP Top 10, secrets, injection vulnerabilities |
 
 ### Workflow
 
-| Agent | Model | Purpose |
-|-------|-------|---------|
-| `requirements-gatherer` | sonnet | Transform vague requests into specifications |
-| `complexity-estimator` | haiku | T-shirt sizing and risk assessment |
-| `workflow-detector` | haiku | Classify task type (feature/bug/refactor) |
-| `summary-generator` | haiku | Session summaries and handoff docs |
-| `doc-generator` | sonnet | Generate and update documentation |
+| Agent | Color | Model | Purpose |
+|-------|-------|-------|---------|
+| `requirements-gatherer` | blue | sonnet | Transform vague requests into specifications |
+| `complexity-estimator` | blue | haiku | T-shirt sizing and risk assessment |
+| `workflow-detector` | yellow | haiku | Classify task type (feature/bug/refactor) |
+| `summary-generator` | teal | haiku | Session summaries and handoff docs |
+| `doc-generator` | teal | sonnet | Generate and update documentation |
 
 ### Integration
 
-| Agent | Model | Purpose |
-|-------|-------|---------|
-| `git-manager` | haiku | Commits, branches, PRs with conventional messages |
-| `bug-catcher` | haiku | Create bug reports during development |
+| Agent | Color | Model | Purpose |
+|-------|-------|-------|---------|
+| `git-manager` | orange | haiku | Commits, branches, PRs with conventional messages |
+| `bug-catcher` | orange | haiku | Create bug reports during development |
 
 ---
 
