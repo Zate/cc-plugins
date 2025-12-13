@@ -27,7 +27,7 @@ That's it. You're ready to go.
 
 | Plugin | Description | Components |
 |--------|-------------|------------|
-| **[devloop](plugins/devloop)** | Token-conscious feature development workflow with codebase refactoring analysis, 17 specialized agents, 19 skills, and strategic model selection | 17 agents, 11 commands, 19 skills |
+| **[devloop](plugins/devloop)** | Token-conscious feature development workflow with codebase refactoring analysis, 17 specialized agents, 22 skills, task completion enforcement, and strategic model selection | 17 agents, 11 commands, 22 skills |
 
 ---
 

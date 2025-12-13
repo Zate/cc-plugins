@@ -168,6 +168,81 @@ This command assumes:
    - Create PR using `gh pr create`
    - Return PR URL
 
+### Phase 5.5: Version & CHANGELOG
+
+**Goal**: Update version and CHANGELOG if warranted
+
+**Actions**:
+
+Invoke `Skill: version-management` for detailed guidance.
+
+1. **Determine if version bump is needed**:
+   ```bash
+   # Get commits since last tag
+   last_tag=$(git describe --tags --abbrev=0 2>/dev/null || echo "")
+   if [ -n "$last_tag" ]; then
+       git log ${last_tag}..HEAD --oneline
+   else
+       git log --oneline -20
+   fi
+   ```
+
+2. **Auto-detect bump type** from conventional commits:
+   - `BREAKING CHANGE:` or `!:` → MAJOR
+   - `feat:` → MINOR
+   - `fix:`, `perf:` → PATCH
+   - Other → No bump needed
+
+3. **If bump warranted**, ask user:
+   ```
+   Use AskUserQuestion:
+   - question: "Based on commits, suggest [MINOR] bump. Update version?"
+   - header: "Version"
+   - options:
+     - Accept (Bump to suggested version)
+     - Different (Let me choose the bump type)
+     - Skip (No version change)
+   ```
+
+4. **Update version files** (if bumping):
+   - Check for: `package.json`, `plugin.json`, `VERSION`, `pyproject.toml`, `Cargo.toml`
+   - Update the version field
+
+5. **Update CHANGELOG** (if exists):
+   ```bash
+   ls CHANGELOG.md 2>/dev/null && echo "CHANGELOG found"
+   ```
+
+   If CHANGELOG.md exists:
+   - Generate entry from commits since last version
+   - Group by type (Added, Fixed, Changed)
+   - Insert under new version header
+   - Follow Keep a Changelog format
+
+6. **Commit version bump** (if changes made):
+   ```
+   git add -A
+   git commit -m "chore(release): bump version to vX.Y.Z
+
+   - Bump version to X.Y.Z
+   - Update CHANGELOG.md"
+   ```
+
+7. **Optionally create tag**:
+   ```
+   Use AskUserQuestion:
+   - question: "Create git tag for vX.Y.Z?"
+   - header: "Tag"
+   - options:
+     - Yes (Create annotated tag)
+     - No (Skip tagging)
+   ```
+
+   If yes:
+   ```bash
+   git tag -a vX.Y.Z -m "Release vX.Y.Z"
+   ```
+
 ### Phase 6: Post-Ship
 
 **Goal**: Wrap up and next steps
@@ -190,6 +265,12 @@ This command assumes:
    ### PR (if created)
    - **URL**: [url]
    - **Title**: [title]
+
+   ### Version (if bumped)
+   - **Previous**: [old version]
+   - **New**: [new version]
+   - **Tag**: [tag name if created]
+   - **CHANGELOG**: [Updated/Skipped]
 
    ### Validation Results
    - DoD: [PASS/OVERRIDE]

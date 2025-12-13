@@ -163,6 +163,71 @@ Options:
 - Different approach: Suggest an alternative
 ```
 
+## Task-Linked Commits
+
+When invoked from `/devloop:continue` with task context, include task references:
+
+### Single Task Commit
+```
+<type>(<scope>): <description> - Task X.Y
+
+<body explaining what was implemented>
+
+Refs: #issue (if applicable)
+```
+
+**Example**:
+```
+feat(auth): implement JWT token generation - Task 2.1
+
+Added JWT token generation with RS256 signing.
+Includes token refresh and expiration handling.
+
+Refs: #42
+```
+
+### Grouped Tasks Commit
+```
+<type>(<scope>): <description> - Tasks X.Y, X.Z
+
+<body explaining the grouped changes>
+
+- Task X.Y: <what this task did>
+- Task X.Z: <what this task did>
+
+Refs: #issue (if applicable)
+```
+
+**Example**:
+```
+feat(auth): implement authentication flow - Tasks 2.1, 2.2
+
+Complete authentication with JWT tokens and tests.
+
+- Task 2.1: JWT token generation and validation
+- Task 2.2: Unit tests for token service
+
+Refs: #42
+```
+
+### Plan Progress Log Update
+
+After successful commit, return the commit hash for Progress Log update:
+
+```markdown
+## Commit Created
+
+**Hash**: abc1234
+**Task(s)**: Task 2.1, Task 2.2
+
+Update Progress Log with:
+- YYYY-MM-DD HH:MM: Committed Tasks 2.1, 2.2 - abc1234
+```
+
+The caller (typically `/devloop:continue`) should update `.claude/devloop-plan.md` with this information.
+
+---
+
 ## Commit Message Generation
 
 Analyze the changes to generate appropriate message:
@@ -172,6 +237,7 @@ Analyze the changes to generate appropriate message:
 3. **Determine scope** from affected files/modules
 4. **Write description** that explains the "what"
 5. **Add body** explaining the "why" if not obvious
+6. **Include task reference** if provided in prompt
 
 ### Example Messages
 

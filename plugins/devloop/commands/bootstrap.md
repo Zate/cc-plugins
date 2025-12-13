@@ -171,7 +171,40 @@ Use AskUserQuestion:
 
 [Key architectural decisions from specs, or sensible defaults]
 
-## Development Workflow
+## Development Workflow (Devloop)
+
+This project uses devloop for structured development.
+
+### Key Commands
+- `/devloop` - Start new feature (full workflow)
+- `/devloop:continue` - Resume from plan
+- `/devloop:quick` - Quick implementation for small tasks
+- `/devloop:ship` - Commit and/or PR
+
+### Task Completion Requirements
+Before marking a task complete:
+1. Implementation working
+2. Tests pass (if applicable)
+3. Plan updated (`.claude/devloop-plan.md`)
+4. Changes committed (atomic, reviewable commits)
+
+### Commit Conventions
+Use conventional commits: `type(scope): description`
+- `feat:` new feature → MINOR version bump
+- `fix:` bug fix → PATCH version bump
+- `BREAKING CHANGE:` → MAJOR version bump
+
+Include task reference: `feat(auth): add login - Task 2.1`
+
+### Versioning
+- Semantic versioning: MAJOR.MINOR.PATCH
+- Version auto-detected from commits at phase/feature completion
+- CHANGELOG updated with each release (if present)
+
+### Plan Location
+Active plan: `.claude/devloop-plan.md`
+
+## Branch Strategy
 
 - Feature branches off main
 - Tests required for new features

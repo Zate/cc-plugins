@@ -121,8 +121,70 @@ Once user confirms:
 1. **Load context**: Read files relevant to the task
 2. **Check dependencies**: Ensure prerequisite tasks are done
 3. **Execute**: Implement the task following devloop principles
-4. **Update plan**: Mark task as complete in the plan file
-5. **Report**: Summarize what was done
+4. **Report**: Summarize what was done
+
+### Step 5.5: Task Checkpoint (REQUIRED)
+
+**Before proceeding to the next task, complete this checkpoint:**
+
+Invoke `Skill: task-checkpoint` for the complete checklist.
+
+#### 1. Verify Implementation
+- [ ] Code changes implement task requirements
+- [ ] No placeholder code or TODOs left incomplete
+- [ ] Tests pass (run test suite if applicable)
+- [ ] Error handling is in place
+
+#### 2. Update Plan File
+**REQUIRED** - Update `.claude/devloop-plan.md`:
+- [ ] Mark task complete: `- [ ]` → `- [x]`
+- [ ] Add Progress Log entry: `- YYYY-MM-DD HH:MM: Completed Task X.Y - [summary]`
+- [ ] Update `**Updated**:` timestamp
+
+#### 3. Commit Decision
+
+Determine commit strategy using `Skill: atomic-commits`:
+
+```
+Use AskUserQuestion:
+- question: "Task complete. How should we handle the commit?"
+- header: "Commit"
+- options:
+  - Commit now (Create atomic commit for this task)
+  - Group with next (Continue, commit after related tasks)
+  - Review changes (Show diff before deciding)
+```
+
+**Commit now if:**
+- Task is self-contained and reviewable
+- Changes are < 300 lines
+- Unrelated to the next task
+
+**Group with next if:**
+- Next task is tightly coupled (e.g., feature + its tests)
+- Combined changes form a more coherent unit
+- Both tasks together are still < 500 lines
+
+#### 4. Execute Commit (if committing now)
+
+1. Launch git-manager agent with task context
+2. Include task reference in commit: `feat(scope): description - Task X.Y`
+3. After commit, update Progress Log with commit hash:
+   ```markdown
+   - YYYY-MM-DD HH:MM: Committed Task X.Y - abc1234
+   ```
+
+#### 5. Enforcement Check
+
+Read `.claude/devloop.local.md` for enforcement setting:
+
+**If `enforcement: strict`:**
+- Verify plan was actually updated
+- Block if not updated - do not proceed to next task
+
+**If `enforcement: advisory` (default):**
+- Warn if plan not updated
+- Allow override with user confirmation
 
 ### Step 6: Update Plan File
 
@@ -156,6 +218,74 @@ Use AskUserQuestion:
   - Stop here (Save progress and stop)
   - Review (Show updated status)
 ```
+
+### Step 7.5: Phase Completion Checkpoint
+
+**When all tasks in the current phase are marked `[x]`:**
+
+#### 1. Verify Phase Completion
+- [ ] All tasks in phase are marked complete
+- [ ] All tests pass
+- [ ] No uncommitted changes from grouped commits
+
+#### 2. Commit Any Pending Work
+If commits were grouped during the phase:
+- Phase boundary = natural commit point
+- Commit all grouped work now
+- Use format: `feat(scope): complete [phase name] - Tasks X.1-X.N`
+
+#### 3. Documentation Check
+
+Check for project documentation:
+```bash
+ls CHANGELOG.md README.md docs/
+```
+
+**If CHANGELOG.md exists:**
+```
+Use AskUserQuestion:
+- question: "Phase complete. Update CHANGELOG?"
+- header: "Changelog"
+- options:
+  - Update now (Generate entry from commits)
+  - Skip (No changelog update needed)
+  - Review commits (Show what would be added)
+```
+
+If updating, use `Skill: version-management` for CHANGELOG format.
+
+#### 4. Version Check
+
+Use `Skill: version-management` to determine if a version bump is warranted:
+
+1. Parse commits since last tag:
+   ```bash
+   git log $(git describe --tags --abbrev=0 2>/dev/null || echo "HEAD~50")..HEAD --oneline
+   ```
+
+2. Determine bump from conventional commits:
+   - `BREAKING CHANGE:` or `!:` → MAJOR
+   - `feat:` → MINOR
+   - `fix:`, `perf:` → PATCH
+   - Other → No bump
+
+3. If bump warranted:
+   ```
+   Use AskUserQuestion:
+   - question: "Based on commits, suggest [MINOR] bump (v1.2.0 → v1.3.0). Proceed?"
+   - header: "Version"
+   - options:
+     - Accept suggested (Bump to suggested version)
+     - Different bump (Let me choose)
+     - Skip versioning (No version change now)
+   ```
+
+#### 5. Update Plan for Phase Transition
+
+Update `.claude/devloop-plan.md`:
+- [ ] Update `**Current Phase**:` to next phase
+- [ ] Add Progress Log entry: `- YYYY-MM-DD HH:MM: Completed Phase X - [summary]`
+- [ ] If versioned: `- YYYY-MM-DD HH:MM: Released vX.Y.Z`
 
 ---
 

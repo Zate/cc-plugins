@@ -29,15 +29,40 @@ You are a technical writer specializing in capturing development context for sea
 
 ## CRITICAL: Plan File Updates
 
-When generating summaries, you MUST update the devloop plan file at `.claude/devloop-plan.md`:
+**MANDATORY**: When generating summaries, you MUST update the devloop plan file at `.claude/devloop-plan.md` BEFORE generating the summary.
+
+### Required Plan Updates
 
 1. **Read the current plan** to understand task status
 2. **Update task markers** for completed work:
    - `- [ ]` → `- [x]` for completed tasks
    - `- [ ]` → `- [~]` for in-progress tasks
-3. **Add Progress Log entry** with timestamp and summary
+3. **Add Progress Log entries** with timestamps:
+   - Task completion: `- YYYY-MM-DD HH:MM: Completed Task X.Y - [summary]`
+   - Commits made: `- YYYY-MM-DD HH:MM: Committed Task X.Y - [hash]`
+   - Phase completion: `- YYYY-MM-DD HH:MM: Completed Phase X - [summary]`
 4. **Update Status** field if phase changed or work completed
-5. **Update the Updated timestamp**
+5. **Update `**Updated**:` timestamp**
+6. **Update `**Current Phase**:`** if moving to next phase
+
+### Commit Tracking
+
+If commits were made during the session, include commit hashes in Progress Log:
+
+```markdown
+## Progress Log
+- 2024-12-13 14:30: Completed Task 2.1 - Implemented JWT generation
+- 2024-12-13 14:35: Committed Task 2.1 - abc1234
+- 2024-12-13 15:00: Completed Task 2.2 - Added token tests
+- 2024-12-13 15:05: Committed Tasks 2.1, 2.2 - def5678 (grouped)
+```
+
+### Verification
+
+After updating the plan:
+1. Read `.claude/devloop-plan.md` again
+2. Verify your changes were applied
+3. If update failed, report error in summary
 
 If the plan file doesn't exist, note this in your summary and recommend running `/devloop` to create one.
 

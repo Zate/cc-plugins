@@ -188,6 +188,59 @@ git status --porcelain
 git fetch origin && git status -uno
 ```
 
+#### Commit Tracking Criteria
+
+**Verify that work has been properly committed:**
+
+```bash
+# Count commits since main/base branch
+git rev-list --count origin/main..HEAD 2>/dev/null || echo "0"
+
+# Check if there are uncommitted changes
+uncommitted=$(git status --porcelain | wc -l)
+echo "Uncommitted files: $uncommitted"
+
+# Check Progress Log for commit hashes
+if [ -f ".claude/devloop-plan.md" ]; then
+    grep -c "Committed.*[a-f0-9]\{7\}" .claude/devloop-plan.md || echo "0"
+fi
+```
+
+**Commit validation rules:**
+- All completed tasks should have corresponding commit entries
+- No significant uncommitted changes (except docs being updated now)
+- Progress Log should show commit hashes for completed work
+
+If uncommitted changes exist:
+```
+Question: "There are uncommitted changes. How should we proceed?"
+Header: "Commits"
+multiSelect: false
+Options:
+- Commit first: Create commit before DoD (Recommended)
+- Intentional: These changes are intentional (explain why)
+- Review: Show me what's uncommitted
+```
+
+#### Plan Progress Validation
+
+**Verify Progress Log is up to date:**
+
+```bash
+# Check for recent Progress Log entries (within last 24 hours)
+today=$(date +%Y-%m-%d)
+grep "$today" .claude/devloop-plan.md | grep "Progress Log" -A 10 | head -10
+```
+
+Progress Log should show:
+- Task completion entries for each `[x]` task
+- Commit hashes for committed work
+- Phase transitions if applicable
+
+**If Progress Log is sparse or missing entries**, this is a warning (not blocker):
+- Recommend updating before shipping
+- Note which tasks lack Progress Log entries
+
 ### Step 3: Score Each Category
 
 For each category:
@@ -263,6 +316,8 @@ For each category:
 |-----------|--------|---------|
 | Changes committable | [Pass/Fail] | [Status] |
 | Branch up to date | [Pass/Warn] | [Commits behind] |
+| Work committed | [Pass/Warn] | [Uncommitted file count] |
+| Progress Log current | [Pass/Warn] | [Missing entries] |
 
 **Status**: [Pass/Warn/Fail]
 

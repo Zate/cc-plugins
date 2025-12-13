@@ -2,7 +2,7 @@
 
 **A complete, token-conscious feature development workflow for professional software engineering.**
 
-[![Version](https://img.shields.io/badge/version-1.6.0-blue)](./CHANGELOG.md) [![Agents](https://img.shields.io/badge/agents-17-green)](#agents) [![Skills](https://img.shields.io/badge/skills-19-purple)](#skills) [![Commands](https://img.shields.io/badge/commands-11-orange)](#commands)
+[![Version](https://img.shields.io/badge/version-1.7.0-blue)](./CHANGELOG.md) [![Agents](https://img.shields.io/badge/agents-17-green)](#agents) [![Skills](https://img.shields.io/badge/skills-22-purple)](#skills) [![Commands](https://img.shields.io/badge/commands-11-orange)](#commands)
 
 ---
 
@@ -165,7 +165,7 @@ devloop includes 17 specialized agents, each optimized for a specific task. Agen
 
 ## Skills
 
-devloop provides 19 skills—domain knowledge that Claude automatically applies when relevant:
+devloop provides 22 skills—domain knowledge that Claude automatically applies when relevant:
 
 ### Architecture & Design
 
@@ -205,6 +205,14 @@ devloop provides 19 skills—domain knowledge that Claude automatically applies 
 | `plan-management` | Plan file conventions |
 | `bug-tracking` | Bug report management |
 | `project-bootstrap` | New project setup from docs |
+
+### Task Completion
+
+| Skill | Purpose |
+|-------|---------|
+| `task-checkpoint` | Task completion checklist and verification |
+| `atomic-commits` | Commit strategy and logical grouping |
+| `version-management` | Semantic versioning and CHANGELOG management |
 
 ---
 
@@ -338,7 +346,7 @@ plugins/devloop/
 ├── hooks/                    # Event handlers
 │   ├── hooks.json
 │   └── session-start.sh
-├── skills/                   # 18 domain skills
+├── skills/                   # 22 domain skills
 │   ├── go-patterns/
 │   ├── react-patterns/
 │   ├── architecture-patterns/
@@ -352,7 +360,23 @@ plugins/devloop/
 
 ## Changelog
 
-### 1.6.0 (Current)
+### 1.7.0 (Current)
+
+- **Task Completion Enforcement**: New checkpoint system ensures tasks are properly completed
+- Added `task-checkpoint` skill for task completion verification
+- Added `atomic-commits` skill for commit strategy guidance
+- Added `version-management` skill for semantic versioning and CHANGELOG
+- Updated `/devloop:continue` with task and phase completion checkpoints
+- Updated `/devloop:ship` with version bumping and CHANGELOG generation
+- Updated `/devloop:bootstrap` to include devloop workflow in generated CLAUDE.md
+- Enhanced `git-manager` agent with task-linked commits
+- Enhanced `summary-generator` agent with commit tracking
+- Enhanced `dod-validator` agent with commit verification
+- Updated `plan-management` skill with enforcement configuration
+- Support for per-project enforcement modes (advisory/strict)
+- Auto-detection of version bumps from conventional commits
+
+### 1.6.0
 
 - Added `/devloop:analyze` command for codebase refactoring analysis
 - Added `refactor-analyzer` agent for identifying technical debt
