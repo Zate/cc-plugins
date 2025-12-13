@@ -2,7 +2,7 @@
 
 **A curated marketplace of high-quality Claude Code plugins for professional development workflows.**
 
-[![Plugins](https://img.shields.io/badge/plugins-2-blue)](.claude-plugin/marketplace.json) [![Claude Code](https://img.shields.io/badge/Claude%20Code-compatible-green)](https://code.claude.com) [![License](https://img.shields.io/badge/license-MIT-purple)](LICENSE)
+[![Plugins](https://img.shields.io/badge/plugins-1-blue)](.claude-plugin/marketplace.json) [![Claude Code](https://img.shields.io/badge/Claude%20Code-compatible-green)](https://code.claude.com) [![License](https://img.shields.io/badge/license-MIT-purple)](LICENSE)
 
 ---
 
@@ -27,20 +27,22 @@ That's it. You're ready to go.
 
 | Plugin | Description | Components |
 |--------|-------------|------------|
-| **[devloop](plugins/devloop)** | Token-conscious feature development workflow with 16 specialized agents, 17 skills, and strategic model selection | 16 agents, 9 commands, 17 skills |
-| **[code-refactor-analyzer](plugins/code-refactor-analyzer)** | Multi-language codebase analysis for refactoring opportunities with interactive vetting and actionable reports | 1 agent, 1 command, 1 skill |
+| **[devloop](plugins/devloop)** | Token-conscious feature development workflow with codebase refactoring analysis, 17 specialized agents, 19 skills, and strategic model selection | 17 agents, 11 commands, 19 skills |
 
 ---
 
 ## Featured: devloop
 
-The flagship plugin for professional software development. A complete 12-phase workflow from requirements through deployment.
+The flagship plugin for professional software development. A complete 12-phase workflow from requirements through deployment, plus codebase refactoring analysis.
 
 ```bash
 /plugin install devloop
 
 # Start a new feature
 /devloop Add user authentication with OAuth
+
+# Analyze codebase for refactoring
+/devloop:analyze
 
 # Resume work on an existing plan
 /devloop:continue
@@ -55,8 +57,9 @@ The flagship plugin for professional software development. A complete 12-phase w
 **Why devloop?**
 
 - **Token-conscious**: Strategic model selection (20% opus / 60% sonnet / 20% haiku)
+- **Refactoring Analysis**: Identify technical debt, large files, and code quality issues
 - **Language-aware**: Built-in patterns for Go, React, Java, and Python
-- **Agent-powered**: 16 specialized agents for exploration, architecture, testing, and review
+- **Agent-powered**: 17 specialized agents for exploration, architecture, testing, analysis, and review
 - **Quality-focused**: Security scanning, code review, and Definition of Done validation
 
 [Read the full devloop documentation →](plugins/devloop/README.md)

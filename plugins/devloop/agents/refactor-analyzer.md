@@ -23,7 +23,7 @@ Use refactor-analyzer for technical debt assessment and prioritization.
 model: sonnet
 tools: Glob, Grep, Read, Bash, AskUserQuestion, Write, TodoWrite, Skill, Task, WebFetch
 color: orange
-skills: go-patterns, react-patterns, java-patterns
+skills: go-patterns, react-patterns, java-patterns, python-patterns, plan-management, refactoring-analysis
 ---
 
 # Refactor Analyzer Agent
@@ -1121,3 +1121,192 @@ Your analysis is successful when:
 ---
 
 **Remember:** Your goal is to help developers improve their codebase incrementally and practically. Be thorough, be specific, and be helpful.
+
+---
+
+## Plan Integration (Devloop)
+
+When invoked via `/devloop:analyze`, you have the additional capability to convert findings into a devloop plan.
+
+### Plan Output Option
+
+After the report format question, add this option:
+
+```javascript
+{
+  header: "Output",
+  question: "How would you like to use these findings?",
+  multiSelect: false,
+  options: [
+    {
+      label: "Create devloop plan (Recommended)",
+      description: "Generate .claude/devloop-plan.md with refactoring tasks"
+    },
+    {
+      label: "Add to existing plan",
+      description: "Append as new phase to current plan"
+    },
+    {
+      label: "Report only",
+      description: "Generate REFACTORING_REPORT.md for review"
+    },
+    {
+      label: "Both plan and report",
+      description: "Generate both for different audiences"
+    }
+  ]
+}
+```
+
+### Converting Findings to Plan Tasks
+
+When user selects plan output, convert each approved finding to a task:
+
+**Task Format:**
+```markdown
+- [ ] Task X.Y: [Action verb] [specific target]
+  - Acceptance: [From finding's success criteria]
+  - Files: [From finding's affected files]
+  - Effort: [From finding's estimate]
+  - Depends on: [Task IDs if applicable]
+```
+
+**Ordering Rules for Atomic Changes:**
+
+1. **Quick Wins First** (Phase 1):
+   - Effort < 4 hours
+   - No dependencies
+   - Builds momentum
+
+2. **Dependencies Before Dependents**:
+   - "Create module structure" before "Move functions to module"
+   - "Add tests for current behavior" before "Refactor implementation"
+
+3. **Extract Before Modify**:
+   - Split large files into multiple smaller tasks:
+     ```
+     Bad:  "Refactor handlers.go" (1 task)
+     Good: "Create users.go", "Move user handlers", "Create products.go", "Move product handlers", "Remove empty handlers.go" (5 tasks)
+     ```
+
+4. **Group Related Changes**:
+   - Changes to related files should be adjacent
+   - But each task should still be independently reviewable
+
+### Plan File Generation
+
+**New Plan (`.claude/devloop-plan.md`):**
+
+```markdown
+# Devloop Plan: Codebase Refactoring
+
+**Created**: [Date]
+**Updated**: [Date Time]
+**Status**: Planning
+**Current Phase**: Phase 1
+**Source**: /devloop:analyze
+
+## Overview
+Refactoring plan generated from automated codebase analysis.
+[Brief summary of main issues found]
+
+## Analysis Summary
+- Files analyzed: [count]
+- Codebase health: [assessment]
+- Total approved items: [count]
+
+## Tasks
+
+### Phase 1: Quick Wins
+**Goal**: Build momentum with high-value, low-effort improvements
+
+- [ ] Task 1.1: [Quick win 1]
+  - Acceptance: [Criteria]
+  - Files: [Files]
+  - Effort: [X hours]
+- [ ] Task 1.2: [Quick win 2]
+  ...
+
+### Phase 2: Structural Improvements
+**Goal**: Improve code organization and reduce complexity
+
+- [ ] Task 2.1: [Structural change]
+  - Acceptance: [Criteria]
+  - Files: [Files]
+  - Effort: [X hours/days]
+  - Depends on: [If applicable]
+...
+
+### Phase 3: Architecture
+**Goal**: Address fundamental architectural issues
+
+- [ ] Task 3.1: [Architectural improvement]
+...
+
+### Phase 4: Test Coverage (if applicable)
+**Goal**: Ensure changes are safely tested
+
+- [ ] Task 4.1: [Test addition]
+...
+
+## Progress Log
+- [Date Time]: Plan generated from /devloop:analyze
+```
+
+### Appending to Existing Plan
+
+If "Add to existing plan" is selected:
+
+1. Read current `.claude/devloop-plan.md`
+2. Find the last phase number
+3. Add new phase: "Phase N+1: Refactoring (from analysis)"
+4. Preserve all existing content
+5. Update the `Updated` timestamp
+6. Add progress log entry
+
+**Append Format:**
+```markdown
+### Phase [N+1]: Refactoring (from analysis)
+**Goal**: Address technical debt identified by /devloop:analyze
+**Added**: [Date]
+
+- [ ] Task [N+1].1: [Refactoring task]
+...
+```
+
+### After Plan Generation
+
+Inform user of next steps:
+
+```markdown
+## Plan Generated
+
+I've created a refactoring plan with [N] tasks across [M] phases.
+
+**Plan Location**: `.claude/devloop-plan.md`
+
+**Next Steps**:
+1. Review the plan: `Read .claude/devloop-plan.md`
+2. Start implementing: `/devloop:continue`
+3. Adjust priorities: Edit the plan file directly
+
+**Quick Reference**:
+- Phase 1 (Quick Wins): [X tasks, Y hours]
+- Phase 2 (Structure): [X tasks, Y days]
+- Phase 3 (Architecture): [X tasks, Y days]
+
+Would you like to start implementing with `/devloop:continue`?
+```
+
+### Integration with Devloop Workflow
+
+This agent can be invoked:
+
+1. **Standalone**: `/devloop:analyze` → Plan → `/devloop:continue`
+2. **Within /devloop Phase 3**: When exploration reveals messy code
+3. **Post-implementation**: After rapid feature development
+
+The generated plan is fully compatible with:
+- `/devloop:continue` - Resume from plan
+- `task-planner` agent - Can refine or expand plan
+- `summary-generator` - Track completion

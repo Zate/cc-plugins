@@ -12,18 +12,11 @@
   },
   "plugins": [
     {
-      "name": "code-refactor-analyzer",
-      "source": "./plugins/code-refactor-analyzer",
-      "description": "Analyzes codebases for refactoring opportunities across Go, Python, TypeScript/React and other languages. Identifies large files, complex code, poor organization, and provides actionable recommendations.",
-      "category": "development",
-      "tags": ["refactoring", "code-analysis", "code-quality", "technical-debt"]
-    },
-    {
       "name": "devloop",
       "source": "./plugins/devloop",
-      "description": "Token-conscious feature development workflow with specialized agents, strategic model selection (opus/sonnet/haiku), language-specific skills, and automated hooks for Go, React, and Java projects",
+      "description": "Token-conscious feature development workflow with codebase refactoring analysis, specialized agents, strategic model selection (opus/sonnet/haiku), language-specific skills, and automated hooks for Go, React, Java, and Python projects",
       "category": "development",
-      "tags": ["feature-development", "workflow", "agents", "go", "react", "java", "model-selection"]
+      "tags": ["feature-development", "workflow", "agents", "refactoring", "code-analysis", "go", "react", "java", "python", "model-selection"]
     }
   ]
 }

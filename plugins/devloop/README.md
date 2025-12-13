@@ -2,7 +2,7 @@
 
 **A complete, token-conscious feature development workflow for professional software engineering.**
 
-[![Version](https://img.shields.io/badge/version-1.5.0-blue)](./CHANGELOG.md) [![Agents](https://img.shields.io/badge/agents-16-green)](#agents) [![Skills](https://img.shields.io/badge/skills-18-purple)](#skills) [![Commands](https://img.shields.io/badge/commands-10-orange)](#commands)
+[![Version](https://img.shields.io/badge/version-1.6.0-blue)](./CHANGELOG.md) [![Agents](https://img.shields.io/badge/agents-17-green)](#agents) [![Skills](https://img.shields.io/badge/skills-19-purple)](#skills) [![Commands](https://img.shields.io/badge/commands-11-orange)](#commands)
 
 ---
 
@@ -64,6 +64,7 @@ devloop provides a 12-phase workflow that mirrors how senior engineers approach 
 | Command | Purpose | When to Use |
 |---------|---------|-------------|
 | `/devloop` | Full feature workflow | New features, complex changes |
+| `/devloop:analyze` | Codebase refactoring analysis | Technical debt, messy code, large files |
 | `/devloop:bootstrap` | New project setup | Greenfield projects with docs |
 | `/devloop:continue` | Resume existing plan | Continuing previous work |
 | `/devloop:quick` | Fast implementation | Small, well-defined tasks |
@@ -82,6 +83,10 @@ devloop provides a 12-phase workflow that mirrors how senior engineers approach 
 
 # Full feature development
 /devloop Add rate limiting to API endpoints
+
+# Analyze codebase for refactoring
+/devloop:analyze
+/devloop:analyze Focus on the API layer
 
 # Quick fix
 /devloop:quick Fix the null pointer in UserService
@@ -103,7 +108,7 @@ devloop provides a 12-phase workflow that mirrors how senior engineers approach 
 
 ## Agents
 
-devloop includes 16 specialized agents, each optimized for a specific task. Agents are color-coded by category for easy visual identification when invoked.
+devloop includes 17 specialized agents, each optimized for a specific task. Agents are color-coded by category for easy visual identification when invoked.
 
 ### Color Scheme
 
@@ -112,6 +117,7 @@ devloop includes 16 specialized agents, each optimized for a specific task. Agen
 | 🟡 yellow | Exploration | code-explorer, workflow-detector |
 | 🟣 indigo | Architecture | code-architect, task-planner |
 | 🔴 red | Critical Review | code-reviewer, security-scanner |
+| 🟠 orange | Analysis | refactor-analyzer |
 | 🔵 cyan | Testing | test-generator, test-runner |
 | 🟢 green | Validation | qa-agent, dod-validator |
 | 🔵 blue | Requirements | requirements-gatherer, complexity-estimator |
@@ -126,6 +132,7 @@ devloop includes 16 specialized agents, each optimized for a specific task. Agen
 | `code-architect` | indigo | sonnet | Architecture design and implementation blueprints |
 | `code-reviewer` | red | sonnet | Quality review with confidence-based filtering |
 | `task-planner` | indigo | sonnet | Break architecture into ordered, actionable tasks |
+| `refactor-analyzer` | orange | sonnet | Identify refactoring opportunities and technical debt |
 
 ### Testing & Quality
 
@@ -158,7 +165,7 @@ devloop includes 16 specialized agents, each optimized for a specific task. Agen
 
 ## Skills
 
-devloop provides 18 skills—domain knowledge that Claude automatically applies when relevant:
+devloop provides 19 skills—domain knowledge that Claude automatically applies when relevant:
 
 ### Architecture & Design
 
@@ -184,6 +191,7 @@ devloop provides 18 skills—domain knowledge that Claude automatically applies 
 | `testing-strategies` | Test design and coverage |
 | `security-checklist` | OWASP, auth, data protection |
 | `deployment-readiness` | Pre-deploy validation |
+| `refactoring-analysis` | Codebase analysis for technical debt |
 
 ### Workflow
 
@@ -290,6 +298,7 @@ Configure with `/devloop:statusline`.
 | Situation | Command |
 |-----------|---------|
 | New feature, complex | `/devloop` |
+| Messy code, tech debt | `/devloop:analyze` |
 | Small fix, clear scope | `/devloop:quick` |
 | Unknown if possible | `/devloop:spike` |
 | Ready to commit | `/devloop:ship` |
@@ -343,7 +352,15 @@ plugins/devloop/
 
 ## Changelog
 
-### 1.5.0 (Current)
+### 1.6.0 (Current)
+
+- Added `/devloop:analyze` command for codebase refactoring analysis
+- Added `refactor-analyzer` agent for identifying technical debt
+- Added `refactoring-analysis` skill with analysis methodology
+- Analysis findings can be converted directly to devloop plan tasks
+- Merged functionality from retired `code-refactor-analyzer` plugin
+
+### 1.5.0
 
 - Added `/devloop:bootstrap` command for greenfield projects
 - Added `project-bootstrap` skill for CLAUDE.md best practices
