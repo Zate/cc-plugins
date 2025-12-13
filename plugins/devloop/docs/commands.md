@@ -1,6 +1,6 @@
 # Devloop Commands Reference
 
-Complete documentation for all 9 slash commands in the devloop plugin.
+Complete documentation for all 10 slash commands in the devloop plugin.
 
 ---
 
@@ -9,6 +9,7 @@ Complete documentation for all 9 slash commands in the devloop plugin.
 | Command | Purpose | Arguments |
 |---------|---------|-----------|
 | `/devloop` | Full 12-phase feature workflow | Feature description |
+| `/devloop:bootstrap` | New project setup from docs | Path(s) to PRD/specs |
 | `/devloop:continue` | Resume from existing plan | Optional step number |
 | `/devloop:quick` | Fast implementation for small tasks | Task description |
 | `/devloop:spike` | Technical exploration/POC | What to explore |
@@ -61,6 +62,47 @@ Complete documentation for all 9 slash commands in the devloop plugin.
 - Just need code review → use `/devloop:review`
 
 **Output**: Saves plan to `.claude/devloop-plan.md`
+
+---
+
+### /devloop:bootstrap
+
+**Set up a new project from documentation artifacts.**
+
+```bash
+/devloop:bootstrap ./docs/PRD.md              # From PRD
+/devloop:bootstrap ./PRD.md ./specs/api.yaml  # Multiple docs
+/devloop:bootstrap                            # Interactive mode
+```
+
+**Arguments**: Path(s) to documentation files (PRD, specs, briefs) - optional
+
+**What It Does**:
+1. Reads provided documentation (PRD, specs, design docs)
+2. Extracts project context and requirements
+3. Determines tech stack (from docs or asks user)
+4. Generates comprehensive CLAUDE.md
+5. Sets up `.claude/` directory structure
+6. Optionally creates initial development plan
+
+**When to Use**:
+- Starting a new project from scratch
+- Have PRD, specs, or design documents but no code
+- Want to set up devloop before writing any code
+- Converting business requirements into development-ready context
+
+**When NOT to Use**:
+- Existing codebase → use `/init` instead
+- No documentation → just start with `/devloop`
+- Quick prototypes → over-engineering
+
+**Supported Inputs**:
+- Markdown files (`.md`)
+- YAML/JSON specs (`.yaml`, `.yml`, `.json`)
+- Plain text (`.txt`)
+- PDF documents (`.pdf`)
+
+**Output**: Creates `CLAUDE.md` and optionally `.claude/devloop-plan.md`
 
 ---
 
@@ -350,6 +392,7 @@ Complete documentation for all 9 slash commands in the devloop plugin.
 
 | Scenario | Command |
 |----------|---------|
+| New project, have docs | `/devloop:bootstrap` |
 | New feature, complex | `/devloop` |
 | Small fix, clear scope | `/devloop:quick` |
 | Unknown if possible | `/devloop:spike` |
@@ -363,6 +406,7 @@ Complete documentation for all 9 slash commands in the devloop plugin.
 
 | Phase | Primary Command |
 |-------|-----------------|
+| Greenfield project | `/devloop:bootstrap` |
 | Starting new work | `/devloop` |
 | Resuming work | `/devloop:continue` |
 | Small tasks | `/devloop:quick` |
@@ -374,6 +418,7 @@ Complete documentation for all 9 slash commands in the devloop plugin.
 
 | Time | Command | Phases |
 |------|---------|--------|
+| 5-15 min | `/devloop:bootstrap` | 5 setup phases |
 | 10-20 min | `/devloop:quick` | 4 simplified phases |
 | 30-60 min | `/devloop:spike` | 5 exploration phases |
 | 1-4 hours | `/devloop` | 12 complete phases |

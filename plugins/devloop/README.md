@@ -2,7 +2,7 @@
 
 **A complete, token-conscious feature development workflow for professional software engineering.**
 
-[![Version](https://img.shields.io/badge/version-1.4.0-blue)](./CHANGELOG.md) [![Agents](https://img.shields.io/badge/agents-16-green)](#agents) [![Skills](https://img.shields.io/badge/skills-17-purple)](#skills) [![Commands](https://img.shields.io/badge/commands-9-orange)](#commands)
+[![Version](https://img.shields.io/badge/version-1.5.0-blue)](./CHANGELOG.md) [![Agents](https://img.shields.io/badge/agents-16-green)](#agents) [![Skills](https://img.shields.io/badge/skills-18-purple)](#skills) [![Commands](https://img.shields.io/badge/commands-10-orange)](#commands)
 
 ---
 
@@ -64,6 +64,7 @@ devloop provides a 12-phase workflow that mirrors how senior engineers approach 
 | Command | Purpose | When to Use |
 |---------|---------|-------------|
 | `/devloop` | Full feature workflow | New features, complex changes |
+| `/devloop:bootstrap` | New project setup | Greenfield projects with docs |
 | `/devloop:continue` | Resume existing plan | Continuing previous work |
 | `/devloop:quick` | Fast implementation | Small, well-defined tasks |
 | `/devloop:spike` | Technical exploration | Unknown feasibility |
@@ -76,6 +77,9 @@ devloop provides a 12-phase workflow that mirrors how senior engineers approach 
 ### Examples
 
 ```bash
+# Bootstrap a new project from documentation
+/devloop:bootstrap ./docs/PRD.md ./specs/api.yaml
+
 # Full feature development
 /devloop Add rate limiting to API endpoints
 
@@ -154,7 +158,7 @@ devloop includes 16 specialized agents, each optimized for a specific task. Agen
 
 ## Skills
 
-devloop provides 17 skills—domain knowledge that Claude automatically applies when relevant:
+devloop provides 18 skills—domain knowledge that Claude automatically applies when relevant:
 
 ### Architecture & Design
 
@@ -192,6 +196,7 @@ devloop provides 17 skills—domain knowledge that Claude automatically applies 
 | `git-workflows` | Branching, commits, releases |
 | `plan-management` | Plan file conventions |
 | `bug-tracking` | Bug report management |
+| `project-bootstrap` | New project setup from docs |
 
 ---
 
@@ -324,7 +329,7 @@ plugins/devloop/
 ├── hooks/                    # Event handlers
 │   ├── hooks.json
 │   └── session-start.sh
-├── skills/                   # 17 domain skills
+├── skills/                   # 18 domain skills
 │   ├── go-patterns/
 │   ├── react-patterns/
 │   ├── architecture-patterns/
@@ -338,7 +343,14 @@ plugins/devloop/
 
 ## Changelog
 
-### 1.4.0 (Current)
+### 1.5.0 (Current)
+
+- Added `/devloop:bootstrap` command for greenfield projects
+- Added `project-bootstrap` skill for CLAUDE.md best practices
+- Now supports starting projects from PRD/specs before any code exists
+- Comprehensive documentation in `docs/` directory
+
+### 1.4.0
 
 - Added statusline integration (`/devloop:statusline`)
 - Fixed JSON injection vulnerability in session-start hook
