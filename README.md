@@ -2,7 +2,7 @@
 
 **A curated marketplace of high-quality Claude Code plugins for professional development workflows.**
 
-[![Plugins](https://img.shields.io/badge/plugins-3-blue)](.claude-plugin/marketplace.json) [![Claude Code](https://img.shields.io/badge/Claude%20Code-compatible-green)](https://code.claude.com) [![License](https://img.shields.io/badge/license-MIT-purple)](LICENSE)
+[![Plugins](https://img.shields.io/badge/plugins-2-blue)](.claude-plugin/marketplace.json) [![Claude Code](https://img.shields.io/badge/Claude%20Code-compatible-green)](https://code.claude.com) [![License](https://img.shields.io/badge/license-MIT-purple)](LICENSE)
 
 ---
 
@@ -28,7 +28,6 @@ That's it. You're ready to go.
 | Plugin | Description | Components |
 |--------|-------------|------------|
 | **[devloop](plugins/devloop)** | Token-conscious feature development workflow with 16 specialized agents, 17 skills, and strategic model selection | 16 agents, 9 commands, 17 skills |
-| **[gd](plugins/gd)** | Comprehensive Godot game development with project setup, scene/UI templates, debugging, and performance optimization | 2 agents, 8 commands, 4 skills |
 | **[code-refactor-analyzer](plugins/code-refactor-analyzer)** | Multi-language codebase analysis for refactoring opportunities with interactive vetting and actionable reports | 1 agent, 1 command, 1 skill |
 
 ---

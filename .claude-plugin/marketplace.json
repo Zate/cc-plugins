@@ -19,13 +19,6 @@
       "tags": ["refactoring", "code-analysis", "code-quality", "technical-debt"]
     },
     {
-      "name": "gd",
-      "source": "./plugins/gd",
-      "description": "Comprehensive Godot game development plugin for Claude Code featuring project setup, scene/UI templates, debugging tools, performance optimization, and interactive planning agents. Supports 2D/3D game development with rapid iteration workflows.",
-      "category": "development",
-      "tags": ["godot", "game-development", "gamedev", "game-engine", "2d-games", "3d-games"]
-    },
-    {
       "name": "devloop",
       "source": "./plugins/devloop",
       "description": "Token-conscious feature development workflow with specialized agents, strategic model selection (opus/sonnet/haiku), language-specific skills, and automated hooks for Go, React, and Java projects",
