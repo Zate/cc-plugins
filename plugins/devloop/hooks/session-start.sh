@@ -492,12 +492,38 @@ CONTEXT_MSG="$CONTEXT_MSG
 
 **Available Commands**: /devloop, /devloop:continue, /devloop:quick, /devloop:spike, /devloop:review, /devloop:ship, /devloop:bug, /devloop:bugs"
 
+# Build brief status message for user display
+STATUS_MSG="devloop: $PROJECT_NAME"
+if [ "$LANGUAGE" != "unknown" ]; then
+    STATUS_MSG="$STATUS_MSG ($LANGUAGE"
+    if [ "$FRAMEWORK" != "none" ]; then
+        STATUS_MSG="$STATUS_MSG/$FRAMEWORK"
+    fi
+    STATUS_MSG="$STATUS_MSG)"
+fi
+if [ -n "$ACTIVE_PLAN" ]; then
+    PLAN_NAME=$(echo "$ACTIVE_PLAN" | sed 's/name=\([^,]*\).*/\1/')
+    STATUS_MSG="$STATUS_MSG | plan: $PLAN_NAME"
+fi
+
 # Escape for JSON - use jq if available, fallback to more robust escaping
+# Using hookSpecificOutput.additionalContext adds context to Claude's context
+# WITHOUT displaying it in the terminal output (unlike systemMessage which is visible)
+# systemMessage is shown to user but NOT added to context - used for brief status
 if command -v jq &> /dev/null; then
     # Use jq for proper JSON encoding
     ESCAPED_MSG=$(printf '%s' "$CONTEXT_MSG" | jq -Rs '.')
-    # Output for Claude (jq already adds quotes)
-    echo "{\"systemMessage\": ${ESCAPED_MSG}}"
+    ESCAPED_STATUS=$(printf '%s' "$STATUS_MSG" | jq -Rs '.')
+    # Output: brief status to user, full context to Claude
+    cat <<EOF
+{
+  "systemMessage": ${ESCAPED_STATUS},
+  "hookSpecificOutput": {
+    "hookEventName": "SessionStart",
+    "additionalContext": ${ESCAPED_MSG}
+  }
+}
+EOF
 else
     # Fallback: escape backslashes, quotes, and control characters
     ESCAPED_MSG=$(printf '%s' "$CONTEXT_MSG" | awk '
@@ -510,10 +536,15 @@ else
             print
         }
     ' | sed '$ s/\\n$//')
-    # Output for Claude
+    ESCAPED_STATUS=$(printf '%s' "$STATUS_MSG" | sed 's/"/\\"/g')
+    # Output: brief status to user, full context to Claude
     cat <<EOF
 {
-  "systemMessage": "$ESCAPED_MSG"
+  "systemMessage": "$ESCAPED_STATUS",
+  "hookSpecificOutput": {
+    "hookEventName": "SessionStart",
+    "additionalContext": "$ESCAPED_MSG"
+  }
 }
 EOF
 fi
