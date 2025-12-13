@@ -12,14 +12,16 @@
 # Add this marketplace
 /plugin marketplace add Zate/cc-plugins
 
-# Browse available plugins
-/plugin list
-
-# Install a plugin
+# Install the devloop plugin
 /plugin install devloop
+
+# Start building immediately
+/devloop Add user authentication with OAuth
 ```
 
 That's it. You're ready to go.
+
+**New to plugins?** Check out the [Getting Started Guide](docs/GETTING_STARTED.md) for a complete walkthrough, or grab the [Quick Reference](docs/QUICK_REFERENCE.md) cheat sheet.
 
 ---
 
@@ -186,9 +188,11 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for detailed guidelines.
 
 | Resource | Description |
 |----------|-------------|
+| [Getting Started](docs/GETTING_STARTED.md) | New user guide - start here |
+| [Quick Reference](docs/QUICK_REFERENCE.md) | Command cheat sheet |
+| [devloop Documentation](plugins/devloop/README.md) | Full devloop plugin docs |
 | [CONTRIBUTING.md](CONTRIBUTING.md) | Contribution guidelines |
-| [CLAUDE.md](CLAUDE.md) | Agent guidance for this repo |
-| [Plugin Creation Guide](docs/PLUGIN_CREATION_GUIDE.md) | Detailed plugin development guide |
+| [Plugin Creation Guide](docs/PLUGIN_CREATION_GUIDE.md) | Build your own plugins |
 | [Official Docs](https://code.claude.com/docs/en/plugins.md) | Claude Code plugin documentation |
 
 ---
