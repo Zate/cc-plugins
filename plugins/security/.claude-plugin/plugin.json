@@ -1,0 +1,38 @@
+{
+  "name": "security",
+  "version": "1.0.0",
+  "description": "Comprehensive security plugin for Claude Code providing ASVS 5.0-aligned audits and live security validation",
+  "author": "cc-plugins",
+  "homepage": "https://github.com/anthropics/cc-plugins",
+  "repository": "https://github.com/anthropics/cc-plugins",
+  "license": "MIT",
+  "keywords": [
+    "security",
+    "audit",
+    "owasp",
+    "asvs",
+    "vulnerability",
+    "code-review"
+  ],
+  "compatibility": {
+    "claude-code": ">=1.0.0"
+  },
+  "settings": {
+    "enforcement": {
+      "type": "string",
+      "default": "advisory",
+      "enum": ["strict", "warning", "advisory"],
+      "description": "Security enforcement level: strict (block), warning (alert), advisory (log)"
+    },
+    "enableLiveGuard": {
+      "type": "boolean",
+      "default": true,
+      "description": "Enable real-time security validation via hooks"
+    },
+    "auditScope": {
+      "type": "array",
+      "default": ["all"],
+      "description": "Default ASVS chapters to include in audits"
+    }
+  }
+}
