@@ -19,13 +19,22 @@ SECURITY_LOG="${PLUGIN_ROOT}/.security-scan.log"
 # Get timestamp
 TIMESTAMP=$(date '+%Y-%m-%d %H:%M:%S')
 
-# Log function
+# Log function with file locking to prevent race conditions
 log_finding() {
     local severity="$1"
     local message="$2"
     local file="${3:-unknown}"
 
-    echo "[$TIMESTAMP] [$severity] $message (file: $file)" >> "$SECURITY_LOG"
+    # Sanitize inputs to prevent log injection
+    severity="${severity//[^A-Z]/_}"
+    message="${message//[$'\n\r']/}"
+    file="${file//[$'\n\r']/}"
+
+    # Use flock for atomic append (create lock file if needed)
+    (
+        flock -w 5 200 || { echo "Warning: Could not acquire log lock" >&2; return 1; }
+        echo "[$TIMESTAMP] [$severity] $message (file: $file)" >> "$SECURITY_LOG"
+    ) 200>"${SECURITY_LOG}.lock"
 }
 
 # Quick pattern checks on stdin or files from environment
@@ -39,26 +48,29 @@ fi
 
 # Quick checks on content
 if [[ -n "$CONTENT" ]]; then
-    # Check for obvious secrets
-    if echo "$CONTENT" | grep -qE 'AKIA[A-Z0-9]{16}'; then
+    # Check for obvious secrets using fixed-string matching where possible
+    # AWS Access Key ID pattern (fixed prefix, then alphanumeric)
+    if printf '%s' "$CONTENT" | grep -qE 'AKIA[A-Z0-9]{16}'; then
         log_finding "CRITICAL" "AWS key detected in written content" "${TOOL_INPUT_FILE:-unknown}"
         echo '{"status": "warning", "message": "Security: AWS key detected"}'
         exit 0
     fi
 
-    if echo "$CONTENT" | grep -qE "BEGIN.*PRIVATE KEY"; then
+    # Private key detection using fixed string (more reliable than regex)
+    if printf '%s' "$CONTENT" | grep -qF 'BEGIN' && printf '%s' "$CONTENT" | grep -qF 'PRIVATE KEY'; then
         log_finding "CRITICAL" "Private key detected in written content" "${TOOL_INPUT_FILE:-unknown}"
         echo '{"status": "warning", "message": "Security: Private key detected"}'
         exit 0
     fi
 
-    # Check for SQL injection patterns
-    if echo "$CONTENT" | grep -qE 'f["'"'"']SELECT|f["'"'"']INSERT.*\{'; then
+    # Check for SQL injection patterns (Python f-strings)
+    # Pattern: f"SELECT or f'SELECT with variable interpolation
+    if printf '%s' "$CONTENT" | grep -qE 'f"SELECT|f'\''SELECT|f"INSERT|f'\''INSERT'; then
         log_finding "HIGH" "SQL injection pattern detected" "${TOOL_INPUT_FILE:-unknown}"
     fi
 
-    # Check for command injection
-    if echo "$CONTENT" | grep -q 'shell\s*=\s*True'; then
+    # Check for command injection (fixed string matching)
+    if printf '%s' "$CONTENT" | grep -qF 'shell=True'; then
         log_finding "MEDIUM" "shell=True usage detected" "${TOOL_INPUT_FILE:-unknown}"
     fi
 fi

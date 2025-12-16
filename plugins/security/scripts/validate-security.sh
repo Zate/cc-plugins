@@ -30,6 +30,41 @@ HIGH_COUNT=0
 MEDIUM_COUNT=0
 FINDINGS=()
 
+# Validate file path - reject paths with dangerous characters
+validate_file_path() {
+    local file="$1"
+
+    # Reject empty paths
+    [[ -z "$file" ]] && return 1
+
+    # Reject paths containing shell metacharacters or control characters
+    # Allow: alphanumeric, /, ., -, _, space (common in paths)
+    if [[ "$file" =~ [\$\`\|\;\&\<\>\!\(\)\{\}\[\]\'\"] ]] || [[ "$file" =~ [[:cntrl:]] ]]; then
+        echo "Warning: Skipping file with suspicious characters: ${file:0:50}..." >&2
+        return 1
+    fi
+
+    # Reject paths that look like command injection attempts
+    if [[ "$file" == *'$('* ]] || [[ "$file" == *'`'* ]]; then
+        echo "Warning: Skipping file with command substitution pattern" >&2
+        return 1
+    fi
+
+    return 0
+}
+
+# Helper function to escape JSON strings
+json_escape() {
+    local str="$1"
+    # Escape backslashes, quotes, and control characters for JSON
+    str="${str//\\/\\\\}"
+    str="${str//\"/\\\"}"
+    str="${str//$'\n'/\\n}"
+    str="${str//$'\r'/\\r}"
+    str="${str//$'\t'/\\t}"
+    printf '%s' "$str"
+}
+
 # Helper function to add finding
 add_finding() {
     local severity="$1"
@@ -44,12 +79,18 @@ add_finding() {
         location="$file"
     fi
 
-    FINDINGS+=("[$severity] $message ($location)")
+    # Sanitize for safe storage
+    local sanitized_msg
+    sanitized_msg=$(json_escape "$message")
+    local sanitized_loc
+    sanitized_loc=$(json_escape "$location")
+
+    FINDINGS+=("[$severity] $sanitized_msg ($sanitized_loc)")
 
     case "$severity" in
-        CRITICAL) ((CRITICAL_COUNT++)) ;;
-        HIGH) ((HIGH_COUNT++)) ;;
-        MEDIUM) ((MEDIUM_COUNT++)) ;;
+        CRITICAL) ((CRITICAL_COUNT++)) || true ;;
+        HIGH) ((HIGH_COUNT++)) || true ;;
+        MEDIUM) ((MEDIUM_COUNT++)) || true ;;
     esac
 }
 
@@ -377,17 +418,27 @@ check_debug_mode() {
 scan_file() {
     local file="$1"
 
+    # Validate file path for security (prevent command injection via filenames)
+    if ! validate_file_path "$file"; then
+        return
+    fi
+
     # Skip non-existent files
     [[ ! -f "$file" ]] && return
 
-    # Skip binary files
-    if file "$file" | grep -q 'binary'; then
-        return
+    # Skip binary files using MIME type detection (more reliable than 'file' text output)
+    local mime_type
+    if mime_type=$(file -b --mime-type -- "$file" 2>/dev/null); then
+        case "$mime_type" in
+            application/octet-stream|application/x-executable|application/x-mach-binary|image/*|audio/*|video/*)
+                return
+                ;;
+        esac
     fi
 
     # Skip test files in quick mode
     if [[ "$MODE" == "quick" ]]; then
-        if echo "$file" | grep -qiE 'test|spec|mock|fixture|__test__|\.test\.|_test\.'; then
+        if [[ "$file" =~ (test|spec|mock|fixture|__test__|\.test\.|_test\.) ]]; then
             return
         fi
     fi

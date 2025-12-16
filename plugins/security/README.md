@@ -28,8 +28,14 @@ Real-time security validation during development:
 
 | Skill | Description |
 |-------|-------------|
-| `vulnerability-patterns` | Detection patterns for 9 languages covering SQL injection, XSS, command injection, and more |
-| `remediation-library` | Fix patterns with do/don't examples for 13 vulnerability types |
+| `vulnerability-patterns` | Index to detection pattern skills |
+| `vuln-patterns-core` | Universal patterns: secrets, SQL/command injection, path traversal |
+| `vuln-patterns-languages` | Language-specific patterns: JS/TS, Python, Go, Java, Ruby, PHP |
+| `remediation-library` | Index to remediation skills |
+| `remediation-injection` | Fixes for SQL, command injection, XSS |
+| `remediation-crypto` | Fixes for weak cryptography, randomness, TLS |
+| `remediation-auth` | Fixes for credentials, JWT, deserialization, access control |
+| `remediation-config` | Fixes for path traversal, debug mode, security headers |
 | `asvs-requirements` | Full OWASP ASVS 5.0 requirements database |
 | `project-context` | Auto-detect project tech stack and applicable rules |
 | `audit-report` | Standardized security report format |
@@ -37,12 +43,12 @@ Real-time security validation during development:
 ## Installation
 
 ```bash
-/plugin install anthropics/cc-plugins:security
+/plugin install Zate/cc-plugins:security
 ```
 
 Or add the marketplace and install:
 ```bash
-/plugin marketplace add anthropics/cc-plugins
+/plugin marketplace add Zate/cc-plugins
 /plugin install security
 ```
 
@@ -328,11 +334,16 @@ Examples:
 
 ### Adding Custom Patterns
 
-Edit `skills/vulnerability-patterns/SKILL.md` to add custom detection patterns.
+For universal patterns (secrets, injection), edit `skills/vuln-patterns-core/SKILL.md`.
+For language-specific patterns, edit `skills/vuln-patterns-languages/SKILL.md`.
 
 ### Adding Custom Remediation
 
-Edit `skills/remediation-library/SKILL.md` to add fix patterns for your tech stack.
+Choose the appropriate skill based on vulnerability type:
+- `skills/remediation-injection/SKILL.md` - SQL, command injection, XSS fixes
+- `skills/remediation-crypto/SKILL.md` - Cryptography, randomness, TLS fixes
+- `skills/remediation-auth/SKILL.md` - Credentials, JWT, deserialization fixes
+- `skills/remediation-config/SKILL.md` - Path traversal, debug, headers fixes
 
 ### Custom Hooks
 
