@@ -131,11 +131,22 @@ When context is detected, map to relevant security concerns:
 
 ### Automatic Detection
 
-Run the build script to generate/update context:
+To detect project context, use the Read and Glob tools:
 
-```bash
-${CLAUDE_PLUGIN_ROOT}/scripts/build-project-context.sh
-```
+1. **Find config files** using Glob:
+   - `package.json`, `requirements.txt`, `go.mod`, `Cargo.toml`, etc.
+
+2. **Read package files** to detect frameworks:
+   - Read `package.json` for JS/TS dependencies
+   - Read `requirements.txt` or `pyproject.toml` for Python
+   - Read `go.mod` for Go modules
+
+3. **Scan for feature indicators** using Grep:
+   - Auth: `passport|jwt|bcrypt|session`
+   - Database: `prisma|sequelize|mongoose|sqlalchemy`
+   - File upload: `multer|multipart|upload`
+
+4. **Write context** to `.claude/project-context.json`
 
 ### Manual Override
 
@@ -217,6 +228,5 @@ This skill is designed to be identical to devloop's project-context skill, allow
 
 ## See Also
 
-- `scripts/build-project-context.sh` - Detection script
 - `Skill: asvs-requirements` - ASVS chapter mapping
 - `Skill: vulnerability-patterns` - Language-specific patterns

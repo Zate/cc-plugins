@@ -1,7 +1,7 @@
 ---
 description: Security plugin entry point - shows available security commands and quick status
 argument-hint: Optional subcommand (audit, guard, status)
-allowed-tools: ["Read", "Glob", "Grep", "Bash", "AskUserQuestion", "Skill"]
+allowed-tools: ["Read", "Glob", "Grep", "AskUserQuestion", "Skill"]
 ---
 
 # Security Plugin
@@ -34,15 +34,7 @@ If `$ARGUMENTS` is provided:
 
 ### Step 2: Detect Project Context
 
-Check if project context exists:
-
-```bash
-if [ -f .claude/project-context.json ]; then
-    echo "Project context found"
-else
-    echo "No project context - run detection first"
-fi
-```
+Use the Read tool to check if `.claude/project-context.json` exists.
 
 If no context exists, offer to generate it:
 
@@ -51,15 +43,12 @@ Use AskUserQuestion:
 - question: "No project context found. Generate it now?"
 - header: "Context"
 - options:
-  - Generate (Run project detection script)
+  - Generate (Detect project tech stack)
   - Skip (Continue without context)
   - Manual (I'll provide project details)
 ```
 
-If "Generate" selected, run:
-```bash
-${CLAUDE_PLUGIN_ROOT}/scripts/build-project-context.sh
-```
+If "Generate" selected, use `Skill: project-context` to detect the project's tech stack and create the context file using Read and Glob tools to analyze the project structure.
 
 ### Step 3: Show Status
 
