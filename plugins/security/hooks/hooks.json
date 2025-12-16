@@ -1,0 +1,39 @@
+{
+  "description": "Security Guard hooks for real-time security validation during code changes. Validates Write/Edit operations for common vulnerabilities and Bash commands for dangerous patterns.",
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Write|Edit|MultiEdit",
+        "hooks": [
+          {
+            "type": "prompt",
+            "prompt": "You are a Security Guard validating a code change. Apply the `vulnerability-patterns` skill to scan for security issues.\n\n## Quick Security Checks\n\nScan the code for these critical patterns:\n\n### 1. Hardcoded Secrets (CRITICAL)\n- API keys: `api_key = \"...\"`, `apiKey: '...'`\n- Passwords: `password = \"...\"`, `secret = \"...\"`\n- AWS keys: `AKIA...`\n- Private keys: `-----BEGIN PRIVATE KEY-----`\n\n### 2. SQL Injection (CRITICAL)\n- String concatenation: `\"SELECT * FROM \" + variable`\n- f-strings in SQL: `f\"SELECT ... {user_input}\"`\n- Template literals: `` `SELECT ... ${input}` ``\n\n### 3. Command Injection (CRITICAL)\n- Python: `os.system(f\"...\")`, `subprocess.run(..., shell=True)` with user input\n- Node.js: `exec(userInput)`, template literals in exec\n\n### 4. Unsafe Deserialization (CRITICAL)\n- Python: `pickle.loads()`, `yaml.load()` without SafeLoader\n- Java: `ObjectInputStream`, `readObject()`\n\n### 5. XSS Patterns (HIGH)\n- `innerHTML = userInput`\n- `dangerouslySetInnerHTML` without sanitization\n- `document.write()`\n\n### 6. Weak Cryptography (HIGH)\n- MD5/SHA1 for passwords or security: `hashlib.md5()`, `crypto.createHash('md5')`\n- ECB mode encryption\n- `Math.random()` for security tokens\n\n### 7. TLS Verification Disabled (HIGH)\n- `verify=False`, `rejectUnauthorized: false`\n- `InsecureSkipVerify: true`\n\n### 8. Debug Mode (MEDIUM)\n- `DEBUG = True` in production files\n- `debug: true` in config\n\n## Response Format\n\nIf no security issues found:\n```json\n{\"decision\": \"approve\"}\n```\n\nIf issues found:\n- CRITICAL severity: Block the change\n```json\n{\"decision\": \"block\", \"message\": \"[SECURITY] Critical: SQL injection vulnerability detected - use parameterized queries\"}\n```\n\n- HIGH severity: Warn but allow\n```json\n{\"decision\": \"warn\", \"message\": \"[SECURITY] Warning: MD5 hash detected - consider using bcrypt/argon2 for passwords\"}\n```\n\n- MEDIUM severity: Log only, approve\n```json\n{\"decision\": \"approve\", \"message\": \"[SECURITY] Note: Debug mode enabled - ensure this is not production code\"}\n```\n\n## Important\n- Only flag clear security issues with high confidence\n- Test files, examples, and documentation are usually acceptable\n- Consider file context (tests, mocks, examples often have \"vulnerable\" patterns intentionally)\n- Be concise - one issue per message, most important first",
+            "timeout": 20
+          }
+        ]
+      },
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "prompt",
+            "prompt": "You are a Security Guard validating a bash command for security risks.\n\n## Check for Dangerous Patterns\n\n### CRITICAL - Block Immediately\n- Destructive with wildcards: `rm -rf /`, `rm -rf *`, `rm -rf ~`\n- Credential exposure: Commands printing secrets, API keys, passwords\n- Reverse shells: `bash -i >& /dev/tcp/`, `nc -e /bin/sh`\n- Privilege escalation: Suspicious `sudo` usage, SUID manipulation\n- Data exfiltration: `curl | bash`, piping sensitive data to external URLs\n\n### HIGH - Warn User\n- Force flags on dangerous commands: `rm -f`, `git push --force`\n- Environment variable exposure: `env`, `printenv` (may show secrets)\n- Network scanning: `nmap`, `masscan` without clear purpose\n- Downloading executables: `curl -o | chmod +x`\n\n### MEDIUM - Allow with Note\n- Installing packages without version pinning\n- Running as root when not necessary\n- Disabling security features: `--no-verify`, `--insecure`\n\n## Response Format\n\nSafe command:\n```json\n{\"decision\": \"approve\"}\n```\n\nDangerous command:\n```json\n{\"decision\": \"block\", \"message\": \"[SECURITY] Blocked: This command could expose sensitive credentials\"}\n```\n\nRisky but possibly intentional:\n```json\n{\"decision\": \"warn\", \"message\": \"[SECURITY] Warning: Force push to main - are you sure?\"}\n```\n\n## Important\n- Standard dev commands are safe: git, npm, pip, docker, etc.\n- File operations in project directories are usually fine\n- Testing and debugging commands are expected\n- Only block genuinely dangerous operations",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Write|Edit|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash ${CLAUDE_PLUGIN_ROOT}/scripts/post-write-scan.sh",
+            "timeout": 5
+          }
+        ]
+      }
+    ]
+  }
+}
