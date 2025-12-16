@@ -2,106 +2,11 @@
   "name": "security",
   "version": "1.1.0",
   "description": "Comprehensive security plugin for Claude Code providing ASVS 5.0-aligned audits and live security validation",
-  "author": "cc-plugins",
-  "homepage": "https://github.com/anthropics/cc-plugins",
-  "repository": "https://github.com/anthropics/cc-plugins",
-  "license": "MIT",
-  "keywords": [
-    "security",
-    "audit",
-    "owasp",
-    "asvs",
-    "vulnerability",
-    "code-review",
-    "live-guard"
-  ],
-  "compatibility": {
-    "claude-code": ">=1.0.0"
+  "author": {
+    "name": "cc-plugins",
+    "email": "zate75+claude-code-plugins@gmail.com"
   },
-  "settings": {
-    "enforcement": {
-      "type": "string",
-      "default": "warning",
-      "enum": ["strict", "warning", "advisory"],
-      "description": "Default security enforcement level: strict (block on issues), warning (alert but allow), advisory (log only)"
-    },
-    "enableLiveGuard": {
-      "type": "boolean",
-      "default": true,
-      "description": "Enable real-time security validation via PreToolUse hooks"
-    },
-    "auditScope": {
-      "type": "array",
-      "default": ["all"],
-      "description": "Default ASVS chapters to include in audits (e.g., ['V1', 'V6', 'V11'] or ['all'])"
-    },
-    "auditLevel": {
-      "type": "string",
-      "default": "L2",
-      "enum": ["L1", "L2", "L3"],
-      "description": "ASVS verification level: L1 (minimum), L2 (standard), L3 (comprehensive)"
-    },
-    "ruleOverrides": {
-      "type": "object",
-      "default": {},
-      "description": "Override enforcement level per vulnerability category",
-      "properties": {
-        "injection": {
-          "type": "string",
-          "enum": ["strict", "warning", "advisory", "disabled"],
-          "description": "SQL/Command injection checks"
-        },
-        "secrets": {
-          "type": "string",
-          "enum": ["strict", "warning", "advisory", "disabled"],
-          "description": "Hardcoded secrets detection"
-        },
-        "crypto": {
-          "type": "string",
-          "enum": ["strict", "warning", "advisory", "disabled"],
-          "description": "Weak cryptography checks"
-        },
-        "xss": {
-          "type": "string",
-          "enum": ["strict", "warning", "advisory", "disabled"],
-          "description": "Cross-site scripting checks"
-        },
-        "deserialization": {
-          "type": "string",
-          "enum": ["strict", "warning", "advisory", "disabled"],
-          "description": "Unsafe deserialization checks"
-        },
-        "tls": {
-          "type": "string",
-          "enum": ["strict", "warning", "advisory", "disabled"],
-          "description": "TLS/certificate validation checks"
-        },
-        "auth": {
-          "type": "string",
-          "enum": ["strict", "warning", "advisory", "disabled"],
-          "description": "Authentication security checks"
-        }
-      }
-    },
-    "excludePaths": {
-      "type": "array",
-      "default": ["**/test/**", "**/__tests__/**", "**/spec/**", "**/fixtures/**", "**/mocks/**"],
-      "description": "Glob patterns for paths to exclude from security checks"
-    },
-    "includeLanguages": {
-      "type": "array",
-      "default": ["python", "javascript", "typescript", "java", "go", "ruby", "php"],
-      "description": "Languages to include in security checks"
-    },
-    "blockOnCritical": {
-      "type": "boolean",
-      "default": true,
-      "description": "Always block on critical severity findings regardless of enforcement mode"
-    },
-    "logFindings": {
-      "type": "boolean",
-      "default": true,
-      "description": "Log all security findings to .security-scan.log"
-    }
-  }
+  "homepage": "https://github.com/Zate/cc-plugins",
+  "repository": "https://github.com/Zate/cc-plugins",
+  "license": "MIT"
 }
