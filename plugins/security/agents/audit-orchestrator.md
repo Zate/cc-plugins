@@ -15,6 +15,7 @@ The audit-orchestrator handles the full workflow: discovery, scoping, parallel a
 allowed-tools:
   - Read
   - Write
+  - Edit
   - Glob
   - Grep
   - Task

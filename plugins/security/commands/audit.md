@@ -1,7 +1,7 @@
 ---
 description: Run a comprehensive security audit aligned with OWASP ASVS 5.0
 argument-hint: Optional audit type (quick, standard, comprehensive) or specific domain
-allowed-tools: ["Read", "Write", "Glob", "Grep", "Bash", "Task", "AskUserQuestion", "TodoWrite", "Skill"]
+allowed-tools: ["Read", "Write", "Edit", "Glob", "Grep", "Task", "AskUserQuestion", "TodoWrite", "Skill"]
 ---
 
 # Security Audit Command
