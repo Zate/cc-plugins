@@ -4,200 +4,481 @@ argument-hint: Optional audit type (quick, standard, comprehensive) or specific 
 allowed-tools: ["Read", "Write", "Edit", "Glob", "Grep", "Task", "AskUserQuestion", "TodoWrite", "Skill"]
 ---
 
-# Security Audit Command
+# Security Audit - Interactive Phased Workflow
 
-Run a comprehensive security audit of your codebase, aligned with OWASP Application Security Verification Standard (ASVS) 5.0.
+A comprehensive security audit aligned with OWASP ASVS 5.0, with visibility and control at every step.
 
-## Quick Start
+## Core Principles
 
-```bash
-/security:audit              # Interactive - asks for scope
-/security:audit quick        # Quick scan (L1 only)
-/security:audit standard     # Standard audit (L1 + L2)
-/security:audit comprehensive # Full audit (all levels)
-```
+- **Visibility**: User always sees what's happening
+- **Control**: User can adjust at each phase
+- **Progressive**: Findings build up visibly
+- **Selective**: User controls final report content
+- **Resumable**: Artifacts allow picking up where left off
 
-## Overview
+## Environment Context
 
-This command orchestrates a multi-phase security audit:
+Use the `Skill: project-context` to detect project configuration if `.claude/project-context.json` doesn't exist.
 
-1. **Discovery** - Analyzes your project's technology stack
-2. **Scoping** - Customizes the audit based on your needs
-3. **Execution** - Runs domain-specific auditors in parallel
-4. **Reporting** - Generates a comprehensive findings report
+---
 
-## Workflow
+## Phase 0: Triage
 
-### Step 1: Parse Arguments
+**Goal**: Parse arguments and determine audit scope
 
-If `$ARGUMENTS` is provided:
+**Model**: haiku
 
-| Argument | Action |
-|----------|--------|
-| `quick` | Set audit level to L1 only |
-| `standard` | Set audit level to L1 + L2 |
-| `comprehensive` or `full` | Set audit level to L1 + L2 + L3 |
-| `auth` or `authentication` | Focus on V6, V7 chapters |
-| `api` | Focus on V4, V1, V2 chapters |
-| `frontend` or `web` | Focus on V3 chapter |
-| `crypto` | Focus on V11, V12 chapters |
+**Actions**:
+1. Check if `$ARGUMENTS` is provided:
 
-If no argument provided, proceed to interactive scoping.
+   | Argument | Action |
+   |----------|--------|
+   | `quick` | Set level=L1, skip interactive scoping |
+   | `standard` | Set level=L1+L2, skip interactive scoping |
+   | `comprehensive` or `full` | Set level=L1+L2+L3, skip interactive scoping |
+   | `auth` or `authentication` | Focus on V6, V7 chapters |
+   | `api` | Focus on V4, V1, V2 chapters |
+   | `frontend` or `web` | Focus on V3 chapter |
+   | `crypto` | Focus on V11, V12 chapters |
+   | (none) | Proceed to interactive Phase 1 |
 
-### Step 2: Launch Audit Orchestrator
+2. Create initial todo list for tracking:
+   ```
+   - [ ] Phase 1: Discovery
+   - [ ] Phase 2: Planning
+   - [ ] Phase 3: Execution
+   - [ ] Phase 4: Review
+   - [ ] Phase 5: Report
+   ```
 
-Invoke the audit-orchestrator agent to handle the full audit workflow:
+3. Create `.claude/security/` directory if it doesn't exist
 
-```markdown
-Launch Task with subagent_type: audit-orchestrator
+---
 
-Provide context:
-- Project directory: current working directory
-- Requested scope: $ARGUMENTS or "interactive"
-- Output preference: summary + file
+## Phase 1: Discovery
 
-The orchestrator will:
-1. Run project discovery
-2. Conduct interactive scoping (if not specified)
-3. Spawn domain auditors
-4. Consolidate findings
-5. Generate report
-```
+**Goal**: Understand the project's technology stack
 
-### Step 3: Handle Results
+**Model**: haiku
 
-When the orchestrator completes:
+**Actions**:
+1. Mark Phase 1 as in_progress in todos
+2. Check for existing context:
+   ```
+   Use Read to check if `.claude/project-context.json` exists
+   ```
 
-1. **Display summary** in the conversation:
+3. If no context exists, invoke `Skill: project-context` to:
+   - Detect languages from config files (package.json, go.mod, etc.)
+   - Identify frameworks from dependencies
+   - Find security-relevant features (auth, uploads, payments, etc.)
+   - Write results to `.claude/project-context.json`
+
+4. Read and analyze the project context:
+   - Project type (web-api, web-app, cli, library)
+   - Languages detected
+   - Frameworks in use
+   - Security-relevant features
+
+5. Write discovery results to `.claude/security/discovery.json`:
+   ```json
+   {
+     "timestamp": "2025-12-16T...",
+     "languages": ["typescript", "go"],
+     "frameworks": ["express", "react"],
+     "features": ["authentication", "file-upload", "api"],
+     "projectType": "web-app",
+     "sourceDirectories": ["src/", "api/"]
+   }
+   ```
+
+6. **Display findings to user** - show what was detected
+
+7. **Get user confirmation**:
+   ```
+   Use AskUserQuestion:
+   - question: "I detected the following stack:\n\n**Languages**: [list]\n**Frameworks**: [list]\n**Features**: [list]\n\nIs this correct?"
+   - header: "Discovery"
+   - options:
+     - Correct (Continue to planning)
+     - Adjust (Let me add/remove features)
+     - Regenerate (Re-scan the codebase)
+   ```
+
+8. If "Adjust" selected, use AskUserQuestion with multiSelect to let user modify feature list
+
+9. Mark Phase 1 as completed
+
+---
+
+## Phase 2: Planning
+
+**Goal**: Map features to auditors and get user approval
+
+**Model**: haiku
+
+**Actions**:
+1. Mark Phase 2 as in_progress
+2. Read `.claude/security/discovery.json`
+
+3. **Map features to relevant auditors**:
+
+   | Detected Feature | Relevant Auditors |
+   |------------------|-------------------|
+   | authentication | authentication-auditor, session-auditor |
+   | oauth | oauth-auditor, token-auditor |
+   | file-upload | file-auditor |
+   | api | api-auditor, validation-auditor, encoding-auditor |
+   | database | encoding-auditor, data-protection-auditor |
+   | frontend/web | frontend-auditor |
+   | payments | crypto-auditor, logging-auditor |
+   | config/secrets | config-auditor |
+   | tls/https | communication-auditor |
+   | webrtc | webrtc-auditor |
+
+4. **Only select auditors matching detected features** - do NOT run all 17 auditors
+
+5. Write plan to `.claude/security/plan.json`:
+   ```json
+   {
+     "timestamp": "2025-12-16T...",
+     "level": "L2",
+     "selectedAuditors": [
+       {"name": "encoding-auditor", "reason": "API with database detected"},
+       {"name": "authentication-auditor", "reason": "Auth feature detected"}
+     ],
+     "excludedPaths": ["node_modules/", "vendor/"],
+     "estimatedRequirements": 150
+   }
+   ```
+
+6. **Present plan to user for approval**:
+   ```
+   Use AskUserQuestion:
+   - question: "Here's the proposed audit plan:\n\n**Level**: L2 (Standard)\n**Auditors to run** ([N] total):\n- encoding-auditor: API with database detected\n- authentication-auditor: Auth feature detected\n- [etc.]\n\n**Estimated requirements**: ~150\n\nProceed with this plan?"
+   - header: "Audit Plan"
+   - options:
+     - Proceed (Run these auditors)
+     - Customize (Let me select which to run)
+     - Quick scan (L1 only, faster)
+     - Full scan (All applicable auditors, L1+L2+L3)
+   ```
+
+7. If "Customize" selected:
+   ```
+   Use AskUserQuestion:
+   - question: "Select which auditors to run:"
+   - header: "Auditors"
+   - multiSelect: true
+   - options:
+     - [List only relevant auditors with descriptions]
+   ```
+
+8. Mark Phase 2 as completed
+
+---
+
+## Phase 3: Execution
+
+**Goal**: Run selected auditors and show progress
+
+**Model**: sonnet
+
+**Actions**:
+1. Mark Phase 3 as in_progress
+2. Read `.claude/security/plan.json`
+3. Create `.claude/security/findings/` directory
+
+4. **Update todos with each auditor as a task**:
+   ```
+   - [x] Phase 1: Discovery
+   - [x] Phase 2: Planning
+   - [~] Phase 3: Execution
+     - [ ] encoding-auditor
+     - [ ] authentication-auditor
+     - [ ] session-auditor
+   - [ ] Phase 4: Review
+   - [ ] Phase 5: Report
+   ```
+
+5. **Launch auditors in batches** using Task tool:
+   - Launch 3-4 auditors in parallel (use `run_in_background: true`)
+   - Each auditor should output structured JSON findings
+   - Provide context: project type, languages, relevant directories
+
+6. **Poll for progress** using TaskOutput:
+   - Check status periodically with `block: false`
+   - Display progress updates:
+     ```
+     ⏳ encoding-auditor: running...
+     ✓ authentication-auditor: 3 findings
+     ⏳ session-auditor: running...
+     ```
+
+7. **As each completes**, save findings to `.claude/security/findings/{auditor}.json`:
+   ```json
+   {
+     "auditor": "encoding-auditor",
+     "timestamp": "2025-12-16T...",
+     "findings": [
+       {
+         "id": "ENC-001",
+         "severity": "high",
+         "title": "SQL injection vulnerability",
+         "description": "...",
+         "file": "src/api/users.ts",
+         "line": 45,
+         "asvs": "V1.2.1",
+         "recommendation": "..."
+       }
+     ],
+     "summary": {
+       "total": 3,
+       "critical": 0,
+       "high": 1,
+       "medium": 2,
+       "low": 0
+     }
+   }
+   ```
+
+8. Mark each auditor todo as completed when done
+9. When all complete, show summary and mark Phase 3 as completed
+
+---
+
+## Phase 4: Review
+
+**Goal**: Let user review and select findings for report
+
+**Model**: sonnet
+
+**Actions**:
+1. Mark Phase 4 as in_progress
+2. Read all findings from `.claude/security/findings/*.json`
+
+3. **Aggregate and sort by severity**:
+   - Group findings: Critical → High → Medium → Low → Info
+   - Deduplicate: same file + same line + similar issue = duplicate
+   - Keep most severe classification for duplicates
+
+4. **Display findings grouped by severity** with context:
+   ```
+   ## Critical Findings (2)
+
+   ### CRIT-001: SQL Injection in user API
+   - File: src/api/users.ts:45
+   - ASVS: V1.2.1
+   - Code: `db.query("SELECT * FROM users WHERE id = " + userId)`
+
+   ### CRIT-002: ...
+
+   ## High Findings (5)
+   ...
+   ```
+
+5. **For each severity level, ask user what to include**:
+   ```
+   Use AskUserQuestion:
+   - question: "Found 2 Critical findings. Include in report?"
+   - header: "Critical"
+   - multiSelect: true
+   - options:
+     - CRIT-001: SQL Injection in user API
+     - CRIT-002: Auth bypass in admin route
+   ```
+
+   Repeat for High, Medium (combine Low/Info or skip if many)
+
+6. **Allow marking false positives**:
+   ```
+   Use AskUserQuestion:
+   - question: "Mark any as false positives?"
+   - header: "False Positives"
+   - options:
+     - No false positives (Continue)
+     - Mark some (Let me select which are false positives)
+   ```
+
+7. Write reviewed findings to `.claude/security/reviewed-findings.json`:
+   ```json
+   {
+     "timestamp": "2025-12-16T...",
+     "included": [...],
+     "excluded": [...],
+     "falsePositives": [...],
+     "summary": {
+       "total": 15,
+       "included": 12,
+       "excluded": 2,
+       "falsePositives": 1
+     }
+   }
+   ```
+
+8. Mark Phase 4 as completed
+
+---
+
+## Phase 5: Report
+
+**Goal**: Generate final audit report
+
+**Model**: sonnet
+
+**Actions**:
+1. Mark Phase 5 as in_progress
+2. Read `.claude/security/reviewed-findings.json`
+
+3. **Generate markdown report** using `Skill: audit-report`:
    ```markdown
+   # Security Audit Report
+
+   **Project**: [name]
+   **Date**: [date]
+   **Scope**: [audit type and chapters]
+   **Auditors Run**: [list]
+
+   ## Executive Summary
+
+   - **Total Findings**: [count]
+   - **Critical**: [count]
+   - **High**: [count]
+   - **Medium**: [count]
+   - **Low**: [count]
+
+   ### Risk Assessment
+   [Overall risk level and key concerns]
+
+   ## Findings
+
+   ### Critical Findings
+   [Detailed findings with ASVS mapping]
+
+   ### High Findings
+   [...]
+
+   ## Recommendations
+
+   ### Immediate Actions
+   1. [Most urgent fixes]
+
+   ### Short-term Improvements
+   1. [Important but not urgent]
+
+   ## Appendix
+
+   ### ASVS Coverage
+   [Requirements checked vs total]
+
+   ### Methodology
+   [Audit approach and limitations]
+   ```
+
+4. Write report to `.claude/security/audit-{timestamp}.md`
+
+5. **Generate machine-readable JSON** to `.claude/security/audit-{timestamp}.json`
+
+6. **Display summary in conversation**:
+   ```
    ## Security Audit Complete
 
-   **Findings**: X total (Y critical, Z high)
+   **Findings**: 15 total (2 critical, 5 high)
 
    ### Top Issues
    1. [Critical] SQL injection in /api/users - V1.2.1
-   2. [High] Missing CSRF protection - V3.5.1
-   3. [High] Weak password hashing - V6.2.4
+   2. [Critical] Auth bypass in /admin - V6.2.1
+   3. [High] Missing CSRF protection - V3.5.1
 
-   **Full report**: .claude/security-audit-2024-12-15.md
+   **Full report**: .claude/security/audit-2025-12-16.md
    ```
 
-2. **Offer next steps**:
+7. **Offer next steps**:
    ```
    Use AskUserQuestion:
    - question: "How would you like to proceed?"
    - header: "Next Steps"
    - options:
      - View full report (Open the detailed findings)
-     - Fix critical issues (Start remediation workflow)
-     - Export findings (Generate JSON/CSV export)
+     - Fix critical issues (Start remediation)
+     - Log as bugs (Track findings in /devloop:bugs)
      - Run another audit (Change scope and re-run)
+     - Done (End audit session)
    ```
 
-## Audit Types
+8. If "Log as bugs" selected, use `/devloop:bug` or bug-catcher agent for each finding
 
-### Quick Scan (L1)
-- **Duration**: Fastest
-- **Coverage**: Minimum baseline requirements
-- **Best for**: Initial assessment, CI/CD integration
-- **Requirements checked**: ~100 (L1 only)
+9. Mark Phase 5 as completed and all todos complete
 
-### Standard Audit (L1 + L2)
-- **Duration**: Moderate
-- **Coverage**: Recommended for most applications
-- **Best for**: Regular security reviews
-- **Requirements checked**: ~250 (L1 + L2)
+---
 
-### Comprehensive Audit (L1 + L2 + L3)
-- **Duration**: Longest
-- **Coverage**: Maximum rigor for critical applications
-- **Best for**: Pre-release, compliance, high-value apps
-- **Requirements checked**: ~369 (all levels)
+## Artifact Structure
 
-## Domain-Specific Audits
+All audit artifacts are saved to `.claude/security/`:
 
-Focus on specific security areas:
-
-| Focus | Chapters | Auditors |
-|-------|----------|----------|
-| `auth` | V6, V7 | authentication-auditor, session-auditor |
-| `api` | V4, V1, V2 | api-auditor, encoding-auditor, validation-auditor |
-| `frontend` | V3 | frontend-auditor |
-| `crypto` | V11, V12 | crypto-auditor, communication-auditor |
-| `config` | V13, V14 | config-auditor, data-protection-auditor |
-| `oauth` | V10, V9 | oauth-auditor, token-auditor |
-
-## Output Files
-
-The audit generates:
-
-- **Report**: `.claude/security-audit-[date].md`
-  - Executive summary
-  - Detailed findings with ASVS mapping
-  - Remediation recommendations
-  - Coverage statistics
-
-- **Machine-readable**: `.claude/security-audit-[date].json`
-  - Structured findings for tooling integration
-  - Severity scores and classifications
-  - File locations and line numbers
-
-## Integration with CI/CD
-
-For automated security scanning:
-
-```bash
-# In CI pipeline
-/security:audit quick
-
-# Check for critical/high findings
-if grep -q '"severity": "critical"' .claude/security-audit-*.json; then
-  exit 1
-fi
+```
+.claude/security/
+├── discovery.json          # Phase 1 output - detected tech stack
+├── plan.json               # Phase 2 output - selected auditors
+├── findings/               # Phase 3 output - raw auditor results
+│   ├── encoding-auditor.json
+│   ├── authentication-auditor.json
+│   └── ...
+├── reviewed-findings.json  # Phase 4 output - user-approved findings
+├── audit-2025-12-16.md     # Phase 5 output - final report
+└── audit-2025-12-16.json   # Phase 5 output - machine-readable
 ```
 
-## Model Usage
+This structure allows:
+- **Resumability**: Pick up where you left off
+- **Transparency**: Inspect any phase's output
+- **Reuse**: Re-run report without re-running auditors
+
+---
+
+## Model Selection Reference
 
 | Phase | Model | Rationale |
 |-------|-------|-----------|
-| Argument parsing | haiku | Simple logic |
-| Orchestrator | sonnet | Complex coordination |
-| Domain auditors | sonnet | Security analysis |
-| Report generation | sonnet | Comprehensive output |
+| 0. Triage | haiku | Simple argument parsing |
+| 1. Discovery | haiku | File detection is straightforward |
+| 2. Planning | haiku | Mapping features to auditors |
+| 3. Execution | sonnet | Domain auditors need deep analysis |
+| 4. Review | sonnet | Context-aware deduplication |
+| 5. Report | sonnet | Comprehensive report generation |
+
+---
+
+## Quick Reference: Arguments
+
+```bash
+/security:audit              # Interactive - full phased workflow
+/security:audit quick        # Quick scan (L1 only, minimal interaction)
+/security:audit standard     # Standard audit (L1 + L2)
+/security:audit comprehensive # Full audit (all levels)
+/security:audit auth         # Focus on authentication (V6, V7)
+/security:audit api          # Focus on API security (V1, V2, V4)
+/security:audit frontend     # Focus on frontend (V3)
+/security:audit crypto       # Focus on cryptography (V11, V12)
+```
+
+---
 
 ## Error Handling
 
-| Issue | Action |
-|-------|--------|
-| No source files | Ask user for source directory |
-| Unsupported language | Run generic checks, note limitation |
-| Auditor failure | Continue with others, note incomplete coverage |
-| No findings | Celebrate! But verify scope wasn't too narrow |
+| Issue | Resolution |
+|-------|------------|
+| No source files found | Ask user for source directory |
+| Auditor timeout | Note partial results, continue with others |
+| Unknown framework | Fall back to generic checks, note in report |
+| No findings | Celebrate! Verify scope wasn't too narrow |
+| User abandons mid-audit | Artifacts allow resume later |
 
-## Examples
-
-### Interactive Audit
-```
-User: /security:audit
-Assistant: [Launches orchestrator which asks scoping questions]
-```
-
-### Quick CI Scan
-```
-User: /security:audit quick
-Assistant: Running quick security scan (L1 requirements)...
-[Generates summary and report]
-```
-
-### Focused Auth Audit
-```
-User: /security:audit auth
-Assistant: Running authentication-focused audit (V6, V7)...
-[Detailed auth findings]
-```
+---
 
 ## See Also
 
-- `/security` - Plugin overview and status
+- `/security` - Plugin overview and quick status
 - `Skill: asvs-requirements` - ASVS 5.0 reference
-- `Agent: audit-orchestrator` - Full audit workflow details
+- `Skill: project-context` - Tech stack detection
+- `Skill: audit-report` - Report formatting

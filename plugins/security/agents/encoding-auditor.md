@@ -182,7 +182,43 @@ For each finding, report:
 
 ## Output Format
 
-Return findings in this structure:
+**IMPORTANT**: When invoked by `/security:audit`, return ONLY the JSON block below. The command will parse this and save to `.claude/security/findings/encoding-auditor.json`.
+
+```json
+{
+  "auditor": "encoding-auditor",
+  "chapter": "V1",
+  "timestamp": "2025-12-16T12:00:00Z",
+  "filesAnalyzed": 45,
+  "findings": [
+    {
+      "id": "ENC-001",
+      "severity": "critical",
+      "title": "SQL injection in user query",
+      "asvs": "V1.2.1",
+      "cwe": "CWE-89",
+      "file": "src/api/users.ts",
+      "line": 45,
+      "description": "User input concatenated directly into SQL query",
+      "code": "db.query(`SELECT * FROM users WHERE id = ${userId}`)",
+      "recommendation": "Use parameterized queries: db.query('SELECT * FROM users WHERE id = ?', [userId])"
+    }
+  ],
+  "summary": {
+    "total": 5,
+    "critical": 1,
+    "high": 2,
+    "medium": 2,
+    "low": 0
+  },
+  "safePatterns": [
+    "ORM usage with Prisma - parameterized by default",
+    "Input validation middleware on all API routes"
+  ]
+}
+```
+
+**When invoked directly** (not by the audit command), also provide a human-readable summary:
 
 ```markdown
 ## V1 Encoding & Sanitization Audit Results
@@ -202,12 +238,6 @@ Return findings in this structure:
 
 ### High Findings
 [List high findings]
-
-### Medium Findings
-[List medium findings]
-
-### Low Findings
-[List low findings]
 
 ### Verified Safe Patterns
 [List good patterns found - positive findings]

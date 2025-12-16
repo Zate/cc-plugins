@@ -161,6 +161,100 @@ This shows plugin loading, manifest validation, and component registration.
 - [Skills Documentation](https://code.claude.com/docs/en/skills/overview) - Creating skills
 - [Commands Documentation](https://code.claude.com/docs/en/commands) - Custom slash commands
 
+## Command Orchestration Pattern
+
+**Critical**: All plugins in this marketplace MUST follow the command orchestration pattern for complex workflows. This ensures consistent user experience across plugins.
+
+### The Pattern
+
+**Commands orchestrate, agents assist.**
+
+- **Commands** (slash commands) should stay in control of multi-phase workflows
+- **Agents** should be helpers for specific subtasks, NOT silent controllers
+- The user should always see progress in the main conversation
+
+### Why This Matters
+
+Bad pattern (silent agent):
+```
+User: /plugin:audit
+→ Spawns orchestrator-agent
+→ Agent runs silently for 5 minutes
+→ User thinks it hung
+→ Poor UX
+```
+
+Good pattern (command orchestrates):
+```
+User: /plugin:audit
+→ Command runs Phase 1: Discovery
+→ Shows results, asks user to confirm
+→ Command runs Phase 2: Planning
+→ Shows plan, asks user to approve
+→ Command spawns agents for subtasks
+→ Shows progress as agents complete
+→ User always sees what's happening
+```
+
+### Implementation Guidelines
+
+1. **Phased Workflow**: Break complex operations into phases
+2. **User Checkpoints**: Use `AskUserQuestion` between phases
+3. **Progress Visibility**: Track with `TodoWrite`, show status updates
+4. **Artifact State**: Save phase outputs to `.claude/` for resumability
+5. **Agent Helpers**: Spawn agents for subtasks, not as main controllers
+
+### Example Structure
+
+```markdown
+## Phase 1: Discovery
+**Goal**: Understand the context
+**Actions**:
+1. Detect relevant information
+2. Save to `.claude/plugin-name/discovery.json`
+3. Display findings to user
+4. AskUserQuestion: Confirm/adjust
+
+## Phase 2: Planning
+**Goal**: Propose an action plan
+**Actions**:
+1. Read discovery.json
+2. Generate plan
+3. Save to `.claude/plugin-name/plan.json`
+4. AskUserQuestion: Approve/customize
+
+## Phase 3: Execution
+**Goal**: Execute the plan with visibility
+**Actions**:
+1. Read plan.json
+2. Launch helper agents in parallel (run_in_background)
+3. Poll TaskOutput for progress
+4. Display status: "✓ task-a complete, ⏳ task-b running"
+5. Save results to `.claude/plugin-name/results/`
+
+## Phase 4: Review
+**Goal**: Let user review and select results
+**Actions**:
+1. Read all results
+2. Display grouped by category
+3. AskUserQuestion: Include/exclude items
+4. Save reviewed output
+
+## Phase 5: Report
+**Goal**: Generate final output
+**Actions**:
+1. Read reviewed output
+2. Generate report/summary
+3. Display in conversation
+4. AskUserQuestion: Next steps
+```
+
+### Reference Implementation
+
+See these plugins for the pattern in action:
+- `plugins/devloop/commands/devloop.md` - Full 12-phase feature workflow
+- `plugins/security/commands/audit.md` - 5-phase security audit
+
 ## Key Principles
 
 ### For All Plugins

@@ -241,7 +241,43 @@ For each finding, report:
 
 ## Output Format
 
-Return findings in this structure:
+**IMPORTANT**: When invoked by `/security:audit`, return ONLY the JSON block below. The command will parse this and save to `.claude/security/findings/authentication-auditor.json`.
+
+```json
+{
+  "auditor": "authentication-auditor",
+  "chapter": "V6",
+  "timestamp": "2025-12-16T12:00:00Z",
+  "filesAnalyzed": 28,
+  "findings": [
+    {
+      "id": "AUTH-001",
+      "severity": "high",
+      "title": "Weak password hashing algorithm",
+      "asvs": "V6.2.4",
+      "cwe": "CWE-916",
+      "file": "src/auth/password.ts",
+      "line": 23,
+      "description": "MD5 used for password hashing instead of bcrypt/Argon2",
+      "code": "const hash = crypto.createHash('md5').update(password).digest('hex')",
+      "recommendation": "Use bcrypt with cost factor 10+ or Argon2id"
+    }
+  ],
+  "summary": {
+    "total": 4,
+    "critical": 0,
+    "high": 2,
+    "medium": 1,
+    "low": 1
+  },
+  "safePatterns": [
+    "Account lockout after 5 failed attempts",
+    "Password minimum length 12 characters enforced"
+  ]
+}
+```
+
+**When invoked directly** (not by the audit command), also provide a human-readable summary:
 
 ```markdown
 ## V6 Authentication Audit Results
@@ -253,22 +289,13 @@ Return findings in this structure:
 - Password Security: [count]
 - Credential Storage: [count]
 - Account Lockout: [count]
-- Credential Recovery: [count]
 - Multi-factor Auth: [count]
-- Session Handling: [count]
-- Identity Provider: [count]
 
 ### Critical Findings
 [List critical findings]
 
 ### High Findings
 [List high findings]
-
-### Medium Findings
-[List medium findings]
-
-### Low Findings
-[List low findings]
 
 ### Verified Safe Patterns
 [List good patterns found - positive findings]
