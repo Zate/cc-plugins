@@ -17,6 +17,13 @@
       "description": "Token-conscious feature development workflow with codebase refactoring analysis, specialized agents, strategic model selection (opus/sonnet/haiku), language-specific skills, and automated hooks for Go, React, Java, and Python projects",
       "category": "development",
       "tags": ["feature-development", "workflow", "agents", "refactoring", "code-analysis", "go", "react", "java", "python", "model-selection"]
+    },
+    {
+      "name": "security",
+      "source": "./plugins/security",
+      "description": "Comprehensive security plugin providing OWASP ASVS 5.0-aligned audits via /security:audit command with 17 domain-specific auditor agents, plus live security guard hooks for real-time vulnerability detection during code changes",
+      "category": "security",
+      "tags": ["security", "audit", "owasp", "asvs", "vulnerability", "code-review", "live-guard", "hooks", "devsecops"]
     }
   ]
 }
