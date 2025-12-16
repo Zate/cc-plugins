@@ -12,9 +12,11 @@ The crypto-auditor performs read-only analysis of cryptographic implementations 
 </commentary>
 </example>
 
-tools: Read, Glob, Grep, Bash
+allowed-tools:
+  - Read
+  - Glob
+  - Grep
 model: sonnet
-permissionMode: plan
 color: cyan
 skills: asvs-requirements, vulnerability-patterns
 ---

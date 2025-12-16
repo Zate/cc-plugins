@@ -12,9 +12,11 @@ The authorization-auditor performs read-only analysis of access control patterns
 </commentary>
 </example>
 
-tools: Read, Glob, Grep, Bash
+allowed-tools:
+  - Read
+  - Glob
+  - Grep
 model: sonnet
-permissionMode: plan
 color: yellow
 skills: asvs-requirements, vulnerability-patterns
 ---

@@ -12,9 +12,11 @@ The config-auditor performs read-only analysis of secrets management and configu
 </commentary>
 </example>
 
-tools: Read, Glob, Grep, Bash
+allowed-tools:
+  - Read
+  - Glob
+  - Grep
 model: sonnet
-permissionMode: plan
 color: green
 skills: asvs-requirements, vulnerability-patterns
 ---

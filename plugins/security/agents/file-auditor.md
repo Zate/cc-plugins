@@ -12,9 +12,11 @@ The file-auditor performs read-only analysis of file upload, storage, and downlo
 </commentary>
 </example>
 
-tools: Read, Glob, Grep, Bash
+allowed-tools:
+  - Read
+  - Glob
+  - Grep
 model: sonnet
-permissionMode: plan
 color: green
 skills: asvs-requirements, vulnerability-patterns
 ---

@@ -12,9 +12,11 @@ The session-auditor performs read-only analysis of session handling and lifecycl
 </commentary>
 </example>
 
-tools: Read, Glob, Grep, Bash
+allowed-tools:
+  - Read
+  - Glob
+  - Grep
 model: sonnet
-permissionMode: plan
 color: teal
 skills: asvs-requirements, vulnerability-patterns
 ---

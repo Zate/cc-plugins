@@ -12,9 +12,11 @@ The token-auditor performs read-only analysis of JWT implementation and token ha
 </commentary>
 </example>
 
-tools: Read, Glob, Grep, Bash
+allowed-tools:
+  - Read
+  - Glob
+  - Grep
 model: sonnet
-permissionMode: plan
 color: indigo
 skills: asvs-requirements, vulnerability-patterns
 ---

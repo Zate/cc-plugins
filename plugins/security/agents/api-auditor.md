@@ -12,9 +12,11 @@ The api-auditor performs read-only analysis of API endpoints, GraphQL configurat
 </commentary>
 </example>
 
-tools: Read, Glob, Grep, Bash
+allowed-tools:
+  - Read
+  - Glob
+  - Grep
 model: sonnet
-permissionMode: plan
 color: purple
 skills: asvs-requirements, vulnerability-patterns
 ---

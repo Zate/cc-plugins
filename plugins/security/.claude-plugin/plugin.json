@@ -1,6 +1,6 @@
 {
   "name": "security",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "Comprehensive security plugin for Claude Code providing ASVS 5.0-aligned audits and live security validation",
   "author": {
     "name": "cc-plugins",

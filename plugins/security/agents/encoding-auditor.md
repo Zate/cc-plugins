@@ -12,9 +12,11 @@ The encoding-auditor performs read-only analysis of code patterns that could lea
 </commentary>
 </example>
 
-tools: Read, Glob, Grep, Bash
+allowed-tools:
+  - Read
+  - Glob
+  - Grep
 model: sonnet
-permissionMode: plan
 color: red
 skills: asvs-requirements, vulnerability-patterns
 ---

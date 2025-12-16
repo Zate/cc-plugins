@@ -12,9 +12,11 @@ The authentication-auditor performs read-only analysis of authentication mechani
 </commentary>
 </example>
 
-tools: Read, Glob, Grep, Bash
+allowed-tools:
+  - Read
+  - Glob
+  - Grep
 model: sonnet
-permissionMode: plan
 color: blue
 skills: asvs-requirements, vulnerability-patterns
 ---

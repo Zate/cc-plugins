@@ -12,7 +12,15 @@ The audit-orchestrator handles the full workflow: discovery, scoping, parallel a
 </commentary>
 </example>
 
-tools: Read, Glob, Grep, Bash, Task, AskUserQuestion, TodoWrite, Skill
+allowed-tools:
+  - Read
+  - Write
+  - Glob
+  - Grep
+  - Task
+  - AskUserQuestion
+  - TodoWrite
+  - Skill
 model: sonnet
 color: purple
 skills: project-context, asvs-requirements, audit-report
@@ -39,16 +47,9 @@ The audit follows these phases:
 ### Actions
 
 1. **Check for existing project context**:
-   ```bash
-   cat .claude/project-context.json 2>/dev/null
-   ```
+   Use the Read tool to read `.claude/project-context.json`. If it doesn't exist, use the `Skill: project-context` to detect the tech stack.
 
-2. **If no context exists**, generate it:
-   ```bash
-   ${CLAUDE_PLUGIN_ROOT}/scripts/build-project-context.sh
-   ```
-
-3. **Read and analyze the project context**:
+2. **Read and analyze the project context**:
    - Project type (web-api, web-app, cli, library, mobile)
    - Languages detected
    - Frameworks in use
@@ -146,42 +147,71 @@ Based on responses, build the audit scope:
    | V16 | logging-auditor |
    | V17 | webrtc-auditor |
 
-3. **Create audit progress tracking** with TodoWrite:
-   - List each auditor as a todo item
+3. **Present audit plan to user** - CRITICAL: Always show what will be audited:
+
+```
+Use AskUserQuestion:
+- question: "I've analyzed your project. Here's the proposed audit plan:\n\n**Detected Stack**: [languages, frameworks]\n**Relevant Auditors**: [list only those matching detected features]\n**Estimated Scope**: [X auditors, covering Y requirements]\n\nProceed with this audit?"
+- header: "Audit Plan"
+- options:
+  - Proceed (Run these auditors)
+  - Customize (Let me select which to run)
+  - Quick scan (Run only critical checks)
+```
+
+If user selects "Customize", show checkboxes for each auditor:
+
+```
+Use AskUserQuestion:
+- question: "Select which auditors to run:"
+- header: "Auditors"
+- multiSelect: true
+- options:
+  - [Only list auditors relevant to detected tech stack]
+```
+
+4. **Create audit progress tracking** with TodoWrite:
+   - List each selected auditor as a todo item
    - Track overall audit progress
 
 ---
 
 ## Phase 4: Execution
 
-**Goal**: Run domain auditors in parallel for efficiency.
+**Goal**: Run ONLY the selected/relevant domain auditors.
+
+### Smart Auditor Selection
+
+**IMPORTANT**: Do NOT run all 17 auditors. Only run auditors that match:
+- Detected languages/frameworks
+- User-selected scope
+- Actually relevant code patterns
+
+For example:
+- No frontend code? Skip frontend-auditor
+- No OAuth usage? Skip oauth-auditor
+- No WebRTC? Skip webrtc-auditor
+- CLI tool with no web? Skip V3, V4, V17
 
 ### Parallel Execution Strategy
 
-Launch multiple auditors concurrently using the Task tool:
+Launch selected auditors concurrently using the Task tool:
 
 ```markdown
 **Important**: All domain auditors are READ-ONLY. They analyze code but do not modify it. This makes parallel execution safe.
 
-Launch auditors in batches based on scope:
+Only launch auditors the user approved. Example for a typical web API:
 
-Batch 1 (Core Security):
-- encoding-auditor (V1)
-- validation-auditor (V2)
-- authentication-auditor (V6)
-- authorization-auditor (V8)
+Batch 1 (Core - if applicable):
+- encoding-auditor (V1) - if database code exists
+- validation-auditor (V2) - if input handling exists
+- authentication-auditor (V6) - if auth code exists
 
-Batch 2 (Web & API):
-- frontend-auditor (V3)
-- api-auditor (V4)
-- session-auditor (V7)
-- token-auditor (V9)
+Batch 2 (Web/API - if applicable):
+- api-auditor (V4) - if API endpoints exist
+- session-auditor (V7) - if session handling exists
 
-Batch 3 (Infrastructure):
-- crypto-auditor (V11)
-- communication-auditor (V12)
-- config-auditor (V13)
-- logging-auditor (V16)
+Skip auditors for features not detected in the codebase.
 ```
 
 ### Auditor Invocation

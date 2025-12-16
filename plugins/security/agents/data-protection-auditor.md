@@ -12,9 +12,11 @@ The data-protection-auditor performs read-only analysis of sensitive data handli
 </commentary>
 </example>
 
-tools: Read, Glob, Grep, Bash
+allowed-tools:
+  - Read
+  - Glob
+  - Grep
 model: sonnet
-permissionMode: plan
 color: green
 skills: asvs-requirements, vulnerability-patterns
 ---

@@ -12,9 +12,11 @@ The frontend-auditor performs read-only analysis of browser security configurati
 </commentary>
 </example>
 
-tools: Read, Glob, Grep, Bash
+allowed-tools:
+  - Read
+  - Glob
+  - Grep
 model: sonnet
-permissionMode: plan
 color: green
 skills: asvs-requirements, vulnerability-patterns
 ---
