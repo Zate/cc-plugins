@@ -116,13 +116,41 @@ Each task should have:
 [Any implementation hints or gotchas]
 ```
 
-### Step 4: Order Tasks by Dependency
+### Step 4: Order Tasks and Mark Parallelism
 
-Create a dependency graph:
-1. Tasks with no dependencies first
-2. Group parallelizable tasks
-3. Identify the critical path
-4. Note which tasks block others
+Create a dependency graph with parallelism markers:
+
+1. **Identify independent tasks**: Tasks that don't share files or dependencies
+2. **Group by parallel execution**: Tasks that can run together get the same group letter
+3. **Mark dependencies explicitly**: Use `[depends:N.M]` for tasks that must wait
+4. **Identify the critical path**: Tasks that determine overall duration
+5. **Note which tasks block others**: Mark with `[sequential]` if needed
+
+**Parallelism markers** (add to task lines):
+| Marker | When to Use |
+|--------|-------------|
+| `[parallel:A]` | Task can run with other Group A tasks |
+| `[depends:N.M]` | Task must wait for Task N.M to complete |
+| `[background]` | Low-priority task that can run in background |
+| `[sequential]` | Task must run alone (e.g., database migration) |
+
+**Example parallel grouping:**
+```markdown
+### Phase 2: Core Implementation  [parallel:partial]
+**Parallel Groups**:
+- Group A: Tasks 2.1, 2.2 (independent file creation)
+- Sequential: Task 2.3 (depends on Group A)
+
+- [ ] Task 2.1: Create user model  [parallel:A]
+- [ ] Task 2.2: Create product model  [parallel:A]
+- [ ] Task 2.3: Create relationships  [depends:2.1,2.2]
+```
+
+**When NOT to mark as parallel:**
+- Tasks modifying the same file
+- Tasks where one generates code the other uses
+- Tasks requiring complex coordination
+- High-cost tasks (multiple Opus agents)
 
 ### Step 5: Create Milestones
 
@@ -176,13 +204,18 @@ Then write the plan file:
 
 ## Tasks
 
-### Phase 1: Foundation
+### Phase 1: Foundation  [parallel:none]
 - [ ] Task 1.1: [Description]
   - Acceptance: [Criteria]
   - Files: [Expected files]
 
-### Phase 2: Core Implementation
-- [ ] Task 2.1: [Description]
+### Phase 2: Core Implementation  [parallel:partial]
+**Parallel Groups**:
+- Group A: Tasks 2.1, 2.2
+
+- [ ] Task 2.1: [Description]  [parallel:A]
+- [ ] Task 2.2: [Description]  [parallel:A]
+- [ ] Task 2.3: [Description]  [depends:2.1,2.2]
 ...
 
 ## Progress Log
@@ -224,24 +257,31 @@ Options:
 
 ---
 
-### Phase 1: Foundation
+### Phase 1: Foundation  [parallel:none]
 **Goal**: [What this phase accomplishes]
-**Parallelizable**: [Yes/No - can tasks run concurrently?]
+**Parallelizable**: none (sequential tasks)
 
-#### Task 1.1: [Name]
-[Full task structure as defined above]
+- [ ] Task 1.1: [Name]
+  [Full task structure as defined above]
 
-#### Task 1.2: [Name]
-...
+- [ ] Task 1.2: [Name]
+  ...
 
 ---
 
-### Phase 2: Core Implementation
+### Phase 2: Core Implementation  [parallel:partial]
 **Goal**: [What this phase accomplishes]
 **Depends On**: Phase 1 complete
+**Parallelizable**: partial
+**Parallel Groups**:
+- Group A: Tasks 2.1, 2.2 (independent implementations)
 
-#### Task 2.1: [Name]
-...
+- [ ] Task 2.1: [Name]  [parallel:A]
+  ...
+- [ ] Task 2.2: [Name]  [parallel:A]
+  ...
+- [ ] Task 2.3: [Name]  [depends:2.1,2.2]
+  ...
 
 ---
 

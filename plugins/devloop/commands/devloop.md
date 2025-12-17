@@ -260,16 +260,41 @@ The SessionStart hook sets these environment variables:
 
 **Actions**:
 1. Wait for explicit user approval
-2. Read all relevant files from exploration phase
-3. Implement following chosen architecture:
+
+2. **Check for parallel task opportunities** in the plan:
+   - Read `.claude/devloop-plan.md` to find tasks with `[parallel:X]` markers
+   - Group tasks by their parallel marker letter
+   - Check for `[depends:N.M]` markers to respect dependencies
+
+   **If parallel tasks found:**
+   ```
+   Use AskUserQuestion:
+   - question: "Tasks [list] can run in parallel (Group [X]). Execute together?"
+   - header: "Parallel"
+   - options:
+     - Run parallel (Spawn agents for independent tasks) (Recommended)
+     - Run sequential (Execute one at a time for more control)
+     - Pick specific (Let me choose which tasks to parallelize)
+   ```
+
+   **If running in parallel:**
+   - Spawn implementation agents for each task using `Task` tool with `run_in_background: true`
+   - Track progress with `TaskOutput` (poll with `block: false`)
+   - Display real-time status to user
+   - Wait for all parallel tasks before proceeding to dependent tasks
+   - See `Skill: plan-management` for token cost guidelines
+
+3. Read all relevant files from exploration phase
+
+4. Implement following chosen architecture:
    - Follow codebase conventions (check CLAUDE.md)
    - Write clean, well-documented code
    - Update todos as you progress
-   - Commit logical checkpoints mentally
+   - Update plan markers as tasks complete
 
-4. For frontend work: `Skill: frontend-design:frontend-design`
-5. For API work: `Skill: api-design`
-6. For database work: `Skill: database-patterns`
+5. For frontend work: `Skill: frontend-design:frontend-design`
+6. For API work: `Skill: api-design`
+7. For database work: `Skill: database-patterns`
 
 ---
 

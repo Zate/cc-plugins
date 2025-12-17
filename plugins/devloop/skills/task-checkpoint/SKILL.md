@@ -82,7 +82,32 @@ Mark it [x] and add Progress Log entry
 Write the updated plan
 ```
 
-### Step 3: Commit Decision
+### Step 3: Check for Parallel Siblings
+
+**Before committing, check if there are parallel tasks that should complete together:**
+
+```
+Read .claude/devloop-plan.md
+Find tasks with same [parallel:X] marker as completed task
+Check if any are still pending or in-progress
+```
+
+**If parallel siblings exist:**
+```
+Use AskUserQuestion:
+- question: "Task X.Y is complete. There are [N] other tasks in parallel group [X]. How proceed?"
+- header: "Parallel"
+- options:
+  - Wait for group (Continue working on parallel tasks before commit)
+  - Commit now (Commit this task independently)
+  - Spawn parallel (Launch agents for remaining group tasks)
+```
+
+**If all parallel tasks complete:**
+- Consider committing them together as a logical unit
+- Use format: `feat(scope): implement [feature] - Tasks X.Y, X.Z`
+
+### Step 4: Commit Decision
 ```
 Use AskUserQuestion:
 - question: "Task complete. How should we handle the commit?"
@@ -93,7 +118,7 @@ Use AskUserQuestion:
   - Review changes first (Show diff before deciding)
 ```
 
-### Step 4: Execute Commit (if committing now)
+### Step 5: Execute Commit (if committing now)
 ```
 If committing:
 1. Launch git-manager agent with task context
@@ -102,7 +127,7 @@ If committing:
 4. After commit, update Progress Log with commit hash
 ```
 
-### Step 5: Enforcement Check
+### Step 6: Enforcement Check
 ```
 Read .claude/devloop.local.md for enforcement setting
 

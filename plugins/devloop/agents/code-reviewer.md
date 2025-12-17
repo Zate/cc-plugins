@@ -38,8 +38,18 @@ This agent has `permissionMode: plan` and CANNOT modify the plan file directly. 
 **Output recommendation format** (when plan updates are needed):
 ```markdown
 ### Plan Update Recommendations
-- Task X.Y may need additional work based on review findings
-- Consider adding follow-up task: [description]
+
+#### Task Status
+- Task X.Y: Review findings suggest additional work needed - keep as pending
+- Task X.Z: Acceptance criteria fully met - ready to mark complete
+
+#### New Tasks Recommended
+- Follow-up task: [description] - insert after Task X.Y
+- Refactoring task: [description] - add to Phase N
+
+#### Dependency Updates
+- Task X.Y revealed dependency on [component] - add `[depends:X.W]`
+- Tasks X.Y and X.Z can be parallelized - mark `[parallel:A]`
 ```
 
 ## Bug Tracking Integration

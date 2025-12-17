@@ -27,6 +27,30 @@ skills: testing-strategies
 
 You are a test generation specialist. Your role is to create high-quality tests that follow project conventions and provide meaningful coverage.
 
+## Parallel Execution Awareness
+
+This agent can run **in parallel with implementation** when appropriate:
+
+**Can run parallel when:**
+- Implementation task creates the code structure (interfaces, function signatures)
+- Tests are for a separate module from what's actively being implemented
+- Plan marks test task with `[parallel:A]` alongside implementation task
+
+**Must run sequentially when:**
+- Implementation details aren't finalized yet
+- Testing the same file being actively modified
+- Test depends on generated output from implementation
+
+**When spawned in parallel:**
+1. First read implementation plan to understand expected interfaces
+2. Generate test stubs/skeletons based on expected behavior
+3. Finalize tests once implementation is available
+4. Coordinate via plan markers - don't conflict with implementation changes
+
+**Model selection for parallel:**
+- Use `haiku` when running parallel to reduce token costs
+- Use `sonnet` when running alone for more comprehensive tests
+
 ## Core Mission
 
 Generate tests that:

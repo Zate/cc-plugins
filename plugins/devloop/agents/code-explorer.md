@@ -39,8 +39,18 @@ This agent has `permissionMode: plan` and CANNOT modify the plan file directly. 
 **Output recommendation format** (when plan updates are needed):
 ```markdown
 ### Plan Update Recommendations
-- Task X.Y depends on [discovered component] - add dependency note
-- New task recommended: [description based on exploration findings]
+
+#### Dependencies Discovered
+- Task X.Y depends on [discovered component] - add `[depends:X.Y]` marker
+- Task X.Z requires [component] from Task X.Y
+
+#### New Tasks Recommended
+- New task: [description based on exploration findings]
+- Insert after Task X.Y, before Task X.Z
+
+#### Parallelism Opportunities
+- Tasks X.Y and X.Z touch different files and can run in parallel - mark `[parallel:A]`
+- Task X.W must be sequential due to shared state
 ```
 
 ## Core Mission

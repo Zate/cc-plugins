@@ -10,13 +10,34 @@ Exploratory workflow for investigating feasibility, evaluating approaches, or pr
 
 ## Plan Integration
 
-Spikes may inform or update the devloop plan:
-1. Check if `.claude/devloop-plan.md` exists - spike findings may affect the plan
-2. If spike validates an approach, note this in the spike report
-3. If spike suggests plan changes, document them in the "Next Steps" section
-4. The parent command/agent is responsible for applying plan updates based on spike recommendations
+**CRITICAL**: Spikes must integrate with any existing devloop plan.
 
-See `Skill: plan-management` for plan format.
+### Before Starting a Spike
+1. Check if `.claude/devloop-plan.md` exists
+2. If it exists, read it to understand:
+   - What feature/work is already planned
+   - Current phase and progress
+   - How this spike relates to existing tasks
+3. Note the relationship in Phase 1 (Define Spike Goals)
+
+### After Completing a Spike
+If spike findings warrant plan changes, you MUST include a **Plan Update Section** in the report:
+
+```markdown
+### Plan Updates Required
+**Existing Plan**: [Plan name from devloop-plan.md, or "None"]
+**Relationship**: [New work | Replaces Task X.Y | Informs Task X.Y | Independent]
+
+#### Recommended Changes
+1. [ ] Add task: [Description] after Task X.Y
+2. [ ] Modify task X.Y: [How it should change]
+3. [ ] Reorder: Move Task X.Y before Task X.Z because [reason]
+4. [ ] Mark parallel: Tasks X.Y and X.Z can run together [parallel:A]
+```
+
+When user proceeds with implementation, the plan MUST be updated before work begins.
+
+See `Skill: plan-management` for plan format and parallelism markers.
 
 ## When to Use
 
@@ -44,8 +65,17 @@ A spike should answer:
 Initial request: $ARGUMENTS
 
 **Actions**:
-1. Create todo list for spike activities
-2. Define what we're trying to learn:
+1. **Check for existing plan**:
+   ```
+   Read .claude/devloop-plan.md (if it exists)
+   - Note the plan name and current phase
+   - Identify if this spike relates to any planned tasks
+   - Record relationship: "new work", "informs Task X.Y", or "independent"
+   ```
+
+2. Create todo list for spike activities
+
+3. Define what we're trying to learn:
    ```
    Use AskUserQuestion:
    - question: "What's the primary question this spike should answer?"
@@ -124,8 +154,10 @@ Initial request: $ARGUMENTS
 
 **Goal**: Document spike findings
 
+**IMPORTANT**: A new spike = a new report. Always **overwrite** any existing spike report using the Write tool (not Edit). Previous spikes are no longer relevant to the current investigation.
+
 **Actions**:
-1. Create spike report:
+1. **Write** spike report to `.claude/{topic}-spike-report.md` (overwrites existing):
 
 ```markdown
 ## Spike Report: [Topic]
@@ -164,6 +196,14 @@ Initial request: $ARGUMENTS
 ### Next Steps
 1. [What to do next if proceeding]
 2. [What to do next if not proceeding]
+
+### Plan Updates Required
+**Existing Plan**: [Plan name from devloop-plan.md, or "None"]
+**Relationship**: [New work | Replaces Task X.Y | Informs Task X.Y | Independent]
+
+#### Recommended Changes
+- [ ] [Add/Modify/Reorder/Remove task - be specific]
+- [ ] [Mark parallelism opportunities if any]
 ```
 
 2. Ask user about next steps:

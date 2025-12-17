@@ -2,7 +2,7 @@
 
 **A complete, token-conscious feature development workflow for professional software engineering.**
 
-[![Version](https://img.shields.io/badge/version-1.7.0-blue)](./CHANGELOG.md) [![Agents](https://img.shields.io/badge/agents-17-green)](#agents) [![Skills](https://img.shields.io/badge/skills-22-purple)](#skills) [![Commands](https://img.shields.io/badge/commands-11-orange)](#commands)
+[![Version](https://img.shields.io/badge/version-1.8.0-blue)](./CHANGELOG.md) [![Agents](https://img.shields.io/badge/agents-17-green)](#agents) [![Skills](https://img.shields.io/badge/skills-22-purple)](#skills) [![Commands](https://img.shields.io/badge/commands-11-orange)](#commands)
 
 ---
 
@@ -253,6 +253,49 @@ devloop saves plans to `.claude/devloop-plan.md` so you can:
 
 ---
 
+## Parallel Task Execution
+
+devloop can run independent tasks in parallel for faster feature development:
+
+### Task Markers
+
+Plans can include parallelism markers:
+
+```markdown
+### Phase 2: Core Implementation  [parallel:partial]
+**Parallel Groups**:
+- Group A: Tasks 2.1, 2.2 (independent implementations)
+
+- [ ] Task 2.1: Create user model  [parallel:A]
+- [ ] Task 2.2: Create product model  [parallel:A]
+- [ ] Task 2.3: Create relationships  [depends:2.1,2.2]
+```
+
+| Marker | Meaning |
+|--------|---------|
+| `[parallel:X]` | Can run with other tasks in group X |
+| `[depends:N.M]` | Must wait for task N.M to complete |
+| `[background]` | Low priority, can run in background |
+| `[sequential]` | Must run alone |
+
+### How It Works
+
+1. **Detection**: `/devloop:continue` detects tasks with matching `[parallel:X]` markers
+2. **User Choice**: Asks if you want to run them together
+3. **Parallel Execution**: Spawns agents for each task with `run_in_background: true`
+4. **Progress Tracking**: Shows status as tasks complete
+5. **Dependency Handling**: Only proceeds to dependent tasks when group completes
+
+### Token Cost Awareness
+
+Not all parallelism is free. Guidelines:
+- **3x haiku agents**: Low cost, high benefit
+- **3x sonnet agents**: Medium cost, evaluate need
+- **3x opus agents**: High cost, usually avoid
+- **Max 3-4 parallel agents**: Beyond this, coordination costs exceed benefits
+
+---
+
 ## Bug Tracking
 
 Non-critical issues found during development go to `.claude/bugs/`:
@@ -360,7 +403,23 @@ plugins/devloop/
 
 ## Changelog
 
-### 1.7.0 (Current)
+### 1.8.0 (Current)
+
+- **Smart Parallel Task Execution**: Run independent tasks in parallel for faster development
+- **Unified Plan Integration**: All commands and agents now consistently work from `.claude/devloop-plan.md`
+- Added parallelism markers: `[parallel:X]`, `[depends:N.M]`, `[background]`, `[sequential]`
+- Updated `plan-management` skill with parallelism guidelines and token cost awareness
+- Updated `/devloop:continue` to detect and spawn parallel task groups
+- Updated `/devloop:spike` with mandatory plan integration and update recommendations
+- Updated `/devloop:quick` to check for existing plans before starting
+- Updated `/devloop` Phase 7 with parallel task detection
+- Updated `task-planner` to generate parallelism annotations
+- Updated `code-explorer`, `code-architect`, `code-reviewer` with plan update recommendations
+- Updated `test-generator` with parallel execution awareness
+- Updated `task-checkpoint` with parallel sibling detection
+- Updated `atomic-commits` with parallel task grouping guidance
+
+### 1.7.0
 
 - **Task Completion Enforcement**: New checkpoint system ensures tasks are properly completed
 - Added `task-checkpoint` skill for task completion verification

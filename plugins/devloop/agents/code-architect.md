@@ -97,7 +97,40 @@ Deliver a decisive, complete architecture blueprint that provides everything nee
 - **Implementation Map**: Specific files to create/modify with detailed change descriptions
 - **Data Flow**: Complete flow from entry points through transformations to outputs
 - **Build Sequence**: Phased implementation steps as a checklist
+- **Parallelization Opportunities**: Which tasks can run in parallel (see below)
 - **Critical Details**: Error handling, state management, testing, performance, and security considerations
+
+### Parallelization Analysis
+
+When designing the build sequence, identify tasks that can run in parallel:
+
+```markdown
+### Build Sequence with Parallelism
+
+**Phase 1: Foundation** [parallel:none]
+- Task 1.1: Create database schema [sequential - must be first]
+- Task 1.2: Define interfaces [depends:1.1]
+
+**Phase 2: Core** [parallel:partial]
+- Task 2.1: Implement UserService  [parallel:A]
+- Task 2.2: Implement ProductService  [parallel:A]
+- Task 2.3: Implement OrderService  [depends:2.1,2.2]
+
+**Parallelism Rationale**:
+- Tasks 2.1 and 2.2 are independent services in separate files
+- Task 2.3 depends on both services and must wait
+```
+
+**Parallelism criteria**:
+- Independent files: Different files with no shared modifications
+- No data dependencies: One task doesn't need output from another
+- Different concerns: Separate domains (e.g., auth vs. products)
+
+**Mark as sequential when**:
+- Tasks modify the same file
+- One task generates code another uses
+- Database migrations or schema changes
+- Shared state or configuration
 
 Make confident architectural choices rather than presenting multiple options. Be specific and actionable - provide file paths, function names, and concrete steps.
 

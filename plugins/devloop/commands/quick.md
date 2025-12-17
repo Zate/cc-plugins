@@ -10,12 +10,41 @@ Streamlined workflow for small, well-defined tasks that don't need full explorat
 
 ## Plan Integration
 
-Quick tasks typically don't require a formal plan, but:
-1. Check if `.claude/devloop-plan.md` exists - this task may be part of a larger plan
-2. If a plan exists with this task listed, mark it as in-progress when starting
-3. Update the plan when the task is complete
+**CRITICAL**: Quick tasks should integrate with any existing plan.
 
-See `Skill: plan-management` for plan format if needed.
+### Before Starting a Quick Task
+
+1. **Check for existing plan**: Read `.claude/devloop-plan.md` if it exists
+2. **Check if task matches a planned task**:
+   - Search plan for keywords from $ARGUMENTS
+   - If match found, warn user:
+   ```
+   Use AskUserQuestion:
+   - question: "This appears to match Task X.Y in the existing plan. Use the plan workflow instead?"
+   - header: "Plan Found"
+   - options:
+     - Use plan (Switch to /devloop:continue Task X.Y) (Recommended)
+     - Quick anyway (Proceed with quick workflow, update plan when done)
+     - Ignore plan (This is unrelated work)
+   ```
+3. **If task is related but not in plan**: Offer to add it
+   ```
+   Use AskUserQuestion:
+   - question: "There's an active plan but this task isn't in it. Add to plan?"
+   - header: "Add to Plan"
+   - options:
+     - Add to plan (Insert as new task, then implement)
+     - Skip adding (Just do the quick task)
+   ```
+
+### After Completing a Quick Task
+
+If a plan exists:
+1. If task was in the plan, mark it `[x]` complete
+2. Add Progress Log entry: `- YYYY-MM-DD HH:MM: Quick-completed Task X.Y - [summary]`
+3. Update timestamps
+
+See `Skill: plan-management` for plan format.
 
 ## When to Use
 

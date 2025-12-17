@@ -67,11 +67,50 @@ Read the plan file and extract:
 - `Status: In Progress` - Current
 - `Status: Pending/TODO` - Not started
 
+### Step 2.5: Detect Parallel Tasks
+
+**Check for parallelism markers** in pending tasks:
+
+1. **Find parallel groups**: Look for `[parallel:X]` markers on pending `[ ]` tasks
+2. **Group by marker**: Tasks with same letter (e.g., `[parallel:A]`) can run together
+3. **Check dependencies**: Tasks with `[depends:N.M]` must wait for dependencies to complete
+
+**If parallel tasks found:**
+```
+Use AskUserQuestion:
+- question: "I found [N] tasks that can run in parallel (Group [X]). Run them together?"
+- header: "Parallel"
+- options:
+  - Run in parallel (Spawn agents for all Group X tasks) (Recommended)
+  - Run sequentially (Execute one at a time)
+  - Pick specific (Let me choose which to run)
+```
+
+**If running in parallel:**
+1. Spawn agents for each task using `Task` tool with `run_in_background: true`
+2. Each agent receives:
+   - Task description and acceptance criteria
+   - Relevant files from plan
+   - Context: "This task is part of parallel group X"
+3. Track progress with `TaskOutput` (poll with `block: false`)
+4. Display status:
+   ```
+   ⏳ Task 2.1: Creating user model...
+   ✓ Task 2.2: Auth service complete
+   ⏳ Task 2.3: Waiting for 2.1...
+   ```
+5. When all group tasks complete, proceed to dependent tasks
+
+**Token cost check** before spawning:
+- If tasks would require multiple Opus agents, warn user about cost
+- Recommend: "3 sonnet agents" or "1 opus + 2 haiku" patterns
+- See `Skill: plan-management` for token cost guidelines
+
 ### Step 3: Determine Next Step
 
 Analyze the plan to find:
-1. First incomplete task/step
-2. Any blocked tasks (dependencies not met)
+1. First incomplete task/step (or parallel group)
+2. Any blocked tasks (dependencies not met via `[depends:X]`)
 3. Current phase if using phased approach
 
 **If user provided $ARGUMENTS**:
@@ -89,6 +128,7 @@ Show the user:
 - **Completed**: [N] tasks
 - **Remaining**: [M] tasks
 - **Current Phase**: [Phase name if applicable]
+- **Parallel Groups Available**: [List any parallel groups with pending tasks]
 
 ### Completed Tasks
 1. ~~[Task 1]~~ ✓
@@ -97,9 +137,14 @@ Show the user:
 ### Next Up
 **[Task N+1]**: [Task description]
 
+### Parallel Opportunities (if any)
+- **Group A** (can run together): Task 2.1, Task 2.2
+- **Blocked until Group A**: Task 2.3 [depends:2.1,2.2]
+
 ### Remaining Tasks
-- [ ] [Task N+2]
-- [ ] [Task N+3]
+- [ ] [Task N+2]  [parallel:A]
+- [ ] [Task N+3]  [parallel:A]
+- [ ] [Task N+4]  [depends:N+2,N+3]
 ```
 
 Then ask:
