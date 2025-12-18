@@ -1,7 +1,7 @@
 # Devloop Plan: Consistency & Enforcement System
 
 **Created**: 2025-12-18
-**Updated**: 2025-12-18 15:30
+**Updated**: 2025-12-18 15:35
 **Status**: In Progress
 **Current Phase**: Phase 1
 
@@ -62,7 +62,7 @@ Task Complete → Plan Update (REQUIRED) → Commit Decision
   - Files: `plugins/devloop/skills/file-locations/SKILL.md`
   - Notes: Include rationale for each decision
 
-- [ ] Task 1.2: Create `.gitignore` template for devloop
+- [x] Task 1.2: Create `.gitignore` template for devloop
   - Acceptance: Template file users can copy, excludes local-only files
   - Files: `plugins/devloop/templates/gitignore-devloop`
   - Notes: Include comments explaining each entry
@@ -160,6 +160,7 @@ Task Complete → Plan Update (REQUIRED) → Commit Decision
 ## Progress Log
 - 2025-12-18 14:00: Plan created from spike report findings
 - 2025-12-18 15:30: Completed Task 1.1 - Created file-locations skill with comprehensive documentation of .claude/ structure, git tracking status, and rationale
+- 2025-12-18 15:35: Completed Task 1.2 - Created gitignore-devloop template with commented sections and troubleshooting guide
 
 ## Notes
 

@@ -1,0 +1,78 @@
+# =============================================================================
+# Devloop .gitignore Template
+# =============================================================================
+# Copy this content to your project's .gitignore file to properly manage
+# which .claude/ files are tracked vs local-only.
+#
+# Usage:
+#   cat plugins/devloop/templates/gitignore-devloop >> .gitignore
+#
+# Or manually copy the sections you need.
+# =============================================================================
+
+# -----------------------------------------------------------------------------
+# Claude Code Local Settings (DO NOT COMMIT)
+# -----------------------------------------------------------------------------
+# Personal Claude Code configuration - different per machine/user
+.claude/settings.local.json
+
+# -----------------------------------------------------------------------------
+# Devloop Local Configuration (DO NOT COMMIT)
+# -----------------------------------------------------------------------------
+# Personal preferences like enforcement level, model preferences
+# Each developer may have different settings
+.claude/devloop.local.md
+
+# -----------------------------------------------------------------------------
+# Security Audit Outputs (DO NOT COMMIT)
+# -----------------------------------------------------------------------------
+# Security reports may contain sensitive vulnerability details
+# Should be addressed and closed, not preserved in git history
+# Especially important for public repositories
+.claude/security/
+
+# -----------------------------------------------------------------------------
+# Spike Investigation Reports (DO NOT COMMIT)
+# -----------------------------------------------------------------------------
+# Exploratory working notes from /devloop:spike
+# Conclusions flow into the plan; reports are transient
+# May contain rejected approaches or dead ends
+.claude/*-spike-report.md
+
+# -----------------------------------------------------------------------------
+# Optional: Session Summaries (Depends on Workflow)
+# -----------------------------------------------------------------------------
+# Uncomment if you want to keep session summaries local
+# Some teams prefer to commit these for context preservation
+# .claude/session-summary.md
+
+# =============================================================================
+# Files That SHOULD Be Tracked (for reference - don't add these to .gitignore)
+# =============================================================================
+# These files are intentionally NOT ignored and should be committed:
+#
+# .claude/devloop-plan.md       - Active implementation plan (shared state)
+# .claude/devloop-worklog.md    - Completed work history (team reference)
+# .claude/project-context.json  - Tech stack cache (speeds up session start)
+# .claude/issues/                - Issue tracking (bugs, features, tasks)
+# .claude/commands/              - Project-specific slash commands
+#
+# If any of these are being ignored, check for conflicting .gitignore patterns
+
+# =============================================================================
+# Troubleshooting
+# =============================================================================
+# If files are still being tracked after adding this:
+#
+# 1. Check if they were already committed:
+#    git ls-files .claude/
+#
+# 2. Remove from tracking (but keep local file):
+#    git rm --cached .claude/devloop.local.md
+#    git rm --cached .claude/settings.local.json
+#    git rm --cached -r .claude/security/
+#
+# 3. Commit the .gitignore changes:
+#    git add .gitignore && git commit -m "chore: add devloop gitignore patterns"
+#
+# See also: Skill: file-locations for complete documentation
