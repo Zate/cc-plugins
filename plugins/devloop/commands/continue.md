@@ -441,6 +441,90 @@ When `/devloop` creates a plan in Phase 6 (Planning), it should save to `.claude
 
 ---
 
+## Recovery Flows
+
+When resuming work, check for out-of-sync scenarios and offer recovery.
+
+### Scenario 1: Plan Not Updated
+
+**Detection**: Completed tasks marked `[x]` but no recent Progress Log entries.
+
+```
+Use AskUserQuestion:
+- question: "Plan may be out of sync: [N] completed tasks without Progress Log entries. How to proceed?"
+- header: "Recovery"
+- options:
+  - Backfill entries (Add Progress Log entries for completed tasks)
+  - Continue anyway (Resume from next pending task)
+  - Review tasks (Show which tasks appear complete)
+```
+
+**Recovery action** (if backfill selected):
+```markdown
+For each completed task without Progress Log:
+- YYYY-MM-DD HH:MM: [Backfill] Task X.Y completed
+```
+
+### Scenario 2: Uncommitted Changes
+
+**Detection**: `git status` shows modified files, but plan shows tasks complete.
+
+```
+Use AskUserQuestion:
+- question: "Uncommitted changes detected with [N] completed tasks. How to proceed?"
+- header: "Uncommitted"
+- options:
+  - Commit now (Create commit for pending changes)
+  - Discard changes (Reset to last commit)
+  - Continue (Keep changes uncommitted)
+```
+
+### Scenario 3: Worklog Drift
+
+**Detection**: Plan's Progress Log has entries not in worklog.
+
+```
+Use AskUserQuestion:
+- question: "Worklog is behind plan. Some completed tasks may not be in the worklog."
+- header: "Worklog"
+- options:
+  - Sync worklog (Copy missing entries to worklog)
+  - Ignore (Continue without syncing)
+  - Rebuild worklog (Reconstruct from git history)
+```
+
+**Sync action**: Copy Progress Log entries with commit hashes to worklog.
+
+### Scenario 4: Commits Without Tasks
+
+**Detection**: Recent commits don't reference tasks from the plan.
+
+```
+Use AskUserQuestion:
+- question: "Found [N] recent commits not linked to plan tasks. What happened?"
+- header: "Commits"
+- options:
+  - Ad-hoc work (These were outside the plan)
+  - Missing tasks (Add tasks to plan retroactively)
+  - Review commits (Show commit details)
+```
+
+### Scenario 5: Plan Status Stale
+
+**Detection**: `**Updated**:` timestamp is more than 24 hours old.
+
+```
+Use AskUserQuestion:
+- question: "Plan was last updated [time ago]. Is it still current?"
+- header: "Stale"
+- options:
+  - Still current (Continue as-is)
+  - Review plan (Show current plan status)
+  - Refresh (Check for any sync issues)
+```
+
+---
+
 ## Error Handling
 
 **No plan found**: Offer to start fresh with `/devloop`
