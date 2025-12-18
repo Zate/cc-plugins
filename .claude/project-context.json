@@ -1,0 +1,21 @@
+{
+  "name": "cc-plugins",
+  "type": "plugin",
+  "languages": [],
+  "frameworks": [],
+  "features": {
+    "authentication": false,
+    "oauth": false,
+    "file-upload": false,
+    "websockets": false,
+    "database": false,
+    "api": false,
+    "graphql": false,
+    "payments": false,
+    "email": false,
+    "logging": false
+  },
+  "directories": {},
+  "detected_at": "2025-12-15T07:50:48Z",
+  "security_notes": []
+}

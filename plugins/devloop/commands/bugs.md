@@ -1,7 +1,7 @@
 ---
 description: View and manage tracked bugs - list, filter, fix, or close bugs
 argument-hint: Optional filter (open, high, etc.) or bug ID
-allowed-tools: ["Read", "Write", "Edit", "Glob", "Grep", "Bash", "Task", "AskUserQuestion", "TodoWrite", "Skill"]
+allowed-tools: ["Read", "Write", "Edit", "Glob", "Grep", "Task", "AskUserQuestion", "TodoWrite", "Skill"]
 ---
 
 # Manage Bugs
@@ -10,8 +10,6 @@ View, filter, and manage tracked bugs in the project.
 
 > **Note**: This command is an alias for `/devloop:issues bugs`.
 > For the full unified issue tracking system, use `/devloop:issues`.
-
-**IMPORTANT**: Invoke `Skill: issue-tracking` for issue format details.
 
 ## Storage Location
 
@@ -29,19 +27,11 @@ View, filter, and manage tracked bugs in the project.
 
 ### Step 1: Load Bug Index
 
-Check for bugs in unified or legacy system:
+Check for bugs using Read and Glob tools (not bash):
 
-```bash
-# Check unified system first
-if [ -f ".claude/issues/bugs.md" ]; then
-    cat .claude/issues/bugs.md
-# Fall back to legacy system
-elif [ -f ".claude/bugs/index.md" ]; then
-    cat .claude/bugs/index.md
-else
-    echo "No bugs tracked yet. Use /devloop:bug or /devloop:new to report one."
-fi
-```
+1. **Check unified system first**: Read `.claude/issues/bugs.md`
+2. **Fall back to legacy system**: Read `.claude/bugs/index.md`
+3. **If neither exists**: Display "No bugs tracked yet. Use /devloop:bug or /devloop:new to report one."
 
 ### Step 2: Parse Arguments
 

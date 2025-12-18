@@ -1,7 +1,7 @@
 ---
 description: Smart issue creation - analyzes input, detects type, asks confirmation, creates issue
 argument-hint: Optional issue description
-allowed-tools: ["Read", "Write", "Edit", "Glob", "Bash", "AskUserQuestion", "TodoWrite", "Skill"]
+allowed-tools: ["Read", "Write", "Edit", "Glob", "Grep", "AskUserQuestion", "TodoWrite", "Skill", "Task"]
 ---
 
 # New Issue
@@ -182,22 +182,14 @@ Use AskUserQuestion:
 
 ### Step 6: Create Issue
 
-1. Ensure `.claude/issues/` directory exists:
-   ```bash
-   mkdir -p .claude/issues
-   ```
+1. **Check if directory exists**: Use `Glob(".claude/issues/*.md")` to check. If no results and no directory, use Write tool to create the first issue file (Write will create parent directories automatically).
 
-2. Determine next ID for the type:
-   ```bash
-   prefix="FEAT"  # Based on type
-   max_num=$(ls .claude/issues/${prefix}-*.md 2>/dev/null | \
-     sed "s/.*${prefix}-0*//" | sed 's/.md//' | \
-     sort -n | tail -1)
-   next_num=$((${max_num:-0} + 1))
-   id=$(printf "${prefix}-%03d" $next_num)
-   ```
+2. **Determine next ID for the type**:
+   - Use `Glob(".claude/issues/{PREFIX}-*.md")` to find existing issues of this type
+   - Parse filenames to find highest number
+   - Increment by 1, format as `{PREFIX}-{NNN}` (e.g., FEAT-001)
 
-3. Create issue file with gathered information
+3. Create issue file with gathered information using Write tool
 
 4. Regenerate view files (index.md, bugs.md, features.md, backlog.md)
 

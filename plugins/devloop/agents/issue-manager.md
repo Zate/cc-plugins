@@ -25,7 +25,7 @@ Use issue-manager for tasks and chores that don't block current work.
 </commentary>
 </example>
 
-tools: Read, Write, Edit, Glob, Bash, TodoWrite
+tools: Read, Write, Edit, Glob, Grep, TodoWrite
 model: haiku
 color: orange
 skills: issue-tracking
@@ -54,24 +54,15 @@ Create, update, and manage issues in `.claude/issues/` for items that:
 
 ### Step 1: Determine System Location
 
-Check which system to use:
+Check which system to use with Glob:
 
-```bash
-# Prefer unified system
-if [ -d ".claude/issues" ]; then
-    echo "unified"
-elif [ -d ".claude/bugs" ]; then
-    echo "legacy"
-else
-    echo "unified"  # Default to unified for new projects
-fi
-```
+1. **Check unified system**: `Glob(".claude/issues/*.md")` - if results, use unified
+2. **Check legacy system**: `Glob(".claude/bugs/*.md")` - if results and no unified, use legacy
+3. **Default**: Use unified for new projects
 
-### Step 2: Ensure Directory Exists
+### Step 2: Directory Creation
 
-```bash
-mkdir -p .claude/issues
-```
+The Write tool creates parent directories automatically. Simply write the issue file to `.claude/issues/{PREFIX}-{NNN}.md` and the directory will be created if needed.
 
 ### Step 3: Determine Issue Type
 
@@ -87,13 +78,14 @@ Default priority: bug > feature > task if ambiguous.
 
 ### Step 4: Determine Next ID
 
-```bash
-prefix="FEAT"  # Based on type
-highest=$(ls .claude/issues/${prefix}-*.md 2>/dev/null | \
-  sed "s/.*${prefix}-0*//" | sed 's/.md//' | sort -n | tail -1)
-next=$((${highest:-0} + 1))
-printf "${prefix}-%03d" $next
-```
+Use Glob to find existing issues and determine next ID:
+
+1. `Glob(".claude/issues/{PREFIX}-*.md")` to get all issues of this type
+2. Parse filenames to extract numbers (e.g., `FEAT-001.md` → 1)
+3. Find highest number, add 1
+4. Format as `{PREFIX}-{NNN}` with zero-padding (e.g., `FEAT-002`)
+
+If no existing issues of this type, start at `{PREFIX}-001`.
 
 ### Step 5: Gather Issue Information
 

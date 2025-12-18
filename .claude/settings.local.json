@@ -4,7 +4,14 @@
       "Bash(mkdir:*)",
       "Bash(git init:*)",
       "Bash(mv:*)",
-      "Bash(grep:*)"
+      "Bash(grep:*)",
+      "Bash(chmod:*)",
+      "SlashCommand(/devloop:feature:*)",
+      "Bash(cat:*)",
+      "Bash(CLAUDE_PROJECT_DIR=/Users/zberg/projects/cc-plugins bash:*)",
+      "Bash(rm:*)",
+      "Bash(git add:*)",
+      "Skill(devloop:plan-management)"
     ],
     "deny": [],
     "ask": []

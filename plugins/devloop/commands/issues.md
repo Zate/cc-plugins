@@ -1,14 +1,12 @@
 ---
 description: View all issues (replaces and extends /devloop:bugs) - filter by type, status, or ID
 argument-hint: Optional filter (bugs, features, backlog, BUG-001) or action (fix, close)
-allowed-tools: ["Read", "Write", "Edit", "Glob", "Grep", "Bash", "Task", "AskUserQuestion", "TodoWrite", "Skill"]
+allowed-tools: ["Read", "Write", "Edit", "Glob", "Grep", "Task", "AskUserQuestion", "TodoWrite", "Skill"]
 ---
 
 # Manage Issues
 
 View, filter, and manage all tracked issues - bugs, features, tasks, chores, and spikes.
-
-**IMPORTANT**: Invoke `Skill: issue-tracking` for issue format and storage details.
 
 ## Quick Usage
 
@@ -24,17 +22,13 @@ View, filter, and manage all tracked issues - bugs, features, tasks, chores, and
 
 ### Step 1: Check Issue Directory
 
-Check for `.claude/issues/` directory:
+Use Glob to check for issues:
 
-```bash
-if [ -d ".claude/issues" ]; then
-    ls .claude/issues/
-else
-    echo "No issues tracked yet. Use /devloop:new to create one."
-fi
-```
+1. **Check unified system**: `Glob(".claude/issues/*.md")`
+2. **Check legacy system**: `Glob(".claude/bugs/*.md")` (if unified not found)
+3. **If neither exists**: Display "No issues tracked yet. Use /devloop:new to create one."
 
-If `.claude/bugs/` exists but not `.claude/issues/`, offer migration (see Migration section).
+If `.claude/bugs/` exists but `.claude/issues/` doesn't, offer migration (see Migration section).
 
 ### Step 2: Parse Arguments
 
