@@ -384,6 +384,28 @@ If no `.claude/devloop.local.md` exists:
 - `changelog: true` (offers to update if exists)
 - `auto_tag: false` (manual tagging)
 
+### Enforcement Hooks
+
+The devloop plugin includes hooks that implement enforcement:
+
+**Pre-Commit Hook** (`hooks/pre-commit.sh`):
+- Triggered before any `git commit` command
+- Checks if plan has completed tasks without Progress Log entries
+- In advisory mode: warns but allows commit
+- In strict mode: blocks commit until plan is updated
+- Checks `**Updated**:` timestamp (recent = approved)
+
+**Post-Commit Hook** (`hooks/post-commit.sh`):
+- Triggered after successful `git commit`
+- Extracts commit hash and message
+- Parses task references from commit message (e.g., "- Task 1.1")
+- Updates worklog with commit entry
+- Adds completed tasks to worklog's "Tasks Completed" section
+
+**Hook Configuration**:
+Hooks are configured in `plugins/devloop/hooks/hooks.json` and use the
+`condition` field to match git commit commands specifically.
+
 ---
 
 ## Error Handling
@@ -405,5 +427,7 @@ If using Claude's built-in plan mode (`--permission-mode plan`):
 ## See Also
 
 - `Skill: workflow-selection` - Choosing the right workflow
+- `Skill: worklog-management` - Worklog format and updates
+- `Skill: file-locations` - Where devloop files belong
 - `Skill: complexity-estimation` - Estimating task complexity
 - `/devloop:continue` - Resuming from a plan

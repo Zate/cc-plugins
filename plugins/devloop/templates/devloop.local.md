@@ -3,6 +3,35 @@
 # Copy this file to your project's .claude/ directory as devloop.local.md
 # Customize the settings below for your project
 
+# =============================================================================
+# ENFORCEMENT SETTINGS
+# =============================================================================
+# Controls how strictly devloop enforces plan updates and commits
+
+# Enforcement mode: advisory (default) or strict
+# - advisory: Warn when plan is out of sync, allow override
+# - strict: Block commits when plan is out of sync
+enforcement: advisory
+
+# Auto-commit prompting after task completion
+# When true, prompts "Commit now?" after each completed task
+auto_commit: true
+
+# Suggest version bumps at phase completion
+# When true, suggests version bump based on conventional commits
+auto_version: true
+
+# Maintain CHANGELOG.md
+# When true, offers to update CHANGELOG when commits are made
+changelog: true
+
+# Create git tags automatically (or prompt)
+# When false (default), prompts before creating tags
+auto_tag: false
+
+# =============================================================================
+# DEFINITION OF DONE
+# =============================================================================
 # Definition of Done - Customize criteria for your project
 definition_of_done:
   code:
