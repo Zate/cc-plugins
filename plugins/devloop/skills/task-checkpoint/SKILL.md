@@ -125,6 +125,20 @@ If committing:
 2. Generate conventional commit message
 3. Include task reference: "feat(scope): description - Task X.Y"
 4. After commit, update Progress Log with commit hash
+5. Update worklog with committed tasks (see Step 5a)
+```
+
+### Step 5a: Update Worklog
+```
+After successful commit:
+1. Read .claude/devloop-worklog.md (create if doesn't exist)
+2. Add entry to commit table:
+   | {hash} | {date} | {commit message} | {task refs} |
+3. Add task to "Tasks Completed" section with commit hash:
+   - [x] Task X.Y: [Description] ({hash})
+4. Update "Last Updated" timestamp
+
+See Skill: worklog-management for detailed format.
 ```
 
 ### Step 6: Enforcement Check
@@ -247,6 +261,7 @@ This skill is invoked by:
 
 This skill references:
 - `Skill: plan-management` - Plan file format and location
+- `Skill: worklog-management` - Worklog format and updates
 - `Skill: atomic-commits` - Commit decision guidance
 - `Skill: git-workflows` - Commit message conventions
 
@@ -260,4 +275,5 @@ This skill references:
 | Tests pass | Yes (if applicable) | Run test suite |
 | Plan updated | Yes | Mark [x], add log entry |
 | Commit created | Depends | Commit or group |
+| Worklog updated | After commit | Add entry with hash |
 | Enforcement check | Auto | Based on project config |
