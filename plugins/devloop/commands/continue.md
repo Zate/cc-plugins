@@ -10,6 +10,15 @@ Resume work from an existing implementation plan. Finds the current plan, identi
 
 **IMPORTANT**: Always invoke `Skill: plan-management` to understand plan format and update procedures.
 
+## Context Sources
+
+When resuming work, read both:
+1. **Plan** (`.claude/devloop-plan.md`) - What's in progress
+2. **Worklog** (`.claude/devloop-worklog.md`) - What's already committed
+
+The worklog shows completed tasks with commit hashes; the plan shows current progress.
+For worklog format details, invoke: `Skill: worklog-management`
+
 ## Plan Location
 
 The canonical plan location is: **`.claude/devloop-plan.md`**

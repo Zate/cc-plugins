@@ -234,9 +234,36 @@ The SessionStart hook sets these environment variables:
    - [Date]: Plan created
    ```
 
-4. Invoke: `Skill: testing-strategies` for test planning
+4. **Initialize worklog** if it doesn't exist:
+   Create `.claude/devloop-worklog.md`:
+   ```markdown
+   # Devloop Worklog
 
-5. Present plan for approval:
+   **Project**: [project-name]
+   **Last Updated**: [Date]
+
+   ---
+
+   ## [Feature Name] (In Progress)
+
+   **Started**: [Date]
+   **Plan**: .claude/devloop-plan.md
+
+   ### Commits
+
+   | Hash | Date | Message | Tasks |
+   |------|------|---------|-------|
+
+   ### Tasks Completed
+
+   (None yet - entries added as tasks are committed)
+   ```
+
+   For worklog format details: `Skill: worklog-management`
+
+5. Invoke: `Skill: testing-strategies` for test planning
+
+6. Present plan for approval:
    ```
    Use AskUserQuestion:
    - question: "Implementation plan ready ([N] tasks). Proceed?"
