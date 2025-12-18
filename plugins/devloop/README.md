@@ -2,7 +2,7 @@
 
 **A complete, token-conscious feature development workflow for professional software engineering.**
 
-[![Version](https://img.shields.io/badge/version-1.8.0-blue)](./CHANGELOG.md) [![Agents](https://img.shields.io/badge/agents-17-green)](#agents) [![Skills](https://img.shields.io/badge/skills-22-purple)](#skills) [![Commands](https://img.shields.io/badge/commands-11-orange)](#commands)
+[![Version](https://img.shields.io/badge/version-1.9.0-blue)](./CHANGELOG.md) [![Agents](https://img.shields.io/badge/agents-18-green)](#agents) [![Skills](https://img.shields.io/badge/skills-23-purple)](#skills) [![Commands](https://img.shields.io/badge/commands-13-orange)](#commands)
 
 ---
 
@@ -25,6 +25,16 @@ devloop is a Claude Code plugin that brings structure and efficiency to software
 
 # That's it. devloop guides you through the rest.
 ```
+
+### Using devloop with Other AI Agents
+
+**Don't have Claude Code?** You can still use devloop methodology with Cursor, Aider, Gemini, or any AI coding agent.
+
+See **[DEVLOOP_FOR_GENERIC_AGENTS.md](./docs/DEVLOOP_FOR_GENERIC_AGENTS.md)** for:
+- Complete workflow documentation without plugin requirements
+- Plan file format specification
+- Integration with `.cursorrules`, `.aider.conf.yml`, and other agent configs
+- Best practices for non-Claude agents
 
 ---
 
@@ -71,8 +81,10 @@ devloop provides a 12-phase workflow that mirrors how senior engineers approach 
 | `/devloop:spike` | Technical exploration | Unknown feasibility |
 | `/devloop:review` | Code review | Before commits, PR review |
 | `/devloop:ship` | Git integration | Ready to commit/PR |
-| `/devloop:bug` | Report a bug | Track issues for later |
-| `/devloop:bugs` | Manage bugs | View, fix, or close bugs |
+| `/devloop:new` | Smart issue creation | Track bugs, features, tasks |
+| `/devloop:issues` | Manage all issues | View, filter, work on issues |
+| `/devloop:bug` | Report a bug | Quick bug tracking |
+| `/devloop:bugs` | View bugs | Bug-only view |
 | `/devloop:statusline` | Configure status bar | Setup status display |
 
 ### Examples
@@ -102,13 +114,22 @@ devloop provides a 12-phase workflow that mirrors how senior engineers approach 
 
 # Resume where you left off
 /devloop:continue
+
+# Track issues for later
+/devloop:new Add dark mode support eventually
+/devloop:new The button is broken on mobile
+
+# View and manage issues
+/devloop:issues
+/devloop:issues bugs
+/devloop:issues backlog
 ```
 
 ---
 
 ## Agents
 
-devloop includes 17 specialized agents, each optimized for a specific task. Agents are color-coded by category for easy visual identification when invoked.
+devloop includes 18 specialized agents, each optimized for a specific task. Agents are color-coded by category for easy visual identification when invoked.
 
 ### Color Scheme
 
@@ -121,7 +142,7 @@ devloop includes 17 specialized agents, each optimized for a specific task. Agen
 | 🔵 cyan | Testing | test-generator, test-runner |
 | 🟢 green | Validation | qa-agent, dod-validator |
 | 🔵 blue | Requirements | requirements-gatherer, complexity-estimator |
-| 🟠 orange | Integration | git-manager, bug-catcher |
+| 🟠 orange | Integration | git-manager, bug-catcher, issue-manager |
 | 🔷 teal | Documentation | doc-generator, summary-generator |
 
 ### Core Development
@@ -159,13 +180,14 @@ devloop includes 17 specialized agents, each optimized for a specific task. Agen
 | Agent | Color | Model | Purpose |
 |-------|-------|-------|---------|
 | `git-manager` | orange | haiku | Commits, branches, PRs with conventional messages |
-| `bug-catcher` | orange | haiku | Create bug reports during development |
+| `bug-catcher` | orange | haiku | Create bug reports during development (legacy) |
+| `issue-manager` | orange | haiku | Create any issue type during development |
 
 ---
 
 ## Skills
 
-devloop provides 22 skills—domain knowledge that Claude automatically applies when relevant:
+devloop provides 23 skills—domain knowledge that Claude automatically applies when relevant:
 
 ### Architecture & Design
 
@@ -203,7 +225,8 @@ devloop provides 22 skills—domain knowledge that Claude automatically applies 
 | `requirements-patterns` | Requirements gathering |
 | `git-workflows` | Branching, commits, releases |
 | `plan-management` | Plan file conventions |
-| `bug-tracking` | Bug report management |
+| `bug-tracking` | Bug report management (legacy) |
+| `issue-tracking` | Unified issue management |
 | `project-bootstrap` | New project setup from docs |
 
 ### Task Completion
@@ -296,23 +319,80 @@ Not all parallelism is free. Guidelines:
 
 ---
 
-## Bug Tracking
+## Issue Tracking
 
-Non-critical issues found during development go to `.claude/bugs/`:
+devloop includes a unified issue tracking system for bugs, features, tasks, chores, and spikes. Issues are stored in `.claude/issues/` with type-prefixed IDs for quick identification.
+
+### Issue Types
+
+| Type | Prefix | When to Use |
+|------|--------|-------------|
+| Bug | BUG- | Something is broken |
+| Feature | FEAT- | New functionality |
+| Task | TASK- | Technical work, refactoring |
+| Chore | CHORE- | Maintenance, dependencies |
+| Spike | SPIKE- | Research, investigation |
+
+### Commands
 
 ```bash
-# Report a bug
-/devloop:bug
+# Smart issue creation (auto-detects type)
+/devloop:new Add dark mode support
+/devloop:new Button doesn't work on mobile
 
-# View all bugs
-/devloop:bugs
+# View all issues
+/devloop:issues
 
-# View only high priority
-/devloop:bugs high
+# Filter by type
+/devloop:issues bugs
+/devloop:issues features
+/devloop:issues backlog
 
-# Fix a specific bug
-/devloop:bugs fix BUG-001
+# Filter by priority
+/devloop:issues high
+
+# Work on specific issue
+/devloop:issues FEAT-001
+
+# Legacy commands (still work)
+/devloop:bug    # Quick bug creation
+/devloop:bugs   # Bug-only view
 ```
+
+### Smart Type Detection
+
+`/devloop:new` analyzes your input to auto-detect issue type:
+
+| Input Keywords | Detected Type |
+|----------------|---------------|
+| "broken", "error", "crash", "fix" | Bug |
+| "add", "create", "implement", "new" | Feature |
+| "refactor", "clean up", "optimize" | Task |
+| "dependency", "upgrade", "config" | Chore |
+| "investigate", "explore", "research" | Spike |
+
+### Directory Structure
+
+```
+.claude/issues/
+├── index.md        # Master index (all issues)
+├── bugs.md         # Bug-only view
+├── features.md     # Feature-only view
+├── backlog.md      # Open features + tasks
+├── BUG-001.md      # Individual issue files
+├── FEAT-001.md
+└── TASK-001.md
+```
+
+### Migration from .claude/bugs/
+
+If you have an existing `.claude/bugs/` directory, devloop will:
+1. Detect it automatically
+2. Offer to migrate to the unified system
+3. Preserve all existing bug data with BUG- prefixes
+4. Both systems can coexist during transition
+
+See [Migration Guide](#migration-from-bugs-to-issues) below for details.
 
 ---
 
@@ -342,6 +422,45 @@ Configure with `/devloop:statusline`.
 
 ---
 
+## Migration from Bugs to Issues
+
+If you have an existing `.claude/bugs/` directory and want to migrate to the unified issue system:
+
+### Automatic Migration
+
+1. Run `/devloop:issues` - it will detect `.claude/bugs/` and offer migration
+2. Choose "Yes, migrate" when prompted
+3. All bugs are copied to `.claude/issues/` with `type: bug` added
+4. Original `.claude/bugs/` is preserved (delete manually when ready)
+
+### Manual Migration
+
+```bash
+# 1. Create issues directory
+mkdir -p .claude/issues
+
+# 2. For each bug file, copy and add type field
+# The migration adds: type: bug to frontmatter
+
+# 3. Regenerate view files
+# Run /devloop:issues to regenerate index.md, bugs.md, etc.
+
+# 4. Verify migration worked
+# Check .claude/issues/ has all your bugs
+
+# 5. (Optional) Remove old directory
+rm -rf .claude/bugs/
+```
+
+### Coexistence Mode
+
+During transition, both systems work:
+- `/devloop:bug` creates in `.claude/issues/` (preferred) or `.claude/bugs/` (fallback)
+- `/devloop:bugs` checks both locations
+- New issues always go to `.claude/issues/`
+
+---
+
 ## Best Practices
 
 ### Use the Right Command
@@ -355,6 +474,8 @@ Configure with `/devloop:statusline`.
 | Ready to commit | `/devloop:ship` |
 | Reviewing code | `/devloop:review` |
 | Continuing work | `/devloop:continue` |
+| Track for later | `/devloop:new` |
+| View/manage issues | `/devloop:issues` |
 
 ### Answer Clarifying Questions
 
@@ -403,7 +524,20 @@ plugins/devloop/
 
 ## Changelog
 
-### 1.8.0 (Current)
+### 1.9.0 (Current)
+
+- **Unified Issue Tracking**: New system supporting bugs, features, tasks, chores, and spikes
+- Added `/devloop:new` command with smart type detection from keywords
+- Added `/devloop:issues` command for viewing and managing all issue types
+- Added `issue-manager` agent for creating any issue type
+- Added `issue-tracking` skill with full schema and view generation rules
+- Type-prefixed IDs: BUG-001, FEAT-001, TASK-001, CHORE-001, SPIKE-001
+- Auto-generated view files: index.md, bugs.md, features.md, backlog.md
+- Updated `workflow-detector` to route issue tracking requests
+- Migration support from `.claude/bugs/` to unified `.claude/issues/`
+- Backwards compatibility: `/devloop:bug` and `/devloop:bugs` still work
+
+### 1.8.0
 
 - **Smart Parallel Task Execution**: Run independent tasks in parallel for faster development
 - **Unified Plan Integration**: All commands and agents now consistently work from `.claude/devloop-plan.md`
