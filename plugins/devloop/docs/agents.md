@@ -162,10 +162,10 @@ Technical project planner that breaks down architecture into ordered, actionable
 - Defines acceptance criteria per task
 - Specifies test requirements
 - Groups into phases/milestones
-- Saves to `.claude/devloop-plan.md`
+- Saves to `.devloop/plan.md`
 
 **Plan File Management**:
-- **MUST** save plans to `.claude/devloop-plan.md`
+- **MUST** save plans to `.devloop/plan.md`
 - Writes to TodoWrite for session tracking
 - Includes complexity estimates per task
 
@@ -319,7 +319,7 @@ Quality gate validator ensuring all Definition of Done criteria are met.
 - Checks plan task completion
 
 **Plan Integration**:
-- **MUST** read `.claude/devloop-plan.md`
+- **MUST** read `.devloop/plan.md`
 - Validates all tasks marked complete
 - Updates plan Status to "Complete" when passing
 - Adds Progress Log entries
@@ -520,7 +520,7 @@ Technical writer creating session summaries and handoff documentation.
 - Updates plan Progress Log
 
 **Plan File Updates**:
-- **MUST** update `.claude/devloop-plan.md`
+- **MUST** update `.devloop/plan.md`
 - Marks tasks complete `[ ]` → `[x]`
 - Marks in-progress `[ ]` → `[~]`
 - Adds Progress Log entries
@@ -638,7 +638,7 @@ Bug tracking assistant creating structured bug reports for non-critical issues.
 - User-facing bug reports (use /devloop:bug)
 
 **Capabilities**:
-- Creates bug files in `.claude/bugs/`
+- Creates bug files in `.devloop/issues/`
 - Assigns bug IDs (BUG-001, BUG-002, etc.)
 - Tracks priority, status, tags
 - Updates bug index

@@ -12,9 +12,9 @@ Complete documentation for hooks, environment variables, statusline, and plugin 
 | Validation Hooks | Tool use validation | `hooks/hooks.json` |
 | Statusline | Status bar display | `statusline/devloop-statusline.sh` |
 | Environment Variables | Project context | Set by SessionStart hook |
-| Local Settings | Project-specific config | `.claude/devloop.local.md` |
-| Plan File | Workflow state | `.claude/devloop-plan.md` |
-| Bug Tracking | Issue management | `.claude/bugs/` |
+| Local Settings | Project-specific config | `.devloop/local.md` |
+| Plan File | Workflow state | `.devloop/plan.md` |
+| Bug Tracking | Issue management | `.devloop/issues/` |
 
 ---
 
@@ -222,7 +222,7 @@ The statusline receives JSON input from Claude Code:
 
 ### Plan File Location
 
-**Path**: `.claude/devloop-plan.md`
+**Path**: `.devloop/plan.md`
 
 ### Plan File Format
 
@@ -279,7 +279,7 @@ Use `/devloop:continue` to:
 
 ### Project-Specific Configuration
 
-**Path**: `.claude/devloop.local.md`
+**Path**: `.devloop/local.md`
 
 Override default behavior with project-specific settings:
 
@@ -318,7 +318,7 @@ workflow:
 ### Directory Structure
 
 ```
-.claude/bugs/
+.devloop/issues/
 ├── INDEX.md           # Bug index with status summary
 ├── BUG-001.md         # Individual bug report
 ├── BUG-002.md
@@ -371,11 +371,11 @@ Likely a CSS specificity issue.
 **Option 1**: Keep bugs local
 ```gitignore
 # .gitignore
-.claude/bugs/
+.devloop/issues/
 ```
 
 **Option 2**: Share with team
-- Commit `.claude/bugs/` to share bug tracking
+- Commit `.devloop/issues/` to share bug tracking
 
 ---
 
@@ -470,7 +470,7 @@ plugins/devloop/
 
 ### Plan File Not Found
 
-1. Ensure `.claude/` directory exists
+1. Ensure `.devloop/` directory exists
 2. Check working directory is project root
 3. Verify plan was created by `/devloop` command
 

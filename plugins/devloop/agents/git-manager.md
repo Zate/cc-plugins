@@ -224,7 +224,7 @@ Update Progress Log with:
 - YYYY-MM-DD HH:MM: Committed Tasks 2.1, 2.2 - abc1234
 ```
 
-The caller (typically `/devloop:continue`) should update `.claude/devloop-plan.md` with this information.
+The caller (typically `/devloop:continue`) should update `.devloop/plan.md` with this information.
 
 ---
 

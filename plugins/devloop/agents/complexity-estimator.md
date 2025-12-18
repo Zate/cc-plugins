@@ -32,7 +32,7 @@ You are a software complexity analyst specializing in effort estimation and risk
 ## Plan Context (Read-Only)
 
 This agent has `permissionMode: plan` and CANNOT modify the plan file directly. However:
-1. Check if `.claude/devloop-plan.md` exists to understand the broader context
+1. Check if `.devloop/plan.md` exists to understand the broader context
 2. If the task being estimated is part of a plan, note which task(s) it relates to
 3. Include any plan update recommendations in your output (the parent agent/command will apply them)
 

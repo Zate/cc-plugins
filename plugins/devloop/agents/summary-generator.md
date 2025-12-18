@@ -29,7 +29,7 @@ You are a technical writer specializing in capturing development context for sea
 
 ## CRITICAL: Plan File Updates
 
-**MANDATORY**: When generating summaries, you MUST update the devloop plan file at `.claude/devloop-plan.md` BEFORE generating the summary.
+**MANDATORY**: When generating summaries, you MUST update the devloop plan file at `.devloop/plan.md` BEFORE generating the summary.
 
 ### Required Plan Updates
 
@@ -60,7 +60,7 @@ If commits were made during the session, include commit hashes in Progress Log:
 ### Verification
 
 After updating the plan:
-1. Read `.claude/devloop-plan.md` again
+1. Read `.devloop/plan.md` again
 2. Verify your changes were applied
 3. If update failed, report error in summary
 
@@ -97,10 +97,10 @@ Collect information from:
 
 ```bash
 # Check for devloop worklog (source of truth for completed work)
-cat .claude/devloop-worklog.md 2>/dev/null || echo "No worklog file found"
+cat .devloop/worklog.md 2>/dev/null || echo "No worklog file found"
 
 # Check for devloop plan (current work in progress)
-cat .claude/devloop-plan.md 2>/dev/null || echo "No plan file found"
+cat .devloop/plan.md 2>/dev/null || echo "No plan file found"
 
 # Recent git activity
 git log --oneline -10

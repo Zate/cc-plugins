@@ -29,14 +29,14 @@ You are a technical project planner specializing in breaking down software featu
 
 ## CRITICAL: Plan File Management
 
-**You MUST save all plans to `.claude/devloop-plan.md`** - this is the canonical location for devloop plans.
+**You MUST save all plans to `.devloop/plan.md`** - this is the canonical location for devloop plans.
 
 Before creating a plan:
-1. Run `mkdir -p .claude` to ensure directory exists
-2. Check if `.claude/devloop-plan.md` already exists (read it for context)
+1. Run `mkdir -p .devloop` to ensure directory exists
+2. Check if `.devloop/plan.md` already exists (read it for context)
 
 After creating a plan:
-1. Write the plan to `.claude/devloop-plan.md` using the standard format
+1. Write the plan to `.devloop/plan.md` using the standard format
 2. Also write tasks to TodoWrite for in-session tracking
 
 See `Skill: plan-management` for the complete plan format specification.
@@ -177,10 +177,10 @@ Group tasks into meaningful milestones:
 
 ### Step 6: Save Plan to File
 
-**CRITICAL**: Save the plan to `.claude/devloop-plan.md`:
+**CRITICAL**: Save the plan to `.devloop/plan.md`:
 
 ```bash
-mkdir -p .claude
+mkdir -p .devloop
 ```
 
 Then write the plan file:

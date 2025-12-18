@@ -201,7 +201,7 @@ The devloop workflow mirrors how senior engineers approach complex features. Eac
    - Specify test requirements per task
    - Group into phases/milestones
 2. Write all tasks to TodoWrite
-3. Save plan to `.claude/devloop-plan.md`
+3. Save plan to `.devloop/plan.md`
 4. Present plan for approval
 
 **Plan File Format**:
@@ -323,7 +323,7 @@ The devloop workflow mirrors how senior engineers approach complex features. Eac
    - Quality criteria: Review passed, no critical issues
    - Documentation criteria: Docs updated as needed
    - Integration criteria: Ready for commit
-2. Check for project-specific DoD in `.claude/devloop.local.md`
+2. Check for project-specific DoD in `.devloop/local.md`
 3. Present validation results
 
 **Agent Used**: `dod-validator` (haiku)

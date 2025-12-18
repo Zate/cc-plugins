@@ -316,7 +316,7 @@ This project uses devloop for structured development.
 Before marking a task complete:
 1. Implementation working
 2. Tests pass (if applicable)
-3. Plan updated (`.claude/devloop-plan.md`)
+3. Plan updated (`.devloop/plan.md`)
 4. Changes committed (atomic, reviewable commits)
 
 ### Commit Conventions
@@ -333,7 +333,7 @@ Include task reference: `feat(auth): add login - Task 2.1`
 - CHANGELOG updated with each release (if present)
 
 ### Plan Location
-Active plan: `.claude/devloop-plan.md`
+Active plan: `.devloop/plan.md`
 ```
 
 ### Why This Matters

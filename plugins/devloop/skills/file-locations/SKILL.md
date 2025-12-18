@@ -1,6 +1,6 @@
 ---
 name: file-locations
-description: Authoritative reference for .claude/ directory structure and file locations. Documents which files are git-tracked vs local-only, their purposes, and naming conventions. Use when creating devloop artifacts or understanding project structure.
+description: Authoritative reference for .devloop/ directory structure and file locations. Documents which files are git-tracked vs local-only, their purposes, and naming conventions. Use when creating devloop artifacts or understanding project structure.
 ---
 
 # File Locations
@@ -14,43 +14,41 @@ description: Authoritative reference for .claude/ directory structure and file l
 - Setting up a new project with devloop
 - Troubleshooting file location issues
 - Reviewing what artifacts exist in a project
+- Migrating from old `.claude/` paths to `.devloop/`
 
 ## When NOT to Use This Skill
 
-- Working with application code (not .claude/ files)
+- Working with application code (not `.devloop/` files)
 - General git operations (use `Skill: git-workflows`)
-- Project configuration outside .claude/ directory
+- Claude Code configuration (`.claude/` is separate)
 
 ---
 
 ## Directory Structure
 
 ```
-.claude/
-├── devloop-plan.md           # Active implementation plan (git-tracked)
-├── devloop-worklog.md        # Completed work history (git-tracked)
-├── devloop.local.md          # Local settings/preferences (NOT git-tracked)
-├── project-context.json      # Tech stack cache (git-tracked)
+.devloop/                     # Devloop's dedicated directory (v1.11.0+)
+├── plan.md                   # Active implementation plan (git-tracked)
+├── worklog.md                # Completed work history (git-tracked)
+├── local.md                  # Local settings/preferences (NOT git-tracked)
+├── context.json              # Tech stack cache (git-tracked)
 │
 ├── issues/                   # Issue tracking (git-tracked)
 │   ├── index.md              # Issue index and counts
+│   ├── bugs.md               # Bug-only view
+│   ├── features.md           # Feature-only view
+│   ├── backlog.md            # Open features + tasks
 │   ├── BUG-001.md            # Individual bug reports
 │   ├── FEAT-001.md           # Feature requests
 │   ├── TASK-001.md           # General tasks
 │   ├── CHORE-001.md          # Maintenance tasks
 │   └── SPIKE-001.md          # Technical investigations
 │
-├── bugs/                     # Legacy bug directory (migrate to issues/)
-│   └── ...
-│
-├── security/                 # Security audit outputs (NOT git-tracked)
-│   ├── audit-report.md       # Full audit report
-│   └── findings/             # Individual findings
-│
-├── settings.local.json       # Claude Code local settings (NOT git-tracked)
-├── commands/                 # Project-specific commands (git-tracked)
-└── *-spike-report.md         # Spike investigation reports (NOT git-tracked)
+└── spikes/                   # Spike investigation reports (NOT git-tracked)
+    └── {topic}.md            # e.g., auth.md, caching.md
 ```
+
+**Note**: Claude Code's `.claude/` directory remains separate and is not managed by devloop.
 
 ---
 
@@ -60,11 +58,10 @@ description: Authoritative reference for .claude/ directory structure and file l
 
 | File/Directory | Purpose | Created By |
 |----------------|---------|------------|
-| `devloop-plan.md` | Active implementation plan with tasks | `/devloop`, task-planner |
-| `devloop-worklog.md` | History of completed work with commits | post-commit hook |
-| `project-context.json` | Cached tech stack detection | session-start hook |
+| `plan.md` | Active implementation plan with tasks | `/devloop`, task-planner |
+| `worklog.md` | History of completed work with commits | post-commit hook |
+| `context.json` | Cached tech stack detection | session-start hook |
 | `issues/` | Issue tracking (bugs, features, tasks) | `/devloop:bug`, `/devloop:new` |
-| `commands/` | Project-specific slash commands | User-created |
 
 **Rationale**: These files represent shared project state that all team members need access to.
 
@@ -72,12 +69,10 @@ description: Authoritative reference for .claude/ directory structure and file l
 
 | File/Directory | Purpose | Created By |
 |----------------|---------|------------|
-| `devloop.local.md` | Personal preferences, enforcement settings | User-created |
-| `settings.local.json` | Claude Code local configuration | Claude Code |
-| `security/` | Security audit findings (may contain sensitive info) | `/security:audit` |
-| `*-spike-report.md` | Exploratory investigation reports | `/devloop:spike` |
+| `local.md` | Personal preferences, enforcement settings | User-created |
+| `spikes/` | Exploratory investigation reports | `/devloop:spike` |
 
-**Rationale**: These files contain local preferences, sensitive information, or exploratory work that shouldn't be shared.
+**Rationale**: These files contain local preferences or exploratory work that shouldn't be shared.
 
 ---
 
@@ -87,9 +82,10 @@ description: Authoritative reference for .claude/ directory structure and file l
 
 | Pattern | Example | Purpose |
 |---------|---------|---------|
-| `devloop-plan.md` | Fixed name | Active plan (only one) |
-| `devloop-worklog.md` | Fixed name | Work history |
-| `devloop.local.md` | Fixed name | Local settings |
+| `plan.md` | Fixed name | Active plan (only one) |
+| `worklog.md` | Fixed name | Work history |
+| `local.md` | Fixed name | Local settings |
+| `context.json` | Fixed name | Project context cache |
 
 ### Issues
 
@@ -99,22 +95,21 @@ description: Authoritative reference for .claude/ directory structure and file l
 | `FEAT-NNN.md` | `FEAT-001.md` | Feature requests |
 | `TASK-NNN.md` | `TASK-001.md` | General tasks |
 | `CHORE-NNN.md` | `CHORE-001.md` | Maintenance tasks |
-| `SPIKE-NNN.md` | `SPIKE-001.md` | Technical investigations |
+| `SPIKE-NNN.md` | `SPIKE-001.md` | Technical investigations (issue tracker) |
 
-### Reports
+### Spike Reports
 
 | Pattern | Example | Purpose |
 |---------|---------|---------|
-| `*-spike-report.md` | `auth-spike-report.md` | Spike investigation results |
-| `security/audit-report.md` | Fixed path | Security audit output |
+| `spikes/{topic}.md` | `spikes/auth.md` | Spike investigation results |
 
 ---
 
 ## Detailed File Specifications
 
-### devloop-plan.md
+### plan.md
 
-**Location**: `.claude/devloop-plan.md`
+**Location**: `.devloop/plan.md`
 **Git Status**: Tracked
 **Created By**: `/devloop` command, task-planner agent
 **Updated By**: `/devloop:continue`, task-checkpoint skill
@@ -149,9 +144,9 @@ description: Authoritative reference for .claude/ directory structure and file l
 
 ---
 
-### devloop-worklog.md
+### worklog.md
 
-**Location**: `.claude/devloop-worklog.md`
+**Location**: `.devloop/worklog.md`
 **Git Status**: Tracked
 **Created By**: Post-commit hook (first commit)
 **Updated By**: Post-commit hook (automatic)
@@ -179,9 +174,9 @@ description: Authoritative reference for .claude/ directory structure and file l
 
 ---
 
-### devloop.local.md
+### local.md
 
-**Location**: `.claude/devloop.local.md`
+**Location**: `.devloop/local.md`
 **Git Status**: NOT Tracked (add to .gitignore)
 **Created By**: User (manually or via template)
 **Updated By**: User
@@ -212,9 +207,9 @@ Personal preferences and notes for this project.
 
 ---
 
-### project-context.json
+### context.json
 
-**Location**: `.claude/project-context.json`
+**Location**: `.devloop/context.json`
 **Git Status**: Tracked
 **Created By**: Session-start hook
 **Updated By**: Session-start hook (refreshed periodically)
@@ -243,14 +238,17 @@ Personal preferences and notes for this project.
 
 ### issues/ Directory
 
-**Location**: `.claude/issues/`
+**Location**: `.devloop/issues/`
 **Git Status**: Tracked
 **Created By**: `/devloop:bug`, `/devloop:new`, issue-manager agent
 
 **Structure**:
 ```
 issues/
-├── index.md              # Issue index with counts
+├── index.md              # Master index with counts
+├── bugs.md               # Bug-only filtered view
+├── features.md           # Feature-only filtered view
+├── backlog.md            # Open features + tasks
 ├── BUG-001.md
 ├── FEAT-001.md
 └── ...
@@ -274,36 +272,13 @@ issues/
 
 ---
 
-### security/ Directory
+### spikes/ Directory
 
-**Location**: `.claude/security/`
-**Git Status**: NOT Tracked
-**Created By**: `/security:audit` command
-
-**Structure**:
-```
-security/
-├── audit-report.md       # Full audit report
-├── findings/
-│   ├── finding-001.md
-│   └── ...
-└── remediation-plan.md   # Optional remediation plan
-```
-
-**Rationale for NOT tracking**:
-- May contain sensitive vulnerability details
-- Could reveal security weaknesses if repo is public
-- Findings should be addressed, not preserved in history
-
----
-
-### Spike Reports
-
-**Location**: `.claude/*-spike-report.md`
+**Location**: `.devloop/spikes/`
 **Git Status**: NOT Tracked
 **Created By**: `/devloop:spike` command
 
-**Naming**: `{topic}-spike-report.md` (e.g., `auth-spike-report.md`)
+**Naming**: `{topic}.md` (e.g., `auth.md`, `caching.md`)
 
 **Rationale for NOT tracking**:
 - Exploratory/investigative work
@@ -318,17 +293,8 @@ Add these patterns to your project's `.gitignore`:
 
 ```gitignore
 # Devloop local files (do not commit)
-.claude/devloop.local.md
-.claude/settings.local.json
-.claude/security/
-.claude/*-spike-report.md
-
-# Keep these tracked
-!.claude/devloop-plan.md
-!.claude/devloop-worklog.md
-!.claude/project-context.json
-!.claude/issues/
-!.claude/commands/
+.devloop/local.md
+.devloop/spikes/
 ```
 
 See also: `plugins/devloop/templates/gitignore-devloop` for a copy-paste template.
@@ -336,6 +302,13 @@ See also: `plugins/devloop/templates/gitignore-devloop` for a copy-paste templat
 ---
 
 ## Decision Rationale
+
+### Why use .devloop/ instead of .claude/?
+
+- **Clean separation**: Devloop files are separate from Claude Code's `.claude/` directory
+- **Simple gitignore**: Just ignore `local.md` and `spikes/` - no complex patterns
+- **Clear ownership**: `.devloop/` = devloop plugin, `.claude/` = Claude Code core
+- **Easier maintenance**: No confusion with other Claude tools' files
 
 ### Why track the plan?
 
@@ -349,12 +322,6 @@ See also: `plugins/devloop/templates/gitignore-devloop` for a copy-paste templat
 - **Environment-specific**: May differ between machines
 - **Avoid conflicts**: Prevents merge conflicts on preferences
 
-### Why NOT track security reports?
-
-- **Sensitivity**: Vulnerability details are sensitive
-- **Ephemeral**: Should be addressed and closed, not preserved
-- **Public repos**: Would expose attack vectors
-
 ### Why NOT track spike reports?
 
 - **Working notes**: Not polished deliverables
@@ -365,19 +332,43 @@ See also: `plugins/devloop/templates/gitignore-devloop` for a copy-paste templat
 
 ## Migration Guide
 
+### From .claude/ to .devloop/ (v1.10.x → v1.11.x)
+
+If you have existing devloop files in `.claude/`:
+
+| Old Location | New Location |
+|--------------|--------------|
+| `.claude/devloop-plan.md` | `.devloop/plan.md` |
+| `.claude/devloop-worklog.md` | `.devloop/worklog.md` |
+| `.claude/devloop.local.md` | `.devloop/local.md` |
+| `.claude/project-context.json` | `.devloop/context.json` |
+| `.claude/issues/` | `.devloop/issues/` |
+| `.claude/bugs/` | `.devloop/issues/` |
+| `.claude/*-spike-report.md` | `.devloop/spikes/*.md` |
+
+**Migration Process**:
+1. Session-start hook detects old files and prompts for migration
+2. User confirms via AskUserQuestion
+3. Files are moved to new locations (content preserved)
+4. Old files can be deleted after verification
+
+**Backwards Compatibility**:
+- v1.11.x reads from `.devloop/` first, falls back to `.claude/` paths
+- v1.12.0+ will remove fallback (migrate before upgrading)
+
 ### From bugs/ to issues/
 
 If you have existing `.claude/bugs/` files:
 
-1. Move files to `.claude/issues/` with prefix: `BUG-001.md`
-2. Update internal links and references
-3. Create `index.md` with issue listing
+1. Files move to `.devloop/issues/` with prefix: `BUG-001.md`
+2. `type: bug` added to frontmatter
+3. View files (`index.md`, `bugs.md`) generated automatically
 
-### From no .claude/ to devloop
+### New Project Setup
 
-1. Create `.claude/` directory
-2. Copy `.gitignore` template (Task 1.2 will create this)
-3. Run `/devloop` to create initial plan
+1. Run `/devloop` to create initial plan
+2. `.devloop/` directory created automatically
+3. Add `.devloop/local.md` and `.devloop/spikes/` to `.gitignore`
 4. Context will be detected and cached automatically
 
 ---
@@ -386,5 +377,6 @@ If you have existing `.claude/bugs/` files:
 
 - `Skill: plan-management` - Plan file format and update rules
 - `Skill: issue-tracking` - Issue file format and workflows
+- `Skill: worklog-management` - Worklog format and update rules
 - `Skill: atomic-commits` - When and how to commit
 - `/devloop:continue` - Resuming from a plan

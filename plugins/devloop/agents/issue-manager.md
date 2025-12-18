@@ -35,7 +35,7 @@ You are an issue tracking assistant that creates well-structured issues for bugs
 
 ## Core Mission
 
-Create, update, and manage issues in `.claude/issues/` for items that:
+Create, update, and manage issues in `.devloop/issues/` for items that:
 - Are not critical enough to stop current work
 - Should be tracked for future action
 - Were discovered by agents or users during development
@@ -58,9 +58,9 @@ Check which system to use:
 
 ```bash
 # Prefer unified system
-if [ -d ".claude/issues" ]; then
+if [ -d ".devloop/issues" ]; then
     echo "unified"
-elif [ -d ".claude/bugs" ]; then
+elif [ -d ".devloop/issues" ]; then
     echo "legacy"
 else
     echo "unified"  # Default to unified for new projects
@@ -70,7 +70,7 @@ fi
 ### Step 2: Ensure Directory Exists
 
 ```bash
-mkdir -p .claude/issues
+mkdir -p .devloop/issues
 ```
 
 ### Step 3: Determine Issue Type
@@ -89,7 +89,7 @@ Default priority: bug > feature > task if ambiguous.
 
 ```bash
 prefix="FEAT"  # Based on type
-highest=$(ls .claude/issues/${prefix}-*.md 2>/dev/null | \
+highest=$(ls .devloop/issues/${prefix}-*.md 2>/dev/null | \
   sed "s/.*${prefix}-0*//" | sed 's/.md//' | sort -n | tail -1)
 next=$((${highest:-0} + 1))
 printf "${prefix}-%03d" $next
@@ -110,7 +110,7 @@ Collect from the calling context:
 
 ### Step 6: Create Issue File
 
-Write to `.claude/issues/{PREFIX}-{NNN}.md`:
+Write to `.devloop/issues/{PREFIX}-{NNN}.md`:
 
 ```markdown
 ---
@@ -160,7 +160,7 @@ After creating the issue, regenerate all view files:
 3. **features.md** - Feature-only view
 4. **backlog.md** - Open features + tasks
 
-Read all `.claude/issues/{PREFIX}-*.md` files and regenerate views based on the templates in the `issue-tracking` skill.
+Read all `.devloop/issues/{PREFIX}-*.md` files and regenerate views based on the templates in the `issue-tracking` skill.
 
 ## View File Templates
 
@@ -325,7 +325,7 @@ After creating an issue, report:
 **Type**: {type}
 **Title**: {title}
 **Priority**: {priority}
-**File**: .claude/issues/{PREFIX}-{NNN}.md
+**File**: .devloop/issues/{PREFIX}-{NNN}.md
 
 The issue has been logged for future action.
 ```
@@ -353,9 +353,9 @@ Labels: {optional}
 
 ## Legacy Support
 
-If `.claude/bugs/` exists but `.claude/issues/` doesn't:
-- For bug type: Create in `.claude/bugs/` using old format
-- For other types: Create `.claude/issues/` and use unified system
+If `.devloop/issues/` exists but `.devloop/issues/` doesn't:
+- For bug type: Create in `.devloop/issues/` using old format
+- For other types: Create `.devloop/issues/` and use unified system
 
 ## Error Handling
 

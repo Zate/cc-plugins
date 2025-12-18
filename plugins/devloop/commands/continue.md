@@ -13,18 +13,18 @@ Resume work from an existing implementation plan. Finds the current plan, identi
 ## Context Sources
 
 When resuming work, read both:
-1. **Plan** (`.claude/devloop-plan.md`) - What's in progress
-2. **Worklog** (`.claude/devloop-worklog.md`) - What's already committed
+1. **Plan** (`.devloop/plan.md`) - What's in progress
+2. **Worklog** (`.devloop/worklog.md`) - What's already committed
 
 The worklog shows completed tasks with commit hashes; the plan shows current progress.
 For worklog format details, invoke: `Skill: worklog-management`
 
 ## Plan Location
 
-The canonical plan location is: **`.claude/devloop-plan.md`**
+The canonical plan location is: **`.devloop/plan.md`**
 
 Search for plans in this order:
-1. **`.claude/devloop-plan.md`** ← Primary (devloop standard)
+1. **`.devloop/plan.md`** ← Primary (devloop standard)
 2. `docs/PLAN.md`, `docs/plan.md`
 3. `PLAN.md`, `plan.md`
 4. `~/.claude/plans/*.md` (fallback - most recent)
@@ -35,7 +35,7 @@ Search for plans in this order:
 
 ```bash
 # Check for project-local plans first
-for plan_file in .claude/devloop-plan.md docs/PLAN.md docs/plan.md PLAN.md plan.md; do
+for plan_file in .devloop/plan.md docs/PLAN.md docs/plan.md PLAN.md plan.md; do
     if [ -f "$plan_file" ]; then
         echo "Found: $plan_file"
         break
@@ -190,7 +190,7 @@ Invoke `Skill: task-checkpoint` for the complete checklist.
 - [ ] Error handling is in place
 
 #### 2. Update Plan File
-**REQUIRED** - Update `.claude/devloop-plan.md`:
+**REQUIRED** - Update `.devloop/plan.md`:
 - [ ] Mark task complete: `- [ ]` → `- [x]`
 - [ ] Add Progress Log entry: `- YYYY-MM-DD HH:MM: Completed Task X.Y - [summary]`
 - [ ] Update `**Updated**:` timestamp
@@ -230,7 +230,7 @@ Use AskUserQuestion:
 
 #### 5. Enforcement Check
 
-Read `.claude/devloop.local.md` for enforcement setting:
+Read `.devloop/local.md` for enforcement setting:
 
 **If `enforcement: strict`:**
 - Verify plan was actually updated
@@ -242,7 +242,7 @@ Read `.claude/devloop.local.md` for enforcement setting:
 
 ### Step 6: Update Plan File
 
-**CRITICAL**: After completing a task, you MUST update `.claude/devloop-plan.md`:
+**CRITICAL**: After completing a task, you MUST update `.devloop/plan.md`:
 
 1. **Mark task complete**: `- [ ]` → `- [x]`
 2. **Add Progress Log entry**: `- [YYYY-MM-DD HH:MM]: Completed [task] - [summary]`
@@ -336,7 +336,7 @@ Use `Skill: version-management` to determine if a version bump is warranted:
 
 #### 5. Update Plan for Phase Transition
 
-Update `.claude/devloop-plan.md`:
+Update `.devloop/plan.md`:
 - [ ] Update `**Current Phase**:` to next phase
 - [ ] Add Progress Log entry: `- YYYY-MM-DD HH:MM: Completed Phase X - [summary]`
 - [ ] If versioned: `- YYYY-MM-DD HH:MM: Released vX.Y.Z`
@@ -393,7 +393,7 @@ The command understands various plan formats:
 
 ## Integration with Devloop
 
-When `/devloop` creates a plan in Phase 6 (Planning), it should save to `.claude/devloop-plan.md`:
+When `/devloop` creates a plan in Phase 6 (Planning), it should save to `.devloop/plan.md`:
 
 ```markdown
 # Devloop Plan: [Feature Name]

@@ -1,6 +1,6 @@
 ---
 # Devloop Configuration Template
-# Copy this file to your project's .claude/ directory as devloop.local.md
+# Copy this file to your project's .devloop/ directory as local.md
 # Customize the settings below for your project
 
 # =============================================================================

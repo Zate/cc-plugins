@@ -1140,7 +1140,7 @@ After the report format question, add this option:
   options: [
     {
       label: "Create devloop plan (Recommended)",
-      description: "Generate .claude/devloop-plan.md with refactoring tasks"
+      description: "Generate .devloop/plan.md with refactoring tasks"
     },
     {
       label: "Add to existing plan",
@@ -1195,7 +1195,7 @@ When user selects plan output, convert each approved finding to a task:
 
 ### Plan File Generation
 
-**New Plan (`.claude/devloop-plan.md`):**
+**New Plan (`.devloop/plan.md`):**
 
 ```markdown
 # Devloop Plan: Codebase Refactoring
@@ -1257,7 +1257,7 @@ Refactoring plan generated from automated codebase analysis.
 
 If "Add to existing plan" is selected:
 
-1. Read current `.claude/devloop-plan.md`
+1. Read current `.devloop/plan.md`
 2. Find the last phase number
 3. Add new phase: "Phase N+1: Refactoring (from analysis)"
 4. Preserve all existing content
@@ -1283,10 +1283,10 @@ Inform user of next steps:
 
 I've created a refactoring plan with [N] tasks across [M] phases.
 
-**Plan Location**: `.claude/devloop-plan.md`
+**Plan Location**: `.devloop/plan.md`
 
 **Next Steps**:
-1. Review the plan: `Read .claude/devloop-plan.md`
+1. Review the plan: `Read .devloop/plan.md`
 2. Start implementing: `/devloop:continue`
 3. Adjust priorities: Edit the plan file directly
 

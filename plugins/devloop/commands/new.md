@@ -182,15 +182,15 @@ Use AskUserQuestion:
 
 ### Step 6: Create Issue
 
-1. Ensure `.claude/issues/` directory exists:
+1. Ensure `.devloop/issues/` directory exists:
    ```bash
-   mkdir -p .claude/issues
+   mkdir -p .devloop/issues
    ```
 
 2. Determine next ID for the type:
    ```bash
    prefix="FEAT"  # Based on type
-   max_num=$(ls .claude/issues/${prefix}-*.md 2>/dev/null | \
+   max_num=$(ls .devloop/issues/${prefix}-*.md 2>/dev/null | \
      sed "s/.*${prefix}-0*//" | sed 's/.md//' | \
      sort -n | tail -1)
    next_num=$((${max_num:-0} + 1))
@@ -212,7 +212,7 @@ Present the created issue:
 **Type**: {type}
 **Title**: {title}
 **Priority**: {priority}
-**Location**: .claude/issues/{PREFIX}-{NNN}.md
+**Location**: .devloop/issues/{PREFIX}-{NNN}.md
 ```
 
 ```
@@ -300,13 +300,13 @@ If creating multiple:
 
 ## Issue File Location
 
-Issues are stored in `.claude/issues/{PREFIX}-{NNN}.md`
+Issues are stored in `.devloop/issues/{PREFIX}-{NNN}.md`
 
 Views:
-- `.claude/issues/index.md` - All issues
-- `.claude/issues/bugs.md` - Bugs only
-- `.claude/issues/features.md` - Features only
-- `.claude/issues/backlog.md` - Open features + tasks
+- `.devloop/issues/index.md` - All issues
+- `.devloop/issues/bugs.md` - Bugs only
+- `.devloop/issues/features.md` - Features only
+- `.devloop/issues/backlog.md` - Open features + tasks
 
 ---
 
@@ -323,11 +323,11 @@ After creating an issue:
 
 ## Migration Note
 
-If `.claude/bugs/` exists but `.claude/issues/` doesn't, offer migration:
+If `.devloop/issues/` exists but `.devloop/issues/` doesn't, offer migration:
 
 ```
 Use AskUserQuestion:
-- question: "Found existing .claude/bugs/ directory. Would you like to migrate to the unified issue system?"
+- question: "Found existing .devloop/issues/ directory. Would you like to migrate to the unified issue system?"
 - header: "Migrate"
 - multiSelect: false
 - options:

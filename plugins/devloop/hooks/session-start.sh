@@ -316,7 +316,7 @@ get_claude_md_summary() {
 get_config_files() {
     local configs=""
 
-    for file in CLAUDE.md .claude/settings.json .claude/devloop.local.md .env.example docker-compose.yml Dockerfile Makefile justfile; do
+    for file in CLAUDE.md .claude/settings.json .devloop/local.md .claude/devloop.local.md .env.example docker-compose.yml Dockerfile Makefile justfile; do
         if [ -f "$file" ]; then
             configs="$configs $file"
         fi
@@ -325,10 +325,33 @@ get_config_files() {
     echo "$configs" | xargs
 }
 
-# Check for open bugs
+# Detect if legacy devloop files exist that could be migrated
+check_migration_needed() {
+    # Check if legacy files exist in .claude/ but .devloop/ doesn't exist yet
+    local needs_migration=false
+
+    if [ ! -d ".devloop" ]; then
+        if [ -f ".claude/devloop-plan.md" ] || [ -f ".claude/devloop-worklog.md" ] || [ -d ".claude/issues" ] || [ -d ".claude/bugs" ]; then
+            needs_migration=true
+        fi
+    fi
+
+    echo "$needs_migration"
+}
+
+# Check for open bugs/issues (prefer .devloop/, fallback to .claude/)
 get_bug_count() {
-    if [ -d ".claude/bugs" ]; then
-        local open=$(grep -l "status: open" .claude/bugs/BUG-*.md 2>/dev/null | wc -l | tr -d ' ' || echo "0")
+    local issues_dir=""
+    if [ -d ".devloop/issues" ]; then
+        issues_dir=".devloop/issues"
+    elif [ -d ".claude/issues" ]; then
+        issues_dir=".claude/issues"
+    elif [ -d ".claude/bugs" ]; then
+        issues_dir=".claude/bugs"
+    fi
+
+    if [ -n "$issues_dir" ]; then
+        local open=$(grep -l "status: open" "$issues_dir"/*.md 2>/dev/null | wc -l | tr -d ' ' || echo "0")
         if [ "$open" -gt 0 ]; then
             echo "$open"
             return
@@ -337,15 +360,24 @@ get_bug_count() {
     echo ""
 }
 
-# Check for existing devloop plan
+# Check for existing devloop plan (prefer .devloop/, fallback to .claude/)
 get_active_plan() {
-    # Check for project-local devloop plan
-    if [ -f ".claude/devloop-plan.md" ]; then
+    local plan_file=""
+
+    # Prefer new .devloop/ location
+    if [ -f ".devloop/plan.md" ]; then
+        plan_file=".devloop/plan.md"
+    elif [ -f ".claude/devloop-plan.md" ]; then
+        # Legacy location fallback
+        plan_file=".claude/devloop-plan.md"
+    fi
+
+    if [ -n "$plan_file" ]; then
         # Extract plan name from first heading
-        local plan_name=$(grep -m1 "^# " .claude/devloop-plan.md 2>/dev/null | sed 's/^# //' | head -c 50)
+        local plan_name=$(grep -m1 "^# " "$plan_file" 2>/dev/null | sed 's/^# //' | head -c 50)
         # Count completed vs total tasks
-        local total=$(grep -c "^\s*- \[" .claude/devloop-plan.md 2>/dev/null || echo "0")
-        local done=$(grep -c "^\s*- \[x\]" .claude/devloop-plan.md 2>/dev/null || echo "0")
+        local total=$(grep -c "^\s*- \[" "$plan_file" 2>/dev/null || echo "0")
+        local done=$(grep -c "^\s*- \[x\]" "$plan_file" 2>/dev/null || echo "0")
         if [ -n "$plan_name" ]; then
             echo "name=$plan_name,done=$done,total=$total"
             return
@@ -395,6 +427,7 @@ CONFIG_FILES=$(get_config_files)
 PROJECT_SIZE=$(get_project_size)
 ACTIVE_PLAN=$(get_active_plan)
 OPEN_BUGS=$(get_bug_count)
+NEEDS_MIGRATION=$(check_migration_needed)
 
 # Write to environment file if available
 if [ -n "${CLAUDE_ENV_FILE:-}" ]; then
@@ -486,6 +519,13 @@ if [ -n "$OPEN_BUGS" ] && [ "$OPEN_BUGS" -gt 0 ]; then
     CONTEXT_MSG="$CONTEXT_MSG
 
 **Open Bugs**: $OPEN_BUGS tracked → Use \`/devloop:bugs\` to manage"
+fi
+
+# Add migration notice if legacy files detected
+if [ "$NEEDS_MIGRATION" = "true" ]; then
+    CONTEXT_MSG="$CONTEXT_MSG
+
+**Migration Available**: Legacy devloop files found in \`.claude/\`. Consider migrating to \`.devloop/\` for cleaner separation. Use AskUserQuestion to offer migration when the user runs a devloop command."
 fi
 
 CONTEXT_MSG="$CONTEXT_MSG

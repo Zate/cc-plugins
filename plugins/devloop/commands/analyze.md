@@ -13,7 +13,7 @@ Comprehensive codebase analysis to identify refactoring opportunities, technical
 This command integrates with devloop's plan system:
 1. Analyzes codebase for refactoring opportunities
 2. Presents findings for user vetting
-3. Converts approved findings to plan tasks in `.claude/devloop-plan.md`
+3. Converts approved findings to plan tasks in `.devloop/plan.md`
 4. Tasks are ordered for atomic, incremental implementation
 
 See `Skill: plan-management` for plan format.
@@ -113,7 +113,7 @@ Use AskUserQuestion:
 - question: "How would you like to use these findings?"
 - header: "Output"
 - options:
-  - Create devloop plan (Recommended) (Generate .claude/devloop-plan.md with refactoring tasks)
+  - Create devloop plan (Recommended) (Generate .devloop/plan.md with refactoring tasks)
   - Add to existing plan (Append as new phase to current plan)
   - Report only (Generate REFACTORING_REPORT.md for review)
   - All formats (Both plan and detailed report)
@@ -137,7 +137,7 @@ If plan output selected:
    - Quick wins early for momentum
    - Larger structural changes later
 
-3. Write to `.claude/devloop-plan.md`:
+3. Write to `.devloop/plan.md`:
    ```markdown
    # Devloop Plan: Codebase Refactoring
 
@@ -167,7 +167,7 @@ If plan output selected:
    ```
 
 4. If "Add to existing plan" selected:
-   - Read current `.claude/devloop-plan.md`
+   - Read current `.devloop/plan.md`
    - Append new phase: "Refactoring (from analysis)"
    - Preserve existing tasks and progress
 
@@ -283,7 +283,7 @@ This command uses:
 ## Notes
 
 - Analysis is non-invasive (read-only during analysis phase)
-- Plan generation writes to `.claude/devloop-plan.md`
+- Plan generation writes to `.devloop/plan.md`
 - Existing plans can be appended to, not overwritten
 - Analysis typically takes 2-10 minutes depending on codebase size
 - Results are deterministic - same code produces same analysis

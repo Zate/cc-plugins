@@ -56,10 +56,16 @@ if { [ -n "$WORK_DIR" ] && [ -d "$WORK_DIR/.git" ]; } || git -C "$WORK_DIR" rev-
     fi
 fi
 
-# Check for devloop plan progress
+# Check for devloop plan progress (prefer .devloop/, fallback to .claude/)
 PLAN_STATUS=""
-PLAN_FILE="${PROJECT_DIR:-.}/.claude/devloop-plan.md"
-if [ -f "$PLAN_FILE" ]; then
+PLAN_FILE=""
+if [ -f "${PROJECT_DIR:-.}/.devloop/plan.md" ]; then
+    PLAN_FILE="${PROJECT_DIR:-.}/.devloop/plan.md"
+elif [ -f "${PROJECT_DIR:-.}/.claude/devloop-plan.md" ]; then
+    PLAN_FILE="${PROJECT_DIR:-.}/.claude/devloop-plan.md"
+fi
+
+if [ -n "$PLAN_FILE" ] && [ -f "$PLAN_FILE" ]; then
     TOTAL=$(grep -c "^\s*- \[" "$PLAN_FILE" 2>/dev/null || echo "0")
     DONE=$(grep -c "^\s*- \[x\]" "$PLAN_FILE" 2>/dev/null || echo "0")
     if [ "$TOTAL" -gt 0 ]; then
@@ -67,11 +73,19 @@ if [ -f "$PLAN_FILE" ]; then
     fi
 fi
 
-# Check for open bugs
+# Check for open bugs/issues (prefer .devloop/, fallback to .claude/)
 BUG_COUNT=""
-BUGS_DIR="${PROJECT_DIR:-.}/.claude/bugs"
-if [ -d "$BUGS_DIR" ]; then
-    OPEN_BUGS=$(grep -l "status: open" "$BUGS_DIR"/BUG-*.md 2>/dev/null | wc -l | tr -d ' ' || echo "0")
+ISSUES_DIR=""
+if [ -d "${PROJECT_DIR:-.}/.devloop/issues" ]; then
+    ISSUES_DIR="${PROJECT_DIR:-.}/.devloop/issues"
+elif [ -d "${PROJECT_DIR:-.}/.claude/issues" ]; then
+    ISSUES_DIR="${PROJECT_DIR:-.}/.claude/issues"
+elif [ -d "${PROJECT_DIR:-.}/.claude/bugs" ]; then
+    ISSUES_DIR="${PROJECT_DIR:-.}/.claude/bugs"
+fi
+
+if [ -n "$ISSUES_DIR" ] && [ -d "$ISSUES_DIR" ]; then
+    OPEN_BUGS=$(grep -l "status: open" "$ISSUES_DIR"/*.md 2>/dev/null | wc -l | tr -d ' ' || echo "0")
     if [ "$OPEN_BUGS" -gt 0 ]; then
         BUG_COUNT="${RED}${OPEN_BUGS}${RESET}"
     fi

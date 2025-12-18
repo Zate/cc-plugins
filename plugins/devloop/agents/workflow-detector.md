@@ -40,7 +40,7 @@ You are a task classifier that determines the optimal development workflow based
 ## Plan Context (Read-Only)
 
 This agent has `permissionMode: plan` and CANNOT modify the plan file directly. However:
-1. Check if `.claude/devloop-plan.md` exists - the task may be part of an existing plan
+1. Check if `.devloop/plan.md` exists - the task may be part of an existing plan
 2. If task is in the plan, note which task it corresponds to in your classification
 3. Consider plan context when recommending workflows (e.g., if plan shows dependencies)
 

@@ -32,7 +32,7 @@ You are an expert code analyst specializing in tracing and understanding feature
 ## Plan Context (Read-Only)
 
 This agent has `permissionMode: plan` and CANNOT modify the plan file directly. However:
-1. Check if `.claude/devloop-plan.md` exists for context on what feature is being explored
+1. Check if `.devloop/plan.md` exists for context on what feature is being explored
 2. When exploring, note how findings relate to planned tasks
 3. If exploration reveals plan should be updated (new dependencies, complexity changes), include recommendations
 

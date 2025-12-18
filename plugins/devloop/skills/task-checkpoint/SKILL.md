@@ -35,7 +35,7 @@ Use this skill:
 - [ ] Edge cases considered
 
 ### 3. Plan Update
-**REQUIRED** - Update `.claude/devloop-plan.md`:
+**REQUIRED** - Update `.devloop/plan.md`:
 - [ ] Mark task as complete: `- [ ]` → `- [x]`
 - [ ] Add Progress Log entry with timestamp and summary
 - [ ] Update the `**Updated**:` timestamp
@@ -76,7 +76,7 @@ Before proceeding:
 
 ### Step 2: Update Plan File
 ```
-Read .claude/devloop-plan.md
+Read .devloop/plan.md
 Find the task that was just completed
 Mark it [x] and add Progress Log entry
 Write the updated plan
@@ -87,7 +87,7 @@ Write the updated plan
 **Before committing, check if there are parallel tasks that should complete together:**
 
 ```
-Read .claude/devloop-plan.md
+Read .devloop/plan.md
 Find tasks with same [parallel:X] marker as completed task
 Check if any are still pending or in-progress
 ```
@@ -131,7 +131,7 @@ If committing:
 ### Step 5a: Update Worklog
 ```
 After successful commit:
-1. Read .claude/devloop-worklog.md (create if doesn't exist)
+1. Read .devloop/worklog.md (create if doesn't exist)
 2. Add entry to commit table:
    | {hash} | {date} | {commit message} | {task refs} |
 3. Add task to "Tasks Completed" section with commit hash:
@@ -143,7 +143,7 @@ See Skill: worklog-management for detailed format.
 
 ### Step 6: Enforcement Check
 ```
-Read .claude/devloop.local.md for enforcement setting
+Read .devloop/local.md for enforcement setting
 
 If enforcement: strict:
   - Verify plan was actually updated
@@ -225,7 +225,7 @@ If plan update is missing:
 ```
 ⚠️ Warning: Plan file not updated for completed task.
 
-The task appears complete but .claude/devloop-plan.md
+The task appears complete but .devloop/plan.md
 was not updated. This may cause sync issues.
 
 Would you like to:
@@ -241,7 +241,7 @@ If plan update is missing:
 🛑 Blocked: Plan update required.
 
 Strict enforcement is enabled. Cannot proceed to next task
-until .claude/devloop-plan.md is updated.
+until .devloop/plan.md is updated.
 
 Required actions:
 1. Mark Task X.Y as [x] complete

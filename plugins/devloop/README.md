@@ -2,7 +2,7 @@
 
 **A complete, token-conscious feature development workflow for professional software engineering.**
 
-[![Version](https://img.shields.io/badge/version-1.10.0-blue)](./CHANGELOG.md) [![Agents](https://img.shields.io/badge/agents-18-green)](#agents) [![Skills](https://img.shields.io/badge/skills-26-purple)](#skills) [![Commands](https://img.shields.io/badge/commands-14-orange)](#commands)
+[![Version](https://img.shields.io/badge/version-1.12.0-blue)](./CHANGELOG.md) [![Agents](https://img.shields.io/badge/agents-18-green)](#agents) [![Skills](https://img.shields.io/badge/skills-26-purple)](#skills) [![Commands](https://img.shields.io/badge/commands-14-orange)](#commands)
 
 ---
 
@@ -74,6 +74,7 @@ devloop provides a 12-phase workflow that mirrors how senior engineers approach 
 | Command | Purpose | When to Use |
 |---------|---------|-------------|
 | `/devloop` | Full feature workflow | New features, complex changes |
+| `/devloop:onboard` | **Existing repo setup** | **First time using devloop, migration from .claude/** |
 | `/devloop:analyze` | Codebase refactoring analysis | Technical debt, messy code, large files |
 | `/devloop:bootstrap` | New project setup | Greenfield projects with docs |
 | `/devloop:continue` | Resume existing plan | Continuing previous work |
@@ -91,6 +92,9 @@ devloop provides a 12-phase workflow that mirrors how senior engineers approach 
 ### Examples
 
 ```bash
+# Onboard an existing codebase to devloop
+/devloop:onboard
+
 # Bootstrap a new project from documentation
 /devloop:bootstrap ./docs/PRD.md ./specs/api.yaml
 
@@ -258,7 +262,7 @@ This is automatic. devloop selects the right model for each phase and agent.
 
 ## Plan Management
 
-devloop saves plans to `.claude/devloop-plan.md` so you can:
+devloop saves plans to `.devloop/plan.md` so you can:
 
 - **Resume later**: `/devloop:continue` picks up where you left off
 - **Track progress**: Plans show completed/pending tasks
@@ -301,14 +305,14 @@ Task Complete → Plan Update (REQUIRED) → Commit Decision
 
 | Component | Purpose |
 |-----------|---------|
-| **Plan** (`.claude/devloop-plan.md`) | What's in progress |
-| **Worklog** (`.claude/devloop-worklog.md`) | What's done (with commits) |
+| **Plan** (`.devloop/plan.md`) | What's in progress |
+| **Worklog** (`.devloop/worklog.md`) | What's done (with commits) |
 | **Pre-commit hook** | Blocks if plan not updated |
 | **Post-commit hook** | Auto-updates worklog |
 
 ### Enforcement Modes
 
-Configure in `.claude/devloop.local.md`:
+Configure in `.devloop/local.md`:
 
 ```yaml
 enforcement: advisory  # advisory (default) | strict
@@ -389,7 +393,7 @@ Not all parallelism is free. Guidelines:
 
 ## Issue Tracking
 
-devloop includes a unified issue tracking system for bugs, features, tasks, chores, and spikes. Issues are stored in `.claude/issues/` with type-prefixed IDs for quick identification.
+devloop includes a unified issue tracking system for bugs, features, tasks, chores, and spikes. Issues are stored in `.devloop/issues/` with type-prefixed IDs for quick identification.
 
 ### Issue Types
 
@@ -442,7 +446,7 @@ devloop includes a unified issue tracking system for bugs, features, tasks, chor
 ### Directory Structure
 
 ```
-.claude/issues/
+.devloop/issues/
 ├── index.md        # Master index (all issues)
 ├── bugs.md         # Bug-only view
 ├── features.md     # Feature-only view
@@ -452,9 +456,9 @@ devloop includes a unified issue tracking system for bugs, features, tasks, chor
 └── TASK-001.md
 ```
 
-### Migration from .claude/bugs/
+### Migration from .devloop/issues/
 
-If you have an existing `.claude/bugs/` directory, devloop will:
+If you have an existing `.devloop/issues/` directory, devloop will:
 1. Detect it automatically
 2. Offer to migrate to the unified system
 3. Preserve all existing bug data with BUG- prefixes
@@ -492,20 +496,20 @@ Configure with `/devloop:statusline`.
 
 ## Migration from Bugs to Issues
 
-If you have an existing `.claude/bugs/` directory and want to migrate to the unified issue system:
+If you have an existing `.devloop/issues/` directory and want to migrate to the unified issue system:
 
 ### Automatic Migration
 
-1. Run `/devloop:issues` - it will detect `.claude/bugs/` and offer migration
+1. Run `/devloop:issues` - it will detect `.devloop/issues/` and offer migration
 2. Choose "Yes, migrate" when prompted
-3. All bugs are copied to `.claude/issues/` with `type: bug` added
-4. Original `.claude/bugs/` is preserved (delete manually when ready)
+3. All bugs are copied to `.devloop/issues/` with `type: bug` added
+4. Original `.devloop/issues/` is preserved (delete manually when ready)
 
 ### Manual Migration
 
 ```bash
 # 1. Create issues directory
-mkdir -p .claude/issues
+mkdir -p .devloop/issues
 
 # 2. For each bug file, copy and add type field
 # The migration adds: type: bug to frontmatter
@@ -514,18 +518,18 @@ mkdir -p .claude/issues
 # Run /devloop:issues to regenerate index.md, bugs.md, etc.
 
 # 4. Verify migration worked
-# Check .claude/issues/ has all your bugs
+# Check .devloop/issues/ has all your bugs
 
 # 5. (Optional) Remove old directory
-rm -rf .claude/bugs/
+rm -rf .devloop/issues/
 ```
 
 ### Coexistence Mode
 
 During transition, both systems work:
-- `/devloop:bug` creates in `.claude/issues/` (preferred) or `.claude/bugs/` (fallback)
+- `/devloop:bug` creates in `.devloop/issues/` (preferred) or `.devloop/issues/` (fallback)
 - `/devloop:bugs` checks both locations
-- New issues always go to `.claude/issues/`
+- New issues always go to `.devloop/issues/`
 
 ---
 
@@ -619,13 +623,13 @@ plugins/devloop/
 - Type-prefixed IDs: BUG-001, FEAT-001, TASK-001, CHORE-001, SPIKE-001
 - Auto-generated view files: index.md, bugs.md, features.md, backlog.md
 - Updated `workflow-detector` to route issue tracking requests
-- Migration support from `.claude/bugs/` to unified `.claude/issues/`
+- Migration support from `.devloop/issues/` to unified `.devloop/issues/`
 - Backwards compatibility: `/devloop:bug` and `/devloop:bugs` still work
 
 ### 1.8.0
 
 - **Smart Parallel Task Execution**: Run independent tasks in parallel for faster development
-- **Unified Plan Integration**: All commands and agents now consistently work from `.claude/devloop-plan.md`
+- **Unified Plan Integration**: All commands and agents now consistently work from `.devloop/plan.md`
 - Added parallelism markers: `[parallel:X]`, `[depends:N.M]`, `[background]`, `[sequential]`
 - Updated `plan-management` skill with parallelism guidelines and token cost awareness
 - Updated `/devloop:continue` to detect and spawn parallel task groups

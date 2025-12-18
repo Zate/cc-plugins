@@ -20,16 +20,16 @@ description: Central reference for devloop plan file location, format, and updat
 The canonical plan location is:
 
 ```
-.claude/devloop-plan.md
+.devloop/plan.md
 ```
 
 **Discovery order** (for finding existing plans):
-1. `.claude/devloop-plan.md` ← Primary location
+1. `.devloop/plan.md` ← Primary location
 2. `docs/PLAN.md`
 3. `PLAN.md`
 4. `~/.claude/plans/*.md` (fallback to most recent)
 
-**Always save new plans to**: `.claude/devloop-plan.md`
+**Always save new plans to**: `.devloop/plan.md`
 
 ## Plan File Format
 
@@ -211,7 +211,7 @@ When creating plans, task-planner should:
 
 ### How to Update
 
-1. **Read the current plan** from `.claude/devloop-plan.md`
+1. **Read the current plan** from `.devloop/plan.md`
 2. **Make changes** to task markers and Progress Log
 3. **Update timestamps**: Set `Updated` to current date/time
 4. **Write back** to the same location
@@ -230,7 +230,7 @@ When creating plans, task-planner should:
 ## Agent Responsibilities
 
 ### Agents that CREATE plans
-- **task-planner**: Creates initial plan, saves to `.claude/devloop-plan.md`
+- **task-planner**: Creates initial plan, saves to `.devloop/plan.md`
 
 ### Agents that UPDATE plans
 - **task-planner**: Modifies plan structure
@@ -266,7 +266,7 @@ They should:
 
 ### Before Starting Work
 ```
-1. Check if .claude/devloop-plan.md exists
+1. Check if .devloop/plan.md exists
 2. If yes, read and understand current state
 3. If no, either create one or confirm this is intentional
 ```
@@ -289,14 +289,14 @@ The session-start hook automatically:
 
 The plan path can be referenced via:
 ```
-DEVLOOP_PLAN_PATH=.claude/devloop-plan.md
+DEVLOOP_PLAN_PATH=.devloop/plan.md
 ```
 
 ---
 
 ## Enforcement Configuration
 
-Configure enforcement behavior in `.claude/devloop.local.md`:
+Configure enforcement behavior in `.devloop/local.md`:
 
 ```yaml
 ---
@@ -316,7 +316,7 @@ When plan is not updated after task completion:
 ```
 ⚠️ Warning: Plan file not updated for completed task.
 
-The task appears complete but .claude/devloop-plan.md
+The task appears complete but .devloop/plan.md
 was not updated. This may cause sync issues.
 
 Would you like to:
@@ -345,7 +345,7 @@ When plan is not updated:
 🛑 Blocked: Plan update required.
 
 Strict enforcement is enabled. Cannot proceed to next task
-until .claude/devloop-plan.md is updated.
+until .devloop/plan.md is updated.
 
 Required actions:
 1. Mark Task X.Y as [x] complete
@@ -369,7 +369,7 @@ Create a commit to proceed.
 
 ### Per-Project Settings
 
-The `.claude/devloop.local.md` file:
+The `.devloop/local.md` file:
 - Is project-specific (not committed to git)
 - Has YAML frontmatter for settings
 - Can include markdown notes/preferences
@@ -377,7 +377,7 @@ The `.claude/devloop.local.md` file:
 
 ### Default Behavior
 
-If no `.claude/devloop.local.md` exists:
+If no `.devloop/local.md` exists:
 - `enforcement: advisory`
 - `auto_commit: true` (prompts, doesn't auto-commit)
 - `auto_version: true` (suggests, doesn't auto-bump)
@@ -421,7 +421,7 @@ Hooks are configured in `plugins/devloop/hooks/hooks.json` and use the
 
 If using Claude's built-in plan mode (`--permission-mode plan`):
 - Claude may create plans in `~/.claude/plans/`
-- After plan mode, **copy/merge** the plan to `.claude/devloop-plan.md`
+- After plan mode, **copy/merge** the plan to `.devloop/plan.md`
 - This ensures the project-local plan stays current
 
 ## See Also

@@ -44,7 +44,7 @@ You are a quality gate validator ensuring features meet all completion criteria 
 
 ## CRITICAL: Plan File Integration
 
-You MUST check and update the devloop plan at `.claude/devloop-plan.md`:
+You MUST check and update the devloop plan at `.devloop/plan.md`:
 
 1. **Read the plan** to verify all tasks are marked complete
 2. **Check task completion** - all `- [ ]` should be `- [x]`
@@ -73,10 +73,10 @@ Validate that a feature is truly complete by checking:
 
 ```bash
 # Check if plan exists and get task counts
-if [ -f ".claude/devloop-plan.md" ]; then
+if [ -f ".devloop/plan.md" ]; then
     echo "Plan found"
-    grep -c "^\s*- \[ \]" .claude/devloop-plan.md  # Incomplete tasks
-    grep -c "^\s*- \[x\]" .claude/devloop-plan.md  # Complete tasks
+    grep -c "^\s*- \[ \]" .devloop/plan.md  # Incomplete tasks
+    grep -c "^\s*- \[x\]" .devloop/plan.md  # Complete tasks
 else
     echo "No plan file - skipping plan validation"
 fi
@@ -88,9 +88,9 @@ If incomplete tasks exist in plan, note this as a DoD failure.
 
 ```bash
 # Check if bugs directory exists and count open high-priority bugs
-if [ -d ".claude/bugs" ]; then
-    high_bugs=$(grep -l "priority: high" .claude/bugs/BUG-*.md 2>/dev/null | xargs grep -l "status: open" 2>/dev/null | wc -l || echo "0")
-    medium_bugs=$(grep -l "priority: medium" .claude/bugs/BUG-*.md 2>/dev/null | xargs grep -l "status: open" 2>/dev/null | wc -l || echo "0")
+if [ -d ".devloop/issues" ]; then
+    high_bugs=$(grep -l "priority: high" .devloop/issues/BUG-*.md 2>/dev/null | xargs grep -l "status: open" 2>/dev/null | wc -l || echo "0")
+    medium_bugs=$(grep -l "priority: medium" .devloop/issues/BUG-*.md 2>/dev/null | xargs grep -l "status: open" 2>/dev/null | wc -l || echo "0")
     echo "Open bugs: $high_bugs high, $medium_bugs medium"
 fi
 ```
@@ -101,7 +101,7 @@ fi
 ### Step 1: Load DoD Configuration
 
 Check for project-specific DoD in:
-1. `.claude/devloop.local.md` (YAML frontmatter)
+1. `.devloop/local.md` (YAML frontmatter)
 2. `CLAUDE.md` (devloop section)
 3. Default DoD if none specified
 
@@ -201,8 +201,8 @@ uncommitted=$(git status --porcelain | wc -l)
 echo "Uncommitted files: $uncommitted"
 
 # Check Progress Log for commit hashes
-if [ -f ".claude/devloop-plan.md" ]; then
-    grep -c "Committed.*[a-f0-9]\{7\}" .claude/devloop-plan.md || echo "0"
+if [ -f ".devloop/plan.md" ]; then
+    grep -c "Committed.*[a-f0-9]\{7\}" .devloop/plan.md || echo "0"
 fi
 ```
 
@@ -229,7 +229,7 @@ Options:
 ```bash
 # Check for recent Progress Log entries (within last 24 hours)
 today=$(date +%Y-%m-%d)
-grep "$today" .claude/devloop-plan.md | grep "Progress Log" -A 10 | head -10
+grep "$today" .devloop/plan.md | grep "Progress Log" -A 10 | head -10
 ```
 
 Progress Log should show:

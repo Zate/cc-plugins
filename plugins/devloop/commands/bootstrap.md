@@ -185,7 +185,7 @@ This project uses devloop for structured development.
 Before marking a task complete:
 1. Implementation working
 2. Tests pass (if applicable)
-3. Plan updated (`.claude/devloop-plan.md`)
+3. Plan updated (`.devloop/plan.md`)
 4. Changes committed (atomic, reviewable commits)
 
 ### Commit Conventions
@@ -202,7 +202,7 @@ Include task reference: `feat(auth): add login - Task 2.1`
 - CHANGELOG updated with each release (if present)
 
 ### Plan Location
-Active plan: `.claude/devloop-plan.md`
+Active plan: `.devloop/plan.md`
 
 ## Branch Strategy
 
@@ -232,7 +232,7 @@ Use AskUserQuestion:
 
 1. Create .claude directory:
 ```bash
-mkdir -p .claude
+mkdir -p .devloop
 ```
 
 2. Ask about initial plan:
@@ -246,7 +246,7 @@ Use AskUserQuestion:
   - No, I'll plan later: Just set up CLAUDE.md for now
 ```
 
-3. If plan requested, create `.claude/devloop-plan.md`:
+3. If plan requested, create `.devloop/plan.md`:
 
 ```markdown
 # Devloop Plan: [Project Name] - Initial Setup
@@ -288,7 +288,7 @@ Use AskUserQuestion:
 Created:
 - CLAUDE.md - Project context and conventions
 - .claude/ - Devloop directory
-[- .claude/devloop-plan.md - Initial plan (if created)]
+[- .devloop/plan.md - Initial plan (if created)]
 
 Your project is ready for devloop!
 ```

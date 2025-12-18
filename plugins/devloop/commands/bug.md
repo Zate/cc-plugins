@@ -15,8 +15,8 @@ Interactive bug reporting for issues that should be tracked for later fixing.
 
 ## Storage Location
 
-- **New projects**: `.claude/issues/BUG-{NNN}.md` (unified system)
-- **Legacy projects**: `.claude/bugs/BUG-{NNN}.md` (if not migrated)
+- **New projects**: `.devloop/issues/BUG-{NNN}.md` (unified system)
+- **Legacy projects**: `.devloop/issues/BUG-{NNN}.md` (if not migrated)
 
 ## When to Use
 
@@ -113,14 +113,14 @@ Use AskUserQuestion:
 ### Step 5: Create Bug
 
 **Unified System** (preferred):
-1. Ensure `.claude/issues/` directory exists
+1. Ensure `.devloop/issues/` directory exists
 2. Determine next bug ID (BUG-{NNN})
 3. Create bug file with gathered information and `type: bug`
 4. Regenerate view files (index.md, bugs.md, etc.)
 5. Confirm creation
 
-**Legacy System** (if `.claude/issues/` doesn't exist):
-1. Ensure `.claude/bugs/` directory exists
+**Legacy System** (if `.devloop/issues/` doesn't exist):
+1. Ensure `.devloop/issues/` directory exists
 2. Determine next bug ID
 3. Create bug file with gathered information
 4. Update index.md
@@ -136,7 +136,7 @@ Present the created bug:
 **ID**: BUG-{NNN}
 **Title**: {title}
 **Priority**: {priority}
-**Location**: .claude/bugs/BUG-{NNN}.md
+**Location**: .devloop/issues/BUG-{NNN}.md
 
 ### Quick Actions
 ```
@@ -169,8 +169,8 @@ If user provides a clear description in `$ARGUMENTS`, streamline:
 
 ## Bug File Location
 
-**Unified System**: `.claude/issues/BUG-{NNN}.md` (preferred)
-**Legacy System**: `.claude/bugs/BUG-{NNN}.md`
+**Unified System**: `.devloop/issues/BUG-{NNN}.md` (preferred)
+**Legacy System**: `.devloop/issues/BUG-{NNN}.md`
 
 ---
 

@@ -21,7 +21,7 @@ A unified, file-based issue tracking system that supports multiple issue types w
 - **External issues**: Bugs in third-party dependencies - file upstream
 - **Already tracked**: Check existing issues before creating duplicates
 - **Trivial fixes**: If it takes <2 minutes to fix, just fix it
-- **Plan tasks**: Use `.claude/devloop-plan.md` for active implementation tasks
+- **Plan tasks**: Use `.devloop/plan.md` for active implementation tasks
 
 ## Issue Types
 
@@ -36,7 +36,7 @@ A unified, file-based issue tracking system that supports multiple issue types w
 ## Issue Storage Location
 
 ```
-.claude/issues/
+.devloop/issues/
 ├── index.md           # Master index (all issues)
 ├── bugs.md            # View: type:bug only
 ├── features.md        # View: type:feature only
@@ -49,16 +49,16 @@ A unified, file-based issue tracking system that supports multiple issue types w
 └── ...
 ```
 
-### Migration from .claude/bugs/
+### Migration from .devloop/issues/
 
-If a project has existing `.claude/bugs/`:
-1. Issues can be migrated to `.claude/issues/` preserving BUG- prefixes
+If a project has existing `.devloop/issues/`:
+1. Issues can be migrated to `.devloop/issues/` preserving BUG- prefixes
 2. Both locations can coexist during transition
 3. See Migration section below for details
 
 ## Issue File Format
 
-Each issue is stored as `.claude/issues/{PREFIX}-{NNN}.md`:
+Each issue is stored as `.devloop/issues/{PREFIX}-{NNN}.md`:
 
 ```markdown
 ---
@@ -169,7 +169,7 @@ Each type maintains its own counter. To get next ID:
 ```bash
 # For a specific type (e.g., FEAT)
 prefix="FEAT"
-max_num=$(ls .claude/issues/${prefix}-*.md 2>/dev/null | \
+max_num=$(ls .devloop/issues/${prefix}-*.md 2>/dev/null | \
   sed "s/.*${prefix}-0*//" | sed 's/.md//' | \
   sort -n | tail -1)
 next_num=$((${max_num:-0} + 1))
@@ -386,7 +386,7 @@ Views are auto-generated whenever an issue is created, updated, or deleted.
 # Pseudocode for view generation
 
 def regenerate_views():
-    issues = parse_all_issues(".claude/issues/*.md")
+    issues = parse_all_issues(".devloop/issues/*.md")
 
     # Generate index.md
     generate_index(issues)
@@ -478,7 +478,7 @@ When an agent needs to create an issue:
 ### 1. Initialize Directory
 
 ```bash
-mkdir -p .claude/issues
+mkdir -p .devloop/issues
 ```
 
 ### 2. Determine Type
@@ -489,7 +489,7 @@ Analyze the input using smart routing keywords (see above).
 
 ```bash
 prefix="FEAT"  # Based on detected type
-max_num=$(ls .claude/issues/${prefix}-*.md 2>/dev/null | \
+max_num=$(ls .devloop/issues/${prefix}-*.md 2>/dev/null | \
   sed "s/.*${prefix}-0*//" | sed 's/.md//' | \
   sort -n | tail -1)
 next_num=$((${max_num:-0} + 1))
@@ -546,7 +546,7 @@ When code-reviewer finds issues:
 ### With DoD Validation
 
 dod-validator should:
-- Check `.claude/issues/` for open issues related to current feature
+- Check `.devloop/issues/` for open issues related to current feature
 - Warn if high-priority bugs exist
 - Not block on low/medium issues
 
@@ -562,29 +562,29 @@ workflow-detector should:
 - Route issue-related requests to `/devloop:new` or `/devloop:issues`
 - Recognize "report a bug", "add to backlog", "create feature request"
 
-## Migration from .claude/bugs/
+## Migration from .devloop/issues/
 
 ### Automatic Detection
 
-If `.claude/bugs/` exists but `.claude/issues/` doesn't:
+If `.devloop/issues/` exists but `.devloop/issues/` doesn't:
 - Prompt user about migration
 - Offer to migrate automatically
 
 ### Migration Steps
 
-1. Create `.claude/issues/` directory
+1. Create `.devloop/issues/` directory
 2. Copy `BUG-*.md` files, updating frontmatter:
    - Add `type: bug` field
    - Rename `tags` to `labels` if present
 3. Regenerate all view files
-4. Optionally remove `.claude/bugs/` after verification
+4. Optionally remove `.devloop/issues/` after verification
 
 ### Coexistence Mode
 
 During transition, both can coexist:
-- `.claude/bugs/` for legacy bug tracking
-- `.claude/issues/` for unified issue tracking
-- Commands should prefer `.claude/issues/` if it exists
+- `.devloop/issues/` for legacy bug tracking
+- `.devloop/issues/` for unified issue tracking
+- Commands should prefer `.devloop/issues/` if it exists
 
 ## Commands
 

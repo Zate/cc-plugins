@@ -357,7 +357,7 @@ Add Progress Log entry:
 
 ## Project Configuration
 
-In `.claude/devloop.local.md`:
+In `.devloop/local.md`:
 
 ```yaml
 ---

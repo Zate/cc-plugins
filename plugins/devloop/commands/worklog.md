@@ -29,7 +29,7 @@ View and manage the devloop worklog - the history of completed work with commit 
 
 1. Check if worklog exists:
    ```bash
-   cat .claude/devloop-worklog.md 2>/dev/null || echo "No worklog found"
+   cat .devloop/worklog.md 2>/dev/null || echo "No worklog found"
    ```
 
 2. If no worklog:
@@ -73,8 +73,8 @@ View and manage the devloop worklog - the history of completed work with commit 
 
 1. Read both files:
    ```bash
-   cat .claude/devloop-plan.md
-   cat .claude/devloop-worklog.md
+   cat .devloop/plan.md
+   cat .devloop/worklog.md
    ```
 
 2. Find Progress Log entries with commit hashes not in worklog
@@ -164,7 +164,7 @@ View and manage the devloop worklog - the history of completed work with commit 
      - Cancel (Keep existing worklog)
    ```
 
-5. Write worklog to `.claude/devloop-worklog.md`
+5. Write worklog to `.devloop/worklog.md`
 
 6. Report results:
    ```markdown
@@ -172,7 +172,7 @@ View and manage the devloop worklog - the history of completed work with commit 
 
    **Period**: [date range]
    **Commits found**: [N]
-   **File**: .claude/devloop-worklog.md
+   **File**: .devloop/worklog.md
 
    Run `/devloop:worklog status` to view.
    ```

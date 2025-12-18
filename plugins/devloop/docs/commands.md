@@ -1,6 +1,6 @@
 # Devloop Commands Reference
 
-Complete documentation for all 10 slash commands in the devloop plugin.
+Complete documentation for all slash commands in the devloop plugin.
 
 ---
 
@@ -9,6 +9,7 @@ Complete documentation for all 10 slash commands in the devloop plugin.
 | Command | Purpose | Arguments |
 |---------|---------|-----------|
 | `/devloop` | Full 12-phase feature workflow | Feature description |
+| `/devloop:onboard` | Existing repo setup & migration | None |
 | `/devloop:bootstrap` | New project setup from docs | Path(s) to PRD/specs |
 | `/devloop:continue` | Resume from existing plan | Optional step number |
 | `/devloop:quick` | Fast implementation for small tasks | Task description |
@@ -61,7 +62,7 @@ Complete documentation for all 10 slash commands in the devloop plugin.
 - Unknown feasibility → use `/devloop:spike`
 - Just need code review → use `/devloop:review`
 
-**Output**: Saves plan to `.claude/devloop-plan.md`
+**Output**: Saves plan to `.devloop/plan.md`
 
 ---
 
@@ -102,7 +103,7 @@ Complete documentation for all 10 slash commands in the devloop plugin.
 - Plain text (`.txt`)
 - PDF documents (`.pdf`)
 
-**Output**: Creates `CLAUDE.md` and optionally `.claude/devloop-plan.md`
+**Output**: Creates `CLAUDE.md` and optionally `.devloop/plan.md`
 
 ---
 
@@ -119,7 +120,7 @@ Complete documentation for all 10 slash commands in the devloop plugin.
 **Arguments**: Optional step number or phase name
 
 **What It Does**:
-1. Reads `.claude/devloop-plan.md`
+1. Reads `.devloop/plan.md`
 2. Identifies current state and next task
 3. Marks task as in-progress
 4. Continues implementation
@@ -306,7 +307,7 @@ Complete documentation for all 10 slash commands in the devloop plugin.
 **What It Does**:
 1. Gathers bug details (title, description, priority)
 2. Identifies related files
-3. Creates bug report in `.claude/bugs/BUG-NNN.md`
+3. Creates bug report in `.devloop/issues/BUG-NNN.md`
 4. Updates bug index
 
 **When to Use**:
@@ -320,7 +321,7 @@ Complete documentation for all 10 slash commands in the devloop plugin.
 - Production issues (use issue tracker)
 - Issues being fixed in current session
 
-**Output**: Bug report with ID, saved to `.claude/bugs/`
+**Output**: Bug report with ID, saved to `.devloop/issues/`
 
 ---
 
@@ -430,7 +431,7 @@ Complete documentation for all 10 slash commands in the devloop plugin.
 ## Tips & Best Practices
 
 ### Starting Work
-1. Check for existing plan: `ls .claude/devloop-plan.md`
+1. Check for existing plan: `ls .devloop/plan.md`
 2. If exists, use `/devloop:continue`
 3. If not, choose appropriate workflow command
 
@@ -445,7 +446,7 @@ Complete documentation for all 10 slash commands in the devloop plugin.
 3. Don't skip DoD validation
 
 ### Bug Management
-- Keep `.claude/bugs/` in `.gitignore` (local tracking)
+- Keep `.devloop/issues/` in `.gitignore` (local tracking)
 - Or commit to share across team
 - Periodically review with `/devloop:bugs`
 

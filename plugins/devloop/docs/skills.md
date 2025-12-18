@@ -644,14 +644,14 @@ Central reference for devloop plan file location, format, and update procedures.
 - Exploratory spikes
 
 **Key Topics**:
-- **Plan location**: `.claude/devloop-plan.md` (canonical)
+- **Plan location**: `.devloop/plan.md` (canonical)
 - **Plan format**: Markdown with frontmatter
 - **Task markers**: [ ] pending, [x] complete, [~] in progress
 - **Update rules**: When to mark tasks, update status
 - **Agent permissions**: Who can read, who can update
 - **Progress log**: Timestamped event history
 
-**Plan File Location**: `.claude/devloop-plan.md`
+**Plan File Location**: `.devloop/plan.md`
 
 **Task Markers**:
 - `- [ ]` Pending
@@ -679,12 +679,12 @@ Bug report format, storage location, and bug management workflows.
 - During active bug fixing
 
 **Key Topics**:
-- **Bug location**: `.claude/bugs/BUG-NNN.md`
+- **Bug location**: `.devloop/issues/BUG-NNN.md`
 - **Bug format**: Frontmatter with title, status, priority
 - **Bug lifecycle**: open → in-progress → fixed/wont-fix
 - **Priority levels**: low, medium, high
 - **Tags**: ui, api, formatting, logic, performance, docs
-- **Index management**: `.claude/bugs/index.md`
+- **Index management**: `.devloop/issues/index.md`
 
 **Bug File Format**:
 ```markdown

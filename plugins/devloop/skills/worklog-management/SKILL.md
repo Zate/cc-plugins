@@ -26,7 +26,7 @@ description: Reference for managing the devloop worklog - a history of completed
 ## File Location
 
 ```
-.claude/devloop-worklog.md
+.devloop/worklog.md
 ```
 
 **Git Status**: Tracked (committed to repository)
@@ -48,7 +48,7 @@ description: Reference for managing the devloop worklog - a history of completed
 ## [Feature/Epic Name] (vX.Y.Z)
 
 **Period**: YYYY-MM-DD to YYYY-MM-DD
-**Plan**: .claude/devloop-plan-[feature].md (archived)
+**Plan**: .devloop/plan-[feature].md (archived)
 
 ### Commits
 
@@ -147,7 +147,7 @@ When Status changes to "Complete":
 ## User Authentication Feature (v1.2.0)
 
 **Period**: 2024-12-10 to 2024-12-15
-**Plan**: .claude/archived/devloop-plan-auth.md
+**Plan**: .devloop/archived/devloop-plan-auth.md
 ```
 
 ---
@@ -237,15 +237,15 @@ When a feature is complete and you want to start fresh:
 ## User Authentication (v1.2.0) - COMPLETE
 
 **Period**: 2024-12-10 to 2024-12-15
-**Plan**: .claude/archived/devloop-plan-auth.md
+**Plan**: .devloop/archived/devloop-plan-auth.md
 **Release Notes**: See CHANGELOG.md for v1.2.0
 ```
 
 ### 2. Archive Plan (Optional)
 
 ```bash
-mkdir -p .claude/archived
-mv .claude/devloop-plan.md .claude/archived/devloop-plan-auth.md
+mkdir -p .devloop/archived
+mv .devloop/plan.md .devloop/archived/devloop-plan-auth.md
 ```
 
 ### 3. Create New Plan
@@ -282,12 +282,12 @@ Start fresh with `/devloop` for the next feature.
 
 | Action | Location | When |
 |--------|----------|------|
-| Create worklog | `.claude/devloop-worklog.md` | First commit with plan |
+| Create worklog | `.devloop/worklog.md` | First commit with plan |
 | Add commit entry | Commit table | Each commit |
 | Add task entry | Tasks Completed list | Task committed |
 | Update timestamp | Last Updated field | Any change |
 | Start new section | New `## Feature` header | New plan started |
-| Archive | Move to `.claude/archived/` | Feature complete |
+| Archive | Move to `.devloop/archived/` | Feature complete |
 
 ---
 

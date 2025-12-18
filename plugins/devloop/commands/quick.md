@@ -14,7 +14,7 @@ Streamlined workflow for small, well-defined tasks that don't need full explorat
 
 ### Before Starting a Quick Task
 
-1. **Check for existing plan**: Read `.claude/devloop-plan.md` if it exists
+1. **Check for existing plan**: Read `.devloop/plan.md` if it exists
 2. **Check if task matches a planned task**:
    - Search plan for keywords from $ARGUMENTS
    - If match found, warn user:

@@ -202,9 +202,9 @@ The SessionStart hook sets these environment variables:
 
 3. **Save plan to project** for later resumption with `/devloop:continue`:
    ```bash
-   mkdir -p .claude
+   mkdir -p .devloop
    ```
-   Write plan to `.claude/devloop-plan.md` with format:
+   Write plan to `.devloop/plan.md` with format:
    ```markdown
    # Devloop Plan: [Feature Name]
 
@@ -235,7 +235,7 @@ The SessionStart hook sets these environment variables:
    ```
 
 4. **Initialize worklog** if it doesn't exist:
-   Create `.claude/devloop-worklog.md`:
+   Create `.devloop/worklog.md`:
    ```markdown
    # Devloop Worklog
 
@@ -247,7 +247,7 @@ The SessionStart hook sets these environment variables:
    ## [Feature Name] (In Progress)
 
    **Started**: [Date]
-   **Plan**: .claude/devloop-plan.md
+   **Plan**: .devloop/plan.md
 
    ### Commits
 
@@ -289,7 +289,7 @@ The SessionStart hook sets these environment variables:
 1. Wait for explicit user approval
 
 2. **Check for parallel task opportunities** in the plan:
-   - Read `.claude/devloop-plan.md` to find tasks with `[parallel:X]` markers
+   - Read `.devloop/plan.md` to find tasks with `[parallel:X]` markers
    - Group tasks by their parallel marker letter
    - Check for `[depends:N.M]` markers to respect dependencies
 
@@ -400,7 +400,7 @@ The SessionStart hook sets these environment variables:
    - Documentation criteria: Docs updated as needed
    - Integration criteria: Ready for commit
 
-2. Check for project-specific DoD in `.claude/devloop.local.md`
+2. Check for project-specific DoD in `.devloop/local.md`
 3. If validation fails:
    ```
    Use AskUserQuestion:
@@ -524,10 +524,10 @@ Invoke as needed throughout workflow:
 
 ## Plan Management
 
-All devloop workflows save plans to `.claude/devloop-plan.md`. For plan format details and update procedures, invoke: `Skill: plan-management`
+All devloop workflows save plans to `.devloop/plan.md`. For plan format details and update procedures, invoke: `Skill: plan-management`
 
 ## Bug Tracking
 
-Non-critical issues can be tracked in `.claude/bugs/` for later fixing. Agents can log bugs during review/testing, or use `/devloop:bug` to report manually. For details, invoke: `Skill: bug-tracking`
+Non-critical issues can be tracked in `.devloop/issues/` for later fixing. Agents can log bugs during review/testing, or use `/devloop:bug` to report manually. For details, invoke: `Skill: bug-tracking`
 
 ---

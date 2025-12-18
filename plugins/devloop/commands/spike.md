@@ -13,7 +13,7 @@ Exploratory workflow for investigating feasibility, evaluating approaches, or pr
 **CRITICAL**: Spikes must integrate with any existing devloop plan.
 
 ### Before Starting a Spike
-1. Check if `.claude/devloop-plan.md` exists
+1. Check if `.devloop/plan.md` exists
 2. If it exists, read it to understand:
    - What feature/work is already planned
    - Current phase and progress
@@ -67,7 +67,7 @@ Initial request: $ARGUMENTS
 **Actions**:
 1. **Check for existing plan**:
    ```
-   Read .claude/devloop-plan.md (if it exists)
+   Read .devloop/plan.md (if it exists)
    - Note the plan name and current phase
    - Identify if this spike relates to any planned tasks
    - Record relationship: "new work", "informs Task X.Y", or "independent"
@@ -157,7 +157,7 @@ Initial request: $ARGUMENTS
 **IMPORTANT**: A new spike = a new report. Always **overwrite** any existing spike report using the Write tool (not Edit). Previous spikes are no longer relevant to the current investigation.
 
 **Actions**:
-1. **Write** spike report to `.claude/{topic}-spike-report.md` (overwrites existing):
+1. **Write** spike report to `.devloop/spikes/{topic}.md` (overwrites existing):
 
 ```markdown
 ## Spike Report: [Topic]

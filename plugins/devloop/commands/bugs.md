@@ -15,8 +15,8 @@ View, filter, and manage tracked bugs in the project.
 
 ## Storage Location
 
-- **New projects**: `.claude/issues/` (unified system, check `bugs.md` view)
-- **Legacy projects**: `.claude/bugs/` (if not migrated)
+- **New projects**: `.devloop/issues/` (unified system, check `bugs.md` view)
+- **Legacy projects**: `.devloop/issues/` (if not migrated)
 
 ## Quick Usage
 
@@ -33,11 +33,11 @@ Check for bugs in unified or legacy system:
 
 ```bash
 # Check unified system first
-if [ -f ".claude/issues/bugs.md" ]; then
-    cat .claude/issues/bugs.md
+if [ -f ".devloop/issues/bugs.md" ]; then
+    cat .devloop/issues/bugs.md
 # Fall back to legacy system
-elif [ -f ".claude/bugs/index.md" ]; then
-    cat .claude/bugs/index.md
+elif [ -f ".devloop/issues/index.md" ]; then
+    cat .devloop/issues/index.md
 else
     echo "No bugs tracked yet. Use /devloop:bug or /devloop:new to report one."
 fi
@@ -102,7 +102,7 @@ Use AskUserQuestion:
 
 If specific bug requested or "View details" selected:
 
-1. Read `.claude/bugs/BUG-{NNN}.md`
+1. Read `.devloop/issues/BUG-{NNN}.md`
 2. Display full bug report
 3. Offer actions:
 

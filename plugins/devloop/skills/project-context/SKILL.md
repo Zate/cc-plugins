@@ -16,13 +16,13 @@ Detects and provides context about the current project's technology stack, featu
 
 ## When NOT to Use This Skill
 
-- **Context already known** - Don't re-detect if `.claude/project-context.json` is fresh
+- **Context already known** - Don't re-detect if `.devloop/context.json` is fresh
 - **Single file review** - Overkill for reviewing a single file
 - **Non-code tasks** - Documentation, configuration-only work
 
 ## Project Context Schema
 
-The skill produces or reads `.claude/project-context.json`:
+The skill produces or reads `.devloop/context.json`:
 
 ```json
 {
@@ -139,7 +139,7 @@ ${CLAUDE_PLUGIN_ROOT}/scripts/build-project-context.sh
 
 ### Manual Override
 
-Create or edit `.claude/project-context.json` directly for:
+Create or edit `.devloop/context.json` directly for:
 - Projects with non-standard structure
 - Additional security notes
 - Custom feature flags
@@ -148,7 +148,7 @@ Create or edit `.claude/project-context.json` directly for:
 
 When context exists and is fresh (<24h old):
 
-1. Read `.claude/project-context.json`
+1. Read `.devloop/context.json`
 2. Use detected info for audit scoping
 3. Skip re-detection unless requested
 
@@ -156,8 +156,8 @@ When context exists and is fresh (<24h old):
 
 ```bash
 # Check if context is stale (>24h)
-if [ -f .claude/project-context.json ]; then
-  detected_at=$(jq -r '.detected_at' .claude/project-context.json)
+if [ -f .devloop/context.json ]; then
+  detected_at=$(jq -r '.detected_at' .devloop/context.json)
   # Compare with current time
 fi
 ```

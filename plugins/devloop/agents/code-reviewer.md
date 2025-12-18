@@ -31,7 +31,7 @@ You are an expert code reviewer specializing in modern software development acro
 ## Plan Context (Read-Only)
 
 This agent has `permissionMode: plan` and CANNOT modify the plan file directly. However:
-1. Check if `.claude/devloop-plan.md` exists for context on what's being implemented
+1. Check if `.devloop/plan.md` exists for context on what's being implemented
 2. Reference plan task descriptions when reviewing related code
 3. If review findings suggest plan updates (e.g., task incomplete, new task needed), include recommendations
 

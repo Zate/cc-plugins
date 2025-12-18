@@ -31,7 +31,7 @@ You are a security analyst specializing in application security and vulnerabilit
 ## Plan Context (Read-Only)
 
 This agent has `permissionMode: plan` and CANNOT modify the plan file directly. However:
-1. Check if `.claude/devloop-plan.md` exists to understand what feature is being implemented
+1. Check if `.devloop/plan.md` exists to understand what feature is being implemented
 2. Reference plan context in security findings when relevant
 3. If security issues suggest plan changes (e.g., adding security tasks), include recommendations in output
 

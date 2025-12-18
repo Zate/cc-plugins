@@ -7,10 +7,16 @@
 # If no project_dir is provided, uses the current directory.
 
 PROJECT_DIR="${1:-.}"
-OUTPUT_FILE="${PROJECT_DIR}/.claude/project-context.json"
 
-# Ensure .claude directory exists
-mkdir -p "${PROJECT_DIR}/.claude"
+# Prefer .devloop/ for output, fallback to .claude/ if it exists and .devloop/ doesn't
+if [ -d "${PROJECT_DIR}/.devloop" ] || [ ! -d "${PROJECT_DIR}/.claude" ]; then
+    OUTPUT_FILE="${PROJECT_DIR}/.devloop/context.json"
+    mkdir -p "${PROJECT_DIR}/.devloop"
+else
+    # Legacy location for existing projects
+    OUTPUT_FILE="${PROJECT_DIR}/.claude/project-context.json"
+    mkdir -p "${PROJECT_DIR}/.claude"
+fi
 
 # Initialize variables
 LANGUAGES=""

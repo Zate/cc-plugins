@@ -11,7 +11,7 @@ Comprehensive code review workflow for existing changes, PRs, or specific files.
 ## Plan Integration
 
 Code review is a read-only operation that doesn't modify the plan, but:
-1. Check if `.claude/devloop-plan.md` exists for context on what's being reviewed
+1. Check if `.devloop/plan.md` exists for context on what's being reviewed
 2. Reference plan task descriptions in review comments when relevant
 3. Note in review output if reviewed changes relate to specific plan tasks
 

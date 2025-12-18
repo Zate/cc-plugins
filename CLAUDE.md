@@ -255,22 +255,24 @@ See these plugins for the pattern in action:
 - `plugins/devloop/commands/devloop.md` - Full 12-phase feature workflow
 - `plugins/security/commands/audit.md` - 5-phase security audit
 
-## .claude/ Directory Structure
+## .devloop/ Directory Structure
 
-Plugins that persist artifacts should use the `.claude/` directory following these conventions:
+The devloop plugin uses a standalone `.devloop/` directory for all its artifacts:
 
 ```
-.claude/
-├── devloop-plan.md           # Active plan (git-tracked)
-├── devloop-worklog.md        # Completed work history (git-tracked)
-├── devloop.local.md          # Local settings (NOT git-tracked)
-├── project-context.json      # Tech stack cache (git-tracked)
-├── issues/                   # Issue tracking (git-tracked)
+.devloop/
+├── plan.md               # Active plan (git-tracked)
+├── worklog.md            # Completed work history (git-tracked)
+├── local.md              # Local settings (NOT git-tracked)
+├── context.json          # Tech stack cache (git-tracked)
+├── issues/               # Issue tracking (git-tracked)
 │   ├── index.md
 │   └── BUG-001.md, FEAT-001.md, etc.
-├── security/                 # Security outputs (NOT git-tracked)
-└── *-spike-report.md         # Investigation reports (NOT git-tracked)
+└── spikes/               # Spike reports (NOT git-tracked)
+    └── {topic}.md
 ```
+
+Other plugins may use `.claude/` for their artifacts.
 
 ### Git Tracking Guidelines
 
@@ -290,10 +292,12 @@ Plugins that persist artifacts should use the `.claude/` directory following the
 Add these patterns to exclude local-only files:
 
 ```gitignore
-.claude/devloop.local.md
+# Devloop local files
+.devloop/local.md
+.devloop/spikes/
+
+# Claude Code local settings
 .claude/settings.local.json
-.claude/security/
-.claude/*-spike-report.md
 ```
 
 See `plugins/devloop/templates/gitignore-devloop` for a complete template.

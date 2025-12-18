@@ -12,7 +12,7 @@ End-to-end workflow for validating a feature is complete and integrating it into
 
 ## Plan Integration
 
-Before shipping, check if a devloop plan exists at `.claude/devloop-plan.md`:
+Before shipping, check if a devloop plan exists at `.devloop/plan.md`:
 1. Read the plan to verify all tasks are marked complete
 2. If incomplete tasks exist, warn the user before proceeding
 3. After successful ship, update the plan Status to "Complete"
@@ -248,7 +248,7 @@ Invoke `Skill: version-management` for detailed guidance.
 **Goal**: Wrap up and next steps
 
 **Actions**:
-1. **Update Plan File** (if `.claude/devloop-plan.md` exists):
+1. **Update Plan File** (if `.devloop/plan.md` exists):
    - Set Status to "Complete"
    - Add Progress Log entry: `[YYYY-MM-DD HH:MM]: Feature shipped - [commit hash or PR URL]`
    - Update timestamps

@@ -18,11 +18,15 @@ if [[ ! "$TOOL_INPUT" =~ "git commit" ]]; then
     exit 0
 fi
 
-# Check if devloop plan exists
-PLAN_FILE=".claude/devloop-plan.md"
-LOCAL_CONFIG=".claude/devloop.local.md"
-
-if [ ! -f "$PLAN_FILE" ]; then
+# Check if devloop plan exists (prefer .devloop/, fallback to .claude/)
+if [ -f ".devloop/plan.md" ]; then
+    PLAN_FILE=".devloop/plan.md"
+    LOCAL_CONFIG=".devloop/local.md"
+elif [ -f ".claude/devloop-plan.md" ]; then
+    # Legacy location fallback
+    PLAN_FILE=".claude/devloop-plan.md"
+    LOCAL_CONFIG=".claude/devloop.local.md"
+else
     # No plan file = no enforcement needed
     echo '{"decision": "approve"}'
     exit 0
@@ -77,7 +81,7 @@ if [ "$COMPLETED_TASKS" -gt "$PROGRESS_ENTRIES" ]; then
         cat <<EOF
 {
   "decision": "block",
-  "message": "Plan sync required: $DIFF completed task(s) may not have Progress Log entries. Update .claude/devloop-plan.md before committing. Set enforcement: advisory in .claude/devloop.local.md to allow override."
+  "message": "Plan sync required: $DIFF completed task(s) may not have Progress Log entries. Update $PLAN_FILE before committing. Set enforcement: advisory in $LOCAL_CONFIG to allow override."
 }
 EOF
         exit 0
@@ -86,7 +90,7 @@ EOF
         cat <<EOF
 {
   "decision": "warn",
-  "message": "Plan may be out of sync: $DIFF completed task(s) without matching Progress Log entries. Consider updating .claude/devloop-plan.md."
+  "message": "Plan may be out of sync: $DIFF completed task(s) without matching Progress Log entries. Consider updating $PLAN_FILE."
 }
 EOF
         exit 0

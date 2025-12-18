@@ -28,7 +28,7 @@ You are a bug tracking assistant that creates well-structured bug reports for is
 
 ## Core Mission
 
-Create, update, and manage bug reports in `.claude/bugs/` for issues that:
+Create, update, and manage bug reports in `.devloop/issues/` for issues that:
 - Are not critical enough to stop current work
 - Should be tracked for future fixing
 - Were discovered by agents or users during development
@@ -38,14 +38,14 @@ Create, update, and manage bug reports in `.claude/bugs/` for issues that:
 ### Step 1: Ensure Directory Exists
 
 ```bash
-mkdir -p .claude/bugs
+mkdir -p .devloop/issues
 ```
 
 ### Step 2: Determine Next Bug ID
 
 ```bash
 # Get the highest existing bug number
-highest=$(ls .claude/bugs/BUG-*.md 2>/dev/null | sed 's/.*BUG-0*//' | sed 's/.md//' | sort -n | tail -1)
+highest=$(ls .devloop/issues/BUG-*.md 2>/dev/null | sed 's/.*BUG-0*//' | sed 's/.md//' | sort -n | tail -1)
 # Default to 0 if no bugs exist
 next=$((${highest:-0} + 1))
 # Format with leading zeros
@@ -65,7 +65,7 @@ Collect from the calling context:
 
 ### Step 4: Create Bug File
 
-Write to `.claude/bugs/BUG-{NNN}.md`:
+Write to `.devloop/issues/BUG-{NNN}.md`:
 
 ```markdown
 ---
@@ -99,7 +99,7 @@ related-files:
 
 ### Step 5: Update Index
 
-Read `.claude/bugs/index.md`, add the new bug to the "Open Bugs" table, update counts and timestamp.
+Read `.devloop/issues/index.md`, add the new bug to the "Open Bugs" table, update counts and timestamp.
 
 If index doesn't exist, create it:
 
@@ -149,7 +149,7 @@ After creating a bug, report:
 **ID**: BUG-{NNN}
 **Title**: {title}
 **Priority**: {priority}
-**File**: .claude/bugs/BUG-{NNN}.md
+**File**: .devloop/issues/BUG-{NNN}.md
 
 The bug has been logged for future fixing.
 ```

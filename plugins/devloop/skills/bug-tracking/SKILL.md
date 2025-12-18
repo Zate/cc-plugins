@@ -26,7 +26,7 @@ A lightweight, file-based bug tracking system integrated into the devloop workfl
 ## Bug Storage Location
 
 ```
-.claude/bugs/
+.devloop/issues/
 ├── index.md           # Overview of all bugs with status
 ├── BUG-001.md         # Individual bug files
 ├── BUG-002.md
@@ -35,7 +35,7 @@ A lightweight, file-based bug tracking system integrated into the devloop workfl
 
 ## Bug File Format
 
-Each bug is stored as `.claude/bugs/BUG-{NNN}.md`:
+Each bug is stored as `.devloop/issues/BUG-{NNN}.md`:
 
 ```markdown
 ---
@@ -93,7 +93,7 @@ Any additional context, screenshots references, or thoughts on how to fix.
 
 ## Index File Format
 
-`.claude/bugs/index.md`:
+`.devloop/issues/index.md`:
 
 ```markdown
 # Bug Tracker
@@ -132,13 +132,13 @@ When an agent discovers a bug, it should:
 
 1. **Check if bugs directory exists**:
    ```bash
-   mkdir -p .claude/bugs
+   mkdir -p .devloop/issues
    ```
 
 2. **Get next bug ID**:
    ```bash
    # Find highest existing bug number
-   ls .claude/bugs/BUG-*.md 2>/dev/null | sed 's/.*BUG-0*//' | sed 's/.md//' | sort -n | tail -1
+   ls .devloop/issues/BUG-*.md 2>/dev/null | sed 's/.*BUG-0*//' | sed 's/.md//' | sort -n | tail -1
    # Add 1 for next ID, pad to 3 digits
    ```
 
@@ -211,7 +211,7 @@ When code-reviewer finds issues that aren't critical:
 
 ### With DoD Validation
 dod-validator should:
-- Check `.claude/bugs/` for open bugs related to current feature
+- Check `.devloop/issues/` for open bugs related to current feature
 - Warn if high-priority bugs exist
 - Not block on low/medium bugs
 

@@ -52,10 +52,15 @@ TASK_REFS=$(echo "$COMMIT_MSG" | grep -oE 'Task[s]?[[:space:]]+[0-9]+\.[0-9]+(,[
 # Get current date/time
 COMMIT_DATE=$(date "+%Y-%m-%d %H:%M")
 
-# Check for worklog file
-WORKLOG_FILE=".claude/devloop-worklog.md"
-
-if [ ! -f "$WORKLOG_FILE" ]; then
+# Check for worklog file (prefer .devloop/, fallback to .claude/)
+if [ -f ".devloop/worklog.md" ]; then
+    WORKLOG_FILE=".devloop/worklog.md"
+    PLAN_FILE=".devloop/plan.md"
+elif [ -f ".claude/devloop-worklog.md" ]; then
+    # Legacy location fallback
+    WORKLOG_FILE=".claude/devloop-worklog.md"
+    PLAN_FILE=".claude/devloop-plan.md"
+else
     # Worklog doesn't exist - could create it, but for now just skip
     # The worklog should be created by /devloop command
     exit 0
@@ -101,7 +106,6 @@ if [ -n "$TASK_REFS" ]; then
         # Check if task is already in the completed list
         if ! grep -q "\[x\].*Task $TASK" "$WORKLOG_FILE" 2>/dev/null; then
             # Get task description from plan file if available
-            PLAN_FILE=".claude/devloop-plan.md"
             TASK_DESC=""
             if [ -f "$PLAN_FILE" ]; then
                 # Find the task description (text after "Task X.Y:")

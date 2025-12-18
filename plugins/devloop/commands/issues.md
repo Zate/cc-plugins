@@ -24,17 +24,17 @@ View, filter, and manage all tracked issues - bugs, features, tasks, chores, and
 
 ### Step 1: Check Issue Directory
 
-Check for `.claude/issues/` directory:
+Check for `.devloop/issues/` directory:
 
 ```bash
-if [ -d ".claude/issues" ]; then
-    ls .claude/issues/
+if [ -d ".devloop/issues" ]; then
+    ls .devloop/issues/
 else
     echo "No issues tracked yet. Use /devloop:new to create one."
 fi
 ```
 
-If `.claude/bugs/` exists but not `.claude/issues/`, offer migration (see Migration section).
+If `.devloop/issues/` exists but not `.devloop/issues/`, offer migration (see Migration section).
 
 ### Step 2: Parse Arguments
 
@@ -184,7 +184,7 @@ Use AskUserQuestion:
 
 If specific issue requested (e.g., `BUG-003`) or "View details" selected:
 
-1. Read `.claude/issues/{PREFIX}-{NNN}.md`
+1. Read `.devloop/issues/{PREFIX}-{NNN}.md`
 2. Display full issue report
 3. Offer actions:
 
@@ -355,13 +355,13 @@ View files are derived from issue files. Issue files are the source of truth.
 
 ---
 
-## Migration from .claude/bugs/
+## Migration from .devloop/issues/
 
-If `.claude/bugs/` exists but `.claude/issues/` doesn't:
+If `.devloop/issues/` exists but `.devloop/issues/` doesn't:
 
 ```
 Use AskUserQuestion:
-- question: "Found existing .claude/bugs/ directory. Migrate to unified issue system?"
+- question: "Found existing .devloop/issues/ directory. Migrate to unified issue system?"
 - header: "Migrate"
 - multiSelect: false
 - options:
@@ -371,11 +371,11 @@ Use AskUserQuestion:
 ```
 
 If migrating:
-1. Create `.claude/issues/` directory
+1. Create `.devloop/issues/` directory
 2. Copy each `BUG-*.md` file, adding `type: bug` to frontmatter
 3. Rename `tags` to `labels` if present
 4. Generate all view files
-5. Optionally remove `.claude/bugs/` after verification
+5. Optionally remove `.devloop/issues/` after verification
 
 ---
 
