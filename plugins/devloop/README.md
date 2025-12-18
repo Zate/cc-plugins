@@ -2,7 +2,7 @@
 
 **A complete, token-conscious feature development workflow for professional software engineering.**
 
-[![Version](https://img.shields.io/badge/version-1.9.0-blue)](./CHANGELOG.md) [![Agents](https://img.shields.io/badge/agents-18-green)](#agents) [![Skills](https://img.shields.io/badge/skills-23-purple)](#skills) [![Commands](https://img.shields.io/badge/commands-13-orange)](#commands)
+[![Version](https://img.shields.io/badge/version-1.10.0-blue)](./CHANGELOG.md) [![Agents](https://img.shields.io/badge/agents-18-green)](#agents) [![Skills](https://img.shields.io/badge/skills-26-purple)](#skills) [![Commands](https://img.shields.io/badge/commands-14-orange)](#commands)
 
 ---
 
@@ -85,6 +85,7 @@ devloop provides a 12-phase workflow that mirrors how senior engineers approach 
 | `/devloop:issues` | Manage all issues | View, filter, work on issues |
 | `/devloop:bug` | Report a bug | Quick bug tracking |
 | `/devloop:bugs` | View bugs | Bug-only view |
+| `/devloop:worklog` | Manage work history | View, sync, reconstruct worklog |
 | `/devloop:statusline` | Configure status bar | Setup status display |
 
 ### Examples
@@ -187,7 +188,7 @@ devloop includes 18 specialized agents, each optimized for a specific task. Agen
 
 ## Skills
 
-devloop provides 23 skills—domain knowledge that Claude automatically applies when relevant:
+devloop provides 26 skills—domain knowledge that Claude automatically applies when relevant:
 
 ### Architecture & Design
 
@@ -225,6 +226,8 @@ devloop provides 23 skills—domain knowledge that Claude automatically applies 
 | `requirements-patterns` | Requirements gathering |
 | `git-workflows` | Branching, commits, releases |
 | `plan-management` | Plan file conventions |
+| `worklog-management` | Worklog format and updates |
+| `file-locations` | Where devloop files belong |
 | `bug-tracking` | Bug report management (legacy) |
 | `issue-tracking` | Unified issue management |
 | `project-bootstrap` | New project setup from docs |
@@ -273,6 +276,71 @@ devloop saves plans to `.claude/devloop-plan.md` so you can:
 - [ ] Task 3: Add session management
 - [ ] Task 4: Write tests
 ```
+
+---
+
+## Consistency & Enforcement
+
+devloop 1.10.0 introduces a consistency system that ensures plans stay in sync with actual work.
+
+### Workflow Diagram
+
+```
+Task Complete → Plan Update (REQUIRED) → Commit Decision
+                                              ↓
+                        PreCommit Hook (verifies plan sync)
+                                              ↓
+                              Git Commit (proceeds)
+                                              ↓
+                        PostCommit Hook (updates worklog)
+                                              ↓
+                              Worklog Updated
+```
+
+### Key Components
+
+| Component | Purpose |
+|-----------|---------|
+| **Plan** (`.claude/devloop-plan.md`) | What's in progress |
+| **Worklog** (`.claude/devloop-worklog.md`) | What's done (with commits) |
+| **Pre-commit hook** | Blocks if plan not updated |
+| **Post-commit hook** | Auto-updates worklog |
+
+### Enforcement Modes
+
+Configure in `.claude/devloop.local.md`:
+
+```yaml
+enforcement: advisory  # advisory (default) | strict
+```
+
+| Mode | Behavior |
+|------|----------|
+| **advisory** | Warns when plan is out of sync, allows override |
+| **strict** | Blocks commits until plan is updated |
+
+### Recovery Flows
+
+`/devloop:continue` detects and offers recovery for:
+
+- **Plan not updated**: Tasks marked complete without Progress Log entries
+- **Uncommitted changes**: Code changes without corresponding commits
+- **Worklog drift**: Plan entries not synced to worklog
+- **Commits without tasks**: Work done outside the plan
+
+### File Locations
+
+```
+.claude/
+├── devloop-plan.md         # Active plan (git-tracked)
+├── devloop-worklog.md      # Completed work (git-tracked)
+├── devloop.local.md        # Local settings (NOT git-tracked)
+├── project-context.json    # Tech cache (git-tracked)
+├── issues/                 # Issue tracking (git-tracked)
+└── security/               # Audit reports (NOT git-tracked)
+```
+
+See `Skill: file-locations` for complete documentation.
 
 ---
 
@@ -524,7 +592,24 @@ plugins/devloop/
 
 ## Changelog
 
-### 1.9.0 (Current)
+### 1.10.0 (Current)
+
+- **Consistency & Enforcement System**: Plan and worklog synchronization with configurable enforcement
+- Added worklog management (`devloop-worklog.md`) for completed work history with commits
+- Added `file-locations` skill documenting all `.claude/` file locations and git tracking
+- Added `worklog-management` skill for worklog format and update procedures
+- Added `/devloop:worklog` command for viewing, syncing, and reconstructing worklog
+- Added pre-commit hook to verify plan sync before commits
+- Added post-commit hook to auto-update worklog after commits
+- Added recovery flows in `/devloop:continue` for out-of-sync scenarios
+- Added `.gitignore` template for devloop (`templates/gitignore-devloop`)
+- Updated `devloop.local.md` template with enforcement settings
+- Updated `task-checkpoint` skill with worklog integration
+- Updated `summary-generator` to use worklog as source of truth
+- Updated `plan-management` with enforcement hooks documentation
+- Updated CLAUDE.md with `.claude/` directory structure guidance
+
+### 1.9.0
 
 - **Unified Issue Tracking**: New system supporting bugs, features, tasks, chores, and spikes
 - Added `/devloop:new` command with smart type detection from keywords
