@@ -15,6 +15,17 @@
     ],
     "PreToolUse": [
       {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash ${CLAUDE_PLUGIN_ROOT}/hooks/pre-commit.sh \"$TOOL_INPUT\"",
+            "timeout": 10,
+            "condition": "git commit"
+          }
+        ]
+      },
+      {
         "matcher": "Write|Edit|MultiEdit",
         "hooks": [
           {
@@ -39,6 +50,12 @@
       {
         "matcher": "Bash",
         "hooks": [
+          {
+            "type": "command",
+            "command": "bash ${CLAUDE_PLUGIN_ROOT}/hooks/post-commit.sh \"$TOOL_INPUT\" \"$TOOL_OUTPUT\"",
+            "timeout": 10,
+            "condition": "git commit"
+          },
           {
             "type": "prompt",
             "prompt": "Analyze the bash command result:\n\n1. Did the command succeed or fail?\n2. If it failed, is this expected or unexpected?\n3. Are there warning signs in the output (deprecation warnings, permission issues, etc.)?\n\nProvide brief analysis in this format:\n{\"status\": \"success|warning|error\", \"summary\": \"One line summary\", \"action\": \"none|retry|investigate\"}",
