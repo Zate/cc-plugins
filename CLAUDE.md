@@ -255,6 +255,51 @@ See these plugins for the pattern in action:
 - `plugins/devloop/commands/devloop.md` - Full 12-phase feature workflow
 - `plugins/security/commands/audit.md` - 5-phase security audit
 
+## .claude/ Directory Structure
+
+Plugins that persist artifacts should use the `.claude/` directory following these conventions:
+
+```
+.claude/
+├── devloop-plan.md           # Active plan (git-tracked)
+├── devloop-worklog.md        # Completed work history (git-tracked)
+├── devloop.local.md          # Local settings (NOT git-tracked)
+├── project-context.json      # Tech stack cache (git-tracked)
+├── issues/                   # Issue tracking (git-tracked)
+│   ├── index.md
+│   └── BUG-001.md, FEAT-001.md, etc.
+├── security/                 # Security outputs (NOT git-tracked)
+└── *-spike-report.md         # Investigation reports (NOT git-tracked)
+```
+
+### Git Tracking Guidelines
+
+| Category | Examples | Git Status |
+|----------|----------|------------|
+| **Shared State** | Plans, issues, context | Tracked |
+| **Local Config** | Settings, preferences | NOT tracked |
+| **Sensitive Data** | Security findings | NOT tracked |
+| **Working Notes** | Spike reports | NOT tracked |
+
+**Why track shared state?** Team visibility, context preservation across sessions.
+**Why NOT track local config?** Personal preferences vary, avoids merge conflicts.
+**Why NOT track security?** May contain sensitive vulnerability details.
+
+### .gitignore for Plugins
+
+Add these patterns to exclude local-only files:
+
+```gitignore
+.claude/devloop.local.md
+.claude/settings.local.json
+.claude/security/
+.claude/*-spike-report.md
+```
+
+See `plugins/devloop/templates/gitignore-devloop` for a complete template.
+
+For detailed file specifications, invoke `Skill: file-locations` from the devloop plugin.
+
 ## Key Principles
 
 ### For All Plugins
