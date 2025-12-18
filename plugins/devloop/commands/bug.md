@@ -8,7 +8,15 @@ allowed-tools: ["Read", "Write", "Edit", "Glob", "Bash", "AskUserQuestion", "Tod
 
 Interactive bug reporting for issues that should be tracked for later fixing.
 
-**IMPORTANT**: Invoke `Skill: bug-tracking` for bug format and storage details.
+> **Note**: This command is an alias for `/devloop:new` with type=bug.
+> For the full unified issue tracking system, use `/devloop:new` or `/devloop:issues`.
+
+**IMPORTANT**: Invoke `Skill: issue-tracking` for issue format and storage details.
+
+## Storage Location
+
+- **New projects**: `.claude/issues/BUG-{NNN}.md` (unified system)
+- **Legacy projects**: `.claude/bugs/BUG-{NNN}.md` (if not migrated)
 
 ## When to Use
 
@@ -104,6 +112,14 @@ Use AskUserQuestion:
 
 ### Step 5: Create Bug
 
+**Unified System** (preferred):
+1. Ensure `.claude/issues/` directory exists
+2. Determine next bug ID (BUG-{NNN})
+3. Create bug file with gathered information and `type: bug`
+4. Regenerate view files (index.md, bugs.md, etc.)
+5. Confirm creation
+
+**Legacy System** (if `.claude/issues/` doesn't exist):
 1. Ensure `.claude/bugs/` directory exists
 2. Determine next bug ID
 3. Create bug file with gathered information
@@ -153,9 +169,8 @@ If user provides a clear description in `$ARGUMENTS`, streamline:
 
 ## Bug File Location
 
-Bugs are stored in `.claude/bugs/BUG-{NNN}.md`
-
-Index at `.claude/bugs/index.md`
+**Unified System**: `.claude/issues/BUG-{NNN}.md` (preferred)
+**Legacy System**: `.claude/bugs/BUG-{NNN}.md`
 
 ---
 
@@ -163,6 +178,15 @@ Index at `.claude/bugs/index.md`
 
 After creating a bug:
 - The bug is tracked for later
-- Use `/devloop:bugs` to see all bugs
+- Use `/devloop:issues bugs` or `/devloop:bugs` to see all bugs
+- Use `/devloop:issues` to see all issues including bugs
 - Bugs can be fixed during `/devloop:continue` or dedicated bug-fix sessions
-- DoD validation will check for related open bugs
+- DoD validation will check for related open issues
+
+---
+
+## See Also
+
+- `/devloop:new` - Smart issue creation (auto-detects type)
+- `/devloop:issues` - View and manage all issues
+- `/devloop:bugs` - View bugs only

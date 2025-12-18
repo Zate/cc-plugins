@@ -8,7 +8,15 @@ allowed-tools: ["Read", "Write", "Edit", "Glob", "Grep", "Bash", "Task", "AskUse
 
 View, filter, and manage tracked bugs in the project.
 
-**IMPORTANT**: Invoke `Skill: bug-tracking` for bug format details.
+> **Note**: This command is an alias for `/devloop:issues bugs`.
+> For the full unified issue tracking system, use `/devloop:issues`.
+
+**IMPORTANT**: Invoke `Skill: issue-tracking` for issue format details.
+
+## Storage Location
+
+- **New projects**: `.claude/issues/` (unified system, check `bugs.md` view)
+- **Legacy projects**: `.claude/bugs/` (if not migrated)
 
 ## Quick Usage
 
@@ -21,13 +29,17 @@ View, filter, and manage tracked bugs in the project.
 
 ### Step 1: Load Bug Index
 
-Check if `.claude/bugs/index.md` exists:
+Check for bugs in unified or legacy system:
 
 ```bash
-if [ -f ".claude/bugs/index.md" ]; then
+# Check unified system first
+if [ -f ".claude/issues/bugs.md" ]; then
+    cat .claude/issues/bugs.md
+# Fall back to legacy system
+elif [ -f ".claude/bugs/index.md" ]; then
     cat .claude/bugs/index.md
 else
-    echo "No bugs tracked yet. Use /devloop:bug to report one."
+    echo "No bugs tracked yet. Use /devloop:bug or /devloop:new to report one."
 fi
 ```
 
@@ -226,6 +238,14 @@ Use AskUserQuestion:
 ## Integration with Devloop
 
 - Bugs can be addressed during `/devloop:continue` sessions
-- DoD validator checks for open bugs
+- DoD validator checks for open bugs/issues
 - Summary generator notes bugs fixed
 - Plan can include bug-fix tasks
+
+---
+
+## See Also
+
+- `/devloop:new` - Smart issue creation (auto-detects type)
+- `/devloop:issues` - View and manage all issues
+- `/devloop:bug` - Report a new bug

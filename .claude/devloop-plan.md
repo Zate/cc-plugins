@@ -1,9 +1,9 @@
 # Devloop Plan: Unified Issue Tracking System
 
 **Created**: 2025-12-18
-**Updated**: 2025-12-18 11:15
+**Updated**: 2025-12-18 11:45
 **Status**: In Progress
-**Current Phase**: Phase 1
+**Current Phase**: Phase 2 (complete)
 
 ## Overview
 
@@ -63,17 +63,17 @@ Extend the existing bugs tracking system into a unified "issues" system that sup
 - Group A: Tasks 2.1, 2.2 (independent command creation)
 - Group B: Task 2.3 (depends on both commands existing)
 
-- [ ] Task 2.1: Create `/devloop:new` command with smart routing  [parallel:A]
+- [x] Task 2.1: Create `/devloop:new` command with smart routing  [parallel:A]
   - Acceptance: Command analyzes input, detects type, asks confirmation, creates issue
   - Files: `plugins/devloop/commands/new.md`
   - Notes: Support both single and multiple item creation
 
-- [ ] Task 2.2: Create `/devloop:issues` command (extends bugs)  [parallel:A]
+- [x] Task 2.2: Create `/devloop:issues` command (extends bugs)  [parallel:A]
   - Acceptance: View/filter/manage all issue types, backwards compat with bugs
   - Files: `plugins/devloop/commands/issues.md`
   - Notes: Support filters: all, bugs, features, backlog, by-label
 
-- [ ] Task 2.3: Update existing bug commands as aliases  [depends:2.1,2.2]
+- [x] Task 2.3: Update existing bug commands as aliases  [depends:2.1,2.2]
   - Acceptance: `/devloop:bug` → creates type:bug, `/devloop:bugs` → filters to bugs
   - Files: `plugins/devloop/commands/bug.md`, `plugins/devloop/commands/bugs.md`
   - Notes: Add deprecation notice, redirect to new commands
@@ -111,3 +111,4 @@ Extend the existing bugs tracking system into a unified "issues" system that sup
 ## Progress Log
 - 2025-12-18 10:30: Plan created from spike findings (.claude/unified-issues-spike-report.md)
 - 2025-12-18 11:15: Completed Tasks 1.1 & 1.2 - Created issue-tracking skill with full schema, type definitions, ID prefix rules, and view generation rules
+- 2025-12-18 11:45: Completed Phase 2 (Tasks 2.1, 2.2, 2.3) - Created /devloop:new and /devloop:issues commands, updated bug/bugs as aliases
