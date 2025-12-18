@@ -1,117 +1,169 @@
-# Devloop Plan: Unified Issue Tracking System
+# Devloop Plan: Consistency & Enforcement System
 
 **Created**: 2025-12-18
-**Updated**: 2025-12-18 12:30
-**Status**: Complete
-**Current Phase**: Phase 4 (complete)
+**Updated**: 2025-12-18 15:30
+**Status**: In Progress
+**Current Phase**: Phase 1
 
 ## Overview
 
-Extend the existing bugs tracking system into a unified "issues" system that supports bugs, features, tasks, and other work items. Introduces smart `/devloop:new` command for intelligent routing, type-prefixed IDs (BUG-001, FEAT-001, TASK-001), and auto-generated view files for focused workflows.
+Implement a unified consistency and enforcement system for devloop that ensures:
+1. Clear documentation of where files belong (git-tracked vs local-only)
+2. Separation of active plan from completed work history (worklog)
+3. Mandatory plan updates and commits after task completion
+4. Happy path with clear checkpoints and recovery flows
+
+**Spike Reference**: `.claude/devloop-consistency-spike-report.md`
 
 ## Requirements
 
-1. Support multiple issue types: bug, feature, task, chore, spike
-2. Type-prefixed IDs for immediate context (BUG-xxx, FEAT-xxx, TASK-xxx)
-3. Smart `/devloop:new` command that analyzes input and routes to correct type
-4. Auto-generated view files (bugs.md, features.md, backlog.md)
-5. Backwards compatibility with existing `/devloop:bug` and `/devloop:bugs` commands
-6. Single `.claude/issues/` directory as source of truth
-7. Committable to git for project persistence
+1. All devloop artifacts have documented, consistent file locations
+2. Completed work moves from plan to worklog on commit
+3. Plan updates are enforced (strict by default, configurable)
+4. Commits only succeed when plan is in sync
+5. Recovery flows handle out-of-sync scenarios gracefully
+6. Existing workflows continue to work (backwards compatible)
 
 ## Architecture
 
-**Directory Structure:**
+**File Structure**:
 ```
-.claude/issues/
-├── index.md          # Master index (all issues)
-├── bugs.md           # View: type:bug only
-├── features.md       # View: type:feature only
-├── backlog.md        # View: open features + tasks
-├── BUG-001.md        # Bug issues
-├── FEAT-001.md       # Feature issues
-├── TASK-001.md       # Task issues
-└── ...
+.claude/
+├── devloop-plan.md         # Active plan (git-tracked)
+├── devloop-worklog.md      # Completed work history (git-tracked)
+├── devloop.local.md        # Local settings/overrides (NOT git-tracked)
+├── project-context.json    # Tech detection cache (git-tracked)
+├── issues/                 # Issue tracking (git-tracked)
+│   ├── index.md
+│   ├── BUG-001.md
+│   └── ...
+├── security/               # Security audit reports (NOT git-tracked)
+└── *-spike-report.md       # Spike reports (NOT git-tracked)
 ```
 
-**Smart Routing Keywords:**
-- bug: "bug", "broken", "doesn't work", "error", "crash", "fix"
-- feature: "add", "new", "implement", "create", "build", "feature"
-- task: "refactor", "clean up", "improve", "optimize", "update"
-- chore: "chore", "maintenance", "upgrade", "dependency"
+**Enforcement Flow**:
+```
+Task Complete → Plan Update (REQUIRED) → Commit Decision
+                                              ↓
+                        PreCommit Hook (verifies plan sync)
+                                              ↓
+                              Git Commit (proceeds)
+                                              ↓
+                        PostCommit Hook (updates worklog)
+```
 
 ## Tasks
 
-### Phase 1: Core Skill and Schema [parallel:partial]
-**Parallelizable**: partial
+### Phase 1: Foundation [parallel:none]
+**Goal**: Document file locations and provide clear guidance
+
+- [x] Task 1.1: Create `file-locations` skill
+  - Acceptance: SKILL.md documenting all .claude/ files, what they're for, and git tracking status
+  - Files: `plugins/devloop/skills/file-locations/SKILL.md`
+  - Notes: Include rationale for each decision
+
+- [ ] Task 1.2: Create `.gitignore` template for devloop
+  - Acceptance: Template file users can copy, excludes local-only files
+  - Files: `plugins/devloop/templates/gitignore-devloop`
+  - Notes: Include comments explaining each entry
+
+- [ ] Task 1.3: Update CLAUDE.md with file location guidance
+  - Acceptance: CLAUDE.md section on .claude/ directory structure
+  - Files: `CLAUDE.md`
+  - Notes: Reference file-locations skill for details
+
+### Phase 2: Worklog System [parallel:partial]
+**Goal**: Separate completed work from active plan
 **Parallel Groups**:
-- Group A: Tasks 1.1, 1.2 (independent skill creation)
+- Group A: Tasks 2.1, 2.2 (independent skill creation)
 
-- [x] Task 1.1: Create `issue-tracking` skill extending bug-tracking  [parallel:A]
-  - Acceptance: SKILL.md with full schema, type definitions, ID prefix rules
-  - Files: `plugins/devloop/skills/issue-tracking/SKILL.md`
-  - Notes: Include migration guidance from bug-tracking
+- [ ] Task 2.1: Create `worklog-management` skill [parallel:A]
+  - Acceptance: SKILL.md with worklog format, update rules, integration points
+  - Files: `plugins/devloop/skills/worklog-management/SKILL.md`
+  - Notes: Document when entries move from plan to worklog
 
-- [x] Task 1.2: Define view file generation rules  [parallel:A]
-  - Acceptance: Document how views are generated/maintained in skill
-  - Files: Part of SKILL.md above
-  - Notes: Views regenerated on any issue create/update/delete
+- [ ] Task 2.2: Update `task-checkpoint` skill for worklog [parallel:A]
+  - Acceptance: Skill mentions worklog update as part of commit flow
+  - Files: `plugins/devloop/skills/task-checkpoint/SKILL.md`
+  - Notes: Add worklog section to checkpoint checklist
 
-### Phase 2: Commands [parallel:partial]
-**Parallelizable**: partial
+- [ ] Task 2.3: Initialize worklog in devloop command [depends:2.1]
+  - Acceptance: /devloop creates worklog file alongside plan
+  - Files: `plugins/devloop/commands/devloop.md`
+  - Notes: Also update /devloop:continue to read worklog
+
+- [ ] Task 2.4: Update summary-generator to use worklog [depends:2.1]
+  - Acceptance: Agent reads worklog for session summaries
+  - Files: `plugins/devloop/agents/summary-generator.md`
+  - Notes: Worklog is source of truth for what was done
+
+### Phase 3: Enforcement Hooks [parallel:partial]
+**Goal**: Make plan updates and commits mandatory
 **Parallel Groups**:
-- Group A: Tasks 2.1, 2.2 (independent command creation)
-- Group B: Task 2.3 (depends on both commands existing)
+- Group A: Tasks 3.1, 3.2 (independent hook implementation)
 
-- [x] Task 2.1: Create `/devloop:new` command with smart routing  [parallel:A]
-  - Acceptance: Command analyzes input, detects type, asks confirmation, creates issue
-  - Files: `plugins/devloop/commands/new.md`
-  - Notes: Support both single and multiple item creation
+- [ ] Task 3.1: Add PreCommit hook to hooks.json [parallel:A]
+  - Acceptance: Hook runs before git commit, blocks if plan not updated
+  - Files: `plugins/devloop/hooks/hooks.json`
+  - Notes: Matcher should catch "Bash" with "git commit" in command
 
-- [x] Task 2.2: Create `/devloop:issues` command (extends bugs)  [parallel:A]
-  - Acceptance: View/filter/manage all issue types, backwards compat with bugs
-  - Files: `plugins/devloop/commands/issues.md`
-  - Notes: Support filters: all, bugs, features, backlog, by-label
+- [ ] Task 3.2: Implement pre-commit.sh verification [parallel:A]
+  - Acceptance: Script checks plan status, returns approve/block
+  - Files: `plugins/devloop/hooks/pre-commit.sh`
+  - Notes: Check for [x] tasks without Progress Log entries
 
-- [x] Task 2.3: Update existing bug commands as aliases  [depends:2.1,2.2]
-  - Acceptance: `/devloop:bug` → creates type:bug, `/devloop:bugs` → filters to bugs
-  - Files: `plugins/devloop/commands/bug.md`, `plugins/devloop/commands/bugs.md`
-  - Notes: Add deprecation notice, redirect to new commands
+- [ ] Task 3.3: Add PostCommit hook to hooks.json [depends:3.1]
+  - Acceptance: Hook runs after successful git commit
+  - Files: `plugins/devloop/hooks/hooks.json`
+  - Notes: Matcher catches successful git commit output
 
-### Phase 3: Agent Updates [parallel:partial]
-**Parallelizable**: partial
+- [ ] Task 3.4: Implement post-commit.sh worklog updater [depends:3.2,3.3]
+  - Acceptance: Script moves Progress Log entries to worklog with commit hash
+  - Files: `plugins/devloop/hooks/post-commit.sh`
+  - Notes: Get commit hash from git rev-parse HEAD
+
+- [ ] Task 3.5: Update devloop.local.md template with enforcement settings
+  - Acceptance: Template includes enforcement config with strict defaults
+  - Files: `plugins/devloop/templates/devloop.local.md`
+  - Notes: Document all enforcement options
+
+- [ ] Task 3.6: Update plan-management skill with enforcement docs [depends:3.5]
+  - Acceptance: Skill documents enforcement modes and configuration
+  - Files: `plugins/devloop/skills/plan-management/SKILL.md`
+  - Notes: Add Enforcement section with examples
+
+### Phase 4: Recovery & Polish [parallel:partial]
+**Goal**: Handle edge cases and improve UX
 **Parallel Groups**:
-- Group A: Tasks 3.1, 3.2 (independent agent updates)
+- Group A: Tasks 4.1, 4.2 (independent recovery flows)
 
-- [x] Task 3.1: Create `issue-manager` agent (extends bug-catcher)  [parallel:A]
-  - Acceptance: Agent can create any issue type, update views
-  - Files: `plugins/devloop/agents/issue-manager.md`
-  - Notes: Should be invokable by other agents to log issues
+- [ ] Task 4.1: Implement recovery prompts in continue.md [parallel:A]
+  - Acceptance: Command detects out-of-sync states and offers recovery
+  - Files: `plugins/devloop/commands/continue.md`
+  - Notes: Handle: plan not updated, commit without task, worklog drift
 
-- [x] Task 3.2: Update workflow-detector to route to issues  [parallel:A]
-  - Acceptance: Detector recognizes issue-related requests, routes appropriately
-  - Files: `plugins/devloop/agents/workflow-detector.md`
-  - Notes: Add issue patterns to detection logic
+- [ ] Task 4.2: Add worklog reconstruction command [parallel:A]
+  - Acceptance: Command rebuilds worklog from git history
+  - Files: `plugins/devloop/commands/worklog.md` (new)
+  - Notes: Useful for existing projects adopting devloop
 
-### Phase 4: Integration and Testing [sequential]
-**Parallelizable**: none
-
-- [x] Task 4.1: Update devloop README with issue tracking docs  [sequential]
-  - Acceptance: README documents new issue system, commands, migration
+- [ ] Task 4.3: Update devloop README with workflow diagrams [depends:4.1,4.2]
+  - Acceptance: README shows happy path and recovery flows
   - Files: `plugins/devloop/README.md`
+  - Notes: Use ASCII or mermaid diagrams
 
-- [x] Task 4.2: Create migration guide for existing .claude/bugs/  [depends:4.1]
-  - Acceptance: Clear steps to migrate bugs → issues
-  - Files: `plugins/devloop/docs/MIGRATION.md` or in README
-
-- [x] Task 4.3: Version bump and changelog  [depends:4.1,4.2]
-  - Acceptance: Bump to 1.9.0, document new feature
+- [ ] Task 4.4: Version bump and release notes [depends:4.3]
+  - Acceptance: Bump to 1.10.0, document new enforcement system
   - Files: `plugins/devloop/.claude-plugin/plugin.json`
+  - Notes: Major feature addition
 
 ## Progress Log
-- 2025-12-18 10:30: Plan created from spike findings (.claude/unified-issues-spike-report.md)
-- 2025-12-18 11:15: Completed Tasks 1.1 & 1.2 - Created issue-tracking skill with full schema, type definitions, ID prefix rules, and view generation rules
-- 2025-12-18 11:45: Completed Phase 2 (Tasks 2.1, 2.2, 2.3) - Created /devloop:new and /devloop:issues commands, updated bug/bugs as aliases
-- 2025-12-18 12:00: Completed Phase 3 (Tasks 3.1, 3.2) - Created issue-manager agent, updated workflow-detector with issue tracking routing
-- 2025-12-18 12:30: Completed Phase 4 (Tasks 4.1, 4.2, 4.3) - Updated README with docs & migration guide, bumped version to 1.9.0
-- 2025-12-18 12:30: **Plan Complete** - All 10 tasks finished, ready for /devloop:ship
+- 2025-12-18 14:00: Plan created from spike report findings
+- 2025-12-18 15:30: Completed Task 1.1 - Created file-locations skill with comprehensive documentation of .claude/ structure, git tracking status, and rationale
+
+## Notes
+
+- Start with strict enforcement for new projects, advisory for existing
+- Worklog is optional initially - can reconstruct from git log
+- Focus on happy path first, recovery in Phase 4
+- All hooks should timeout quickly (<10s) to avoid blocking
