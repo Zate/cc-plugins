@@ -434,7 +434,8 @@ plugins/devloop/
 │   ├── requirements-patterns/
 │   ├── git-workflows/
 │   ├── plan-management/
-│   └── bug-tracking/
+│   ├── issue-tracking/
+│   └── tool-usage-policy/
 ├── statusline/               # Status bar script
 │   └── devloop-statusline.sh
 ├── docs/                     # Documentation

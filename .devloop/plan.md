@@ -1,9 +1,9 @@
 # Devloop Plan: Plugin Simplification v1.1
 
 **Created**: 2025-12-19
-**Updated**: 2025-12-19 12:30
+**Updated**: 2025-12-19 13:00
 **Status**: Active
-**Current Phase**: 1
+**Current Phase**: 2
 
 ## Overview
 
@@ -50,15 +50,15 @@ Simplify the devloop plugin based on architecture spike findings. Target 40-50% 
   - Files: `plugins/devloop/skills/tool-usage-policy/SKILL.md`
   - Notes: Created 135-line skill with DO/DON'T patterns, tool selection table, parallelization strategy
 
-- [ ] Task 1.3: Remove deprecated bug-tracking skill [depends:1.2]
+- [x] Task 1.3: Remove deprecated bug-tracking skill [depends:1.2]
   - Acceptance: bug-tracking skill removed, references updated to issue-tracking
-  - Files: Remove `plugins/devloop/skills/bug-tracking/`, update references
-  - Notes: issue-tracking supersedes it
+  - Files: Removed `plugins/devloop/skills/bug-tracking/`, updated 4 agents and 3 docs
+  - Notes: Updated code-reviewer, bug-catcher, test-runner, dod-validator to use issue-tracking
 
-- [ ] Task 1.4: Trim refactor-analyzer agent [depends:1.2]
-  - Acceptance: Agent reduced from 1,312 to ~400 lines
+- [x] Task 1.4: Trim refactor-analyzer agent [depends:1.2]
+  - Acceptance: Agent reduced from 1,312 to 264 lines (80% reduction)
   - Files: `plugins/devloop/agents/refactor-analyzer.md`
-  - Notes: Move methodology to refactoring-analysis skill, reference tool-usage-policy
+  - Notes: References tool-usage-policy and refactoring-analysis skills, kept essential vetting and report templates
 
 ### Phase 2: Hook-Based Automation [parallel:partial]
 **Goal**: Make skills and agents invoke more deterministically
@@ -133,6 +133,10 @@ Simplify the devloop plugin based on architecture spike findings. Target 40-50% 
 - 2025-12-19 11:00: Plan created from spike report findings
 - 2025-12-19 12:30: Completed Task 1.1 - Added UserPromptSubmit hook for smart command routing
 - 2025-12-19 12:30: Completed Task 1.2 - Created tool-usage-policy skill (135 lines)
+- 2025-12-19 12:35: Committed Tasks 1.1, 1.2 - 05f3883
+- 2025-12-19 13:00: Completed Task 1.3 - Removed bug-tracking skill, updated 4 agents and 3 docs
+- 2025-12-19 13:00: Completed Task 1.4 - Reduced refactor-analyzer from 1,312 to 264 lines (80% reduction)
+- 2025-12-19 13:00: Phase 1 Complete! All 4 tasks done
 
 ## Notes
 

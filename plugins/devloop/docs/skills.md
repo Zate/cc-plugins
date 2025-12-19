@@ -664,57 +664,28 @@ Central reference for devloop plan file location, format, and update procedures.
 
 ---
 
-### bug-tracking
-Bug report format, storage location, and bug management workflows.
+### issue-tracking
+Unified issue tracking for bugs, features, tasks, and other work items.
 
 **When to Use**:
-- Creating bug reports
-- Managing bug tracker
-- Understanding bug format
-- Bug workflow decisions
+- Creating any type of issue (bug, feature, task, chore, spike)
+- Managing the issue backlog
+- Understanding issue format and workflows
+- Issue routing and prioritization
 
 **When NOT to Use**:
-- For feature requests
 - Critical bugs (fix immediately)
-- During active bug fixing
+- Plan tasks (use plan-management instead)
+- External issues (file upstream)
 
 **Key Topics**:
-- **Bug location**: `.devloop/issues/BUG-NNN.md`
-- **Bug format**: Frontmatter with title, status, priority
-- **Bug lifecycle**: open → in-progress → fixed/wont-fix
-- **Priority levels**: low, medium, high
-- **Tags**: ui, api, formatting, logic, performance, docs
-- **Index management**: `.devloop/issues/index.md`
+- **Issue location**: `.devloop/issues/{TYPE}-NNN.md`
+- **Issue types**: BUG, FEAT, TASK, CHORE, SPIKE
+- **Issue lifecycle**: open → in-progress → resolved/wont-fix
+- **Priority levels**: low, medium, high, critical
+- **View files**: bugs.md, features.md, backlog.md
 
-**Bug File Format**:
-```markdown
----
-id: BUG-NNN
-title: Brief description
-status: open | in-progress | fixed | wont-fix
-priority: low | medium | high
-created: ISO timestamp
-updated: ISO timestamp
-reporter: agent-name or "user"
-tags: [ui, api, etc.]
-related-files:
-  - file/path.ts
----
-
-# BUG-NNN: Title
-
-## Description
-[What's wrong]
-
-## Context
-- Discovered during: [context]
-- Blocking: no
-
-## Suggested Fix
-[If provided]
-```
-
-**Auto-loaded by**: bug-catcher, test-runner, code-reviewer
+**Auto-loaded by**: bug-catcher, test-runner, code-reviewer, dod-validator
 
 ---
 
@@ -727,7 +698,7 @@ related-files:
 | **Architecture** | architecture-patterns, api-design, database-patterns | ✅ | ❌ |
 | **Languages** | go-patterns, react-patterns, java-patterns, python-patterns | ✅ | ❌ |
 | **Quality** | testing-strategies, security-checklist, deployment-readiness | ✅ | ❌ |
-| **Workflow** | workflow-selection, model-selection-guide, complexity-estimation, requirements-patterns, git-workflows, plan-management, bug-tracking | ❌ | ✅ |
+| **Workflow** | workflow-selection, model-selection-guide, complexity-estimation, requirements-patterns, git-workflows, plan-management, issue-tracking | ❌ | ✅ |
 
 ### By Frequency of Use
 
@@ -736,7 +707,7 @@ related-files:
 | **Very High** (used in most features) | architecture-patterns, testing-strategies, plan-management |
 | **High** (used when language matches) | go-patterns, react-patterns, java-patterns, python-patterns |
 | **Medium** (used in specific phases) | api-design, database-patterns, git-workflows, complexity-estimation |
-| **Low** (consulted when needed) | workflow-selection, model-selection-guide, requirements-patterns, bug-tracking |
+| **Low** (consulted when needed) | workflow-selection, model-selection-guide, requirements-patterns, issue-tracking |
 | **Situational** | security-checklist, deployment-readiness |
 
 ### By Version Requirements

@@ -22,7 +22,7 @@ Use dod-validator when assessing completeness.
 tools: Bash, Read, Write, Edit, Grep, Glob, TodoWrite, AskUserQuestion
 model: haiku
 color: green
-skills: plan-management, bug-tracking
+skills: plan-management, issue-tracking
 ---
 
 You are a quality gate validator ensuring features meet all completion criteria before release.

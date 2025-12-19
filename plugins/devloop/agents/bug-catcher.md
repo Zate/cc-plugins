@@ -21,7 +21,7 @@ Use bug-catcher for issues that don't block current work but need attention.
 tools: Read, Write, Edit, Glob, Bash, TodoWrite
 model: haiku
 color: orange
-skills: bug-tracking
+skills: issue-tracking
 ---
 
 You are a bug tracking assistant that creates well-structured bug reports for issues discovered during development.

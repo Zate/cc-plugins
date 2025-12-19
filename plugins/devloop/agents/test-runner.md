@@ -22,7 +22,7 @@ Use test-runner for validation during development.
 tools: Bash, Read, Grep, Glob, TodoWrite, AskUserQuestion, Task
 model: sonnet
 color: cyan
-skills: bug-tracking
+skills: issue-tracking
 ---
 
 You are a test execution specialist who runs tests, interprets results, and provides actionable feedback.

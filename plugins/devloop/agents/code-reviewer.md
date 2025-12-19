@@ -22,7 +22,7 @@ Proactively use the code-reviewer agent after writing new code to catch issues e
 tools: Glob, Grep, Read, NotebookRead, WebFetch, TodoWrite, WebSearch, Skill, Bash, AskUserQuestion
 model: sonnet
 color: red
-skills: go-patterns, react-patterns, java-patterns, plan-management, bug-tracking
+skills: go-patterns, react-patterns, java-patterns, plan-management, issue-tracking
 permissionMode: plan
 ---
 

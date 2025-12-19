@@ -232,8 +232,8 @@ devloop provides 26 skills—domain knowledge that Claude automatically applies 
 | `plan-management` | Plan file conventions |
 | `worklog-management` | Worklog format and updates |
 | `file-locations` | Where devloop files belong |
-| `bug-tracking` | Bug report management (legacy) |
 | `issue-tracking` | Unified issue management |
+| `tool-usage-policy` | Tool selection and parallelization |
 | `project-bootstrap` | New project setup from docs |
 
 ### Task Completion
@@ -687,7 +687,7 @@ plugins/devloop/
 
 - Added bug tracking system (`/devloop:bug`, `/devloop:bugs`)
 - Added bug-catcher agent
-- Added bug-tracking skill
+- Added issue-tracking skill (unified bug/feature/task tracking)
 
 ### 1.2.0
 

@@ -526,8 +526,8 @@ Invoke as needed throughout workflow:
 
 All devloop workflows save plans to `.devloop/plan.md`. For plan format details and update procedures, invoke: `Skill: plan-management`
 
-## Bug Tracking
+## Issue Tracking
 
-Non-critical issues can be tracked in `.devloop/issues/` for later fixing. Agents can log bugs during review/testing, or use `/devloop:bug` to report manually. For details, invoke: `Skill: bug-tracking`
+Non-critical issues (bugs, features, tasks) can be tracked in `.devloop/issues/` for later work. Agents can log issues during review/testing, or use `/devloop:bug` to report bugs and `/devloop:issues` to manage all issue types. For details, invoke: `Skill: issue-tracking`
 
 ---
