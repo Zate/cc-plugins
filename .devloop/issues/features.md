@@ -1,7 +1,7 @@
 # Features
 
-**Last Updated**: 2025-12-19T10:10:00
-**Open**: 3 | **In Progress**: 0 | **Done**: 0
+**Last Updated**: 2025-12-19T13:00:00
+**Open**: 3 | **In Progress**: 0 | **Done**: 1
 
 [← Back to Index](index.md)
 
@@ -19,7 +19,9 @@
 
 ## Recently Completed
 
-(None)
+| ID | Title | Completed |
+|----|-------|-----------|
+| [FEAT-004](FEAT-004.md) | Add golangci-lint hook integration to devloop | 2025-12-19 |
 
 ---
 

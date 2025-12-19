@@ -1,7 +1,7 @@
 # Issue Tracker
 
-**Last Updated**: 2025-12-19T11:00:00
-**Open**: 6 | **In Progress**: 0 | **Done**: 2 | **Won't Do**: 0
+**Last Updated**: 2025-12-19T13:00:00
+**Open**: 6 | **In Progress**: 0 | **Done**: 4 | **Won't Do**: 0
 
 ## Quick Links
 
@@ -38,6 +38,8 @@
 
 | ID | Type | Title | Resolved |
 |----|------|-------|----------|
+| [FEAT-004](FEAT-004.md) | feature | Add golangci-lint hook integration to devloop | 2025-12-19 |
+| [SPIKE-003](SPIKE-003.md) | spike | Investigate golangci-lint hook integration for Go file editing | 2025-12-19 |
 | [SPIKE-002](SPIKE-002.md) | spike | Plugin architecture review - simplification and optimization opportunities | 2025-12-19 |
 | [SPIKE-001](SPIKE-001.md) | spike | Investigate existing codebase onboarding for devloop | 2025-12-18 |
 
