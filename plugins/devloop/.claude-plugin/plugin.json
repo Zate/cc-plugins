@@ -1,6 +1,6 @@
 {
   "name": "devloop",
-  "version": "1.12.3",
+  "version": "1.12.4",
   "description": "Token-conscious feature development workflow with consistency enforcement, worklog management, unified issue tracking (bugs, features, tasks), specialized agents, smart parallel task execution, plan integration across all components, codebase refactoring analysis, strategic model selection (opus/sonnet/haiku), task completion enforcement, semantic versioning, and language-specific skills for Go, React, Java, and Python projects",
   "author": {
     "name": "Zate",
