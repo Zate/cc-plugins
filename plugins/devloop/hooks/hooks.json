@@ -1,6 +1,18 @@
 {
   "description": "Devloop workflow hooks for context loading, validation, progress tracking, and notifications",
   "hooks": {
+    "UserPromptSubmit": [
+      {
+        "matcher": ".*",
+        "hooks": [
+          {
+            "type": "prompt",
+            "prompt": "Analyze the user's prompt and detect if they're requesting development work that could benefit from devloop workflow commands.\n\nKeyword → Command mapping:\n- \"bug\", \"fix\", \"broken\", \"error\", \"issue\" → /devloop:bugs (for bug tracking) or /devloop:quick (for small fixes)\n- \"feature\", \"implement\", \"add\", \"create\" → /devloop (for full workflow) or /devloop:quick (for small tasks)\n- \"refactor\", \"clean up\", \"restructure\", \"improve\" → /devloop:analyze\n- \"test\", \"coverage\", \"unit test\" → Suggest test-related workflow\n- \"review\", \"check\", \"audit\" → /devloop:review\n- \"continue\", \"resume\", \"finish\" → /devloop:continue\n- \"plan\", \"roadmap\", \"what's next\" → /devloop:plan (view current plan)\n\nRules:\n1. Only suggest if keywords are clearly present and intent is development work\n2. Don't suggest for simple questions or clarifications\n3. Don't suggest if the user already used a /devloop command\n4. Be helpful, not intrusive\n\nRespond with:\n{\"show\": true, \"suggestion\": \"/devloop:command\", \"reason\": \"Brief explanation\"}\n\nOr if no suggestion needed:\n{\"show\": false}",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
     "SessionStart": [
       {
         "matcher": ".*",

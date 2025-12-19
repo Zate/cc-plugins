@@ -1,184 +1,142 @@
-# Devloop Plan: Consistency & Enforcement System
+# Devloop Plan: Plugin Simplification v1.1
 
-**Created**: 2025-12-18
-**Updated**: 2025-12-18 16:30
-**Status**: Complete
-**Current Phase**: Done
+**Created**: 2025-12-19
+**Updated**: 2025-12-19 12:30
+**Status**: Active
+**Current Phase**: 1
 
 ## Overview
 
-Implement a unified consistency and enforcement system for devloop that ensures:
-1. Clear documentation of where files belong (git-tracked vs local-only)
-2. Separation of active plan from completed work history (worklog)
-3. Mandatory plan updates and commits after task completion
-4. Happy path with clear checkpoints and recovery flows
+Simplify the devloop plugin based on architecture spike findings. Target 40-50% reduction in total lines while maintaining functionality through hook-based automation, skill consolidation, and agent trimming.
 
-**Spike Reference**: `.devloop/spikes/devloop-consistency-spike-report.md`
+**Spike Reference**: `.devloop/spikes/plugin-architecture-review.md`
 
 ## Requirements
 
-1. All devloop artifacts have documented, consistent file locations
-2. Completed work moves from plan to worklog on commit
-3. Plan updates are enforced (strict by default, configurable)
-4. Commits only succeed when plan is in sync
-5. Recovery flows handle out-of-sync scenarios gracefully
-6. Existing workflows continue to work (backwards compatible)
+1. Add hook-based smart routing for better UX
+2. Reduce verbosity without losing functionality
+3. Consolidate redundant components
+4. Improve skill and agent invocation patterns
+5. Maintain backwards compatibility
 
 ## Architecture
 
-**File Structure**:
-```
-.devloop/
-├── plan.md                 # Active plan (git-tracked)
-├── worklog.md              # Completed work history (git-tracked)
-├── local.md                # Local settings/overrides (NOT git-tracked)
-├── context.json            # Tech detection cache (git-tracked)
-├── issues/                 # Issue tracking (git-tracked)
-│   ├── index.md
-│   ├── BUG-001.md
-│   └── ...
-└── spikes/                 # Spike reports (NOT git-tracked)
-```
+**Current State**:
+- 59 components, ~18,800 lines
+- Skills not being invoked deterministically
+- Hooks underutilized (UserPromptSubmit, SubagentStop unused)
+- Significant redundancy in language patterns and tool policies
 
-**Enforcement Flow**:
-```
-Task Complete → Plan Update (REQUIRED) → Commit Decision
-                                              ↓
-                        PreCommit Hook (verifies plan sync)
-                                              ↓
-                              Git Commit (proceeds)
-                                              ↓
-                        PostCommit Hook (updates worklog)
-```
+**Target State**:
+- ~45 components, ~10,000 lines
+- Hook-based skill injection and smart routing
+- Consolidated tool policies and language patterns
+- Cleaner agent boundaries
 
 ## Tasks
 
-### Phase 1: Foundation [parallel:none]
-**Goal**: Document file locations and provide clear guidance
-
-- [x] Task 1.1: Create `file-locations` skill
-  - Acceptance: SKILL.md documenting all .claude/ files, what they're for, and git tracking status
-  - Files: `plugins/devloop/skills/file-locations/SKILL.md`
-  - Notes: Include rationale for each decision
-
-- [x] Task 1.2: Create `.gitignore` template for devloop
-  - Acceptance: Template file users can copy, excludes local-only files
-  - Files: `plugins/devloop/templates/gitignore-devloop`
-  - Notes: Include comments explaining each entry
-
-- [x] Task 1.3: Update CLAUDE.md with file location guidance
-  - Acceptance: CLAUDE.md section on .claude/ directory structure
-  - Files: `CLAUDE.md`
-  - Notes: Reference file-locations skill for details
-
-### Phase 2: Worklog System [parallel:partial]
-**Goal**: Separate completed work from active plan
+### Phase 1: Quick Wins [parallel:partial]
+**Goal**: High-impact, low-risk improvements
 **Parallel Groups**:
-- Group A: Tasks 2.1, 2.2 (independent skill creation)
+- Group A: Tasks 1.1, 1.2 (independent consolidation)
 
-- [x] Task 2.1: Create `worklog-management` skill [parallel:A]
-  - Acceptance: SKILL.md with worklog format, update rules, integration points
-  - Files: `plugins/devloop/skills/worklog-management/SKILL.md`
-  - Notes: Document when entries move from plan to worklog
+- [x] Task 1.1: Add UserPromptSubmit hook for smart routing [parallel:A]
+  - Acceptance: Hook detects task keywords and suggests appropriate command
+  - Files: `plugins/devloop/hooks/hooks.json`
+  - Notes: Added prompt hook that detects keywords and suggests devloop commands
 
-- [x] Task 2.2: Update `task-checkpoint` skill for worklog [parallel:A]
-  - Acceptance: Skill mentions worklog update as part of commit flow
-  - Files: `plugins/devloop/skills/task-checkpoint/SKILL.md`
-  - Notes: Add worklog section to checkpoint checklist
+- [x] Task 1.2: Create shared tool-usage-policy skill [parallel:A]
+  - Acceptance: Single skill with tool usage guidance, agents reference it
+  - Files: `plugins/devloop/skills/tool-usage-policy/SKILL.md`
+  - Notes: Created 135-line skill with DO/DON'T patterns, tool selection table, parallelization strategy
 
-- [x] Task 2.3: Initialize worklog in devloop command [depends:2.1]
-  - Acceptance: /devloop creates worklog file alongside plan
+- [ ] Task 1.3: Remove deprecated bug-tracking skill [depends:1.2]
+  - Acceptance: bug-tracking skill removed, references updated to issue-tracking
+  - Files: Remove `plugins/devloop/skills/bug-tracking/`, update references
+  - Notes: issue-tracking supersedes it
+
+- [ ] Task 1.4: Trim refactor-analyzer agent [depends:1.2]
+  - Acceptance: Agent reduced from 1,312 to ~400 lines
+  - Files: `plugins/devloop/agents/refactor-analyzer.md`
+  - Notes: Move methodology to refactoring-analysis skill, reference tool-usage-policy
+
+### Phase 2: Hook-Based Automation [parallel:partial]
+**Goal**: Make skills and agents invoke more deterministically
+**Parallel Groups**:
+- Group A: Tasks 2.1, 2.2 (independent hook additions)
+
+- [ ] Task 2.1: Add PreToolUse hook for language skill injection [parallel:A]
+  - Acceptance: Editing .go files triggers go-patterns, .py triggers python-patterns
+  - Files: `plugins/devloop/hooks/hooks.json`
+  - Notes: Use prompt hook type to inject skill invocation hints
+
+- [ ] Task 2.2: Add SubagentStop hook for agent chaining [parallel:A]
+  - Acceptance: After code-explorer completes, suggest code-architect if designing
+  - Files: `plugins/devloop/hooks/hooks.json`
+  - Notes: Improves workflow continuity
+
+- [ ] Task 2.3: Enhance SessionStart with skill preloading [depends:2.1]
+  - Acceptance: Language skills listed in context based on detected stack
+  - Files: `plugins/devloop/hooks/session-start.sh`
+  - Notes: Add "Relevant skills: go-patterns, testing-strategies" to context
+
+### Phase 3: Skill Consolidation [parallel:partial]
+**Goal**: Reduce redundancy in language pattern skills
+**Parallel Groups**:
+- Group A: Tasks 3.1, 3.2 (independent skill work)
+
+- [ ] Task 3.1: Create base language-patterns template [parallel:A]
+  - Acceptance: Shared structure for all language skills
+  - Files: `plugins/devloop/skills/language-patterns-base/SKILL.md`
+  - Notes: Common sections: Error Handling, Testing, Project Structure, Anti-Patterns
+
+- [ ] Task 3.2: Consolidate agent tool policies [parallel:A]
+  - Acceptance: All 18 agents reference tool-usage-policy skill instead of inline policies
+  - Files: All agent .md files
+  - Notes: Each agent loses 50-100 lines
+
+- [ ] Task 3.3: Refactor go-patterns to use base [depends:3.1]
+  - Acceptance: go-patterns extends base, unique content only
+  - Files: `plugins/devloop/skills/go-patterns/SKILL.md`
+  - Notes: Target ~200 lines (down from 528)
+
+- [ ] Task 3.4: Refactor python/java/react-patterns to use base [depends:3.3]
+  - Acceptance: All language skills use base pattern
+  - Files: `plugins/devloop/skills/{python,java,react}-patterns/SKILL.md`
+  - Notes: Can be done in parallel per skill
+
+### Phase 4: Command Optimization [parallel:none]
+**Goal**: Reduce command verbosity through shared phase definitions
+
+- [ ] Task 4.1: Create phase templates skill
+  - Acceptance: Common phases (Discovery, Implementation, Review) defined once
+  - Files: `plugins/devloop/skills/phase-templates/SKILL.md`
+  - Notes: Commands reference phases instead of duplicating
+
+- [ ] Task 4.2: Refactor devloop.md to use phase templates
+  - Acceptance: devloop.md reduced from 533 to ~300 lines
   - Files: `plugins/devloop/commands/devloop.md`
-  - Notes: Also update /devloop:continue to read worklog
+  - Notes: Keep unique behavior, reference phases
 
-- [x] Task 2.4: Update summary-generator to use worklog [depends:2.1]
-  - Acceptance: Agent reads worklog for session summaries
-  - Files: `plugins/devloop/agents/summary-generator.md`
-  - Notes: Worklog is source of truth for what was done
-
-### Phase 3: Enforcement Hooks [parallel:partial]
-**Goal**: Make plan updates and commits mandatory
-**Parallel Groups**:
-- Group A: Tasks 3.1, 3.2 (independent hook implementation)
-
-- [x] Task 3.1: Add PreCommit hook to hooks.json [parallel:A]
-  - Acceptance: Hook runs before git commit, blocks if plan not updated
-  - Files: `plugins/devloop/hooks/hooks.json`
-  - Notes: Matcher should catch "Bash" with "git commit" in command
-
-- [x] Task 3.2: Implement pre-commit.sh verification [parallel:A]
-  - Acceptance: Script checks plan status, returns approve/block
-  - Files: `plugins/devloop/hooks/pre-commit.sh`
-  - Notes: Check for [x] tasks without Progress Log entries
-
-- [x] Task 3.3: Add PostCommit hook to hooks.json [depends:3.1]
-  - Acceptance: Hook runs after successful git commit
-  - Files: `plugins/devloop/hooks/hooks.json`
-  - Notes: Matcher catches successful git commit output
-
-- [x] Task 3.4: Implement post-commit.sh worklog updater [depends:3.2,3.3]
-  - Acceptance: Script moves Progress Log entries to worklog with commit hash
-  - Files: `plugins/devloop/hooks/post-commit.sh`
-  - Notes: Get commit hash from git rev-parse HEAD
-
-- [x] Task 3.5: Update devloop.local.md template with enforcement settings
-  - Acceptance: Template includes enforcement config with strict defaults
-  - Files: `plugins/devloop/templates/devloop.local.md`
-  - Notes: Document all enforcement options
-
-- [x] Task 3.6: Update plan-management skill with enforcement docs [depends:3.5]
-  - Acceptance: Skill documents enforcement modes and configuration
-  - Files: `plugins/devloop/skills/plan-management/SKILL.md`
-  - Notes: Add Enforcement section with examples
-
-### Phase 4: Recovery & Polish [parallel:partial]
-**Goal**: Handle edge cases and improve UX
-**Parallel Groups**:
-- Group A: Tasks 4.1, 4.2 (independent recovery flows)
-
-- [x] Task 4.1: Implement recovery prompts in continue.md [parallel:A]
-  - Acceptance: Command detects out-of-sync states and offers recovery
+- [ ] Task 4.3: Refactor continue.md to use phase templates
+  - Acceptance: continue.md reduced from 533 to ~300 lines
   - Files: `plugins/devloop/commands/continue.md`
-  - Notes: Handle: plan not updated, commit without task, worklog drift
+  - Notes: Significant overlap with devloop.md
 
-- [x] Task 4.2: Add worklog reconstruction command [parallel:A]
-  - Acceptance: Command rebuilds worklog from git history
-  - Files: `plugins/devloop/commands/worklog.md` (new)
-  - Notes: Useful for existing projects adopting devloop
-
-- [x] Task 4.3: Update devloop README with workflow diagrams [depends:4.1,4.2]
-  - Acceptance: README shows happy path and recovery flows
-  - Files: `plugins/devloop/README.md`
-  - Notes: Use ASCII or mermaid diagrams
-
-- [x] Task 4.4: Version bump and release notes [depends:4.3]
-  - Acceptance: Bump to 1.10.0, document new enforcement system
-  - Files: `plugins/devloop/.claude-plugin/plugin.json`
-  - Notes: Major feature addition
+- [ ] Task 4.4: Version bump to 1.13.0
+  - Acceptance: Version updated, CHANGELOG documents simplification
+  - Files: `plugins/devloop/.claude-plugin/plugin.json`, `plugins/devloop/README.md`
+  - Notes: Minor version for non-breaking improvements
 
 ## Progress Log
-- 2025-12-18 14:00: Plan created from spike report findings
-- 2025-12-18 15:30: Completed Task 1.1 - Created file-locations skill with comprehensive documentation of .claude/ structure, git tracking status, and rationale
-- 2025-12-18 15:35: Completed Task 1.2 - Created gitignore-devloop template with commented sections and troubleshooting guide
-- 2025-12-18 15:40: Completed Task 1.3 - Added .claude/ directory structure section to CLAUDE.md
-- 2025-12-18 15:40: Phase 1 complete - Moving to Phase 2
-- 2025-12-18 15:50: Completed Tasks 2.1, 2.2 (parallel) - Created worklog-management skill, updated task-checkpoint with worklog step
-- 2025-12-18 16:00: Completed Task 2.3 - Added worklog initialization to devloop command Phase 6
-- 2025-12-18 16:00: Completed Task 2.4 - Updated summary-generator to read worklog as source of truth
-- 2025-12-18 16:00: Phase 2 complete - Moving to Phase 3
-- 2025-12-18 16:15: Completed Tasks 3.1, 3.2 (parallel) - Added PreCommit hook and pre-commit.sh
-- 2025-12-18 16:15: Completed Tasks 3.3, 3.4 - Added PostCommit hook and post-commit.sh worklog updater
-- 2025-12-18 16:15: Completed Task 3.5 - Added enforcement settings to devloop.local.md template
-- 2025-12-18 16:15: Completed Task 3.6 - Updated plan-management with enforcement hooks docs
-- 2025-12-18 16:15: Phase 3 complete - Moving to Phase 4
-- 2025-12-18 16:30: Completed Tasks 4.1, 4.2 (parallel) - Added recovery flows and worklog command
-- 2025-12-18 16:30: Completed Task 4.3 - Updated README with consistency diagrams and 1.10.0 changelog
-- 2025-12-18 16:30: Completed Task 4.4 - Bumped version to 1.10.0
-- 2025-12-18 16:30: Plan complete - All 17 tasks done
+
+- 2025-12-19 11:00: Plan created from spike report findings
+- 2025-12-19 12:30: Completed Task 1.1 - Added UserPromptSubmit hook for smart command routing
+- 2025-12-19 12:30: Completed Task 1.2 - Created tool-usage-policy skill (135 lines)
 
 ## Notes
 
-- Start with strict enforcement for new projects, advisory for existing
-- Worklog is optional initially - can reconstruct from git log
-- Focus on happy path first, recovery in Phase 4
-- All hooks should timeout quickly (<10s) to avoid blocking
+- Backwards compatibility is critical - don't break existing command/skill names
+- Test each phase before proceeding to next
+- Monitor token usage improvements after each phase
+- Consider creating v2.0 plan for larger refactoring (agent merging, declarative commands)
