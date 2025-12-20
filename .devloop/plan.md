@@ -1,164 +1,195 @@
-# Devloop Plan: Agent Consolidation v2.0
+# Devloop Plan: Component Polish v2.1
 
-**Created**: 2025-12-20
-**Updated**: 2025-12-20 23:45
+**Created**: 2025-12-21
+**Updated**: 2025-12-21
 **Status**: Active
-**Current Phase**: Complete - All 4 Phases Done
+**Current Phase**: Phase 1 - Agent Enhancement
 
 ## Overview
 
-Implement the full architectural review recommendations: consolidate 18 agents into 12, apply XML prompt structure, add skill indexing, and automate log rotation.
+Comprehensive review of all devloop components to improve agent invocation reliability, description quality, XML prompt consistency, and background execution patterns.
 
-**Review Reference**: `.claude/devloop-review-report.md`
-**Spike Reference**: `.devloop/spikes/devloop-v2-consolidation.md`
-**Prior Work**: Plugin Simplification v1.1 (Complete)
+**Prior Work**: Agent Consolidation v2.0 (Complete), Agent Invocation Spike (Complete)
+**Spike Reference**: `.devloop/spikes/agent-invocation-testing.md`
+
+## Component Inventory
+
+| Type | Count | Review Focus |
+|------|-------|--------------|
+| Agents | 9 | Descriptions, examples, XML structure, delegation |
+| Commands | 16 | Agent routing, explicit Task invocation |
+| Skills | 28 | Descriptions, when-to-use, when-NOT-to-use |
+| Hooks | 14 | Consistency, logging, validation |
 
 ## Requirements
 
-1. Reduce agent count from 18 to 12 via consolidation
-2. Apply XML prompt structure to prevent agent drift
-3. Create skill index for dynamic loading (28 skills)
-4. Add worklog rotation script for context hygiene
-5. Maintain backwards compatibility during transition
-
-## Architecture
-
-**Current State** (post v1.1):
-- 18 agents with significant overlap
-- 28 skills (language patterns consolidated)
-- Commands reduced 50% via phase-templates
-- Tool policies consolidated into single skill
-
-**Target State** (v2.0):
-- 12 agents (6 merged into 3 super-agents)
-- Skill index for dynamic loading
-- XML-structured core agent prompts
-- Automated worklog maintenance
-
-### Agent Consolidation Map
-
-| To Delete | Merge Into |
-|-----------|------------|
-| code-architect.md | → engineer.md (NEW) |
-| code-explorer.md | → engineer.md |
-| refactor-analyzer.md | → engineer.md |
-| test-generator.md | → qa-engineer.md (NEW) |
-| test-runner.md | → qa-engineer.md |
-| bug-catcher.md | → qa-engineer.md |
-| issue-manager.md | → task-planner.md (ENHANCE) |
-| requirements-gatherer.md | → task-planner.md |
-| dod-validator.md | → task-planner.md |
+1. All agent descriptions must clearly indicate invocation triggers
+2. All commands must explicitly route to agents via Task tool
+3. All skills must have specific "when to use" and "when NOT to use"
+4. Background execution patterns documented where applicable
+5. XML prompt structure consistent across all agents
+6. Hook logging for debugging agent invocations
 
 ## Tasks
 
-### Phase 1: Agent Consolidation [parallel:partial]
-**Goal**: Reduce agent count from 18 to 12 by merging overlapping agents
+### Phase 1: Agent Enhancement [parallel:partial]
+**Goal**: Ensure all 9 agents have optimal descriptions, examples, and XML structure
 
-- [x] Task 1.1: Create engineer.md super-agent [parallel:A]
-  - Acceptance: Merges code-architect, code-explorer, refactor-analyzer, git-manager
+- [ ] Task 1.1: Review engineer.md [parallel:A]
+  - Check description triggers invocation for exploration/architecture/git tasks
+  - Verify examples show `devloop:engineer` in assistant responses
+  - Ensure XML structure matches template
+  - Add background execution guidance
   - Files: `plugins/devloop/agents/engineer.md`
-  - Notes: Created 280-line agent combining Explorer, Architect, Refactorer, Git modes
 
-- [x] Task 1.2: Create qa-engineer.md super-agent [parallel:A]
-  - Acceptance: Merges test-generator, test-runner, bug-catcher, qa-agent (merge into new qa-engineer.md, delete qa-agent.md)
+- [ ] Task 1.2: Review qa-engineer.md [parallel:A]
+  - Check description triggers for testing/validation tasks
+  - Verify examples use `devloop:qa-engineer`
+  - Ensure XML structure complete
   - Files: `plugins/devloop/agents/qa-engineer.md`
-  - Notes: Created 290-line agent combining Generator, Runner, Bug Tracker, Validator modes
 
-- [x] Task 1.3: Enhance task-planner.md [depends:1.1,1.2]
-  - Acceptance: Absorbs issue-manager, requirements-gatherer, dod-validator
+- [ ] Task 1.3: Review task-planner.md [parallel:A]
+  - Check description for planning/requirements/DoD triggers
+  - Verify examples use `devloop:task-planner`
+  - Ensure XML structure complete
   - Files: `plugins/devloop/agents/task-planner.md`
-  - Notes: Created 437-line agent with Planner, Requirements, Issue Manager, DoD Validator modes
 
-- [x] Task 1.4: Update routing references [depends:1.3]
-  - Acceptance: All commands, hooks, and docs reference new agents
-  - Files: hooks/hooks.json, commands/devloop.md, skills/phase-templates/SKILL.md, docs/agents.md
-  - Notes: Updated SubagentStop chaining, command phases, skill templates, rewrote agents.md for v2.0
-
-- [x] Task 1.5: Delete merged agents [depends:1.4]
-  - Acceptance: 11 old agent files removed (9 merged + git-manager + qa-agent)
-  - Files: Deleted code-architect, code-explorer, refactor-analyzer, git-manager, test-generator, test-runner, bug-catcher, qa-agent, issue-manager, requirements-gatherer, dod-validator
-  - Notes: 9 agents remain: engineer, qa-engineer, task-planner, code-reviewer, security-scanner, complexity-estimator, workflow-detector, doc-generator, summary-generator
-
-### Phase 2: Prompt Hardening [parallel:none]
-**Goal**: Apply XML structure to prevent agent drift
-
-- [x] Task 2.1: Create XML agent template
-  - Acceptance: Template file with system_role, capabilities, workflow_enforcement sections
-  - Files: `plugins/devloop/docs/templates/agent_prompt_structure.xml`
-  - Notes: Created comprehensive template with all XML sections and usage examples
-
-- [x] Task 2.2: Apply XML to engineer.md
-  - Acceptance: Engineer agent uses XML structure with <thinking> enforcement
-  - Files: `plugins/devloop/agents/engineer.md`
-  - Notes: Added system_role, capabilities, mode_detection, workflow_enforcement
-
-- [x] Task 2.3: Apply XML to qa-engineer.md
-  - Acceptance: QA agent uses XML structure
-  - Files: `plugins/devloop/agents/qa-engineer.md`
-  - Notes: Added XML structure with all 4 modes
-
-- [x] Task 2.4: Apply XML to task-planner.md
-  - Acceptance: Task planner uses XML structure
-  - Files: `plugins/devloop/agents/task-planner.md`
-  - Notes: Added XML structure with all 4 modes
-
-- [x] Task 2.5: Apply XML to code-reviewer.md
-  - Acceptance: Code reviewer uses XML structure
+- [ ] Task 1.4: Review code-reviewer.md [parallel:B]
+  - Check description triggers for review/audit tasks
+  - Verify examples use `devloop:code-reviewer`
+  - Ensure XML structure complete
   - Files: `plugins/devloop/agents/code-reviewer.md`
-  - Notes: Added XML structure with confidence scoring and language patterns
 
-### Phase 3: Skill Indexing [parallel:partial]
-**Goal**: Enable dynamic skill loading to reduce token usage
+- [ ] Task 1.5: Review remaining 5 agents [parallel:B]
+  - complexity-estimator, security-scanner, doc-generator, summary-generator, workflow-detector
+  - Apply same checks as above
+  - Files: `plugins/devloop/agents/*.md`
 
-- [x] Task 3.1: Create skills INDEX.md [parallel:A]
-  - Acceptance: Lists all 28 skills with 1-line summaries
+- [ ] Task 1.6: Create agent description guidelines [depends:1.1-1.5]
+  - Document best practices learned
+  - Add to docs/agents.md
+  - Files: `plugins/devloop/docs/agents.md`
+
+### Phase 2: Command Agent Routing [parallel:partial]
+**Goal**: All 16 commands explicitly route to appropriate agents
+
+- [ ] Task 2.1: Audit high-use commands [parallel:A]
+  - continue.md ✓ (already enhanced)
+  - spike.md ✓ (already enhanced)
+  - devloop.md (verify agent routing)
+  - quick.md (add agent routing)
+  - Files: `plugins/devloop/commands/{continue,spike,devloop,quick}.md`
+
+- [ ] Task 2.2: Audit issue/bug commands [parallel:A]
+  - bugs.md, bug.md, issues.md, new.md
+  - Add agent routing to qa-engineer or task-planner
+  - Files: `plugins/devloop/commands/{bugs,bug,issues,new}.md`
+
+- [ ] Task 2.3: Audit workflow commands [parallel:B]
+  - review.md, ship.md, analyze.md
+  - Add explicit agent routing
+  - Files: `plugins/devloop/commands/{review,ship,analyze}.md`
+
+- [ ] Task 2.4: Audit setup commands [parallel:B]
+  - bootstrap.md, onboard.md, golangci-setup.md, statusline.md, worklog.md
+  - Determine if agent routing needed
+  - Files: `plugins/devloop/commands/*.md`
+
+- [ ] Task 2.5: Add background execution patterns [depends:2.1-2.4]
+  - Update commands that benefit from parallel agent execution
+  - Document `run_in_background: true` usage
+  - Files: Commands with parallel phases
+
+### Phase 3: Skill Refinement [parallel:partial]
+**Goal**: All 28 skills have clear invocation triggers
+
+- [ ] Task 3.1: Audit pattern skills [parallel:A]
+  - go-patterns, react-patterns, java-patterns, python-patterns
+  - Ensure descriptions trigger on file type/context
+  - Add clear "when NOT to use"
+  - Files: `plugins/devloop/skills/*-patterns/SKILL.md`
+
+- [ ] Task 3.2: Audit workflow skills [parallel:A]
+  - phase-templates, plan-management, worklog-management, workflow-selection
+  - Ensure descriptions match command triggers
+  - Files: `plugins/devloop/skills/*/SKILL.md`
+
+- [ ] Task 3.3: Audit quality skills [parallel:B]
+  - testing-strategies, security-checklist, deployment-readiness, complexity-estimation
+  - Ensure descriptions trigger in appropriate contexts
+  - Files: `plugins/devloop/skills/*/SKILL.md`
+
+- [ ] Task 3.4: Audit design skills [parallel:B]
+  - architecture-patterns, api-design, database-patterns
+  - Ensure descriptions trigger for design tasks
+  - Files: `plugins/devloop/skills/*/SKILL.md`
+
+- [ ] Task 3.5: Audit remaining skills [depends:3.1-3.4]
+  - tool-usage-policy, model-selection-guide, issue-tracking, etc.
+  - Apply same checks
+  - Files: All remaining skills
+
+- [ ] Task 3.6: Update skill INDEX.md [depends:3.5]
+  - Ensure index reflects improved descriptions
   - Files: `plugins/devloop/skills/INDEX.md`
-  - Notes: INDEX.md already existed with good structure; verified complete
 
-- [x] Task 3.2: Update SessionStart hook [parallel:A]
-  - Acceptance: Hook loads INDEX.md instead of full skill list
-  - Files: `plugins/devloop/hooks/session-start.sh`
-  - Notes: Updated to reference INDEX.md and provide dynamic loading instructions
+### Phase 4: Hook Integration [parallel:none]
+**Goal**: Hooks support debugging and consistent behavior
 
-- [x] Task 3.3: Update task-planner to use index [depends:3.1]
-  - Acceptance: Task planner reads INDEX.md first, loads specific skills on demand
-  - Files: `plugins/devloop/agents/task-planner.md`
-  - Notes: Added skill_index section and complexity-estimation skill
+- [ ] Task 4.1: Fix Task invocation logging hook
+  - Debug stdin JSON format issue
+  - Test in fresh session
+  - Files: `plugins/devloop/hooks/log-task-invocation.sh`
 
-### Phase 4: Maintenance Automation [parallel:none]
-**Goal**: Automate context hygiene
+- [ ] Task 4.2: Review PreToolUse hooks
+  - Ensure consistent behavior
+  - Add logging for debugging
+  - Files: `plugins/devloop/hooks/hooks.json`
 
-- [x] Task 4.1: Create worklog rotation script
-  - Acceptance: Script archives worklog when >500 lines
-  - Files: `plugins/devloop/scripts/rotate-worklog.sh`
-  - Notes: Created with --check-only, --force, --threshold, --quiet options
+- [ ] Task 4.3: Review SubagentStop chaining
+  - Verify agent chaining logic
+  - Test transitions work correctly
+  - Files: `plugins/devloop/hooks/hooks.json`
 
-- [x] Task 4.2: Add rotation to SessionStart
-  - Acceptance: Rotation runs automatically on session start
-  - Files: `plugins/devloop/hooks/session-start.sh`
-  - Notes: Runs quietly, only notifies in context if rotation occurred
+### Phase 5: Documentation & Testing [parallel:none]
+**Goal**: Document changes and validate
 
-- [x] Task 4.3: Version bump to 2.0.0
-  - Acceptance: Version updated, README documents major refactoring
-  - Files: `plugins/devloop/.claude-plugin/plugin.json`, `plugins/devloop/README.md`
-  - Notes: Updated version, badges, agents section, directory structure, and changelog
+- [ ] Task 5.1: Update README.md
+  - Document agent invocation patterns
+  - Add background execution examples
+  - Files: `plugins/devloop/README.md`
+
+- [ ] Task 5.2: Update docs/agents.md
+  - Comprehensive agent reference
+  - Invocation examples
+  - Files: `plugins/devloop/docs/agents.md`
+
+- [ ] Task 5.3: Create testing checklist
+  - Manual validation steps
+  - Expected agent invocations per command
+  - Files: `plugins/devloop/docs/testing.md`
+
+- [ ] Task 5.4: Version bump to 2.1.0
+  - Update plugin.json
+  - Update changelog
+  - Files: `plugins/devloop/.claude-plugin/plugin.json`
 
 ## Progress Log
 
-- 2025-12-20 22:00: Plan created from spike report and architectural review
-- 2025-12-20 22:15: Completed Tasks 1.1, 1.2 - Created engineer.md (280 lines) and qa-engineer.md (290 lines) super-agents
-- 2025-12-20 22:20: Completed Task 1.3 - Enhanced task-planner.md (437 lines) with 4 modes
-- 2025-12-20 22:30: Completed Task 1.4 - Updated routing (hooks, commands, skills, docs)
-- 2025-12-20 22:35: Completed Task 1.5 - Deleted 11 old agents (18 → 9)
-- 2025-12-20 22:40: Phase 1 complete. Committed: fc2868f (net -2,625 lines)
-- 2025-12-20 23:15: Completed Phase 2 - XML prompt hardening applied to 4 core agents
-- 2025-12-20 23:45: Completed Phase 3 - Skill indexing (INDEX.md verified, SessionStart updated, task-planner enhanced)
-- 2025-12-21: Completed Phase 4 - Created rotate-worklog.sh, integrated with SessionStart, version bump to 2.0.0
-- 2025-12-21: **Plan Complete** - All 16/16 tasks done. Ready to commit and ship v2.0.0
+- 2025-12-21: Plan created from spike findings and user feedback
+- 2025-12-21: continue.md and spike.md already enhanced with agent routing
 
 ## Notes
 
-- Test each merged agent before deleting source agents
-- Search codebase for all references before deletion
-- XML structure should NOT break existing behavior
-- Version 2.0.0 indicates breaking changes (agent renaming)
+- Test agent invocations by watching status line for `devloop:agent-name`
+- Use `~/.devloop-agent-invocations.log` for debugging (requires hook fix)
+- Background execution: `run_in_background: true` + `TaskOutput` to collect
+- XML template reference: `plugins/devloop/docs/templates/agent_prompt_structure.xml`
+
+## Success Criteria
+
+1. Running `/devloop:continue` shows appropriate agent in status bar
+2. All commands route to specific agents based on task type
+3. Skills are invoked automatically based on file context
+4. Background parallel execution works for multi-agent phases
+5. Hook logging captures all Task invocations

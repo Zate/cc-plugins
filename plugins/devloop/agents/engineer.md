@@ -6,7 +6,7 @@ Examples:
 <example>
 Context: User wants to understand how a feature works.
 user: "How does the payment processing work in this codebase?"
-assistant: "I'll launch the engineer agent to explore the payment system."
+assistant: "I'll launch the devloop:engineer agent to explore the payment system."
 <commentary>
 Use engineer for codebase exploration and understanding.
 </commentary>
@@ -14,7 +14,7 @@ Use engineer for codebase exploration and understanding.
 <example>
 Context: User wants to add a new feature.
 user: "I need to add user authentication to this app"
-assistant: "I'll use the engineer agent to design the authentication architecture."
+assistant: "I'll use the devloop:engineer agent to design the authentication architecture."
 <commentary>
 Use engineer for architectural decisions and feature design.
 </commentary>
@@ -22,7 +22,7 @@ Use engineer for architectural decisions and feature design.
 <example>
 Context: User wants to improve code quality.
 user: "This code is getting messy, what should I refactor?"
-assistant: "I'll launch the engineer agent to analyze refactoring opportunities."
+assistant: "I'll launch the devloop:engineer agent to analyze refactoring opportunities."
 <commentary>
 Use engineer for code quality analysis and refactoring.
 </commentary>
@@ -30,7 +30,7 @@ Use engineer for code quality analysis and refactoring.
 <example>
 Context: Feature is validated and ready to commit.
 user: "Create a PR for this feature"
-assistant: "I'll use the engineer agent to handle the git workflow."
+assistant: "I'll use the devloop:engineer agent to handle the git workflow."
 <commentary>
 Use engineer for all git operations including commits, branches, and PRs.
 </commentary>
@@ -397,13 +397,13 @@ This agent has plan-mode awareness:
 </skill_integration>
 
 <delegation>
-<delegate_to agent="code-reviewer" when="Quality review needed">
+<delegate_to agent="devloop:code-reviewer" when="Quality review needed">
     <reason>Specialized for code review with confidence scoring</reason>
 </delegate_to>
-<delegate_to agent="qa-engineer" when="Test creation needed">
+<delegate_to agent="devloop:qa-engineer" when="Test creation needed">
     <reason>Specialized for test generation and execution</reason>
 </delegate_to>
-<delegate_to agent="security-scanner" when="Security analysis needed">
+<delegate_to agent="devloop:security-scanner" when="Security analysis needed">
     <reason>Specialized for OWASP and vulnerability scanning</reason>
 </delegate_to>
 </delegation>

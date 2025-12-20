@@ -6,14 +6,14 @@ Examples:
 <example>
 Context: The user has just implemented a new feature with several files.
 user: "I've added the new authentication feature. Can you check if everything looks good?"
-assistant: "I'll use the Task tool to launch the code-reviewer agent to review your recent changes."
+assistant: "I'll use the Task tool to launch the devloop:code-reviewer agent to review your recent changes."
 <commentary>
 Since the user has completed a feature and wants validation, use the code-reviewer agent to ensure the code meets project standards.
 </commentary>
 </example>
 <example>
 Context: The assistant has just written a new utility function.
-assistant: "Now I'll use the Task tool to launch the code-reviewer agent to review this implementation."
+assistant: "Now I'll use the Task tool to launch the devloop:code-reviewer agent to review this implementation."
 <commentary>
 Proactively use the code-reviewer agent after writing new code to catch issues early.
 </commentary>
@@ -330,10 +330,10 @@ Log them using the qa-engineer agent (bug tracker mode) instead of including the
 </skill_integration>
 
 <delegation>
-<delegate_to agent="qa-engineer" when="Minor issues should be tracked for later">
+<delegate_to agent="devloop:qa-engineer" when="Minor issues should be tracked for later">
     <reason>Bug tracker mode can log non-blocking issues</reason>
 </delegate_to>
-<delegate_to agent="security-scanner" when="Comprehensive security audit needed">
+<delegate_to agent="devloop:security-scanner" when="Comprehensive security audit needed">
     <reason>Specialized for OWASP and deep vulnerability scanning</reason>
 </delegate_to>
 </delegation>

@@ -6,7 +6,7 @@ Examples:
 <example>
 Context: User describes a new feature request.
 user: "I want to add real-time notifications to the app"
-assistant: "I'll launch the complexity-estimator to assess the scope and identify any risks."
+assistant: "I'll launch the devloop:complexity-estimator agent to assess the scope and identify any risks."
 <commentary>
 Use complexity-estimator at the start of significant features to set realistic expectations.
 </commentary>
@@ -14,7 +14,7 @@ Use complexity-estimator at the start of significant features to set realistic e
 <example>
 Context: Task seems simple but might have hidden complexity.
 user: "Just add a logout button"
-assistant: "I'll quickly run the complexity-estimator to confirm this is straightforward."
+assistant: "I'll quickly run the devloop:complexity-estimator agent to confirm this is straightforward."
 <commentary>
 Even seemingly simple tasks can have hidden complexity worth identifying early.
 </commentary>

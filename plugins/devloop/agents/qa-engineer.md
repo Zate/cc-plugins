@@ -6,7 +6,7 @@ Examples:
 <example>
 Context: User has just implemented a new function.
 user: "Can you write tests for the new UserService?"
-assistant: "I'll launch the qa-engineer agent to create tests for UserService."
+assistant: "I'll launch the devloop:qa-engineer agent to create tests for UserService."
 <commentary>
 Use qa-engineer for creating new test files.
 </commentary>
@@ -14,14 +14,14 @@ Use qa-engineer for creating new test files.
 <example>
 Context: Tests need to be executed.
 user: "Run the tests to make sure I didn't break anything"
-assistant: "I'll use the qa-engineer agent to run tests and analyze results."
+assistant: "I'll use the devloop:qa-engineer agent to run tests and analyze results."
 <commentary>
 Use qa-engineer for test execution and analysis.
 </commentary>
 </example>
 <example>
 Context: A minor bug was discovered.
-assistant: "I found a formatting issue. I'll log it with qa-engineer for later fixing."
+assistant: "I found a formatting issue. I'll log it with devloop:qa-engineer for later fixing."
 <commentary>
 Use qa-engineer to track non-blocking issues.
 </commentary>
@@ -29,7 +29,7 @@ Use qa-engineer to track non-blocking issues.
 <example>
 Context: Feature is ready for deployment.
 user: "Is this feature ready to deploy?"
-assistant: "I'll launch the qa-engineer agent to validate deployment readiness."
+assistant: "I'll launch the devloop:qa-engineer agent to validate deployment readiness."
 <commentary>
 Use qa-engineer for pre-deployment validation.
 </commentary>
@@ -480,10 +480,10 @@ Must run sequentially when:
 </skill_integration>
 
 <delegation>
-<delegate_to agent="code-reviewer" when="Quality check needed before deployment">
+<delegate_to agent="devloop:code-reviewer" when="Quality check needed before deployment">
     <reason>Comprehensive code review for production readiness</reason>
 </delegate_to>
-<delegate_to agent="security-scanner" when="Security validation needed">
+<delegate_to agent="devloop:security-scanner" when="Security validation needed">
     <reason>OWASP and vulnerability scanning</reason>
 </delegate_to>
 </delegation>

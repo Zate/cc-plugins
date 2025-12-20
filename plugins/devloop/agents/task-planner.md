@@ -6,7 +6,7 @@ Examples:
 <example>
 Context: Architecture design is complete.
 user: "Ok, let's implement the auth feature using approach 2"
-assistant: "I'll launch the task-planner to break this into tasks with acceptance criteria."
+assistant: "I'll launch the devloop:task-planner agent to break this into tasks with acceptance criteria."
 <commentary>
 Use task-planner for creating implementation roadmaps.
 </commentary>
@@ -14,14 +14,14 @@ Use task-planner for creating implementation roadmaps.
 <example>
 Context: User has a vague feature idea.
 user: "I want users to be able to share things"
-assistant: "I'll launch the task-planner to gather requirements and define specifications."
+assistant: "I'll launch the devloop:task-planner agent to gather requirements and define specifications."
 <commentary>
 Use task-planner when requests need structured requirements.
 </commentary>
 </example>
 <example>
 Context: A non-critical issue was discovered.
-assistant: "I found an issue. I'll log it with task-planner for later."
+assistant: "I found an issue. I'll log it with devloop:task-planner for later."
 <commentary>
 Use task-planner to track issues discovered during development.
 </commentary>
@@ -29,7 +29,7 @@ Use task-planner to track issues discovered during development.
 <example>
 Context: Implementation complete, need to verify.
 user: "Is this feature ready to ship?"
-assistant: "I'll use the task-planner to validate all Definition of Done criteria."
+assistant: "I'll use the devloop:task-planner agent to validate all Definition of Done criteria."
 <commentary>
 Use task-planner for completion validation.
 </commentary>
@@ -549,10 +549,10 @@ Options:
 </skill_integration>
 
 <delegation>
-<delegate_to agent="qa-engineer" when="Deployment validation needed">
+<delegate_to agent="devloop:qa-engineer" when="Deployment validation needed">
     <reason>QA engineer handles production readiness; DoD handles work completion</reason>
 </delegate_to>
-<delegate_to agent="engineer" when="Architecture design needed before planning">
+<delegate_to agent="devloop:engineer" when="Architecture design needed before planning">
     <reason>Planning requires completed architecture</reason>
 </delegate_to>
 </delegation>

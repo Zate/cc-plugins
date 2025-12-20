@@ -46,7 +46,7 @@ A comprehensive, token-conscious workflow for feature development from requireme
 **Goal**: Classify task and route to optimal workflow
 
 1. Analyze request: $ARGUMENTS
-2. Launch workflow-detector agent (haiku) if unclear
+2. Launch devloop:workflow-detector agent (haiku) if unclear
 3. Route:
 
 | Task Type | Command |
@@ -64,7 +64,7 @@ A comprehensive, token-conscious workflow for feature development from requireme
 **Goal**: Understand what needs to be built
 
 1. Create todo list with all workflow phases
-2. If vague/complex: Launch task-planner agent in requirements mode (sonnet)
+2. If vague/complex: Launch devloop:task-planner agent in requirements mode (sonnet)
 3. If clear: Confirm understanding with AskUserQuestion
 
 See `Skill: phase-templates` → Discovery Phase for details.
@@ -75,7 +75,7 @@ See `Skill: phase-templates` → Discovery Phase for details.
 
 **Goal**: Estimate effort and identify risks
 
-1. Launch complexity-estimator agent (haiku, plan mode)
+1. Launch devloop:complexity-estimator agent (haiku, plan mode)
 2. If L/XL complexity or high uncertainty:
    - Offer spike option: `/devloop:spike`
    - Or reduce scope
@@ -88,7 +88,7 @@ Reference: `Skill: complexity-estimation`
 
 **Goal**: Deep understanding of existing code
 
-1. Launch 2-3 engineer agents in explore mode in parallel (sonnet)
+1. Launch 2-3 devloop:engineer agents in explore mode in parallel (sonnet)
 2. Each returns 5-10 key files
 3. **Read all identified files**
 4. Present summary of findings
@@ -116,7 +116,7 @@ See `Skill: phase-templates` → Exploration Phase for details.
 
 1. Invoke: `Skill: architecture-patterns`
 2. Invoke language skill: `Skill: go-patterns`, `Skill: react-patterns`, etc.
-3. Launch 2-3 engineer agents in architect mode:
+3. Launch 2-3 devloop:engineer agents in architect mode:
    - **Minimal**: Smallest change, max reuse
    - **Clean**: Best architecture
    - **Pragmatic**: Speed/quality balance
@@ -130,7 +130,7 @@ See `Skill: phase-templates` → Architecture Phase for details.
 
 **Goal**: Break architecture into actionable tasks
 
-1. Launch task-planner agent (sonnet)
+1. Launch devloop:task-planner agent (sonnet)
 2. Write tasks to TodoWrite
 3. **Save plan** to `.devloop/plan.md`
 4. **Initialize worklog** at `.devloop/worklog.md` if needed
@@ -167,8 +167,8 @@ See `Skill: phase-templates` → Implementation Phase for parallel execution det
 
 **Goal**: Ensure code works correctly
 
-1. Launch qa-engineer agent in generator mode (haiku) if needed
-2. Launch qa-engineer agent in runner mode (haiku)
+1. Launch devloop:qa-engineer agent in generator mode (haiku) if needed
+2. Launch devloop:qa-engineer agent in runner mode (haiku)
 3. Handle failures with AskUserQuestion
 
 Reference: `Skill: testing-strategies`
@@ -179,8 +179,8 @@ Reference: `Skill: testing-strategies`
 
 **Goal**: Quality assurance and code review
 
-1. Launch code-reviewer agents in parallel (correctness, quality, conventions)
-2. Launch security-scanner agent (haiku)
+1. Launch devloop:code-reviewer agents in parallel (correctness, quality, conventions)
+2. Launch devloop:security-scanner agent (haiku)
 3. Consolidate findings by severity
 4. Present results for action
 
@@ -190,7 +190,7 @@ Reference: `Skill: testing-strategies`
 
 **Goal**: Verify all completion criteria met
 
-1. Launch task-planner agent in DoD validator mode (haiku)
+1. Launch devloop:task-planner agent in DoD validator mode (haiku)
 2. Check `.devloop/local.md` for project-specific DoD
 3. Handle failures with AskUserQuestion
 
@@ -202,7 +202,7 @@ See `Skill: phase-templates` → Validation Phase for checklist.
 
 **Goal**: Commit changes, create PR if needed
 
-1. Launch engineer agent in git mode (haiku)
+1. Launch devloop:engineer agent in git mode (haiku)
 2. If PR requested: Generate description, create via `gh pr create`
 
 Reference: `Skill: git-workflows`
@@ -213,7 +213,7 @@ Reference: `Skill: git-workflows`
 
 **Goal**: Document completion and handoff
 
-1. Launch summary-generator agent (haiku)
+1. Launch devloop:summary-generator agent (haiku)
 2. Mark all todos complete
 3. Present summary
 4. Suggest follow-up actions

@@ -56,6 +56,19 @@ A spike should answer:
 3. **What's the approach?** - Which option is best?
 4. **What are the risks?** - What could go wrong?
 
+## Agent Routing
+
+**CRITICAL**: This command uses devloop agents for exploration and evaluation.
+
+| Phase | Agent | Purpose |
+|-------|-------|---------|
+| Research | `devloop:engineer` (explore mode) | Find similar patterns, understand codebase |
+| Prototype | Direct implementation | Throwaway POC code |
+| Evaluate | `devloop:complexity-estimator` | T-shirt sizing and risk assessment |
+| Next Steps | Route to appropriate workflow | /devloop, /devloop:continue, etc. |
+
+---
+
 ## Workflow
 
 ### Phase 1: Define Spike Goals
@@ -104,11 +117,28 @@ Initial request: $ARGUMENTS
 **Goal**: Gather information
 
 **Actions**:
-1. Search codebase for related patterns:
-   - Launch code-explorer agent to find similar implementations
-   - Identify existing patterns we might reuse
 
-2. External research if needed:
+1. **Search codebase** - Use Task tool with devloop:engineer:
+   ```
+   Task:
+     subagent_type: devloop:engineer
+     description: "Explore codebase for [spike topic]"
+     prompt: |
+       Explore mode: Research the codebase for patterns related to:
+
+       **Spike Topic**: [Topic from arguments]
+       **Looking for**: Similar implementations, integration points, existing patterns
+
+       Return:
+       - Key files that are relevant
+       - Existing patterns we could reuse
+       - Potential integration points
+       - Any concerns or blockers discovered
+
+       Do NOT modify any code. This is research only.
+   ```
+
+2. **External research** if needed:
    - Use WebSearch for documentation, examples, best practices
    - Use WebFetch to read specific documentation pages
    - Look for known issues or gotchas
@@ -137,12 +167,27 @@ Initial request: $ARGUMENTS
 **Goal**: Assess findings
 
 **Actions**:
-1. Run complexity-estimator on the proposed approach:
-   - Launch complexity-estimator agent
-   - Get T-shirt size estimate
-   - Identify risks
 
-2. Compare approaches if multiple:
+1. **Run complexity assessment** - Use Task tool with devloop:complexity-estimator:
+   ```
+   Task:
+     subagent_type: devloop:complexity-estimator
+     description: "Estimate complexity for [spike topic]"
+     prompt: |
+       Assess the complexity of implementing the approach discovered in this spike:
+
+       **Spike Topic**: [Topic]
+       **Proposed Approach**: [Summary of recommended approach]
+       **Key Findings**: [What was discovered]
+
+       Provide:
+       - T-shirt size estimate (XS/S/M/L/XL)
+       - Risk assessment
+       - Whether full /devloop workflow is needed or /devloop:quick is sufficient
+       - Any dependencies or blockers
+   ```
+
+2. **Compare approaches** if multiple:
    | Approach | Complexity | Risk | Pros | Cons |
    |----------|------------|------|------|------|
    | A | | | | |
