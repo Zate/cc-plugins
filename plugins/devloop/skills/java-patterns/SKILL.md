@@ -5,13 +5,15 @@ description: Java and Spring best practices including dependency injection, stre
 
 # Java Patterns
 
-Modern Java and Spring patterns for building robust applications.
+Modern Java and Spring patterns. **Extends** `language-patterns-base` with Java-specific guidance.
 
-**Java Version**: These patterns target Java 17+ LTS. Records require Java 16+, pattern matching requires Java 21+.
+**Java Version**: Targets Java 17+ LTS. Records require Java 16+, pattern matching requires Java 21+.
+
+> For universal principles (AAA testing, separation of concerns, naming), see `Skill: language-patterns-base`.
 
 ## When NOT to Use This Skill
 
-- **Non-Java code**: Use language-specific skills for Go, Python, TypeScript, etc.
+- **Non-Java code**: Use go-patterns, python-patterns, react-patterns instead
 - **Legacy Java 8**: Different patterns for older Java versions
 - **Non-Spring projects**: Some patterns are Spring-specific
 - **Android development**: Android has its own conventions
@@ -381,6 +383,6 @@ try (var connection = dataSource.getConnection();
 
 ## See Also
 
-- `references/spring-patterns.md` - Spring-specific patterns
-- `references/streams.md` - Advanced stream operations
-- `references/testing.md` - Testing strategies
+- `Skill: language-patterns-base` - Universal principles
+- `Skill: testing-strategies` - Comprehensive test strategies
+- `Skill: architecture-patterns` - High-level design

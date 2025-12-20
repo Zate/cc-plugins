@@ -5,17 +5,31 @@ description: Python-specific best practices including type hints, async patterns
 
 # Python Patterns
 
-Best practices for Python development.
+Idiomatic Python patterns and best practices. **Extends** `language-patterns-base` with Python-specific guidance.
 
-**Python Version**: These patterns target Python 3.10+. Type syntax like `X | Y` requires 3.10+, `match` statements require 3.10+.
+**Python Version**: Targets Python 3.10+. Type syntax like `X | Y` requires 3.10+, `match` statements require 3.10+.
+
+> For universal principles (AAA testing, separation of concerns, naming), see `Skill: language-patterns-base`.
 
 ## When NOT to Use This Skill
 
-- **Non-Python code**: Use language-specific skills for Go, Java, TypeScript, etc.
-- **Python 2**: Legacy Python has different patterns (avoid if possible)
+- **Non-Python code**: Use go-patterns, java-patterns, react-patterns instead
+- **Python 2**: Legacy Python has different patterns
 - **Jupyter notebooks**: Data science workflows have different conventions
 - **MicroPython/CircuitPython**: Embedded Python has constraints
 - **Quick scripts**: Don't over-engineer one-off automation
+
+## Quick Reference
+
+| Pattern | Use Case | Example |
+|---------|----------|---------|
+| Type hints | Function signatures | `def greet(name: str) -> str:` |
+| Dataclasses | Data containers | `@dataclass class User:` |
+| Context managers | Resource cleanup | `with open(f) as file:` |
+| Async/await | Concurrent I/O | `async def fetch():` |
+| Protocols | Structural typing | `class Readable(Protocol):` |
+
+---
 
 ## Type Hints
 
@@ -434,6 +448,7 @@ dev = [
 
 ## See Also
 
-- `Skill: testing-strategies` - Advanced testing
-- `Skill: api-design` - Python API frameworks
+- `Skill: language-patterns-base` - Universal principles
+- `Skill: testing-strategies` - Comprehensive test strategies
+- `Skill: api-design` - RESTful and GraphQL APIs
 - `Skill: database-patterns` - SQLAlchemy patterns

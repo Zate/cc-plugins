@@ -5,9 +5,11 @@ description: React and TypeScript best practices including hooks, component desi
 
 # React Patterns
 
-Modern React patterns and best practices for building maintainable applications.
+Modern React patterns and best practices. **Extends** `language-patterns-base` with React/TypeScript-specific guidance.
 
-**React Version**: These patterns target React 18+. Concurrent features and automatic batching require React 18+.
+**React Version**: Targets React 18+. Concurrent features and automatic batching require React 18+.
+
+> For universal principles (AAA testing, separation of concerns, naming), see `Skill: language-patterns-base`.
 
 ## When NOT to Use This Skill
 
@@ -382,6 +384,6 @@ test('submits form with user data', async () => {
 
 ## See Also
 
-- `references/hooks.md` - Advanced hook patterns
-- `references/performance.md` - Performance optimization
-- `references/testing.md` - Testing strategies
+- `Skill: language-patterns-base` - Universal principles
+- `Skill: testing-strategies` - Comprehensive test strategies
+- `Skill: architecture-patterns` - High-level design
