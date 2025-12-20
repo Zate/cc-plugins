@@ -2,7 +2,7 @@
 
 **A complete, token-conscious feature development workflow for professional software engineering.**
 
-[![Version](https://img.shields.io/badge/version-1.12.0-blue)](./CHANGELOG.md) [![Agents](https://img.shields.io/badge/agents-18-green)](#agents) [![Skills](https://img.shields.io/badge/skills-26-purple)](#skills) [![Commands](https://img.shields.io/badge/commands-14-orange)](#commands)
+[![Version](https://img.shields.io/badge/version-1.13.0-blue)](./CHANGELOG.md) [![Agents](https://img.shields.io/badge/agents-18-green)](#agents) [![Skills](https://img.shields.io/badge/skills-27-purple)](#skills) [![Commands](https://img.shields.io/badge/commands-14-orange)](#commands)
 
 ---
 
