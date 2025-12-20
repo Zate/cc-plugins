@@ -2,8 +2,29 @@
 # Devloop SessionStart hook
 # Detects project context and provides rich initial context for the agent
 # Sets environment variables for use by agents
+# Runs worklog rotation check on session start
 
 set -euo pipefail
+
+# Worklog rotation check (runs quietly, only rotates if needed)
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+ROTATION_SCRIPT="$SCRIPT_DIR/../scripts/rotate-worklog.sh"
+if [ -f "$ROTATION_SCRIPT" ] && [ -f ".devloop/worklog.md" ]; then
+    # Run rotation check quietly - only outputs if rotation happens
+    ROTATION_RESULT=$("$ROTATION_SCRIPT" --quiet 2>/dev/null || true)
+    if echo "$ROTATION_RESULT" | grep -q '"rotated": true' 2>/dev/null; then
+        ROTATED_FILE=$(echo "$ROTATION_RESULT" | grep -o '"archiveFile": "[^"]*"' | sed 's/"archiveFile": "\([^"]*\)"/\1/')
+        # Will be included in context message below
+        WORKLOG_ROTATED=true
+        WORKLOG_ARCHIVE="$ROTATED_FILE"
+    else
+        WORKLOG_ROTATED=false
+        WORKLOG_ARCHIVE=""
+    fi
+else
+    WORKLOG_ROTATED=false
+    WORKLOG_ARCHIVE=""
+fi
 
 # Detect primary project language
 detect_language() {
@@ -562,6 +583,13 @@ if [ -n "$OPEN_BUGS" ] && [ "$OPEN_BUGS" -gt 0 ]; then
     CONTEXT_MSG="$CONTEXT_MSG
 
 **Open Bugs**: $OPEN_BUGS tracked → Use \`/devloop:bugs\` to manage"
+fi
+
+# Add worklog rotation notice if rotated
+if [ "$WORKLOG_ROTATED" = true ]; then
+    CONTEXT_MSG="$CONTEXT_MSG
+
+**Worklog Rotated**: Previous worklog archived to \`$WORKLOG_ARCHIVE\` (exceeded 500 lines)"
 fi
 
 # Add migration notice if legacy files detected

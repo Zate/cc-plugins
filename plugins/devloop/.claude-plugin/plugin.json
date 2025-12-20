@@ -1,7 +1,7 @@
 {
   "name": "devloop",
-  "version": "1.13.1",
-  "description": "Token-conscious feature development workflow with phase templates, hook-based automation, unified language patterns, consistency enforcement, worklog management, unified issue tracking, specialized agents, smart parallel execution, refactoring analysis, strategic model selection (opus/sonnet/haiku), and language-specific skills for Go, React, Java, and Python projects",
+  "version": "2.0.0",
+  "description": "Token-conscious feature development workflow with consolidated super-agents (18→9), XML-structured prompts, dynamic skill loading, automatic worklog rotation, phase templates, hook-based automation, unified language patterns, consistency enforcement, worklog management, unified issue tracking, smart parallel execution, refactoring analysis, strategic model selection (opus/sonnet/haiku), and language-specific skills for Go, React, Java, and Python projects",
   "author": {
     "name": "Zate",
     "email": "zate75+claude-code-plugins@gmail.com"

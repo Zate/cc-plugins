@@ -2,7 +2,7 @@
 
 **A complete, token-conscious feature development workflow for professional software engineering.**
 
-[![Version](https://img.shields.io/badge/version-1.13.0-blue)](./CHANGELOG.md) [![Agents](https://img.shields.io/badge/agents-18-green)](#agents) [![Skills](https://img.shields.io/badge/skills-27-purple)](#skills) [![Commands](https://img.shields.io/badge/commands-14-orange)](#commands)
+[![Version](https://img.shields.io/badge/version-2.0.0-blue)](./CHANGELOG.md) [![Agents](https://img.shields.io/badge/agents-9-green)](#agents) [![Skills](https://img.shields.io/badge/skills-28-purple)](#skills) [![Commands](https://img.shields.io/badge/commands-14-orange)](#commands)
 
 ---
 
@@ -134,59 +134,46 @@ devloop provides a 12-phase workflow that mirrors how senior engineers approach 
 
 ## Agents
 
-devloop includes 18 specialized agents, each optimized for a specific task. Agents are color-coded by category for easy visual identification when invoked.
+devloop v2.0 includes 9 consolidated super-agents. Each agent operates in multiple modes, reducing overhead while maintaining specialized capabilities. Agents are color-coded by category.
 
 ### Color Scheme
 
 | Color | Category | Agents |
 |-------|----------|--------|
-| 🟡 yellow | Exploration | code-explorer, workflow-detector |
-| 🟣 indigo | Architecture | code-architect, task-planner |
-| 🔴 red | Critical Review | code-reviewer, security-scanner |
-| 🟠 orange | Analysis | refactor-analyzer |
-| 🔵 cyan | Testing | test-generator, test-runner |
-| 🟢 green | Validation | qa-agent, dod-validator |
-| 🔵 blue | Requirements | requirements-gatherer, complexity-estimator |
-| 🟠 orange | Integration | git-manager, bug-catcher, issue-manager |
+| 🔵 blue | Engineering | engineer (4 modes) |
+| 🟢 green | Quality | qa-engineer (4 modes) |
+| 🟣 indigo | Planning | task-planner (4 modes) |
+| 🔴 red | Review | code-reviewer, security-scanner |
+| 🟡 yellow | Detection | workflow-detector, complexity-estimator |
 | 🔷 teal | Documentation | doc-generator, summary-generator |
 
-### Core Development
+### Super-Agents (v2.0)
+
+| Agent | Modes | Model | Purpose |
+|-------|-------|-------|---------|
+| `engineer` | Explorer, Architect, Refactorer, Git | sonnet | Codebase exploration, architecture design, refactoring analysis, git operations |
+| `qa-engineer` | Generator, Runner, Bug Tracker, Validator | sonnet | Test generation, test execution, bug tracking, deployment validation |
+| `task-planner` | Planner, Requirements, Issue Manager, DoD | sonnet | Task planning, requirements gathering, issue tracking, DoD validation |
+
+### Specialized Agents
 
 | Agent | Color | Model | Purpose |
 |-------|-------|-------|---------|
-| `code-explorer` | yellow | sonnet | Deep codebase analysis, traces execution paths |
-| `code-architect` | indigo | sonnet | Architecture design and implementation blueprints |
 | `code-reviewer` | red | sonnet | Quality review with confidence-based filtering |
-| `task-planner` | indigo | sonnet | Break architecture into ordered, actionable tasks |
-| `refactor-analyzer` | orange | sonnet | Identify refactoring opportunities and technical debt |
-
-### Testing & Quality
-
-| Agent | Color | Model | Purpose |
-|-------|-------|-------|---------|
-| `test-generator` | cyan | sonnet | Generate tests following project patterns |
-| `test-runner` | cyan | sonnet | Execute tests and analyze failures |
-| `qa-agent` | green | sonnet | Deployment readiness validation |
-| `dod-validator` | green | haiku | Definition of Done checklist verification |
 | `security-scanner` | red | haiku | OWASP Top 10, secrets, injection vulnerabilities |
-
-### Workflow
-
-| Agent | Color | Model | Purpose |
-|-------|-------|-------|---------|
-| `requirements-gatherer` | blue | sonnet | Transform vague requests into specifications |
-| `complexity-estimator` | blue | haiku | T-shirt sizing and risk assessment |
 | `workflow-detector` | yellow | haiku | Classify task type (feature/bug/refactor) |
-| `summary-generator` | teal | haiku | Session summaries and handoff docs |
+| `complexity-estimator` | yellow | haiku | T-shirt sizing and risk assessment |
 | `doc-generator` | teal | sonnet | Generate and update documentation |
+| `summary-generator` | teal | haiku | Session summaries and handoff docs |
 
-### Integration
+### Agent Consolidation (v2.0)
 
-| Agent | Color | Model | Purpose |
-|-------|-------|-------|---------|
-| `git-manager` | orange | haiku | Commits, branches, PRs with conventional messages |
-| `bug-catcher` | orange | haiku | Create bug reports during development (legacy) |
-| `issue-manager` | orange | haiku | Create any issue type during development |
+The following agents were merged into super-agents:
+- `code-explorer`, `code-architect`, `refactor-analyzer`, `git-manager` → **engineer**
+- `test-generator`, `test-runner`, `bug-catcher`, `qa-agent` → **qa-engineer**
+- `requirements-gatherer`, `issue-manager`, `dod-validator` → **task-planner**
+
+This reduces token overhead from agent context while maintaining all capabilities.
 
 ---
 
@@ -569,12 +556,14 @@ Save your plan. Resume later. Hand off to teammates. The plan file is your proje
 plugins/devloop/
 ├── .claude-plugin/
 │   └── plugin.json           # Plugin manifest
-├── agents/                   # 16 specialized agents
-│   ├── code-explorer.md
-│   ├── code-architect.md
+├── agents/                   # 9 consolidated agents (v2.0)
+│   ├── engineer.md           # Super-agent (4 modes)
+│   ├── qa-engineer.md        # Super-agent (4 modes)
+│   ├── task-planner.md       # Super-agent (4 modes)
 │   ├── code-reviewer.md
+│   ├── security-scanner.md
 │   └── ...
-├── commands/                 # 9 slash commands
+├── commands/                 # 14 slash commands
 │   ├── devloop.md
 │   ├── quick.md
 │   ├── continue.md
@@ -582,7 +571,10 @@ plugins/devloop/
 ├── hooks/                    # Event handlers
 │   ├── hooks.json
 │   └── session-start.sh
-├── skills/                   # 22 domain skills
+├── scripts/                  # Automation scripts
+│   └── rotate-worklog.sh     # Worklog rotation (v2.0)
+├── skills/                   # 28 domain skills
+│   ├── INDEX.md              # Skill catalog (v2.0)
 │   ├── go-patterns/
 │   ├── react-patterns/
 │   ├── architecture-patterns/
@@ -596,7 +588,29 @@ plugins/devloop/
 
 ## Changelog
 
-### 1.10.0 (Current)
+### 2.0.0 (Current)
+
+**Major architectural refactoring for reduced token usage and improved agent coordination.**
+
+- **Agent Consolidation**: Reduced from 18 agents to 9 super-agents
+  - `engineer` - Combines code-explorer, code-architect, refactor-analyzer, git-manager (4 modes)
+  - `qa-engineer` - Combines test-generator, test-runner, bug-catcher, qa-agent (4 modes)
+  - `task-planner` - Enhanced to absorb issue-manager, requirements-gatherer, dod-validator (4 modes)
+- **XML Prompt Structure**: Core agents now use XML structure to prevent drift
+  - Added `<system_role>`, `<capabilities>`, `<workflow_enforcement>` sections
+  - Consistent `<thinking>` blocks for complex decisions
+  - Mode detection with explicit routing rules
+- **Dynamic Skill Loading**: Skills now load on-demand instead of all at startup
+  - Added `skills/INDEX.md` as lightweight catalog
+  - SessionStart references index, specific skills loaded when needed
+  - Reduces initial context by ~50%
+- **Automatic Worklog Rotation**: Prevents context bloat from large worklogs
+  - Archives worklog when exceeding 500 lines
+  - Runs automatically on session start
+  - Archived to `.devloop/archive/worklog-YYYY-MM-DD.md`
+- Updated documentation and agents.md for v2.0 architecture
+
+### 1.10.0
 
 - **Consistency & Enforcement System**: Plan and worklog synchronization with configurable enforcement
 - Added worklog management (`devloop-worklog.md`) for completed work history with commits
