@@ -1,9 +1,9 @@
 # Devloop Plan: Agent Consolidation v2.0
 
 **Created**: 2025-12-20
-**Updated**: 2025-12-20
+**Updated**: 2025-12-20 23:15
 **Status**: Active
-**Current Phase**: Phase 1 Complete - Ready for Phase 2
+**Current Phase**: Phase 2 Complete - Ready for Phase 3
 
 ## Overview
 
@@ -82,30 +82,30 @@ Implement the full architectural review recommendations: consolidate 18 agents i
 ### Phase 2: Prompt Hardening [parallel:none]
 **Goal**: Apply XML structure to prevent agent drift
 
-- [ ] Task 2.1: Create XML agent template
+- [x] Task 2.1: Create XML agent template
   - Acceptance: Template file with system_role, capabilities, workflow_enforcement sections
-  - Files: `docs/templates/agent_prompt_structure.xml`
-  - Notes: Follow structure from review report Section 3
+  - Files: `plugins/devloop/docs/templates/agent_prompt_structure.xml`
+  - Notes: Created comprehensive template with all XML sections and usage examples
 
-- [ ] Task 2.2: Apply XML to engineer.md
+- [x] Task 2.2: Apply XML to engineer.md
   - Acceptance: Engineer agent uses XML structure with <thinking> enforcement
   - Files: `plugins/devloop/agents/engineer.md`
-  - Notes: Test after conversion
+  - Notes: Added system_role, capabilities, mode_detection, workflow_enforcement
 
-- [ ] Task 2.3: Apply XML to qa-engineer.md
+- [x] Task 2.3: Apply XML to qa-engineer.md
   - Acceptance: QA agent uses XML structure
   - Files: `plugins/devloop/agents/qa-engineer.md`
-  - Notes: Test after conversion
+  - Notes: Added XML structure with all 4 modes
 
-- [ ] Task 2.4: Apply XML to task-planner.md
+- [x] Task 2.4: Apply XML to task-planner.md
   - Acceptance: Task planner uses XML structure
   - Files: `plugins/devloop/agents/task-planner.md`
-  - Notes: Test after conversion
+  - Notes: Added XML structure with all 4 modes
 
-- [ ] Task 2.5: Apply XML to code-reviewer.md
+- [x] Task 2.5: Apply XML to code-reviewer.md
   - Acceptance: Code reviewer uses XML structure
   - Files: `plugins/devloop/agents/code-reviewer.md`
-  - Notes: Test after conversion
+  - Notes: Added XML structure with confidence scoring and language patterns
 
 ### Phase 3: Skill Indexing [parallel:partial]
 **Goal**: Enable dynamic skill loading to reduce token usage
@@ -150,6 +150,8 @@ Implement the full architectural review recommendations: consolidate 18 agents i
 - 2025-12-20 22:20: Completed Task 1.3 - Enhanced task-planner.md (437 lines) with 4 modes
 - 2025-12-20 22:30: Completed Task 1.4 - Updated routing (hooks, commands, skills, docs)
 - 2025-12-20 22:35: Completed Task 1.5 - Deleted 11 old agents (18 → 9)
+- 2025-12-20 22:40: Phase 1 complete. Committed: fc2868f (net -2,625 lines)
+- 2025-12-20 23:15: Completed Phase 2 - XML prompt hardening applied to 4 core agents
 
 ## Notes
 
