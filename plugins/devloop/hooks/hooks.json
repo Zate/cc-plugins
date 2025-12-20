@@ -27,6 +27,16 @@
     ],
     "PreToolUse": [
       {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "prompt",
+            "prompt": "Analyze the file being edited and suggest relevant language-specific skills if appropriate.\n\nDetect the file extension from the tool input:\n- .go files → Suggest: Skill: go-patterns (Go interfaces, error handling, goroutines, testing)\n- .py files → Suggest: Skill: python-patterns (Type hints, async patterns, pytest, error handling)\n- .java files → Suggest: Skill: java-patterns (Spring, streams, dependency injection, exception handling)\n- .tsx, .jsx, .ts files → Suggest: Skill: react-patterns (Hooks, component design, state management, performance)\n\nRules:\n1. Only suggest if the file extension matches one of the above\n2. This is informational only - do NOT block the operation\n3. If the skill is already being used (check context), don't suggest again\n4. Keep the suggestion brief and relevant\n\nRespond with:\n{\"suggestion\": \"Skill: skill-name\", \"reason\": \"Brief explanation of why this skill helps\"}\n\nOr if no suggestion needed:\n{\"suggestion\": \"none\"}",
+            "timeout": 10
+          }
+        ]
+      },
+      {
         "matcher": "Bash",
         "hooks": [
           {
@@ -126,6 +136,18 @@
             "type": "prompt",
             "prompt": "A milestone notification was received. Summarize:\n\n{\"type\": \"milestone\", \"summary\": \"Brief description of what completed\"}",
             "timeout": 5
+          }
+        ]
+      }
+    ],
+    "SubagentStop": [
+      {
+        "matcher": ".*",
+        "hooks": [
+          {
+            "type": "prompt",
+            "prompt": "An agent has just completed. Based on the agent type and workflow context, suggest the next logical step.\n\nAgent Chaining Rules:\n1. code-explorer → code-architect (if the exploration revealed architecture needs or complex design decisions)\n2. code-architect → task-planner (if architecture is ready for implementation breakdown)\n3. task-planner → (no automatic suggestion, user decides when to implement)\n4. test-generator → test-runner (if tests were generated and should be validated)\n5. test-runner → (no automatic suggestion, user reviews results)\n6. code-reviewer → git-manager (if review passed and changes are ready to commit)\n7. git-manager → (no automatic suggestion, workflow complete)\n\nAnalyze the context:\n- Which agent just completed? (check AGENT_TYPE or agent name in context)\n- What was the outcome? (success, partial, needs follow-up)\n- Is there a clear next step in the workflow?\n\nIf a follow-up makes sense, respond with:\n{\"suggest\": true, \"agent\": \"agent-name\", \"reason\": \"Brief explanation of why this agent should run next\"}\n\nIf no follow-up is needed or context is unclear:\n{\"suggest\": false}\n\nBe helpful but not pushy. Only suggest when there's a clear workflow progression.",
+            "timeout": 15
           }
         ]
       }
