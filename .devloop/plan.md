@@ -1,9 +1,9 @@
 # Devloop Plan: Agent Consolidation v2.0
 
 **Created**: 2025-12-20
-**Updated**: 2025-12-20 23:15
+**Updated**: 2025-12-20 23:45
 **Status**: Active
-**Current Phase**: Phase 2 Complete - Ready for Phase 3
+**Current Phase**: Phase 3 Complete - Ready for Phase 4
 
 ## Overview
 
@@ -110,20 +110,20 @@ Implement the full architectural review recommendations: consolidate 18 agents i
 ### Phase 3: Skill Indexing [parallel:partial]
 **Goal**: Enable dynamic skill loading to reduce token usage
 
-- [ ] Task 3.1: Create skills INDEX.md [parallel:A]
+- [x] Task 3.1: Create skills INDEX.md [parallel:A]
   - Acceptance: Lists all 28 skills with 1-line summaries
   - Files: `plugins/devloop/skills/INDEX.md`
-  - Notes: Categorize by type (language, workflow, domain)
+  - Notes: INDEX.md already existed with good structure; verified complete
 
-- [ ] Task 3.2: Update SessionStart hook [parallel:A]
+- [x] Task 3.2: Update SessionStart hook [parallel:A]
   - Acceptance: Hook loads INDEX.md instead of full skill list
   - Files: `plugins/devloop/hooks/session-start.sh`
-  - Notes: Keep language detection, but use index for suggestions
+  - Notes: Updated to reference INDEX.md and provide dynamic loading instructions
 
-- [ ] Task 3.3: Update task-planner to use index [depends:3.1]
+- [x] Task 3.3: Update task-planner to use index [depends:3.1]
   - Acceptance: Task planner reads INDEX.md first, loads specific skills on demand
   - Files: `plugins/devloop/agents/task-planner.md`
-  - Notes: Add skill retrieval workflow
+  - Notes: Added skill_index section and complexity-estimation skill
 
 ### Phase 4: Maintenance Automation [parallel:none]
 **Goal**: Automate context hygiene
@@ -152,6 +152,7 @@ Implement the full architectural review recommendations: consolidate 18 agents i
 - 2025-12-20 22:35: Completed Task 1.5 - Deleted 11 old agents (18 → 9)
 - 2025-12-20 22:40: Phase 1 complete. Committed: fc2868f (net -2,625 lines)
 - 2025-12-20 23:15: Completed Phase 2 - XML prompt hardening applied to 4 core agents
+- 2025-12-20 23:45: Completed Phase 3 - Skill indexing (INDEX.md verified, SessionStart updated, task-planner enhanced)
 
 ## Notes
 

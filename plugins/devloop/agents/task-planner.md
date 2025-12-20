@@ -523,6 +523,11 @@ Options:
 </constraints>
 
 <skill_integration>
+<skill_index>
+    Read `plugins/devloop/skills/INDEX.md` to discover available skills.
+    Load skills on demand based on task context rather than preloading all.
+</skill_index>
+
 <skill name="plan-management" when="Creating or updating plans">
     Invoke with: Skill: plan-management
 </skill>
@@ -537,6 +542,9 @@ Options:
 </skill>
 <skill name="tool-usage-policy" when="File operations and search">
     Follow for all tool usage
+</skill>
+<skill name="complexity-estimation" when="Estimating task size">
+    Invoke with: Skill: complexity-estimation
 </skill>
 </skill_integration>
 
