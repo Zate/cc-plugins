@@ -360,6 +360,63 @@ get_bug_count() {
     echo ""
 }
 
+# Get relevant skills based on detected language and framework
+get_relevant_skills() {
+    local lang=$1
+    local framework=$2
+    local project_type=$3
+    local skills=""
+
+    # Language-specific skills
+    case "$lang" in
+        go)
+            skills="go-patterns"
+            ;;
+        python)
+            skills="python-patterns"
+            ;;
+        java)
+            skills="java-patterns"
+            ;;
+        typescript|javascript)
+            # React gets react-patterns, general TS/JS gets architecture-patterns
+            case "$framework" in
+                react|nextjs)
+                    skills="react-patterns"
+                    ;;
+                *)
+                    skills="architecture-patterns"
+                    ;;
+            esac
+            ;;
+    esac
+
+    # Add testing-strategies for all known languages
+    if [ "$lang" != "unknown" ]; then
+        if [ -n "$skills" ]; then
+            skills="$skills, testing-strategies"
+        else
+            skills="testing-strategies"
+        fi
+    fi
+
+    # Add database-patterns for backend/fullstack projects
+    case "$project_type" in
+        backend|fullstack)
+            skills="$skills, database-patterns"
+            ;;
+    esac
+
+    # Add api-design for backend projects with web frameworks
+    case "$framework" in
+        express|nestjs|fastify|spring-boot|spring|django|flask|fastapi|gin|echo|fiber|chi|gorilla)
+            skills="$skills, api-design"
+            ;;
+    esac
+
+    echo "$skills"
+}
+
 # Check for existing devloop plan (prefer .devloop/, fallback to .claude/)
 get_active_plan() {
     local plan_file=""
@@ -428,6 +485,7 @@ PROJECT_SIZE=$(get_project_size)
 ACTIVE_PLAN=$(get_active_plan)
 OPEN_BUGS=$(get_bug_count)
 NEEDS_MIGRATION=$(check_migration_needed)
+RELEVANT_SKILLS=$(get_relevant_skills "$LANGUAGE" "$FRAMEWORK" "$PROJECT_TYPE")
 
 # Write to environment file if available
 if [ -n "${CLAUDE_ENV_FILE:-}" ]; then
@@ -458,6 +516,13 @@ CONTEXT_MSG="$CONTEXT_MSG
 - Test Framework: $TEST_FRAMEWORK
 - Project Type: $PROJECT_TYPE
 - Size: $PROJECT_SIZE"
+
+if [ -n "$RELEVANT_SKILLS" ]; then
+    CONTEXT_MSG="$CONTEXT_MSG
+
+**Relevant Skills**: $RELEVANT_SKILLS
+  → Invoke with \`Skill: <skill-name>\` for language-specific guidance"
+fi
 
 if [ -n "$KEY_DIRS" ]; then
     CONTEXT_MSG="$CONTEXT_MSG
