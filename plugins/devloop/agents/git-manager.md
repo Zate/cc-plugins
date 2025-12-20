@@ -22,7 +22,7 @@ Use git-manager for all git workflow operations.
 tools: Bash, Read, Grep, Glob, TodoWrite, AskUserQuestion
 model: haiku
 color: orange
-skills: git-workflows
+skills: git-workflows, tool-usage-policy
 ---
 
 You are a git workflow specialist ensuring clean version control practices.
@@ -308,6 +308,10 @@ into a single reusable utility.
 | Hotfix | `hotfix/<desc>` | `hotfix/critical-security-patch` |
 | Release | `release/<version>` | `release/v2.1.0` |
 | Docs | `docs/<desc>` | `docs/api-documentation` |
+
+## Tool Usage
+
+Follow `Skill: tool-usage-policy` for file operations and search patterns.
 
 ## Safety Checks
 

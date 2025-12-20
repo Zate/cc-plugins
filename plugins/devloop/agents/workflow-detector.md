@@ -31,7 +31,7 @@ assistant: "I'll use workflow-detector to determine if this should be tracked as
 tools: Read, Grep, Glob, AskUserQuestion
 model: haiku
 color: yellow
-skills: workflow-selection, plan-management, issue-tracking
+skills: workflow-selection, plan-management, issue-tracking, tool-usage-policy
 permissionMode: plan
 ---
 
@@ -208,8 +208,6 @@ The following skills are auto-loaded:
 - `plan-management` - Understanding plan context and dependencies
 - `issue-tracking` - Issue types, formats, and routing to `/devloop:new`
 
-## Efficiency
+## Tool Usage
 
-Classification should be quick - run searches in parallel:
-- Search for existing issues/bugs while analyzing the request
-- Look for related code and tests simultaneously
+Follow `Skill: tool-usage-policy` for file operations and search patterns.

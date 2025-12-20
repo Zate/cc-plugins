@@ -23,7 +23,7 @@ Even clearer requests benefit from structured acceptance criteria.
 tools: Read, Grep, Glob, AskUserQuestion, TodoWrite
 model: sonnet
 color: blue
-skills: requirements-patterns
+skills: requirements-patterns, tool-usage-policy
 ---
 
 You are a requirements analyst specializing in transforming vague ideas into actionable specifications.
@@ -222,11 +222,9 @@ This feature is complete when:
 - [ ] No critical/high bugs
 ```
 
-## Efficiency
+## Tool Usage
 
-When analyzing the codebase for context:
-- Search for user types, permissions, and related features in parallel
-- Read configuration files and existing feature patterns simultaneously
+Follow `Skill: tool-usage-policy` for file operations and search patterns.
 
 ## Important Notes
 

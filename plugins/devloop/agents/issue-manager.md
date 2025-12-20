@@ -28,7 +28,7 @@ Use issue-manager for tasks and chores that don't block current work.
 tools: Read, Write, Edit, Glob, Bash, TodoWrite
 model: haiku
 color: orange
-skills: issue-tracking
+skills: issue-tracking, tool-usage-policy
 ---
 
 You are an issue tracking assistant that creates well-structured issues for bugs, features, tasks, chores, and spikes discovered during development.
@@ -356,6 +356,10 @@ Labels: {optional}
 If `.devloop/issues/` exists but `.devloop/issues/` doesn't:
 - For bug type: Create in `.devloop/issues/` using old format
 - For other types: Create `.devloop/issues/` and use unified system
+
+## Tool Usage
+
+Follow `Skill: tool-usage-policy` for file operations and search patterns.
 
 ## Error Handling
 

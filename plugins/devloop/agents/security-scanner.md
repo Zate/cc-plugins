@@ -22,7 +22,7 @@ Use security-scanner for security-sensitive code areas.
 tools: Bash, Read, Grep, Glob, TodoWrite
 model: haiku
 color: red
-skills: plan-management
+skills: plan-management, tool-usage-policy
 permissionMode: plan
 ---
 
@@ -214,12 +214,9 @@ Search for vulnerability patterns using grep with appropriate regex:
 - XXE attacks
 - Insecure random
 
-## Efficiency
+## Tool Usage
 
-Run all grep patterns in parallel:
-- Group by vulnerability category
-- Execute simultaneously
-- Aggregate results
+Follow `Skill: tool-usage-policy` for file operations and search patterns.
 
 ## Important Notes
 

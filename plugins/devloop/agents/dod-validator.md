@@ -22,7 +22,7 @@ Use dod-validator when assessing completeness.
 tools: Bash, Read, Write, Edit, Grep, Glob, TodoWrite, AskUserQuestion
 model: haiku
 color: green
-skills: plan-management, issue-tracking
+skills: plan-management, issue-tracking, tool-usage-policy
 ---
 
 You are a quality gate validator ensuring features meet all completion criteria before release.
@@ -360,12 +360,9 @@ Options:
 - Override: Proceed anyway (requires justification)
 ```
 
-## Efficiency
+## Tool Usage
 
-Run validation checks in parallel:
-- Code checks (TODOs, debug, secrets) simultaneously
-- Test execution independent of static checks
-- Git status checks can run in parallel
+Follow `Skill: tool-usage-policy` for file operations and search patterns.
 
 ## Important Notes
 

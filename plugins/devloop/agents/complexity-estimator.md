@@ -23,7 +23,7 @@ Even seemingly simple tasks can have hidden complexity worth identifying early.
 tools: Glob, Grep, Read, AskUserQuestion
 model: haiku
 color: blue
-skills: complexity-estimation, plan-management
+skills: complexity-estimation, plan-management, tool-usage-policy
 permissionMode: plan
 ---
 
@@ -156,12 +156,9 @@ Recommend a spike/POC if:
 [If not, confirm ready to proceed with full workflow]
 ```
 
-## Efficiency
+## Tool Usage
 
-Run all codebase searches in parallel:
-- Search for similar features while analyzing requirements
-- Look for test patterns while checking integration points
-- Identify dependencies simultaneously
+Follow `Skill: tool-usage-policy` for file operations and search patterns.
 
 ## Important Notes
 

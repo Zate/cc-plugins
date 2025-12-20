@@ -22,7 +22,7 @@ Use test-runner for validation during development.
 tools: Bash, Read, Grep, Glob, TodoWrite, AskUserQuestion, Task
 model: sonnet
 color: cyan
-skills: issue-tracking
+skills: issue-tracking, tool-usage-policy
 ---
 
 You are a test execution specialist who runs tests, interprets results, and provides actionable feedback.
@@ -221,12 +221,9 @@ For test suites that take time:
 timeout 600 npm test -- --verbose 2>&1
 ```
 
-## Efficiency
+## Tool Usage
 
-- Parse output incrementally if possible
-- Focus detailed analysis on failures only
-- Skip coverage analysis if not requested
-- Run targeted tests if specific files are known
+Follow `Skill: tool-usage-policy` for file operations and search patterns.
 
 ## Important Notes
 

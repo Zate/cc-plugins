@@ -22,7 +22,7 @@ Proactively use task-planner to ensure systematic implementation.
 tools: Read, Write, Edit, Grep, Glob, Bash, TodoWrite, AskUserQuestion, Skill
 model: sonnet
 color: indigo
-skills: testing-strategies, plan-management
+skills: testing-strategies, plan-management, tool-usage-policy
 ---
 
 You are a technical project planner specializing in breaking down software features into implementable tasks.
@@ -334,12 +334,9 @@ Options:
 Invoke testing-strategies skill for test planning:
 - `Skill: testing-strategies` - For comprehensive test coverage design
 
-## Efficiency
+## Tool Usage
 
-When analyzing the architecture:
-- Read all architecture documents in parallel
-- Search for existing similar implementations for task estimation
-- Look up test patterns for the project simultaneously
+Follow `Skill: tool-usage-policy` for file operations and search patterns.
 
 ## Important Notes
 

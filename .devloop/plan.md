@@ -1,7 +1,7 @@
 # Devloop Plan: Plugin Simplification v1.1
 
 **Created**: 2025-12-19
-**Updated**: 2025-12-20 12:15
+**Updated**: 2025-12-20 14:30
 **Status**: Active
 **Current Phase**: 3
 
@@ -85,15 +85,15 @@ Simplify the devloop plugin based on architecture spike findings. Target 40-50% 
 **Parallel Groups**:
 - Group A: Tasks 3.1, 3.2 (independent skill work)
 
-- [ ] Task 3.1: Create base language-patterns template [parallel:A]
+- [x] Task 3.1: Create base language-patterns template [parallel:A]
   - Acceptance: Shared structure for all language skills
   - Files: `plugins/devloop/skills/language-patterns-base/SKILL.md`
-  - Notes: Common sections: Error Handling, Testing, Project Structure, Anti-Patterns
+  - Notes: Created 240-line base template with universal sections: Error Handling, Testing, Project Structure, Anti-Patterns, Code Style
 
-- [ ] Task 3.2: Consolidate agent tool policies [parallel:A]
+- [x] Task 3.2: Consolidate agent tool policies [parallel:A]
   - Acceptance: All 18 agents reference tool-usage-policy skill instead of inline policies
-  - Files: All agent .md files
-  - Notes: Each agent loses 50-100 lines
+  - Files: All agent .md files (17 updated, 1 already done)
+  - Notes: All 17 agents now reference tool-usage-policy skill, removed inline Efficiency sections
 
 - [ ] Task 3.3: Refactor go-patterns to use base [depends:3.1]
   - Acceptance: go-patterns extends base, unique content only
@@ -143,6 +143,9 @@ Simplify the devloop plugin based on architecture spike findings. Target 40-50% 
 - 2025-12-20 10:35: Committed Tasks 2.1, 2.2 - 692e651
 - 2025-12-20 12:15: Completed Task 2.3 - Added skill preloading to SessionStart hook
 - 2025-12-20 12:15: Phase 2 Complete! All 3 tasks done
+- 2025-12-20 12:20: Committed Task 2.3 - 939b20c
+- 2025-12-20 14:30: Completed Task 3.1 - Created language-patterns-base skill (240 lines)
+- 2025-12-20 14:30: Completed Task 3.2 - Updated all 17 agents to reference tool-usage-policy
 
 ## Notes
 

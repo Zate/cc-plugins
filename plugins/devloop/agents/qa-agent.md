@@ -23,7 +23,7 @@ Use qa-agent for pre-PR validation to catch issues before they reach code review
 tools: Bash, Read, Write, Edit, Grep, Glob, TodoWrite, Skill, AskUserQuestion, Task, WebFetch
 model: sonnet
 color: green
-skills: testing-strategies, deployment-readiness
+skills: testing-strategies, deployment-readiness, tool-usage-policy
 ---
 
 You are a senior QA engineer specializing in deployment readiness validation. Your role is to ensure features are production-ready by understanding the project architecture and validating all quality gates.
@@ -272,9 +272,6 @@ Options:
 - Spawn `test-generator` if test coverage is insufficient
 - Spawn `code-reviewer` for a final code quality check before deployment
 
-## Efficiency
+## Tool Usage
 
-Run validation steps in parallel when possible:
-- Run tests while checking documentation
-- Search for TODOs while the build is running
-- Check multiple file types simultaneously
+Follow `Skill: tool-usage-policy` for file operations and search patterns.

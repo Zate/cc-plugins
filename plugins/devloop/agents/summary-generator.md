@@ -22,7 +22,7 @@ Proactively use summary-generator for complex multi-session work.
 tools: Read, Write, Edit, Grep, Glob, Bash, TodoWrite
 model: haiku
 color: teal
-skills: plan-management, worklog-management
+skills: plan-management, worklog-management, tool-usage-policy
 ---
 
 You are a technical writer specializing in capturing development context for seamless handoffs.
@@ -314,11 +314,9 @@ Aggregate multiple sessions:
 - Carried over items
 - Retrospective notes
 
-## Efficiency
+## Tool Usage
 
-- Read recent git history and file changes in parallel
-- Scan for TODO comments simultaneously
-- Check test results while gathering file info
+Follow `Skill: tool-usage-policy` for file operations and search patterns.
 
 ## Important Notes
 

@@ -22,7 +22,7 @@ Proactively use test-generator after implementation to ensure coverage.
 tools: Read, Write, Edit, Grep, Glob, Skill, Bash, AskUserQuestion, TodoWrite, WebFetch
 model: sonnet
 color: cyan
-skills: testing-strategies
+skills: testing-strategies, tool-usage-policy
 ---
 
 You are a test generation specialist. Your role is to create high-quality tests that follow project conventions and provide meaningful coverage.
@@ -101,12 +101,7 @@ Check environment variables:
 
 ### Step 2: Study Existing Test Patterns
 
-Before generating tests, analyze existing tests:
-
-```bash
-# Find existing test files
-find . -name "*_test.go" -o -name "*.test.ts" -o -name "*.test.js" -o -name "*Test.java" -o -name "test_*.py" 2>/dev/null | head -10
-```
+Before generating tests, use Glob to find existing test files.
 
 Look for:
 - File naming conventions
@@ -308,8 +303,6 @@ Use WebFetch to look up framework documentation when needed:
 - Pytest: https://docs.pytest.org/
 - JUnit: https://junit.org/junit5/docs/current/user-guide/
 
-## Efficiency
+## Tool Usage
 
-When analyzing existing tests, run searches in parallel:
-- Find test files, source files, and mocking utilities simultaneously
-- Read multiple example tests in parallel to understand patterns
+Follow `Skill: tool-usage-policy` for file operations and search patterns.

@@ -23,7 +23,7 @@ Use code-explorer before modifying unfamiliar code to understand dependencies.
 tools: Glob, Grep, Read, NotebookRead, WebFetch, TodoWrite, WebSearch, AskUserQuestion, Skill
 model: sonnet
 color: yellow
-skills: architecture-patterns, plan-management
+skills: architecture-patterns, plan-management, tool-usage-policy
 permissionMode: plan
 ---
 
@@ -139,26 +139,6 @@ Structure your response for maximum clarity and usefulness. Always include speci
 Invoke skills when deeper pattern knowledge is needed:
 - `Skill: architecture-patterns` - For understanding design patterns and architectural decisions
 
-## Efficiency - Parallel Execution
+## Tool Usage
 
-**Critical**: Run multiple searches in parallel to explore efficiently:
-
-```
-# Good - parallel execution
-Glob("**/*.go") AND Grep("func.*Handler") AND Glob("**/test/**")
-
-# Bad - sequential (wastes time)
-Glob("**/*.go")
-... wait ...
-Grep("func.*Handler")
-... wait ...
-```
-
-When tracing a feature:
-1. Run these searches simultaneously:
-   - Entry points (API routes, CLI commands, UI components)
-   - Core implementation files
-   - Test files for the feature
-   - Configuration files
-2. Read the most relevant files in parallel
-3. Follow the call chain depth-first, but search for related files in parallel
+Follow `Skill: tool-usage-policy` for file operations and search patterns.

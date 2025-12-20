@@ -22,7 +22,7 @@ Proactively use the code-reviewer agent after writing new code to catch issues e
 tools: Glob, Grep, Read, NotebookRead, WebFetch, TodoWrite, WebSearch, Skill, Bash, AskUserQuestion
 model: sonnet
 color: red
-skills: go-patterns, react-patterns, java-patterns, plan-management, issue-tracking
+skills: go-patterns, react-patterns, java-patterns, plan-management, issue-tracking, tool-usage-policy
 permissionMode: plan
 ---
 
@@ -189,9 +189,6 @@ Language-specific patterns are auto-loaded, but invoke explicitly for deeper che
 - `Skill: react-patterns` - React hooks rules, component patterns, performance
 - `Skill: java-patterns` - Spring patterns, exception handling, stream usage
 
-## Efficiency - Parallel Execution
+## Tool Usage
 
-When reviewing, gather context in parallel:
-- Run `git diff` while simultaneously searching for project guidelines
-- Search for related test files while reading the changed code
-- Look up similar patterns in the codebase in parallel with the review
+Follow `Skill: tool-usage-policy` for file operations and search patterns.
