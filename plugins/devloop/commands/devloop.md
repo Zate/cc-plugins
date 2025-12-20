@@ -64,7 +64,7 @@ A comprehensive, token-conscious workflow for feature development from requireme
 **Goal**: Understand what needs to be built
 
 1. Create todo list with all workflow phases
-2. If vague/complex: Launch requirements-gatherer agent (sonnet)
+2. If vague/complex: Launch task-planner agent in requirements mode (sonnet)
 3. If clear: Confirm understanding with AskUserQuestion
 
 See `Skill: phase-templates` → Discovery Phase for details.
@@ -88,7 +88,7 @@ Reference: `Skill: complexity-estimation`
 
 **Goal**: Deep understanding of existing code
 
-1. Launch 2-3 code-explorer agents in parallel (sonnet)
+1. Launch 2-3 engineer agents in explore mode in parallel (sonnet)
 2. Each returns 5-10 key files
 3. **Read all identified files**
 4. Present summary of findings
@@ -116,7 +116,7 @@ See `Skill: phase-templates` → Exploration Phase for details.
 
 1. Invoke: `Skill: architecture-patterns`
 2. Invoke language skill: `Skill: go-patterns`, `Skill: react-patterns`, etc.
-3. Launch 2-3 code-architect agents:
+3. Launch 2-3 engineer agents in architect mode:
    - **Minimal**: Smallest change, max reuse
    - **Clean**: Best architecture
    - **Pragmatic**: Speed/quality balance
@@ -167,8 +167,8 @@ See `Skill: phase-templates` → Implementation Phase for parallel execution det
 
 **Goal**: Ensure code works correctly
 
-1. Launch test-generator agent (haiku) if needed
-2. Launch test-runner agent (haiku)
+1. Launch qa-engineer agent in generator mode (haiku) if needed
+2. Launch qa-engineer agent in runner mode (haiku)
 3. Handle failures with AskUserQuestion
 
 Reference: `Skill: testing-strategies`
@@ -190,7 +190,7 @@ Reference: `Skill: testing-strategies`
 
 **Goal**: Verify all completion criteria met
 
-1. Launch dod-validator agent (haiku)
+1. Launch task-planner agent in DoD validator mode (haiku)
 2. Check `.devloop/local.md` for project-specific DoD
 3. Handle failures with AskUserQuestion
 
@@ -202,7 +202,7 @@ See `Skill: phase-templates` → Validation Phase for checklist.
 
 **Goal**: Commit changes, create PR if needed
 
-1. Launch git-manager agent (haiku)
+1. Launch engineer agent in git mode (haiku)
 2. If PR requested: Generate description, create via `gh pr create`
 
 Reference: `Skill: git-workflows`

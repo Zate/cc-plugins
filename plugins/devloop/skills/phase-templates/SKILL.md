@@ -28,7 +28,7 @@ Standardized phase definitions for devloop workflows. Commands invoke this skill
 ### Actions
 
 1. **Requirements gathering** (if feature is vague):
-   - Launch requirements-gatherer agent (sonnet)
+   - Launch task-planner agent in requirements mode (sonnet)
    - Gather user stories with acceptance criteria
    - Define scope boundaries (in/out)
    - Identify edge cases and error scenarios
@@ -41,7 +41,7 @@ Standardized phase definitions for devloop workflows. Commands invoke this skill
    - options:
      - Yes, proceed (Continue to exploration)
      - Adjust (Let me clarify some points)
-     - More detail needed (Launch requirements-gatherer)
+     - More detail needed (Launch task-planner in requirements mode)
    ```
 
 ### Outputs
@@ -58,7 +58,7 @@ Standardized phase definitions for devloop workflows. Commands invoke this skill
 
 ### Actions
 
-1. Launch 2-3 code-explorer agents in parallel:
+1. Launch 2-3 engineer agents in explore mode in parallel:
    - Agent 1: Find similar features, trace implementation patterns
    - Agent 2: Map architecture and abstractions
    - Agent 3: Identify integration points and testing approaches
@@ -85,7 +85,7 @@ Standardized phase definitions for devloop workflows. Commands invoke this skill
    - `Skill: architecture-patterns`
    - Language-specific: `Skill: go-patterns`, `Skill: react-patterns`, etc.
 
-2. Launch 2-3 code-architect agents in parallel:
+2. Launch 2-3 engineer agents in architect mode in parallel:
    - **Minimal**: Smallest change, maximum reuse
    - **Clean**: Best architecture, maintainability
    - **Pragmatic**: Balance of speed and quality
@@ -218,12 +218,12 @@ Standardized phase definitions for devloop workflows. Commands invoke this skill
 
 ### Actions
 
-1. Launch test-generator agent (haiku) if tests needed:
+1. Launch qa-engineer agent in generator mode (haiku) if tests needed:
    - Generate unit tests following project patterns
    - Generate integration tests for key flows
    - Follow: `Skill: testing-strategies`
 
-2. Launch test-runner agent (haiku):
+2. Launch qa-engineer agent in runner mode (haiku):
    - Execute test suite
    - Parse and analyze results
 
@@ -288,7 +288,7 @@ Standardized phase definitions for devloop workflows. Commands invoke this skill
 
 ### Actions
 
-1. Launch dod-validator agent:
+1. Launch task-planner agent in DoD validator mode:
    - Code criteria: Tasks done, conventions followed
    - Test criteria: Tests exist and pass
    - Quality criteria: Review passed
@@ -321,7 +321,7 @@ Standardized phase definitions for devloop workflows. Commands invoke this skill
 
 ### Actions
 
-1. Launch git-manager agent:
+1. Launch engineer agent in git mode:
    - Stage appropriate files
    - Generate conventional commit message
    - Create commit

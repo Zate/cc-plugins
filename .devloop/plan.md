@@ -1,168 +1,159 @@
-# Devloop Plan: Plugin Simplification v1.1
+# Devloop Plan: Agent Consolidation v2.0
 
-**Created**: 2025-12-19
-**Updated**: 2025-12-20 17:00
-**Status**: Complete
-**Current Phase**: Done
+**Created**: 2025-12-20
+**Updated**: 2025-12-20
+**Status**: Active
+**Current Phase**: Phase 1 Complete - Ready for Phase 2
 
 ## Overview
 
-Simplify the devloop plugin based on architecture spike findings. Target 40-50% reduction in total lines while maintaining functionality through hook-based automation, skill consolidation, and agent trimming.
+Implement the full architectural review recommendations: consolidate 18 agents into 12, apply XML prompt structure, add skill indexing, and automate log rotation.
 
-**Spike Reference**: `.devloop/spikes/plugin-architecture-review.md`
+**Review Reference**: `.claude/devloop-review-report.md`
+**Spike Reference**: `.devloop/spikes/devloop-v2-consolidation.md`
+**Prior Work**: Plugin Simplification v1.1 (Complete)
 
 ## Requirements
 
-1. Add hook-based smart routing for better UX
-2. Reduce verbosity without losing functionality
-3. Consolidate redundant components
-4. Improve skill and agent invocation patterns
-5. Maintain backwards compatibility
+1. Reduce agent count from 18 to 12 via consolidation
+2. Apply XML prompt structure to prevent agent drift
+3. Create skill index for dynamic loading (28 skills)
+4. Add worklog rotation script for context hygiene
+5. Maintain backwards compatibility during transition
 
 ## Architecture
 
-**Current State**:
-- 59 components, ~18,800 lines
-- Skills not being invoked deterministically
-- Hooks underutilized (UserPromptSubmit, SubagentStop unused)
-- Significant redundancy in language patterns and tool policies
+**Current State** (post v1.1):
+- 18 agents with significant overlap
+- 28 skills (language patterns consolidated)
+- Commands reduced 50% via phase-templates
+- Tool policies consolidated into single skill
 
-**Target State**:
-- ~45 components, ~10,000 lines
-- Hook-based skill injection and smart routing
-- Consolidated tool policies and language patterns
-- Cleaner agent boundaries
+**Target State** (v2.0):
+- 12 agents (6 merged into 3 super-agents)
+- Skill index for dynamic loading
+- XML-structured core agent prompts
+- Automated worklog maintenance
+
+### Agent Consolidation Map
+
+| To Delete | Merge Into |
+|-----------|------------|
+| code-architect.md | → engineer.md (NEW) |
+| code-explorer.md | → engineer.md |
+| refactor-analyzer.md | → engineer.md |
+| test-generator.md | → qa-engineer.md (NEW) |
+| test-runner.md | → qa-engineer.md |
+| bug-catcher.md | → qa-engineer.md |
+| issue-manager.md | → task-planner.md (ENHANCE) |
+| requirements-gatherer.md | → task-planner.md |
+| dod-validator.md | → task-planner.md |
 
 ## Tasks
 
-### Phase 1: Quick Wins [parallel:partial]
-**Goal**: High-impact, low-risk improvements
-**Parallel Groups**:
-- Group A: Tasks 1.1, 1.2 (independent consolidation)
+### Phase 1: Agent Consolidation [parallel:partial]
+**Goal**: Reduce agent count from 18 to 12 by merging overlapping agents
 
-- [x] Task 1.1: Add UserPromptSubmit hook for smart routing [parallel:A]
-  - Acceptance: Hook detects task keywords and suggests appropriate command
-  - Files: `plugins/devloop/hooks/hooks.json`
-  - Notes: Added prompt hook that detects keywords and suggests devloop commands
+- [x] Task 1.1: Create engineer.md super-agent [parallel:A]
+  - Acceptance: Merges code-architect, code-explorer, refactor-analyzer, git-manager
+  - Files: `plugins/devloop/agents/engineer.md`
+  - Notes: Created 280-line agent combining Explorer, Architect, Refactorer, Git modes
 
-- [x] Task 1.2: Create shared tool-usage-policy skill [parallel:A]
-  - Acceptance: Single skill with tool usage guidance, agents reference it
-  - Files: `plugins/devloop/skills/tool-usage-policy/SKILL.md`
-  - Notes: Created 135-line skill with DO/DON'T patterns, tool selection table, parallelization strategy
+- [x] Task 1.2: Create qa-engineer.md super-agent [parallel:A]
+  - Acceptance: Merges test-generator, test-runner, bug-catcher, qa-agent (merge into new qa-engineer.md, delete qa-agent.md)
+  - Files: `plugins/devloop/agents/qa-engineer.md`
+  - Notes: Created 290-line agent combining Generator, Runner, Bug Tracker, Validator modes
 
-- [x] Task 1.3: Remove deprecated bug-tracking skill [depends:1.2]
-  - Acceptance: bug-tracking skill removed, references updated to issue-tracking
-  - Files: Removed `plugins/devloop/skills/bug-tracking/`, updated 4 agents and 3 docs
-  - Notes: Updated code-reviewer, bug-catcher, test-runner, dod-validator to use issue-tracking
+- [x] Task 1.3: Enhance task-planner.md [depends:1.1,1.2]
+  - Acceptance: Absorbs issue-manager, requirements-gatherer, dod-validator
+  - Files: `plugins/devloop/agents/task-planner.md`
+  - Notes: Created 437-line agent with Planner, Requirements, Issue Manager, DoD Validator modes
 
-- [x] Task 1.4: Trim refactor-analyzer agent [depends:1.2]
-  - Acceptance: Agent reduced from 1,312 to 264 lines (80% reduction)
-  - Files: `plugins/devloop/agents/refactor-analyzer.md`
-  - Notes: References tool-usage-policy and refactoring-analysis skills, kept essential vetting and report templates
+- [x] Task 1.4: Update routing references [depends:1.3]
+  - Acceptance: All commands, hooks, and docs reference new agents
+  - Files: hooks/hooks.json, commands/devloop.md, skills/phase-templates/SKILL.md, docs/agents.md
+  - Notes: Updated SubagentStop chaining, command phases, skill templates, rewrote agents.md for v2.0
 
-### Phase 2: Hook-Based Automation [parallel:partial]
-**Goal**: Make skills and agents invoke more deterministically
-**Parallel Groups**:
-- Group A: Tasks 2.1, 2.2 (independent hook additions)
+- [x] Task 1.5: Delete merged agents [depends:1.4]
+  - Acceptance: 11 old agent files removed (9 merged + git-manager + qa-agent)
+  - Files: Deleted code-architect, code-explorer, refactor-analyzer, git-manager, test-generator, test-runner, bug-catcher, qa-agent, issue-manager, requirements-gatherer, dod-validator
+  - Notes: 9 agents remain: engineer, qa-engineer, task-planner, code-reviewer, security-scanner, complexity-estimator, workflow-detector, doc-generator, summary-generator
 
-- [x] Task 2.1: Add PreToolUse hook for language skill injection [parallel:A]
-  - Acceptance: Editing .go files triggers go-patterns, .py triggers python-patterns
-  - Files: `plugins/devloop/hooks/hooks.json`
-  - Notes: Added Write|Edit matcher that suggests language-specific skills based on file extension
+### Phase 2: Prompt Hardening [parallel:none]
+**Goal**: Apply XML structure to prevent agent drift
 
-- [x] Task 2.2: Add SubagentStop hook for agent chaining [parallel:A]
-  - Acceptance: After code-explorer completes, suggest code-architect if designing
-  - Files: `plugins/devloop/hooks/hooks.json`
-  - Notes: Added SubagentStop event with agent chaining rules for workflow continuity
+- [ ] Task 2.1: Create XML agent template
+  - Acceptance: Template file with system_role, capabilities, workflow_enforcement sections
+  - Files: `docs/templates/agent_prompt_structure.xml`
+  - Notes: Follow structure from review report Section 3
 
-- [x] Task 2.3: Enhance SessionStart with skill preloading [depends:2.1]
-  - Acceptance: Language skills listed in context based on detected stack
+- [ ] Task 2.2: Apply XML to engineer.md
+  - Acceptance: Engineer agent uses XML structure with <thinking> enforcement
+  - Files: `plugins/devloop/agents/engineer.md`
+  - Notes: Test after conversion
+
+- [ ] Task 2.3: Apply XML to qa-engineer.md
+  - Acceptance: QA agent uses XML structure
+  - Files: `plugins/devloop/agents/qa-engineer.md`
+  - Notes: Test after conversion
+
+- [ ] Task 2.4: Apply XML to task-planner.md
+  - Acceptance: Task planner uses XML structure
+  - Files: `plugins/devloop/agents/task-planner.md`
+  - Notes: Test after conversion
+
+- [ ] Task 2.5: Apply XML to code-reviewer.md
+  - Acceptance: Code reviewer uses XML structure
+  - Files: `plugins/devloop/agents/code-reviewer.md`
+  - Notes: Test after conversion
+
+### Phase 3: Skill Indexing [parallel:partial]
+**Goal**: Enable dynamic skill loading to reduce token usage
+
+- [ ] Task 3.1: Create skills INDEX.md [parallel:A]
+  - Acceptance: Lists all 28 skills with 1-line summaries
+  - Files: `plugins/devloop/skills/INDEX.md`
+  - Notes: Categorize by type (language, workflow, domain)
+
+- [ ] Task 3.2: Update SessionStart hook [parallel:A]
+  - Acceptance: Hook loads INDEX.md instead of full skill list
   - Files: `plugins/devloop/hooks/session-start.sh`
-  - Notes: Added get_relevant_skills function that maps language/framework/project-type to skills
+  - Notes: Keep language detection, but use index for suggestions
 
-### Phase 3: Skill Consolidation [parallel:partial]
-**Goal**: Reduce redundancy in language pattern skills
-**Parallel Groups**:
-- Group A: Tasks 3.1, 3.2 (independent skill work)
+- [ ] Task 3.3: Update task-planner to use index [depends:3.1]
+  - Acceptance: Task planner reads INDEX.md first, loads specific skills on demand
+  - Files: `plugins/devloop/agents/task-planner.md`
+  - Notes: Add skill retrieval workflow
 
-- [x] Task 3.1: Create base language-patterns template [parallel:A]
-  - Acceptance: Shared structure for all language skills
-  - Files: `plugins/devloop/skills/language-patterns-base/SKILL.md`
-  - Notes: Created 240-line base template with universal sections: Error Handling, Testing, Project Structure, Anti-Patterns, Code Style
+### Phase 4: Maintenance Automation [parallel:none]
+**Goal**: Automate context hygiene
 
-- [x] Task 3.2: Consolidate agent tool policies [parallel:A]
-  - Acceptance: All 18 agents reference tool-usage-policy skill instead of inline policies
-  - Files: All agent .md files (17 updated, 1 already done)
-  - Notes: All 17 agents now reference tool-usage-policy skill, removed inline Efficiency sections
+- [ ] Task 4.1: Create worklog rotation script
+  - Acceptance: Script archives worklog when >500 lines
+  - Files: `plugins/devloop/scripts/rotate-worklog.sh`
+  - Notes: Archive to .devloop/archive/worklog-YYYY-MM-DD.md
 
-- [x] Task 3.3: Refactor go-patterns to use base [depends:3.1]
-  - Acceptance: go-patterns extends base, unique content only
-  - Files: `plugins/devloop/skills/go-patterns/SKILL.md`
-  - Notes: Reduced from 529 to 388 lines (27% reduction), references base for universal principles
+- [ ] Task 4.2: Add rotation to SessionStart
+  - Acceptance: Rotation runs automatically on session start
+  - Files: `plugins/devloop/hooks/session-start.sh`
+  - Notes: Only rotate if needed
 
-- [x] Task 3.4: Refactor python/java/react-patterns to use base [depends:3.3]
-  - Acceptance: All language skills use base pattern
-  - Files: `plugins/devloop/skills/{python,java,react}-patterns/SKILL.md`
-  - Notes: Added "Extends" headers, base references, updated See Also sections, added Quick Reference to python-patterns
-
-### Phase 4: Command Optimization [parallel:none]
-**Goal**: Reduce command verbosity through shared phase definitions
-
-- [x] Task 4.1: Create phase templates skill
-  - Acceptance: Common phases (Discovery, Implementation, Review) defined once
-  - Files: `plugins/devloop/skills/phase-templates/SKILL.md`
-  - Notes: Created 460-line skill with all workflow phases, checkpoints, and recovery templates
-
-- [x] Task 4.2: Refactor devloop.md to use phase templates
-  - Acceptance: devloop.md reduced from 533 to ~300 lines
-  - Files: `plugins/devloop/commands/devloop.md`
-  - Notes: Reduced from 534 to 262 lines (51% reduction), references phase-templates skill
-
-- [x] Task 4.3: Refactor continue.md to use phase templates
-  - Acceptance: continue.md reduced from 533 to ~300 lines
-  - Files: `plugins/devloop/commands/continue.md`
-  - Notes: Reduced from 534 to 228 lines (57% reduction), references phase-templates skill
-
-- [x] Task 4.4: Version bump to 1.13.0
-  - Acceptance: Version updated, CHANGELOG documents simplification
+- [ ] Task 4.3: Version bump to 2.0.0
+  - Acceptance: Version updated, README documents major refactoring
   - Files: `plugins/devloop/.claude-plugin/plugin.json`, `plugins/devloop/README.md`
-  - Notes: Updated version to 1.13.0, skill count to 27, updated description
+  - Notes: Document agent consolidation in changelog
 
 ## Progress Log
 
-- 2025-12-19 11:00: Plan created from spike report findings
-- 2025-12-19 12:30: Completed Task 1.1 - Added UserPromptSubmit hook for smart command routing
-- 2025-12-19 12:30: Completed Task 1.2 - Created tool-usage-policy skill (135 lines)
-- 2025-12-19 12:35: Committed Tasks 1.1, 1.2 - 05f3883
-- 2025-12-19 13:00: Completed Task 1.3 - Removed bug-tracking skill, updated 4 agents and 3 docs
-- 2025-12-19 13:00: Completed Task 1.4 - Reduced refactor-analyzer from 1,312 to 264 lines (80% reduction)
-- 2025-12-19 13:00: Phase 1 Complete! All 4 tasks done
-- 2025-12-19 13:05: Committed Tasks 1.3, 1.4 - a7c5c95
-- 2025-12-20 10:30: Completed Task 2.1 - Added PreToolUse hook for language skill injection (.go/.py/.java/.tsx)
-- 2025-12-20 10:30: Completed Task 2.2 - Added SubagentStop hook for agent chaining workflow
-- 2025-12-20 10:35: Committed Tasks 2.1, 2.2 - 692e651
-- 2025-12-20 12:15: Completed Task 2.3 - Added skill preloading to SessionStart hook
-- 2025-12-20 12:15: Phase 2 Complete! All 3 tasks done
-- 2025-12-20 12:20: Committed Task 2.3 - 939b20c
-- 2025-12-20 14:30: Completed Task 3.1 - Created language-patterns-base skill (240 lines)
-- 2025-12-20 14:30: Completed Task 3.2 - Updated all 17 agents to reference tool-usage-policy
-- 2025-12-20 14:35: Committed Tasks 3.1, 3.2 - 7cd7d65
-- 2025-12-20 15:45: Completed Task 3.3 - Refactored go-patterns to extend base (529→388 lines, 27% reduction)
-- 2025-12-20 15:50: Committed Task 3.3 - 5f5bd7c
-- 2025-12-20 16:15: Completed Task 3.4 - Refactored python/java/react-patterns to extend base
-- 2025-12-20 16:20: Committed Task 3.4 - 59ef49e
-- 2025-12-20 16:20: Phase 3 Complete! All 4 tasks done
-- 2025-12-20 16:45: Completed Task 4.1 - Created phase-templates skill (460 lines)
-- 2025-12-20 16:50: Completed Task 4.2 - Refactored devloop.md (534→262 lines, 51% reduction)
-- 2025-12-20 16:55: Completed Task 4.3 - Refactored continue.md (534→228 lines, 57% reduction)
-- 2025-12-20 17:00: Completed Task 4.4 - Version bump to 1.13.0
-- 2025-12-20 17:00: Phase 4 Complete! All tasks done
-- 2025-12-20 17:05: Committed Phase 4 - 10d32c9
-- 2025-12-20 17:05: Plan Complete! 🎉
+- 2025-12-20 22:00: Plan created from spike report and architectural review
+- 2025-12-20 22:15: Completed Tasks 1.1, 1.2 - Created engineer.md (280 lines) and qa-engineer.md (290 lines) super-agents
+- 2025-12-20 22:20: Completed Task 1.3 - Enhanced task-planner.md (437 lines) with 4 modes
+- 2025-12-20 22:30: Completed Task 1.4 - Updated routing (hooks, commands, skills, docs)
+- 2025-12-20 22:35: Completed Task 1.5 - Deleted 11 old agents (18 → 9)
 
 ## Notes
 
-- Backwards compatibility is critical - don't break existing command/skill names
-- Test each phase before proceeding to next
-- Monitor token usage improvements after each phase
-- Consider creating v2.0 plan for larger refactoring (agent merging, declarative commands)
+- Test each merged agent before deleting source agents
+- Search codebase for all references before deletion
+- XML structure should NOT break existing behavior
+- Version 2.0.0 indicates breaking changes (agent renaming)
