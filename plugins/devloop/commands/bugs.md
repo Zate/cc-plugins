@@ -13,6 +13,16 @@ View, filter, and manage tracked bugs in the project.
 
 **IMPORTANT**: Invoke `Skill: issue-tracking` for issue format details.
 
+## Agent Routing
+
+When fixing bugs, this command routes to appropriate agents:
+
+| Action | Agent | Mode/Focus |
+|--------|-------|------------|
+| Investigate | `devloop:engineer` | Explore mode - trace bug source |
+| Quick fix | Direct implementation | No agent needed |
+| Complex fix | `/devloop` workflow | Full agent routing |
+
 ## Storage Location
 
 - **New projects**: `.devloop/issues/` (unified system, check `bugs.md` view)
@@ -152,7 +162,7 @@ When user wants to fix a bug:
 
 5. Based on approach:
    - **Quick fix**: Read related files, implement fix, run tests
-   - **Investigate**: Launch code-explorer on related files
+   - **Investigate**: Launch `devloop:engineer` agent in explore mode to investigate related files
    - **Full devloop**: Redirect to `/devloop` with bug as input
 
 6. After fixing:

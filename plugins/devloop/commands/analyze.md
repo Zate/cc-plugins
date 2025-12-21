@@ -18,6 +18,15 @@ This command integrates with devloop's plan system:
 
 See `Skill: plan-management` for plan format.
 
+## Agent Routing
+
+This command uses devloop agents for analysis:
+
+| Phase | Agent | Mode/Focus |
+|-------|-------|------------|
+| Analysis | `devloop:engineer` | Refactor-analyzer mode |
+| Plan Generation | `devloop:task-planner` | Planning mode (when generating tasks) |
+
 ## When to Use
 
 - **Agent-generated code issues**: When Claude or other agents have created large files, poor structure, or messy code
@@ -58,7 +67,7 @@ See `Skill: plan-management` for plan format.
 Initial request focus: $ARGUMENTS
 
 **Actions**:
-1. Launch `refactor-analyzer` agent (sonnet) to perform comprehensive analysis
+1. Launch `devloop:engineer` agent in refactor-analyzer mode (sonnet) to perform comprehensive analysis
 2. Agent uses standardized methodology:
    - File discovery with Glob
    - Pattern search with Grep
@@ -290,4 +299,4 @@ This command uses:
 
 ---
 
-Invoke the refactor-analyzer agent to perform comprehensive codebase analysis, then convert approved findings into an actionable devloop plan with atomic, ordered tasks.
+Invoke the `devloop:engineer` agent in refactor-analyzer mode to perform comprehensive codebase analysis, then convert approved findings into an actionable devloop plan with atomic, ordered tasks.

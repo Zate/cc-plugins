@@ -3,7 +3,7 @@
 **Created**: 2025-12-21
 **Updated**: 2025-12-21
 **Status**: Active
-**Current Phase**: Phase 2 - Command Agent Routing
+**Current Phase**: Phase 3 - Skill Refinement
 
 ## Overview
 
@@ -76,31 +76,35 @@ Comprehensive review of all devloop components to improve agent invocation relia
 ### Phase 2: Command Agent Routing [parallel:partial]
 **Goal**: All 16 commands explicitly route to appropriate agents
 
-- [ ] Task 2.1: Audit high-use commands [parallel:A]
-  - continue.md ✓ (already enhanced)
-  - spike.md ✓ (already enhanced)
-  - devloop.md (verify agent routing)
-  - quick.md (add agent routing)
+- [x] Task 2.1: Audit high-use commands [parallel:A]
+  - continue.md ✓ (already enhanced with agent routing table)
+  - spike.md ✓ (already enhanced with agent routing table)
+  - devloop.md ✓ (verified agent routing throughout)
+  - quick.md ✓ (command-driven by design, no complex agent routing needed)
   - Files: `plugins/devloop/commands/{continue,spike,devloop,quick}.md`
 
-- [ ] Task 2.2: Audit issue/bug commands [parallel:A]
-  - bugs.md, bug.md, issues.md, new.md
-  - Add agent routing to qa-engineer or task-planner
+- [x] Task 2.2: Audit issue/bug commands [parallel:A]
+  - bugs.md, bug.md, issues.md, new.md ✓
+  - Fixed old "code-explorer" references to `devloop:engineer`
+  - Added Agent Routing sections to bugs.md and issues.md
   - Files: `plugins/devloop/commands/{bugs,bug,issues,new}.md`
 
-- [ ] Task 2.3: Audit workflow commands [parallel:B]
-  - review.md, ship.md, analyze.md
-  - Add explicit agent routing
+- [x] Task 2.3: Audit workflow commands [parallel:B]
+  - review.md ✓ (already had proper routing)
+  - ship.md ✓ (fixed old agent names: dod-validator, test-runner, git-manager)
+  - analyze.md ✓ (fixed old refactor-analyzer reference)
+  - Added Agent Routing sections
   - Files: `plugins/devloop/commands/{review,ship,analyze}.md`
 
-- [ ] Task 2.4: Audit setup commands [parallel:B]
-  - bootstrap.md, onboard.md, golangci-setup.md, statusline.md, worklog.md
-  - Determine if agent routing needed
+- [x] Task 2.4: Audit setup commands [parallel:B]
+  - bootstrap.md, onboard.md, golangci-setup.md, statusline.md, worklog.md ✓
+  - Setup commands are command-driven, no agent routing needed
   - Files: `plugins/devloop/commands/*.md`
 
-- [ ] Task 2.5: Add background execution patterns [depends:2.1-2.4]
-  - Update commands that benefit from parallel agent execution
-  - Document `run_in_background: true` usage
+- [x] Task 2.5: Add background execution patterns [depends:2.1-2.4]
+  - Patterns already documented in continue.md (run_in_background: true)
+  - Parallel execution documented in phase-templates/SKILL.md
+  - devloop.md and review.md show parallel agent patterns ✓
   - Files: Commands with parallel phases
 
 ### Phase 3: Skill Refinement [parallel:partial]
@@ -186,6 +190,8 @@ Comprehensive review of all devloop components to improve agent invocation relia
 - 2025-12-21: Committed Tasks 1.4-1.5 - 04a49c1 (feat: add XML structure to remaining 5 agents)
 - 2025-12-21: Task 1.6 complete - Added "Writing Agent Descriptions" section to docs/agents.md with guidelines for descriptions, examples, XML structure, model selection, and color coding.
 - 2025-12-21: Phase 1 complete - All 6 tasks done. Moving to Phase 2.
+- 2025-12-21: Phase 2 Tasks 2.1-2.5 complete - Audited all 16 commands. Fixed old agent references (code-explorer, dod-validator, test-runner, git-manager, refactor-analyzer). Added Agent Routing sections to bugs.md, issues.md, ship.md, analyze.md.
+- 2025-12-21: Phase 2 complete - All 5 tasks done. Moving to Phase 3.
 
 ## Notes
 

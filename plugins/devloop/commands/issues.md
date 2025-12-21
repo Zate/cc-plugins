@@ -10,6 +10,16 @@ View, filter, and manage all tracked issues - bugs, features, tasks, chores, and
 
 **IMPORTANT**: Invoke `Skill: issue-tracking` for issue format and storage details.
 
+## Agent Routing
+
+When working on issues, this command routes to appropriate agents:
+
+| Action | Agent | Mode/Focus |
+|--------|-------|------------|
+| Investigate | `devloop:engineer` | Explore mode - understand issue context |
+| Quick fix | Direct implementation | No agent needed for simple changes |
+| Complex work | `/devloop` workflow | Full agent routing |
+
 ## Quick Usage
 
 - `/devloop:issues` - Show all open issues
@@ -234,7 +244,7 @@ When user wants to work on an issue:
 
 5. Based on approach:
    - **Quick fix**: Read related files, implement, run tests
-   - **Investigate**: Launch code-explorer on related files
+   - **Investigate**: Launch `devloop:engineer` agent in explore mode to investigate related files
    - **Full devloop**: Redirect to `/devloop` with issue as input
 
 6. After completing:

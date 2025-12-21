@@ -10,6 +10,16 @@ End-to-end workflow for validating a feature is complete and integrating it into
 
 **IMPORTANT**: Always invoke `Skill: plan-management` to understand plan format and update procedures.
 
+## Agent Routing
+
+This command routes to devloop agents at key validation points:
+
+| Phase | Agent | Mode/Focus |
+|-------|-------|------------|
+| DoD Validation | `devloop:task-planner` | DoD validator mode |
+| Test Analysis | `devloop:qa-engineer` | Runner mode (on failure) |
+| Git Operations | `devloop:engineer` | Git mode |
+
 ## Plan Integration
 
 Before shipping, check if a devloop plan exists at `.devloop/plan.md`:
@@ -66,7 +76,7 @@ This command assumes:
 **Skip if**: User chose "Quick commit" or "PR only"
 
 **Actions**:
-1. Launch dod-validator agent (model: haiku):
+1. Launch `devloop:task-planner` agent in DoD validator mode (model: haiku):
    - Check code criteria (no TODOs, no debug statements)
    - Check test criteria (tests exist and pass)
    - Check quality criteria (review done, no critical issues)
@@ -102,7 +112,7 @@ This command assumes:
    ```
 
 2. If tests fail:
-   - Launch test-runner agent to analyze failures
+   - Launch `devloop:qa-engineer` agent in runner mode to analyze failures
    - Present failure analysis
    - Ask how to proceed:
      ```
@@ -146,7 +156,7 @@ This command assumes:
      - PR only (Changes already committed)
    ```
 
-2. Launch git-manager agent for the operation
+2. Launch `devloop:engineer` agent in git mode for the operation
 
 3. **For commits:**
    - Generate conventional commit message from changes
