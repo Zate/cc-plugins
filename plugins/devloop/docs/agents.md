@@ -329,6 +329,186 @@ Technical documentation specialist creating READMEs, API docs, inline comments, 
 
 ---
 
+## Writing Agent Descriptions
+
+Guidelines for creating effective agent definitions. Following these ensures reliable invocation and consistent behavior.
+
+### YAML Frontmatter Requirements
+
+Every agent file requires these frontmatter fields:
+
+```yaml
+---
+name: agent-name              # kebab-case, unique identifier
+description: |                # CRITICAL for invocation
+  Clear description with trigger words.
+  Use when [specific triggers].
+
+Examples:                     # Show Claude when/how to invoke
+<example>
+Context: [User situation]
+user: "[User message]"
+assistant: "I'll launch the devloop:agent-name agent to [action]."
+<commentary>
+[Why this agent is appropriate]
+</commentary>
+</example>
+
+tools: [List of available tools]
+model: sonnet|haiku|opus      # Choose based on task complexity
+color: [color-name]           # Visual identification
+skills: [skill-1, skill-2]    # Auto-loaded skills
+---
+```
+
+### Description Best Practices
+
+**DO**:
+- Start with what the agent does: "Reviews code for bugs..."
+- Include trigger words: "Use when...", "Use for...", "Use during..."
+- Be specific about capabilities: "combining test generation, execution, and bug tracking"
+- Mention context triggers: "after implementing features", "before deployment"
+
+**DON'T**:
+- Use vague descriptions: "Helps with coding tasks"
+- Omit trigger conditions
+- Leave out key capabilities
+
+### Example Format Requirements
+
+Examples must show explicit agent invocation format:
+
+**CORRECT** ✅:
+```markdown
+<example>
+Context: User has just implemented a new feature.
+user: "Can you check if everything looks good?"
+assistant: "I'll use the Task tool to launch the devloop:code-reviewer agent to review your changes."
+<commentary>
+Use code-reviewer after writing new code to catch issues early.
+</commentary>
+</example>
+```
+
+**INCORRECT** ❌:
+```markdown
+<example>
+assistant: "I'll launch the code-reviewer to check."
+</example>
+```
+
+**Key Points**:
+- Always use format: `devloop:agent-name agent`
+- Include the Task tool reference when relevant
+- Provide context about when this invocation is appropriate
+- Include commentary explaining the reasoning
+
+### XML Prompt Structure
+
+Agent prompts (after the frontmatter) should use XML structure for reliable instruction following:
+
+```xml
+<system_role>
+You are the [Role Name] for the DevLoop development workflow system.
+Your primary goal is: [Primary Goal]
+
+<identity>
+    <role>[Role Title]</role>
+    <expertise>[Areas of Expertise]</expertise>
+    <personality>[Personality Traits]</personality>
+</identity>
+</system_role>
+
+<capabilities>
+<capability priority="core">
+    <name>[Capability Name]</name>
+    <description>[What it does]</description>
+</capability>
+<!-- Add 3-5 core capabilities -->
+</capabilities>
+
+<workflow_enforcement>
+<phase order="1">
+    <name>analysis</name>
+    <instruction>
+        Before taking action, analyze the request:
+    </instruction>
+    <output_format>
+        <thinking>
+            - [Analysis points]
+        </thinking>
+    </output_format>
+</phase>
+<!-- Add 3-4 phases -->
+</workflow_enforcement>
+
+<output_requirements>
+<requirement>[Requirement 1]</requirement>
+<requirement>[Requirement 2]</requirement>
+</output_requirements>
+
+<skill_integration>
+<skill name="skill-name" when="[Trigger condition]">
+    Invoke with: Skill: skill-name
+</skill>
+</skill_integration>
+
+<constraints>
+<constraint type="safety">[Safety constraint]</constraint>
+<constraint type="quality">[Quality requirement]</constraint>
+</constraints>
+
+<delegation>
+<delegate_to agent="devloop:other-agent" when="[Condition]">
+    <reason>[Why delegate]</reason>
+</delegate_to>
+</delegation>
+```
+
+**Reference Template**: `docs/templates/agent_prompt_structure.xml`
+
+### Optional Sections
+
+| Section | Use When |
+|---------|----------|
+| `<mode_detection>` | Agent has multiple operating modes |
+| `<plan_context>` | Agent reads from plan.md |
+| `<parallel_execution>` | Agent can run concurrently |
+
+### Model Selection Guidelines
+
+| Model | Cost | Use For |
+|-------|------|---------|
+| **haiku** | 0.2x | Fast classification, simple analysis, estimation |
+| **sonnet** | 1x | Standard implementation, code review, planning |
+| **opus** | 5x | Critical security review, complex reasoning |
+
+Default to **sonnet** unless:
+- Task is simple/fast → haiku
+- Task is critical/complex → opus
+
+### Color Coding Convention
+
+| Color | Category | Examples |
+|-------|----------|----------|
+| 🟣 indigo | Engineering | engineer, task-planner |
+| 🟢 green | Quality | qa-engineer |
+| 🔴 red | Critical Review | code-reviewer, security-scanner |
+| 🟡 yellow | Classification | workflow-detector |
+| 🔵 blue | Estimation | complexity-estimator |
+| 🔷 teal | Documentation | doc-generator, summary-generator |
+
+### Permission Modes
+
+| Mode | Effect |
+|------|--------|
+| (default) | Full read/write access |
+| `permissionMode: plan` | Read-only access to plan files |
+
+Use `permissionMode: plan` for agents that should recommend plan changes but not make them directly.
+
+---
+
 ## Migration from v1.x
 
 If you have automation referencing old agent names, update as follows:

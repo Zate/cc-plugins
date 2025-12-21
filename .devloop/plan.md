@@ -3,7 +3,7 @@
 **Created**: 2025-12-21
 **Updated**: 2025-12-21
 **Status**: Active
-**Current Phase**: Phase 1 - Agent Enhancement
+**Current Phase**: Phase 2 - Command Agent Routing
 
 ## Overview
 
@@ -68,9 +68,9 @@ Comprehensive review of all devloop components to improve agent invocation relia
   - workflow-detector ✓ (fixed examples, added XML structure)
   - Files: `plugins/devloop/agents/*.md`
 
-- [ ] Task 1.6: Create agent description guidelines [depends:1.1-1.5]
-  - Document best practices learned
-  - Add to docs/agents.md
+- [x] Task 1.6: Create agent description guidelines [depends:1.1-1.5]
+  - Document best practices learned ✓
+  - Add to docs/agents.md ✓ (added "Writing Agent Descriptions" section)
   - Files: `plugins/devloop/docs/agents.md`
 
 ### Phase 2: Command Agent Routing [parallel:partial]
@@ -183,6 +183,9 @@ Comprehensive review of all devloop components to improve agent invocation relia
 - 2025-12-21: continue.md and spike.md already enhanced with agent routing
 - 2025-12-21: Tasks 1.1-1.3 complete - engineer, qa-engineer, task-planner agents reviewed. All already conform to v2.0 standards with proper descriptions, examples showing explicit agent invocation, complete XML structure, and delegation patterns.
 - 2025-12-21: Tasks 1.4-1.5 complete - code-reviewer already had XML structure. Fixed examples and added XML structure to 5 agents: complexity-estimator, security-scanner, doc-generator, summary-generator, workflow-detector.
+- 2025-12-21: Committed Tasks 1.4-1.5 - 04a49c1 (feat: add XML structure to remaining 5 agents)
+- 2025-12-21: Task 1.6 complete - Added "Writing Agent Descriptions" section to docs/agents.md with guidelines for descriptions, examples, XML structure, model selection, and color coding.
+- 2025-12-21: Phase 1 complete - All 6 tasks done. Moving to Phase 2.
 
 ## Notes
 
