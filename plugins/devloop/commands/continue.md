@@ -49,6 +49,11 @@ Search in order:
 
 Also read `.devloop/worklog.md` if it exists to understand completed work.
 
+**Archive Awareness**:
+- Check for `.devloop/archive/` directory
+- If archives exist, note them for context (may explain missing phases)
+- Archives contain complete historical phase details if referenced
+
 **If no plan found:**
 ```
 AskUserQuestion:
@@ -71,12 +76,17 @@ Extract from plan file:
 - **Completed tasks**: Count of `[x]` items
 - **Pending tasks**: Count of `[ ]` items
 - **Next task(s)**: First pending item(s)
+- **Archived phases**: Check Progress Log for archival notes
 
 **Task status markers:**
 - `[x]` / `[X]` - Completed
 - `[ ]` - Pending
 - `[parallel:X]` - Can run in parallel with same marker
 - `[depends:N.M]` - Depends on another task
+
+**Archived Phase Detection**:
+- If Progress Log mentions "Archived Phase N" → phase in `.devloop/archive/`
+- If task references archived phase → add "see archive" note
 
 Present status:
 ```markdown
@@ -91,7 +101,12 @@ Present status:
 ### Remaining
 - [ ] Task [N+1]: [Description]
 - [ ] Task [N+2]: [Description]
+
+### Archive Status
+*Phases 1-2 archived to .devloop/archive/ (see worklog for details)*
 ```
+
+Include archive status only if archives exist.
 
 ---
 
@@ -361,6 +376,8 @@ If user selects "Update the plan first" or needs to create a new plan:
 | Stale plan | Updated > 24h ago | Offer to refresh |
 | Uncommitted work | git status shows changes | Offer devloop:engineer (git) |
 | Failed tests | Previous run failed | Offer devloop:qa-engineer (runner) |
+| Large plan | Plan > 200 lines | Suggest /devloop:archive to compress |
+| Missing phase | Task references missing phase | Check archives, suggest restoration if needed |
 
 ---
 
@@ -382,3 +399,5 @@ If user selects "Update the plan first" or needs to create a new plan:
 - Use `/devloop:continue step 3` to jump to specific step
 - If stuck, use "Update the plan first" to revise approach
 - For unknowns, suggest `/devloop:spike` before implementation
+- If plan > 200 lines, use `/devloop:archive` to compress
+- Archived phases available in `.devloop/archive/` if needed for reference
