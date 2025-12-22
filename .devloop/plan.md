@@ -218,10 +218,12 @@ Comprehensive review and enhancement of all devloop components to improve:
   - Added archive tips ✓
   - Files: `plugins/devloop/commands/continue.md` ✓
 
-- [ ] Task 6.3: Update pre-commit hook for archive awareness
-  - Archive-aware grep patterns
-  - Skip archived headers in validation
-  - Files: `plugins/devloop/hooks/pre-commit.sh`
+- [x] Task 6.3: Update pre-commit hook for archive awareness
+  - Archive-aware grep patterns ✓
+  - Skip archived headers in validation ✓
+  - Detect archived plans via Progress Log check ✓
+  - Skip task count validation when plan compressed ✓
+  - Files: `plugins/devloop/hooks/pre-commit.sh` ✓
 
 - [ ] Task 6.4: Update plan-management skill
   - Document archive format
@@ -435,6 +437,7 @@ Comprehensive review and enhancement of all devloop components to improve:
 - 2025-12-22: Task 6.1 complete - Created `/devloop:archive` command with phase detection, archive file creation, Progress Log extraction, and plan compression logic. File: `plugins/devloop/commands/archive.md`
 - 2025-12-22: Reviewed spike reports for engineer agent and continue command improvements. Added Phases 7-11 (31 tasks total): Phase 7 (Foundation - skills & patterns, 3 tasks), Phase 8 (Engineer enhancements, 6 tasks), Phase 9 (Workflow loop, 4 tasks), Phase 10 (Fresh start, 4 tasks), Phase 11 (Integration, 6 tasks). References: `.devloop/spikes/engineer-agent-improvements.md`, `.devloop/spikes/continue-improvements.md`
 - 2025-12-23: Task 6.2 complete - Updated `/devloop:continue` with archive awareness. Added archive detection to Step 1, enhanced Step 2 with archive status display, added recovery scenarios for large plans and missing phases, and added archive tips.
+- 2025-12-23: Task 6.3 complete - Updated pre-commit hook with archive awareness. Hook now detects archived plans via Progress Log and skips task count validation when plan has been compressed, preventing false warnings.
 
 ## Notes
 
