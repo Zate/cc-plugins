@@ -225,10 +225,14 @@ Comprehensive review and enhancement of all devloop components to improve:
   - Skip task count validation when plan compressed ✓
   - Files: `plugins/devloop/hooks/pre-commit.sh` ✓
 
-- [ ] Task 6.4: Update plan-management skill
-  - Document archive format
-  - Add "when to archive" guidance
-  - Files: `plugins/devloop/skills/plan-management/SKILL.md`
+- [x] Task 6.4: Update plan-management skill
+  - Document archive format ✓
+  - Add "when to archive" guidance ✓
+  - Added complete "Plan Archival" section with format, structure, and integration details ✓
+  - Documented archive awareness across commands and hooks ✓
+  - Added restoration instructions ✓
+  - Added archive command to "See Also" references ✓
+  - Files: `plugins/devloop/skills/plan-management/SKILL.md` ✓
 
 - [ ] Task 6.5: Test and validate archival workflow
   - Test on current plan (209 lines)
@@ -438,6 +442,7 @@ Comprehensive review and enhancement of all devloop components to improve:
 - 2025-12-22: Reviewed spike reports for engineer agent and continue command improvements. Added Phases 7-11 (31 tasks total): Phase 7 (Foundation - skills & patterns, 3 tasks), Phase 8 (Engineer enhancements, 6 tasks), Phase 9 (Workflow loop, 4 tasks), Phase 10 (Fresh start, 4 tasks), Phase 11 (Integration, 6 tasks). References: `.devloop/spikes/engineer-agent-improvements.md`, `.devloop/spikes/continue-improvements.md`
 - 2025-12-23: Task 6.2 complete - Updated `/devloop:continue` with archive awareness. Added archive detection to Step 1, enhanced Step 2 with archive status display, added recovery scenarios for large plans and missing phases, and added archive tips.
 - 2025-12-23: Task 6.3 complete - Updated pre-commit hook with archive awareness. Hook now detects archived plans via Progress Log and skips task count validation when plan has been compressed, preventing false warnings.
+- 2025-12-23: Task 6.4 complete - Updated plan-management skill with comprehensive archival documentation. Added "Plan Archival" section covering when to archive, archive format, compressed plan structure, archive-worklog integration, command/hook awareness, and restoration procedures.
 
 ## Notes
 
