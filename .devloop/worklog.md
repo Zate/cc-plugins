@@ -37,6 +37,62 @@
 
 ---
 
+### Component Polish v2.1 - Phase 5 Complete
+
+**Phase 5: Foundation - Skills & Patterns** - Added missing skills to engineer agent, created workflow loop skill, and established AskUserQuestion standards.
+
+**Tasks Completed**:
+- Task 5.1: Added 6 missing skills to engineer.md (complexity-estimation, project-context, api-design, database-patterns, testing-strategies)
+- Task 5.2: Created workflow-loop skill (668 lines) - checkpoint patterns, state transitions, error recovery
+- Task 5.3: Created AskUserQuestion standards document (1,008 lines) - when to ask/not ask, batching, formats, token efficiency
+
+**Commits**: `f24ef82`
+
+**Files Created**:
+- `plugins/devloop/skills/workflow-loop/SKILL.md`
+- `plugins/devloop/docs/ask-user-question-standards.md`
+
+**Files Modified**:
+- `plugins/devloop/agents/engineer.md`
+
+---
+
+### Component Polish v2.1 - Phase 7 Complete
+
+**Phase 7: Workflow Loop Core Improvements** - Fixed workflow loop with mandatory checkpoints and completion detection.
+
+**Tasks Completed**:
+- Task 7.1: Added mandatory post-task checkpoint to continue.md with success/partial/failure paths
+- Task 7.2: Added loop completion detection with 5-state task counting and 8 option handlers
+- Task 7.3: Added context management with 6 session metrics and staleness thresholds
+- Task 7.4: Standardized 11 checkpoint questions across 208 diff lines
+
+**Commits**: `a2e44df`, `16feab6`, `78a30f7`, `ef7aa50`
+
+**Files Modified**:
+- `plugins/devloop/commands/continue.md`
+
+---
+
+### Component Polish v2.1 - Phase 8 In Progress
+
+**Phase 8: Fresh Start Mechanism** - Enable context clearing with state preservation.
+
+**Tasks Completed**:
+- Task 8.1: Created /devloop:fresh command (348 lines) - gathers plan state, saves to .devloop/next-action.json, displays continuation instructions
+- Task 8.2: Added fresh start detection to session-start.sh (+30 lines) - detects state file, parses JSON, displays "Fresh Start Detected" message
+- Task 8.3: Added state file cleanup to continue.md (+313 lines) - Step 1a detects/reads state, Step 2 displays fresh start mode, Step 9 documents workflow
+
+**Commits**: `e292163`, `0116afc` (pending: Task 8.3)
+
+**Files Created**:
+- `plugins/devloop/commands/fresh.md`
+
+**Files Modified**:
+- `plugins/devloop/hooks/session-start.sh`
+
+---
+
 ## 2025-12-18
 
 ### v1.10.0 - Consistency & Enforcement System

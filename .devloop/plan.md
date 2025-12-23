@@ -1,9 +1,9 @@
 # Devloop Plan: Component Polish v2.1
 
 **Created**: 2025-12-21
-**Updated**: 2025-12-23 17:15
+**Updated**: 2025-12-23 08:17
 **Status**: Active
-**Current Phase**: Phase 8 - Fresh Start Mechanism (0/4 complete)
+**Current Phase**: Phase 8 - Fresh Start Mechanism (3/4 complete)
 
 ## Overview
 
@@ -282,27 +282,36 @@ Comprehensive review and enhancement of all devloop components to improve:
 **Reference**: `.devloop/spikes/continue-improvements.md`
 **Dependencies**: Phase 7 Task 7.1 (checkpoint must exist first)
 
-- [ ] Task 8.1: Create /devloop:fresh command [parallel:A]
-  - Gather current plan state
-  - Identify last completed and next pending task
-  - Generate quick summary
-  - Write state to `.devloop/next-action.json`
-  - Present continuation instructions
-  - Files: `plugins/devloop/commands/fresh.md`
+- [x] Task 8.1: Create /devloop:fresh command [parallel:A]
+  - Gather current plan state ✓
+  - Identify last completed and next pending task ✓
+  - Generate quick summary ✓
+  - Write state to `.devloop/next-action.json` ✓
+  - Present continuation instructions ✓
+  - Files: `plugins/devloop/commands/fresh.md` ✓
 
-- [ ] Task 8.2: Add fresh start detection to session-start.sh [parallel:B]
-  - Check for `.devloop/next-action.json` on startup
-  - Parse saved state (with and without jq)
-  - Display fresh start message with next task
-  - Add "dismiss" option to clear state
-  - Files: `plugins/devloop/hooks/session-start.sh`
+- [x] Task 8.2: Add fresh start detection to session-start.sh [parallel:B]
+  - Check for `.devloop/next-action.json` on startup ✓
+  - Parse saved state (with and without jq) ✓
+  - Display fresh start message with next task ✓
+  - Add "dismiss" option to clear state ✓
+  - Added get_fresh_start_state() function with jq + grep/sed fallback ✓
+  - Integrated detection into session startup sequence ✓
+  - Displays concise message (<10 lines) with plan/phase/summary/next task ✓
+  - All 7 test cases passing ✓
+  - Files: `plugins/devloop/hooks/session-start.sh` ✓
 
-- [ ] Task 8.3: Add state file cleanup to continue.md [depends:8.1,8.2]
-  - Read `.devloop/next-action.json` at start if exists
-  - Use saved state to identify next task
-  - Delete state file after reading
-  - Document fresh start workflow
-  - Files: `plugins/devloop/commands/continue.md`
+- [x] Task 8.3: Add state file cleanup to continue.md [depends:8.1,8.2]
+  - Read `.devloop/next-action.json` at start if exists ✓
+  - Use saved state to identify next task ✓
+  - Delete state file after reading ✓
+  - Document fresh start workflow ✓
+  - Added Step 1a: Fresh start state detection with jq + fallback parsing ✓
+  - Updated Step 2: Fresh start integration with dedicated display format ✓
+  - Added Step 9: Fresh Start Workflow comprehensive documentation ✓
+  - Includes state file format, lifecycle, error handling, testing ✓
+  - Added fresh start tip to Tips section ✓
+  - Files: `plugins/devloop/commands/continue.md` ✓
 
 - [ ] Task 8.4: Test fresh start workflow [depends:8.1,8.2,8.3]
   - Test /devloop:fresh saves state correctly
@@ -424,6 +433,9 @@ Comprehensive review and enhancement of all devloop components to improve:
 - 2025-12-23: Task 7.2 complete - Added loop completion detection to continue.md. Step 5b with task counting, dependency checking, 8 completion option handlers, and plan status updates to "Review"/"Complete".
 - 2025-12-23: Task 7.3 complete - Added context management to continue.md. Step 5c with 6 session metrics, staleness thresholds, refresh decision tree, and background agent best practices (313 lines).
 - 2025-12-23: Task 7.4 complete - Standardized checkpoint questions in continue.md. Applied AskUserQuestion standards from Task 5.3. Fixed 11 questions across 208 diff lines. Fixed header compliance, token efficiency, and established 4 standard formats. Phase 7 COMPLETE!
+- 2025-12-23: Task 8.1 complete - Created /devloop:fresh command (348 lines). Gathers plan state, identifies last completed/next pending tasks, writes .devloop/next-action.json, displays continuation instructions. Handles edge cases (no plan, existing state, --dismiss flag).
+- 2025-12-23: Task 8.2 complete - Added fresh start detection to session-start.sh (+30 lines). Detects .devloop/next-action.json, parses with jq/grep fallback, displays concise message with plan/phase/summary/next task. All 7 tests passing.
+- 2025-12-23 08:17: Task 8.3 complete - Added state file cleanup to continue.md. Step 1a detects/reads/deletes .devloop/next-action.json with jq+fallback parsing. Step 2 integrates fresh start display. Step 9 documents complete fresh start workflow (230 lines) with lifecycle, error handling, 4 test cases. Added tip for /devloop:fresh workflow.
 
 ## Notes
 

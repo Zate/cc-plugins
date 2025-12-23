@@ -42,6 +42,67 @@ Resume work from an existing devloop plan. Finds the current plan, identifies pr
 
 ## Step 1: Find and Read the Plan
 
+### 1a: Check for Fresh Start State
+
+**CRITICAL**: Check for saved state BEFORE searching for plan file.
+
+If `.devloop/next-action.json` exists:
+
+1. **Read state file**:
+   ```bash
+   state_content=$(cat .devloop/next-action.json)
+
+   # Parse JSON (prefer jq, fallback to grep/sed)
+   if command -v jq &> /dev/null; then
+     plan=$(jq -r '.plan // ""' .devloop/next-action.json)
+     phase=$(jq -r '.phase // ""' .devloop/next-action.json)
+     summary=$(jq -r '.summary // ""' .devloop/next-action.json)
+     next_task=$(jq -r '.next_pending // ""' .devloop/next-action.json)
+     timestamp=$(jq -r '.timestamp // ""' .devloop/next-action.json)
+   else
+     # Fallback: grep/sed parsing
+     plan=$(grep -o '"plan"[[:space:]]*:[[:space:]]*"[^"]*"' .devloop/next-action.json | sed 's/.*: *"\([^"]*\)".*/\1/')
+     phase=$(grep -o '"phase"[[:space:]]*:[[:space:]]*"[^"]*"' .devloop/next-action.json | sed 's/.*: *"\([^"]*\)".*/\1/')
+     summary=$(grep -o '"summary"[[:space:]]*:[[:space:]]*"[^"]*"' .devloop/next-action.json | sed 's/.*: *"\([^"]*\)".*/\1/')
+     next_task=$(grep -o '"next_pending"[[:space:]]*:[[:space:]]*"[^"]*"' .devloop/next-action.json | sed 's/.*: *"\([^"]*\)".*/\1/')
+   fi
+   ```
+
+2. **Validate state**:
+   - If `plan` and `summary` are not empty → valid state
+   - If missing fields → ignore file, continue to normal plan search
+
+3. **Delete state file** (single-use):
+   ```bash
+   rm .devloop/next-action.json
+   ```
+
+4. **Display fresh start context**:
+   ```markdown
+   ## Resuming from Fresh Start
+
+   **Plan**: {plan}
+   **Phase**: {phase}
+   **Progress**: {summary}
+   **Next task**: {next_task}
+
+   Continuing with fresh context...
+   ```
+
+5. **Set variables for later steps**:
+   ```bash
+   FRESH_START_MODE=true
+   FRESH_START_NEXT_TASK="$next_task"
+   ```
+
+6. **Continue to Step 1b** to read the actual plan file
+
+**If state file does not exist or is invalid**: Skip to Step 1b.
+
+---
+
+### 1b: Search for Plan File
+
 Search in order:
 1. **`.devloop/plan.md`** ← Primary (devloop standard)
 2. `docs/PLAN.md`, `docs/plan.md`
@@ -79,7 +140,7 @@ Extract from plan file:
 - **Current phase**: Where we are
 - **Completed tasks**: Count of `[x]` items
 - **Pending tasks**: Count of `[ ]` items
-- **Next task(s)**: First pending item(s)
+- **Next task(s)**: First pending item(s) OR from fresh start state
 - **Archived phases**: Check Progress Log for archival notes
 
 **Task status markers:**
@@ -92,7 +153,30 @@ Extract from plan file:
 - If Progress Log mentions "Archived Phase N" → phase in `.devloop/archive/`
 - If task references archived phase → add "see archive" note
 
+**Fresh Start Integration**:
+- If `FRESH_START_MODE=true` from Step 1a, use `FRESH_START_NEXT_TASK` as the next task
+- Display "Resuming from fresh start" indicator
+- Skip normal "next task" detection since state provides it
+
 Present status:
+
+**If fresh start mode**:
+```markdown
+## Plan: [Name] (Fresh Start)
+
+**Progress**: [N]/[Total] tasks complete
+**Current Phase**: [Phase name]
+**Resuming from**: Fresh start at [timestamp]
+
+### Next Up (from saved state)
+- [ ] **Task [N]**: [Description from FRESH_START_NEXT_TASK]
+
+### Remaining
+- [ ] Task [N+1]: [Description]
+- [ ] Task [N+2]: [Description]
+```
+
+**If normal mode**:
 ```markdown
 ## Plan: [Name]
 
@@ -1145,6 +1229,194 @@ If user selects "Update the plan first" or needs to create a new plan:
 
 ---
 
+## Step 9: Fresh Start Workflow
+
+**Purpose**: Resume work after clearing conversation context while preserving plan progress.
+
+**Integration**: This workflow leverages the fresh start mechanism created in Phase 8.
+
+### How It Works
+
+**Phase 8 Components:**
+1. **`/devloop:fresh` command** (Task 8.1) - Saves current state to `.devloop/next-action.json`
+2. **Session start hook** (Task 8.2) - Detects saved state on startup and displays message
+3. **`/devloop:continue` integration** (Task 8.3, this task) - Reads and uses saved state
+
+### Workflow Sequence
+
+```
+User runs /devloop:fresh
+    ↓
+State saved to .devloop/next-action.json
+    ↓
+User runs /clear to reset context
+    ↓
+Session start hook detects state file
+    ↓
+Displays: "Fresh start detected. Run /devloop:continue to resume"
+    ↓
+User runs /devloop:continue
+    ↓
+Step 1a: Read and delete state file
+    ↓
+Step 1b: Read plan file normally
+    ↓
+Step 2: Display "Resuming from fresh start" with next task
+    ↓
+Continue normal workflow
+```
+
+### State File Format
+
+The state file `.devloop/next-action.json` contains:
+
+```json
+{
+  "timestamp": "2025-12-23T14:30:00Z",
+  "plan": "Feature Name",
+  "phase": "Phase 3: Implementation",
+  "total_tasks": 15,
+  "completed_tasks": 8,
+  "pending_tasks": 7,
+  "last_completed": "Task 3.2: Create user service",
+  "next_pending": "Task 3.3: Add authentication middleware",
+  "summary": "Completed 8 of 15 tasks (53%). Current phase: Phase 3.",
+  "reason": "fresh_start"
+}
+```
+
+**Key fields used by continue.md**:
+- `plan` - Plan name for display
+- `phase` - Current phase for display
+- `summary` - Progress summary for display
+- `next_pending` - The task to resume (used in Step 2)
+- `timestamp` - When state was saved (for display)
+
+### State File Lifecycle
+
+1. **Created by**: `/devloop:fresh` (Step 4 of fresh.md)
+2. **Detected by**: Session start hook (on startup)
+3. **Read by**: `/devloop:continue` (Step 1a, this file)
+4. **Deleted by**: `/devloop:continue` (Step 1a, immediately after reading)
+
+**Single-use design**: The state file is deleted immediately after reading to prevent reuse. Fresh start state applies only to the next continue invocation.
+
+### Error Handling
+
+| Scenario | Detection | Action |
+|----------|-----------|--------|
+| **State file exists but plan missing** | Step 1b finds no plan | Display state info, offer to create plan |
+| **State file corrupted** | JSON parse fails | Log warning, delete file, continue normal flow |
+| **State file incomplete** | Missing `plan` or `summary` | Ignore file, continue normal flow |
+| **Next task not in plan** | Step 2 can't find task | Display warning, use first pending task instead |
+| **Plan changed since fresh start** | Task count mismatch | Display warning, use state's next_task as hint |
+
+### User Experience
+
+**Normal session (no fresh start)**:
+```
+User: /devloop:continue
+→ Step 1b: Find plan
+→ Step 2: Show "Plan: Feature Name, Progress: 8/15 tasks"
+→ Continue
+```
+
+**Fresh start session**:
+```
+User: /devloop:continue
+→ Step 1a: Detect state file
+→ Display: "Resuming from Fresh Start - Plan: Feature Name, Progress: 8/15 tasks"
+→ Delete state file
+→ Step 1b: Find plan
+→ Step 2: Show "Plan: Feature Name (Fresh Start), Next: Task 3.3"
+→ Continue
+```
+
+**Difference**: Fresh start mode displays additional context and uses state's `next_pending` task directly.
+
+### Why This Design?
+
+**Advantages**:
+1. **Stateless**: State file deleted after use, no stale state
+2. **Resumable**: User can pick up exactly where they left off
+3. **Transparent**: User sees "Fresh Start" indicator for clarity
+4. **Fallback**: If state invalid, falls back to normal plan detection
+5. **Non-intrusive**: Normal workflow unchanged when no state exists
+
+**Trade-offs**:
+- State file is ephemeral (deleted on use)
+- No history of fresh starts (intentional)
+- Requires user to manually run `/clear` and `/devloop:continue`
+
+### Testing Fresh Start Integration
+
+**Test Case 1: Fresh start with valid state**
+```bash
+# Setup
+echo '{"plan":"Test Plan","phase":"Phase 1","summary":"Test","next_pending":"Task 1.1: Test task","timestamp":"2025-12-23T14:30:00Z"}' > .devloop/next-action.json
+
+# Run
+/devloop:continue
+
+# Expected
+# - State file read and deleted
+# - Display "Resuming from Fresh Start"
+# - Next task: "Task 1.1: Test task"
+```
+
+**Test Case 2: Fresh start with invalid state**
+```bash
+# Setup
+echo '{"invalid":"json"}' > .devloop/next-action.json
+
+# Run
+/devloop:continue
+
+# Expected
+# - State file ignored
+# - Normal plan detection
+# - No "Fresh Start" indicator
+```
+
+**Test Case 3: Fresh start with missing plan**
+```bash
+# Setup
+echo '{"plan":"Missing Plan","summary":"Test","next_pending":"Task 1.1"}' > .devloop/next-action.json
+rm -f .devloop/plan.md
+
+# Run
+/devloop:continue
+
+# Expected
+# - State file read
+# - Display state info
+# - Offer to create plan or start /devloop
+```
+
+**Test Case 4: Fresh start with changed plan**
+```bash
+# Setup - state has 15 tasks, plan has 20 tasks
+echo '{"plan":"Test","total_tasks":15,"next_pending":"Task 1.1"}' > .devloop/next-action.json
+# Plan has 20 tasks now
+
+# Run
+/devloop:continue
+
+# Expected
+# - Display warning: "Plan changed since fresh start (15 → 20 tasks)"
+# - Use state's next_task as starting point
+# - Continue normally
+```
+
+### References
+
+- `Skill: plan-management` - Plan file format and locations
+- `Skill: workflow-loop` - Context management and fresh start patterns
+- `/devloop:fresh` - Command that creates state file (Task 8.1)
+- Session start hook - Detects state on startup (Task 8.2)
+
+---
+
 ## Model Usage
 
 | Step | Model | Rationale |
@@ -1165,3 +1437,4 @@ If user selects "Update the plan first" or needs to create a new plan:
 - For unknowns, suggest `/devloop:spike` before implementation
 - If plan > 200 lines, use `/devloop:archive` to compress
 - Archived phases available in `.devloop/archive/` if needed for reference
+- **Fresh start**: Use `/devloop:fresh` to save state, then `/clear` + `/devloop:continue` to resume with fresh context
