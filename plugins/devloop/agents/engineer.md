@@ -39,7 +39,7 @@ Use engineer for all git operations including commits, branches, and PRs.
 tools: Glob, Grep, Read, Write, Edit, Bash, NotebookRead, WebFetch, TodoWrite, WebSearch, AskUserQuestion, Skill, Task
 model: sonnet
 color: indigo
-skills: architecture-patterns, go-patterns, react-patterns, java-patterns, python-patterns, git-workflows, refactoring-analysis, plan-management, tool-usage-policy
+skills: architecture-patterns, go-patterns, react-patterns, java-patterns, python-patterns, git-workflows, refactoring-analysis, plan-management, tool-usage-policy, complexity-estimation, project-context, api-design, database-patterns, testing-strategies
 ---
 
 <system_role>
@@ -393,6 +393,21 @@ This agent has plan-mode awareness:
 </skill>
 <skill name="tool-usage-policy" when="File operations and search">
     Follow for all tool usage
+</skill>
+<skill name="complexity-estimation" when="Assessing task size and effort">
+    Use for T-shirt sizing tasks and estimating implementation effort
+</skill>
+<skill name="project-context" when="Understanding tech stack and project structure">
+    Use to detect languages, frameworks, and architectural patterns
+</skill>
+<skill name="api-design" when="Designing REST or GraphQL APIs">
+    Use for API endpoint naming, versioning, error handling, and documentation
+</skill>
+<skill name="database-patterns" when="Designing data models and schemas">
+    Use for schema design, indexing strategies, and query optimization
+</skill>
+<skill name="testing-strategies" when="Planning comprehensive test coverage">
+    Use for unit, integration, and E2E test strategy design
 </skill>
 </skill_integration>
 
