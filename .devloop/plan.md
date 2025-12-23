@@ -1,9 +1,9 @@
 # Devloop Plan: Component Polish v2.1
 
 **Created**: 2025-12-21
-**Updated**: 2025-12-22
+**Updated**: 2025-12-23 08:03
 **Status**: Active
-**Current Phase**: Phase 6 - Plan Archival
+**Current Phase**: Phase 6 - Plan Archival (4/5 complete), Phase 3 pending
 
 ## Overview
 
@@ -49,80 +49,6 @@ Comprehensive review and enhancement of all devloop components to improve:
 
 ## Tasks
 
-### Phase 1: Agent Enhancement [parallel:partial]
-**Goal**: Ensure all 9 agents have optimal descriptions, examples, and XML structure
-
-- [x] Task 1.1: Review engineer.md [parallel:A]
-  - Check description triggers invocation for exploration/architecture/git tasks ✓
-  - Verify examples show `devloop:engineer` in assistant responses ✓
-  - Ensure XML structure matches template ✓
-  - Add background execution guidance ✓ (has delegation section)
-  - Files: `plugins/devloop/agents/engineer.md`
-
-- [x] Task 1.2: Review qa-engineer.md [parallel:A]
-  - Check description triggers for testing/validation tasks ✓
-  - Verify examples use `devloop:qa-engineer` ✓
-  - Ensure XML structure complete ✓
-  - Files: `plugins/devloop/agents/qa-engineer.md`
-
-- [x] Task 1.3: Review task-planner.md [parallel:A]
-  - Check description for planning/requirements/DoD triggers ✓
-  - Verify examples use `devloop:task-planner` ✓
-  - Ensure XML structure complete ✓
-  - Files: `plugins/devloop/agents/task-planner.md`
-
-- [x] Task 1.4: Review code-reviewer.md [parallel:B]
-  - Check description triggers for review/audit tasks ✓
-  - Verify examples use `devloop:code-reviewer` ✓
-  - Ensure XML structure complete ✓
-  - Files: `plugins/devloop/agents/code-reviewer.md`
-
-- [x] Task 1.5: Review remaining 5 agents [parallel:B]
-  - complexity-estimator ✓ (added XML structure, examples already correct)
-  - security-scanner ✓ (fixed examples, added XML structure)
-  - doc-generator ✓ (fixed examples, added XML structure)
-  - summary-generator ✓ (fixed examples, added XML structure)
-  - workflow-detector ✓ (fixed examples, added XML structure)
-  - Files: `plugins/devloop/agents/*.md`
-
-- [x] Task 1.6: Create agent description guidelines [depends:1.1-1.5]
-  - Document best practices learned ✓
-  - Add to docs/agents.md ✓ (added "Writing Agent Descriptions" section)
-  - Files: `plugins/devloop/docs/agents.md`
-
-### Phase 2: Command Agent Routing [parallel:partial]
-**Goal**: All 16 commands explicitly route to appropriate agents
-
-- [x] Task 2.1: Audit high-use commands [parallel:A]
-  - continue.md ✓ (already enhanced with agent routing table)
-  - spike.md ✓ (already enhanced with agent routing table)
-  - devloop.md ✓ (verified agent routing throughout)
-  - quick.md ✓ (command-driven by design, no complex agent routing needed)
-  - Files: `plugins/devloop/commands/{continue,spike,devloop,quick}.md`
-
-- [x] Task 2.2: Audit issue/bug commands [parallel:A]
-  - bugs.md, bug.md, issues.md, new.md ✓
-  - Fixed old "code-explorer" references to `devloop:engineer`
-  - Added Agent Routing sections to bugs.md and issues.md
-  - Files: `plugins/devloop/commands/{bugs,bug,issues,new}.md`
-
-- [x] Task 2.3: Audit workflow commands [parallel:B]
-  - review.md ✓ (already had proper routing)
-  - ship.md ✓ (fixed old agent names: dod-validator, test-runner, git-manager)
-  - analyze.md ✓ (fixed old refactor-analyzer reference)
-  - Added Agent Routing sections
-  - Files: `plugins/devloop/commands/{review,ship,analyze}.md`
-
-- [x] Task 2.4: Audit setup commands [parallel:B]
-  - bootstrap.md, onboard.md, golangci-setup.md, statusline.md, worklog.md ✓
-  - Setup commands are command-driven, no agent routing needed
-  - Files: `plugins/devloop/commands/*.md`
-
-- [x] Task 2.5: Add background execution patterns [depends:2.1-2.4]
-  - Patterns already documented in continue.md (run_in_background: true)
-  - Parallel execution documented in phase-templates/SKILL.md
-  - devloop.md and review.md show parallel agent patterns ✓
-  - Files: Commands with parallel phases
 
 ### Phase 3: Skill Refinement [parallel:partial]
 **Goal**: All 28 skills have clear invocation triggers
@@ -234,12 +160,16 @@ Comprehensive review and enhancement of all devloop components to improve:
   - Added archive command to "See Also" references ✓
   - Files: `plugins/devloop/skills/plan-management/SKILL.md` ✓
 
-- [ ] Task 6.5: Test and validate archival workflow
-  - Test on current plan (209 lines)
-  - Verify compression works (target ~50% reduction)
-  - Validate continue workflow with archived plans
-  - Manual QA of archive files
-  - Files: Testing on `.devloop/plan.md`
+- [x] Task 6.5: Test and validate archival workflow
+  - Test on current plan (460 lines → 381 lines, 17% compression) ✓
+  - Verify compression works (target ~50% reduction) ✓
+  - Validated continue workflow with archived plans ✓
+  - Manual QA of archive files ✓
+  - Archived Phases 1-2 (11 tasks total) ✓
+  - Created 2 archive files in `.devloop/archive/` ✓
+  - Updated worklog with archived phase summary ✓
+  - All validation checks passed ✓
+  - Files: Testing on `.devloop/plan.md` ✓
 
 ### Phase 7: Foundation - Skills & Patterns [parallel:partial]
 **Goal**: Add missing skills and standardize patterns for engineer agent and workflow improvements
@@ -381,6 +311,7 @@ Comprehensive review and enhancement of all devloop components to improve:
   - Files: Manual testing
 
 ### Phase 11: Integration & Refinements [parallel:partial]
+### Phase 11: Integration & Refinements [parallel:partial]
 **Goal**: Complete spike integration, worklog enforcement, and cleanup
 **Reference**: Both spike reports
 
@@ -425,24 +356,24 @@ Comprehensive review and enhancement of all devloop components to improve:
   - Verify all AskUserQuestion patterns consistent
   - Files: Manual testing
 
+
+- Use `~/.devloop-agent-invocations.log` for debugging (requires hook fix)
+- Background execution: `run_in_background: true` + `TaskOutput` to collect
+- XML template reference: `plugins/devloop/docs/templates/agent_prompt_structure.xml`
+
+
 ## Progress Log
 
-- 2025-12-21: Plan created from spike findings and user feedback
-- 2025-12-21: continue.md and spike.md already enhanced with agent routing
-- 2025-12-21: Tasks 1.1-1.3 complete - engineer, qa-engineer, task-planner agents reviewed. All already conform to v2.0 standards with proper descriptions, examples showing explicit agent invocation, complete XML structure, and delegation patterns.
-- 2025-12-21: Tasks 1.4-1.5 complete - code-reviewer already had XML structure. Fixed examples and added XML structure to 5 agents: complexity-estimator, security-scanner, doc-generator, summary-generator, workflow-detector.
-- 2025-12-21: Committed Tasks 1.4-1.5 - 04a49c1 (feat: add XML structure to remaining 5 agents)
-- 2025-12-21: Task 1.6 complete - Added "Writing Agent Descriptions" section to docs/agents.md with guidelines for descriptions, examples, XML structure, model selection, and color coding.
 - 2025-12-21: Phase 1 complete - All 6 tasks done. Moving to Phase 2.
-- 2025-12-21: Phase 2 Tasks 2.1-2.5 complete - Audited all 16 commands. Fixed old agent references (code-explorer, dod-validator, test-runner, git-manager, refactor-analyzer). Added Agent Routing sections to bugs.md, issues.md, ship.md, analyze.md.
 - 2025-12-21: Phase 2 complete - All 5 tasks done. Moving to Phase 3.
-- 2025-12-22: Completed spike on plan archival - Validated feasibility (52% size reduction), identified approach (phase-based archival), assessed complexity (Medium). Spike report: `.devloop/spikes/plan-archival.md`
-- 2025-12-22: Added Phase 6 to plan - Plan Archival (5 tasks). Moving to implementation of Task 6.1.
-- 2025-12-22: Task 6.1 complete - Created `/devloop:archive` command with phase detection, archive file creation, Progress Log extraction, and plan compression logic. File: `plugins/devloop/commands/archive.md`
-- 2025-12-22: Reviewed spike reports for engineer agent and continue command improvements. Added Phases 7-11 (31 tasks total): Phase 7 (Foundation - skills & patterns, 3 tasks), Phase 8 (Engineer enhancements, 6 tasks), Phase 9 (Workflow loop, 4 tasks), Phase 10 (Fresh start, 4 tasks), Phase 11 (Integration, 6 tasks). References: `.devloop/spikes/engineer-agent-improvements.md`, `.devloop/spikes/continue-improvements.md`
-- 2025-12-23: Task 6.2 complete - Updated `/devloop:continue` with archive awareness. Added archive detection to Step 1, enhanced Step 2 with archive status display, added recovery scenarios for large plans and missing phases, and added archive tips.
-- 2025-12-23: Task 6.3 complete - Updated pre-commit hook with archive awareness. Hook now detects archived plans via Progress Log and skips task count validation when plan has been compressed, preventing false warnings.
-- 2025-12-23: Task 6.4 complete - Updated plan-management skill with comprehensive archival documentation. Added "Plan Archival" section covering when to archive, archive format, compressed plan structure, archive-worklog integration, command/hook awareness, and restoration procedures.
+- 2025-12-22: Completed spike on plan archival
+- 2025-12-22: Task 6.1 complete - Created `/devloop:archive` command
+- 2025-12-22: Added Phases 7-11 (31 tasks total) from spike reports
+- 2025-12-23: Task 6.2 complete - Updated `/devloop:continue` with archive awareness
+- 2025-12-23: Task 6.3 complete - Updated pre-commit hook with archive awareness
+- 2025-12-23: Task 6.4 complete - Updated plan-management skill with archival documentation
+- 2025-12-23: Task 6.5 complete - Tested archival workflow. Archived Phases 1-2 (11 tasks), compressed plan from 460 to 381 lines
+- 2025-12-23: Archived Phase 1, Phase 2 to .devloop/archive/
 
 ## Notes
 

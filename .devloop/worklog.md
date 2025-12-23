@@ -2,7 +2,38 @@
 
 **Project**: cc-plugins
 **Reconstructed From**: Git history (30 days)
-**Last Updated**: 2025-12-18
+**Last Updated**: 2025-12-23
+
+---
+
+## 2025-12-23
+
+### Component Polish v2.1 - Phases 1-2 Complete (Archived)
+
+**Phase 1: Agent Enhancement** - Enhanced all 9 devloop agents with optimal descriptions, XML structure, and examples.
+
+**Tasks Completed**:
+- Task 1.1: Reviewed engineer.md - agent description, examples, XML structure
+- Task 1.2: Reviewed qa-engineer.md - triggers, examples, XML structure
+- Task 1.3: Reviewed task-planner.md - planning/requirements/DoD triggers
+- Task 1.4: Reviewed code-reviewer.md - review/audit task triggers
+- Task 1.5: Reviewed 5 remaining agents (complexity-estimator, security-scanner, doc-generator, summary-generator, workflow-detector)
+- Task 1.6: Created agent description guidelines in docs/agents.md
+
+**Phase 2: Command Agent Routing** - Updated all 16 commands to explicitly route to appropriate agents.
+
+**Tasks Completed**:
+- Task 2.1: Audited high-use commands (continue, spike, devloop, quick)
+- Task 2.2: Audited issue/bug commands (bugs, bug, issues, new) - fixed old agent references
+- Task 2.3: Audited workflow commands (review, ship, analyze) - added routing sections
+- Task 2.4: Audited setup commands (bootstrap, onboard, golangci-setup, statusline, worklog)
+- Task 2.5: Added background execution patterns
+
+**Commits**: `04a49c1`, `802c349` (and related commits from Phase 1-2)
+
+**Archived Plans**:
+- `.devloop/archive/component-polish-v2.1_phase_1_20251223_080237.md`
+- `.devloop/archive/component-polish-v2.1_phase_2_20251223_080253.md`
 
 ---
 
