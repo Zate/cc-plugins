@@ -765,6 +765,320 @@ Step 5b: Check Completion ← YOU ARE HERE
 
 ---
 
+## Step 5c: Context Management
+
+**CRITICAL**: This step runs after Step 5b to detect context staleness and prevent running with overloaded context.
+
+**Reference**: `Skill: workflow-loop` - Context health and recovery patterns
+
+### When to Check
+
+Check context health after:
+- Each task completion (Step 5a checkpoint)
+- Before spawning parallel agents (Step 6)
+- After any agent spawns background tasks
+- At session start (if resuming from previous session)
+
+### Session Metrics to Track
+
+Track these throughout the session (in-memory counters, not persisted):
+
+```bash
+# Initialize at session start
+session_start_time=$(date +%s)
+tasks_completed=0
+agents_spawned=0
+background_agents=0
+
+# Update after each checkpoint
+tasks_completed=$((tasks_completed + 1))
+agents_spawned=$((agents_spawned + 1))
+session_duration=$((current_time - session_start_time))
+
+# Calculate plan size
+plan_lines=$(wc -l < .devloop/plan.md)
+
+# Estimate token usage (rough)
+# ~500 tokens per task completed (prompts + responses)
+# ~2000 tokens per agent spawn (context + output)
+# Plan file contributes ~1 token per 4 characters
+estimated_tokens=$((tasks_completed * 500 + agents_spawned * 2000))
+```
+
+### Staleness Thresholds
+
+| Metric | Threshold | Action | Severity |
+|--------|-----------|--------|----------|
+| **Tasks completed** | 10+ tasks | Suggest fresh start | Warning |
+| **Agents spawned** | 15+ agents | Context getting heavy | Warning |
+| **Session duration** | 2+ hours | Conversation likely stale | Warning |
+| **Plan size** | 500+ lines | Suggest `/devloop:archive` | Info |
+| **Estimated tokens** | 150k+ tokens | Context nearly full | Critical |
+| **Background agents** | 5+ active | Too many parallel tasks | Warning |
+
+**Severity levels**:
+- **Info**: Informational, optional action
+- **Warning**: Recommended action, workflow continues
+- **Critical**: Strongly recommended action, risk of degraded performance
+
+### Detection Logic
+
+After each checkpoint, check thresholds:
+
+```bash
+# Check thresholds
+warnings=()
+critical=false
+
+if [ $tasks_completed -ge 10 ]; then
+  warnings+=("10+ tasks completed - context may be stale")
+fi
+
+if [ $agents_spawned -ge 15 ]; then
+  warnings+=("15+ agents spawned - context heavy")
+fi
+
+if [ $session_duration -ge 7200 ]; then  # 2 hours in seconds
+  warnings+=("Session running 2+ hours - conversation stale")
+fi
+
+if [ $plan_lines -ge 500 ]; then
+  warnings+=("Plan exceeds 500 lines - consider archiving")
+fi
+
+if [ $estimated_tokens -ge 150000 ]; then
+  warnings+=("Estimated 150k+ tokens - context nearly full")
+  critical=true
+fi
+
+if [ $background_agents -ge 5 ]; then
+  warnings+=("5+ background agents - too many parallel tasks")
+fi
+```
+
+### Warning Presentation
+
+**If warnings exist BUT not critical**:
+
+Present advisory warning in checkpoint response:
+
+```markdown
+⚠️ **Context Health Warning**
+
+The following metrics suggest a fresh start may improve performance:
+- {warning 1}
+- {warning 2}
+
+**Recommendations**:
+- Consider `/devloop:fresh` to preserve state and start clean session (Task 8.1 - future)
+- Use `/devloop:archive` to compress plan if large
+- Continue anyway if close to completion
+
+Would you like to continue or take action?
+```
+
+**If CRITICAL threshold exceeded**:
+
+Present critical warning with stronger recommendation:
+
+```markdown
+🛑 **Context Critical**
+
+Context is nearly exhausted:
+- Estimated 150k+ tokens in conversation
+- Risk of degraded performance or incomplete responses
+
+**Recommended Actions** (choose one):
+1. **Fresh start (Recommended)**: Run `/devloop:fresh` to save state and clear context (Task 8.1 - future)
+2. **Archive large plan**: Use `/devloop:archive` to compress if plan > 500 lines
+3. **Continue anyway**: Acknowledge risk, proceed with current context
+
+What would you like to do?
+```
+
+### Refresh Decision Tree
+
+```
+Context check triggered
+    ↓
+Are any thresholds exceeded?
+    ↓
+  NO → Continue normally
+    ↓
+  YES → Check severity
+        ↓
+      Info/Warning → Present advisory, offer actions
+        ↓
+      Critical → Present strong recommendation
+            ↓
+          User chooses:
+            ↓
+          Fresh start → Save state, recommend /clear + /devloop:continue
+            ↓
+          Archive → Launch /devloop:archive
+            ↓
+          Continue → Acknowledge risk, proceed
+```
+
+### Refresh Suggestions by Threshold
+
+| Threshold Exceeded | Primary Suggestion | Alternative |
+|-------------------|-------------------|-------------|
+| Tasks completed (10+) | Fresh start | Archive + continue |
+| Agents spawned (15+) | Fresh start | Review parallel tasks |
+| Session duration (2h+) | Fresh start | Take break, resume |
+| Plan size (500+ lines) | Archive plan | Continue (if close) |
+| Estimated tokens (150k+) | **Fresh start (required)** | None - critical |
+| Background agents (5+) | Wait for completion | Kill background tasks |
+
+### Background Agent Best Practices
+
+**When spawning background agents**:
+
+1. **Use sparingly**: Max 3-4 background agents at once
+2. **Track count**: Increment `background_agents` counter on spawn
+3. **Poll periodically**: Use `TaskOutput(block=false)` to check status
+4. **Block when idle**: Use `TaskOutput(block=true)` only when out of other work
+5. **Decrement on completion**: When agent finishes, reduce counter
+
+**Pattern for background execution**:
+
+```bash
+# Before spawning
+if [ $background_agents -ge 5 ]; then
+  # Too many - wait for some to complete
+  echo "Waiting for background tasks to complete..."
+  TaskOutput(block=true)  # Block until one finishes
+  background_agents=$((background_agents - 1))
+fi
+
+# Spawn background agent
+Task:
+  subagent_type: devloop:engineer
+  description: "Implement feature A"
+  run_in_background: true
+
+background_agents=$((background_agents + 1))
+
+# Later: Poll for results
+while [ $background_agents -gt 0 ]; do
+  result=$(TaskOutput(block=false))
+  if [ -n "$result" ]; then
+    # Agent completed
+    background_agents=$((background_agents - 1))
+    # Process result
+  fi
+  # Continue with other work
+done
+```
+
+**When to use background agents**:
+- Parallel tasks with `[parallel:X]` markers
+- Independent explorers analyzing different areas
+- Test generators running while implementing
+- Read-only operations that don't need immediate results
+
+**When NOT to use background agents**:
+- User interaction required (AskUserQuestion doesn't work in background)
+- Tasks with dependencies on each other
+- Critical path work that blocks other tasks
+- When context is already heavy (see thresholds above)
+
+### Integration with Workflow Loop
+
+**Step 5a (Checkpoint)** → Update session metrics → **Step 5c (Context Management)** → Check thresholds → Present warnings if needed → **Step 5b (Completion Detection)** → **Step 6 (Parallel Tasks)**
+
+**Flow**:
+
+```
+Task completes
+  ↓
+Step 5a: Checkpoint (verify, update plan, ask user)
+  ↓
+Update metrics: tasks_completed++, agents_spawned++
+  ↓
+Step 5c: Context Management (check thresholds)
+  ↓
+[If warnings] → Present advisory/critical warning
+  ↓
+[User chooses action or continues]
+  ↓
+Step 5b: Completion Detection (check if plan done)
+  ↓
+[If work remains] → Step 6: Parallel Tasks
+  ↓
+[Loop continues]
+```
+
+### State Persistence for Fresh Start
+
+When user chooses "Fresh start" from context warning:
+
+1. **Save session state** to `.devloop/session-state.json`:
+   ```json
+   {
+     "last_completed": "Task X.Y",
+     "next_pending": "Task X.Z",
+     "tasks_completed": 12,
+     "agents_spawned": 18,
+     "session_duration": 7890,
+     "reason": "Context heavy - fresh start recommended",
+     "timestamp": "2025-12-23T14:30:00Z"
+   }
+   ```
+
+2. **Display restart instructions**:
+   ```markdown
+   ## Session State Saved
+
+   Your progress has been saved to `.devloop/session-state.json`.
+
+   **To resume with fresh context**:
+   1. Run `/clear` to reset conversation context
+   2. Run `/devloop:continue` to resume from saved state
+
+   **Metrics at pause**:
+   - Tasks completed: {tasks_completed}
+   - Agents spawned: {agents_spawned}
+   - Session duration: {formatted_duration}
+
+   **Next task**: Task {next_pending}
+   ```
+
+3. **END workflow** (user must manually restart)
+
+### Edge Cases
+
+| Scenario | Detection | Action |
+|----------|-----------|--------|
+| **Session just started** | `tasks_completed == 0` | Skip context check |
+| **Plan already archived** | Plan < 200 lines | Skip plan size warning |
+| **Single task remaining** | `pending_tasks == 1` | Skip fresh start suggestion (finish it) |
+| **Background agents stuck** | Agent running > 10 min | Offer to kill/wait |
+| **Token estimate wrong** | Manual override needed | Use actual conversation length if available |
+
+### Testing Context Management
+
+**Simulate thresholds** (for testing):
+
+```bash
+# Force warnings
+tasks_completed=12
+agents_spawned=20
+session_duration=10000
+
+# Check logic
+# Should trigger: tasks, agents, duration warnings
+```
+
+**Expected behavior**:
+- Warning presented after checkpoint
+- User offered clear actions
+- Workflow continues or saves state
+- No blocking unless critical threshold
+
+---
+
 ## Step 6: Handle Parallel Tasks
 
 If next tasks have `[parallel:X]` markers:

@@ -1,9 +1,9 @@
 # Devloop Plan: Component Polish v2.1
 
 **Created**: 2025-12-21
-**Updated**: 2025-12-23 16:30
+**Updated**: 2025-12-23 16:45
 **Status**: Active
-**Current Phase**: Phase 7 - Workflow Loop Core Improvements (2/4 complete)
+**Current Phase**: Phase 7 - Workflow Loop Core Improvements (3/4 complete)
 
 ## Overview
 
@@ -255,12 +255,16 @@ Comprehensive review and enhancement of all devloop components to improve:
   - Updated recovery scenarios table ✓
   - Files: `plugins/devloop/commands/continue.md:496-766` ✓
 
-- [ ] Task 7.3: Add context management to continue.md [depends:7.1]
-  - Context staleness detection thresholds
-  - Track session metrics (tasks, agents, duration)
-  - Suggest refresh when thresholds exceeded
-  - Document background agent pattern
-  - Files: `plugins/devloop/commands/continue.md`
+- [x] Task 7.3: Add context management to continue.md [depends:7.1]
+  - Added Step 5c: Context Management (313 lines) ✓
+  - Session metrics tracking (6 metrics: tasks/agents/duration/plan-size/tokens/background) ✓
+  - Staleness thresholds with severity levels (info/warning/critical) ✓
+  - Detection logic and warning presentation (advisory vs critical) ✓
+  - Refresh decision tree and suggestions by threshold ✓
+  - Background agent best practices (when to use, polling patterns, max limits) ✓
+  - Integration with workflow loop and state persistence ✓
+  - Edge cases and testing guidance ✓
+  - Files: `plugins/devloop/commands/continue.md:768-1080` ✓
 
 - [ ] Task 7.4: Standardize checkpoint questions in continue.md [depends:7.1]
   - Apply AskUserQuestion standards from Task 5.3
@@ -414,6 +418,7 @@ Comprehensive review and enhancement of all devloop components to improve:
 - 2025-12-23: Tasks 6.5-6.6 complete (parallel execution) - Enhanced delegation (all 9 agents with criteria and examples) and workflow awareness (parallel execution, plan sync, task completion reporting). Phase 6 COMPLETE!
 - 2025-12-23: Task 7.1 complete - Added mandatory post-task checkpoint to continue.md. Comprehensive checkpoint sequence with success/partial/failure paths, plan marker updates, session metrics tracking, and fresh start integration. Phase 7 started!
 - 2025-12-23: Task 7.2 complete - Added loop completion detection to continue.md. Step 5b with task counting, dependency checking, 8 completion option handlers, and plan status updates to "Review"/"Complete".
+- 2025-12-23: Task 7.3 complete - Added context management to continue.md. Step 5c with 6 session metrics, staleness thresholds, refresh decision tree, and background agent best practices (313 lines).
 
 ## Notes
 
