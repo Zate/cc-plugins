@@ -1,3 +1,8 @@
+---
+name: project-bootstrap
+description: Best practices for bootstrapping new projects with CLAUDE.md and preparing them for devloop workflows. Use when starting new projects, converting documentation artifacts (PRD, specs) into project context, or setting up CLAUDE.md for the first time.
+---
+
 # Project Bootstrap Skill
 
 Best practices for bootstrapping new projects with CLAUDE.md and preparing them for devloop workflows.

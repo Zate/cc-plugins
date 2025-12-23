@@ -1,9 +1,9 @@
 # Devloop Plan: Component Polish v2.1
 
 **Created**: 2025-12-21
-**Updated**: 2025-12-23 09:30
+**Updated**: 2025-12-23 09:45
 **Status**: Active
-**Current Phase**: Phase 3 - Skill Refinement (4/6 complete)
+**Current Phase**: Phase 3 - Skill Refinement (5/6 complete)
 
 ## Overview
 
@@ -78,10 +78,12 @@ Comprehensive review and enhancement of all devloop components to improve:
   - All 3 skills already compliant, no changes needed ✓
   - Files: `plugins/devloop/skills/*/SKILL.md` ✓
 
-- [ ] Task 3.5: Audit remaining skills [depends:3.1-3.4]
-  - tool-usage-policy, model-selection-guide, issue-tracking, etc.
-  - Apply same checks
-  - Files: All remaining skills
+- [x] Task 3.5: Audit remaining skills [depends:3.1-3.4]
+  - Audited 13 skills: tool-usage-policy, model-selection-guide, issue-tracking, requirements-patterns, git-workflows, file-locations, project-context, project-bootstrap, atomic-commits, version-management, task-checkpoint, refactoring-analysis, language-patterns-base ✓
+  - 9 skills already compliant ✓
+  - 4 skills updated with frontmatter (project-bootstrap, atomic-commits, version-management, task-checkpoint) ✓
+  - Apply same checks ✓
+  - Files: All remaining skills ✓
 
 - [ ] Task 3.6: Update skill INDEX.md [depends:3.5]
   - Ensure index reflects improved descriptions
@@ -382,6 +384,7 @@ Comprehensive review and enhancement of all devloop components to improve:
 - 2025-12-23: Task 3.2 complete - Audited 4 workflow skills. Added "When to Use" section to plan-management skill
 - 2025-12-23: Task 3.3 complete - Audited 4 quality skills. All already compliant (testing-strategies, security-checklist, deployment-readiness, complexity-estimation)
 - 2025-12-23: Task 3.4 complete - Audited 3 design skills. All already compliant (architecture-patterns, api-design, database-patterns)
+- 2025-12-23: Task 3.5 complete - Audited remaining 13 skills. Added frontmatter to 4 skills (project-bootstrap, atomic-commits, version-management, task-checkpoint). 9 skills already compliant
 
 ## Notes
 

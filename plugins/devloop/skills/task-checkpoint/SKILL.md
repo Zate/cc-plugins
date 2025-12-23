@@ -1,3 +1,8 @@
+---
+name: task-checkpoint
+description: Complete checklist and verification for task completion in devloop workflows. Use after completing implementation, before marking tasks complete, when /devloop:continue finishes a task, or before moving to the next task in a phase.
+---
+
 # Task Checkpoint Skill
 
 Complete checklist and verification for task completion in devloop workflows.

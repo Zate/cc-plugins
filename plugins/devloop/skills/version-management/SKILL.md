@@ -1,3 +1,8 @@
+---
+name: version-management
+description: Semantic versioning, CHANGELOG generation, and release management for devloop projects. Use when completing phases, shipping features, determining version bumps, updating CHANGELOG.md, or creating release tags.
+---
+
 # Version Management Skill
 
 Semantic versioning, CHANGELOG generation, and release management for devloop projects.

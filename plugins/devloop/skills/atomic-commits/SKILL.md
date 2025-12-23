@@ -1,3 +1,8 @@
+---
+name: atomic-commits
+description: Guidance for creating reviewable, atomic commits that capture logical units of work. Use when deciding whether to commit after completing a task, determining if multiple tasks should be grouped, or planning commit structure for a feature.
+---
+
 # Atomic Commits Skill
 
 Guidance for creating reviewable, atomic commits that capture logical units of work.
