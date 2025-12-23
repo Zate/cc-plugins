@@ -1,9 +1,9 @@
 # Devloop Plan: Component Polish v2.1
 
 **Created**: 2025-12-21
-**Updated**: 2025-12-23 10:45
+**Updated**: 2025-12-23 10:50
 **Status**: Active
-**Current Phase**: Phase 4 - Hook Integration (3/3 complete) ✓
+**Current Phase**: Phase 5 - Foundation (was Phase 7) - Ready to start
 
 ## Overview
 
@@ -21,7 +21,7 @@ Comprehensive review and enhancement of all devloop components to improve:
 
 ## Component Inventory
 
-| Type | Count | Review Focus (Phases 1-6) | Enhancement Focus (Phases 7-11) |
+| Type | Count | Review Focus (Phases 1-4, 6) | Enhancement Focus (Phases 5-9) |
 |------|-------|---------------------------|----------------------------------|
 | Agents | 9 | Descriptions, XML structure, delegation | Engineer capabilities, mode handling, output formats |
 | Commands | 16 | Agent routing, Task invocation | Workflow loop, checkpoints, fresh start |
@@ -39,7 +39,7 @@ Comprehensive review and enhancement of all devloop components to improve:
 5. ✓ XML prompt structure consistent across all agents
 6. Hook logging for debugging (Phase 4 pending)
 
-**Phases 7-11 (Planned):**
+**Phases 5-9 (Planned):**
 1. Engineer agent has missing skills (complexity-estimation, project-context, etc.)
 2. Workflow loop enforces mandatory checkpoints
 3. Fresh start mechanism enables context clearing with state preservation
@@ -116,29 +116,6 @@ Comprehensive review and enhancement of all devloop components to improve:
   - Recommendation: Remove hook OR simplify to high-value transitions ✓
   - Files: `plugins/devloop/hooks/hooks.json` ✓
 
-### Phase 5: Documentation & Testing [parallel:none]
-**Goal**: Document changes and validate
-
-- [ ] Task 5.1: Update README.md
-  - Document agent invocation patterns
-  - Add background execution examples
-  - Files: `plugins/devloop/README.md`
-
-- [ ] Task 5.2: Update docs/agents.md
-  - Comprehensive agent reference
-  - Invocation examples
-  - Files: `plugins/devloop/docs/agents.md`
-
-- [ ] Task 5.3: Create testing checklist
-  - Manual validation steps
-  - Expected agent invocations per command
-  - Files: `plugins/devloop/docs/testing.md`
-
-- [ ] Task 5.4: Version bump to 2.1.0
-  - Update plugin.json
-  - Update changelog
-  - Files: `plugins/devloop/.claude-plugin/plugin.json`
-
 ### Phase 6: Plan Archival [parallel:none]
 **Goal**: Implement plan archival to compress large plans and integrate Progress Log with worklog
 **Reference**: `.devloop/spikes/plan-archival.md` (Spike complete)
@@ -186,11 +163,11 @@ Comprehensive review and enhancement of all devloop components to improve:
   - All validation checks passed ✓
   - Files: Testing on `.devloop/plan.md` ✓
 
-### Phase 7: Foundation - Skills & Patterns [parallel:partial]
+### Phase 5: Foundation - Skills & Patterns [parallel:partial]
 **Goal**: Add missing skills and standardize patterns for engineer agent and workflow improvements
 **Reference**: `.devloop/spikes/engineer-agent-improvements.md`, `.devloop/spikes/continue-improvements.md`
 
-- [ ] Task 7.1: Add missing skills to engineer.md [parallel:A]
+- [ ] Task 5.1: Add missing skills to engineer.md [parallel:A]
   - Add complexity-estimation skill
   - Add project-context skill
   - Add task-checkpoint skill
@@ -200,7 +177,7 @@ Comprehensive review and enhancement of all devloop components to improve:
   - Remove or clarify refactoring-analysis conflict
   - Files: `plugins/devloop/agents/engineer.md`
 
-- [ ] Task 7.2: Create workflow-loop skill [parallel:A]
+- [ ] Task 5.2: Create workflow-loop skill [parallel:A]
   - Document standard workflow loop pattern
   - Add checkpoint requirements
   - Define state transitions
@@ -208,7 +185,7 @@ Comprehensive review and enhancement of all devloop components to improve:
   - Add context management thresholds
   - Files: `plugins/devloop/skills/workflow-loop/SKILL.md`
 
-- [ ] Task 7.3: Create AskUserQuestion standards document [parallel:B]
+- [ ] Task 5.3: Create AskUserQuestion standards document [parallel:B]
   - When to ALWAYS ask vs NEVER ask
   - Question batching patterns
   - Standard checkpoint question format
@@ -216,52 +193,52 @@ Comprehensive review and enhancement of all devloop components to improve:
   - Token-conscious guidelines
   - Files: `plugins/devloop/docs/ask-user-question-standards.md`
 
-### Phase 8: Engineer Agent Enhancements [parallel:partial]
+### Phase 6: Engineer Agent Enhancements [parallel:partial]
 **Goal**: Improve engineer agent prompts, modes, and capabilities
 **Reference**: `.devloop/spikes/engineer-agent-improvements.md`
 
-- [ ] Task 8.1: Add core prompt enhancements to engineer.md [parallel:A]
+- [ ] Task 6.1: Add core prompt enhancements to engineer.md [parallel:A]
   - Add model escalation guidance (when to suggest opus)
   - Add anti-pattern constraints section
   - Add limitations/self-awareness section
   - Files: `plugins/devloop/agents/engineer.md`
 
-- [ ] Task 8.2: Improve skill integration in engineer.md [parallel:A]
+- [ ] Task 6.2: Improve skill integration in engineer.md [parallel:A]
   - Add skill workflow section (which skills in which modes)
   - Document skill invocation order per mode
   - Add examples of skill combinations
   - Files: `plugins/devloop/agents/engineer.md`
 
-- [ ] Task 8.3: Enhance mode handling in engineer.md [parallel:B]
+- [ ] Task 6.3: Enhance mode handling in engineer.md [parallel:B]
   - Add complexity-aware mode selection
   - Add cross-mode task awareness
   - Document multi-mode workflows
   - Files: `plugins/devloop/agents/engineer.md`
 
-- [ ] Task 8.4: Add output format standards to engineer.md [parallel:B]
+- [ ] Task 6.4: Add output format standards to engineer.md [parallel:B]
   - Structured exploration output format (tables, flow, components)
   - Token-conscious output guidelines
   - Consistent file reference format (file:line)
   - Files: `plugins/devloop/agents/engineer.md`
 
-- [ ] Task 8.5: Enhance delegation in engineer.md [parallel:C]
+- [ ] Task 6.5: Enhance delegation in engineer.md [parallel:C]
   - Expand delegation table (all 9 agents)
   - Add when-to-delegate criteria
   - Document delegation vs direct execution
   - Files: `plugins/devloop/agents/engineer.md`
 
-- [ ] Task 8.6: Add workflow awareness to engineer.md [parallel:C]
+- [ ] Task 6.6: Add workflow awareness to engineer.md [parallel:C]
   - Parallel execution awareness
   - Plan synchronization checkpoint
   - Task completion status reporting
   - Files: `plugins/devloop/agents/engineer.md`
 
-### Phase 9: Workflow Loop Core Improvements [parallel:none]
+### Phase 7: Workflow Loop Core Improvements [parallel:none]
 **Goal**: Fix workflow loop with mandatory checkpoints and completion detection
 **Reference**: `.devloop/spikes/continue-improvements.md`
-**Dependencies**: Phase 7 must be complete (workflow-loop skill, AskUserQuestion standards)
+**Dependencies**: Phase 5 must be complete (workflow-loop skill, AskUserQuestion standards)
 
-- [ ] Task 9.1: Add mandatory post-task checkpoint to continue.md
+- [ ] Task 7.1: Add mandatory post-task checkpoint to continue.md
   - Add Step 5a: MANDATORY Post-Agent Checkpoint
   - Verify agent output (success/failure/partial)
   - Update plan markers ([ ] → [x] or [~])
@@ -270,33 +247,33 @@ Comprehensive review and enhancement of all devloop components to improve:
   - Handle error/partial completion
   - Files: `plugins/devloop/commands/continue.md`
 
-- [ ] Task 9.2: Add loop completion detection to continue.md [depends:9.1]
+- [ ] Task 7.2: Add loop completion detection to continue.md [depends:7.1]
   - Count remaining tasks after each checkpoint
   - Detect when all tasks complete
   - Present completion options (ship/review/add more/end)
   - Auto-update plan status to "Review"
   - Files: `plugins/devloop/commands/continue.md`
 
-- [ ] Task 9.3: Add context management to continue.md [depends:9.1]
+- [ ] Task 7.3: Add context management to continue.md [depends:7.1]
   - Context staleness detection thresholds
   - Track session metrics (tasks, agents, duration)
   - Suggest refresh when thresholds exceeded
   - Document background agent pattern
   - Files: `plugins/devloop/commands/continue.md`
 
-- [ ] Task 9.4: Standardize checkpoint questions in continue.md [depends:9.1]
-  - Apply AskUserQuestion standards from Task 7.3
+- [ ] Task 7.4: Standardize checkpoint questions in continue.md [depends:7.1]
+  - Apply AskUserQuestion standards from Task 5.3
   - Use standard checkpoint question format
   - Use standard error question format
   - Batch related questions
   - Files: `plugins/devloop/commands/continue.md`
 
-### Phase 10: Fresh Start Mechanism [parallel:partial]
+### Phase 8: Fresh Start Mechanism [parallel:partial]
 **Goal**: Enable context clearing with state preservation
 **Reference**: `.devloop/spikes/continue-improvements.md`
-**Dependencies**: Phase 9 Task 9.1 (checkpoint must exist first)
+**Dependencies**: Phase 7 Task 7.1 (checkpoint must exist first)
 
-- [ ] Task 10.1: Create /devloop:fresh command [parallel:A]
+- [ ] Task 8.1: Create /devloop:fresh command [parallel:A]
   - Gather current plan state
   - Identify last completed and next pending task
   - Generate quick summary
@@ -304,66 +281,65 @@ Comprehensive review and enhancement of all devloop components to improve:
   - Present continuation instructions
   - Files: `plugins/devloop/commands/fresh.md`
 
-- [ ] Task 10.2: Add fresh start detection to session-start.sh [parallel:B]
+- [ ] Task 8.2: Add fresh start detection to session-start.sh [parallel:B]
   - Check for `.devloop/next-action.json` on startup
   - Parse saved state (with and without jq)
   - Display fresh start message with next task
   - Add "dismiss" option to clear state
   - Files: `plugins/devloop/hooks/session-start.sh`
 
-- [ ] Task 10.3: Add state file cleanup to continue.md [depends:10.1,10.2]
+- [ ] Task 8.3: Add state file cleanup to continue.md [depends:8.1,8.2]
   - Read `.devloop/next-action.json` at start if exists
   - Use saved state to identify next task
   - Delete state file after reading
   - Document fresh start workflow
   - Files: `plugins/devloop/commands/continue.md`
 
-- [ ] Task 10.4: Test fresh start workflow [depends:10.1,10.2,10.3]
+- [ ] Task 8.4: Test fresh start workflow [depends:8.1,8.2,8.3]
   - Test /devloop:fresh saves state correctly
   - Test SessionStart detects state and displays message
   - Test /devloop:continue reads and clears state
   - Test dismiss clears state
   - Files: Manual testing
 
-### Phase 11: Integration & Refinements [parallel:partial]
-### Phase 11: Integration & Refinements [parallel:partial]
+### Phase 9: Integration & Refinements [parallel:partial]
 **Goal**: Complete spike integration, worklog enforcement, and cleanup
 **Reference**: Both spike reports
 
-- [ ] Task 11.1: Add Phase 5b to spike.md for plan application [parallel:A]
+- [ ] Task 9.1: Add Phase 5b to spike.md for plan application [parallel:A]
   - Add plan update application step
   - Offer apply+start, apply-only, review options
   - Show diff-style preview of changes
   - Auto-invoke /devloop:continue if "apply+start"
   - Files: `plugins/devloop/commands/spike.md`
 
-- [ ] Task 11.2: Enhance task-checkpoint skill [parallel:A]
+- [ ] Task 9.2: Enhance task-checkpoint skill [parallel:A]
   - Add mandatory worklog sync (every task completion)
   - Add worklog reconciliation (at session end)
   - Document worklog format for committed vs pending tasks
   - Files: `plugins/devloop/skills/task-checkpoint/SKILL.md`
 
-- [ ] Task 11.3: Clean up SubagentStop hook [parallel:B]
+- [ ] Task 9.3: Clean up SubagentStop hook [parallel:B]
   - Option 1: Remove hook (recommended - adds noise)
   - Option 2: Make it output structured recommendation
   - Document decision in hooks.json
   - Files: `plugins/devloop/hooks/hooks.json`
 
-- [ ] Task 11.4: Update remaining commands with standards [parallel:C]
+- [ ] Task 9.4: Update remaining commands with standards [parallel:C]
   - Apply AskUserQuestion standards to devloop.md
   - Apply AskUserQuestion standards to review.md
   - Apply AskUserQuestion standards to ship.md
   - Ensure checkpoint pattern consistency
   - Files: `plugins/devloop/commands/{devloop,review,ship}.md`
 
-- [ ] Task 11.5: Update documentation [depends:11.1-11.4]
+- [ ] Task 9.5: Update documentation [depends:9.1-9.4]
   - Document workflow loop in README.md
   - Document fresh start feature in README.md
   - Add engineer agent improvements to docs/agents.md
-  - Update CHANGELOG.md with all Phase 7-11 changes
+  - Update CHANGELOG.md with all Phase 5-9 changes
   - Files: `plugins/devloop/README.md`, `plugins/devloop/docs/agents.md`
 
-- [ ] Task 11.6: Integration testing [depends:11.5]
+- [ ] Task 9.6: Integration testing [depends:9.5]
   - Test complete workflow loop (plan → work → checkpoint → commit → continue)
   - Test fresh start full cycle
   - Test spike → plan application
@@ -371,6 +347,35 @@ Comprehensive review and enhancement of all devloop components to improve:
   - Verify all AskUserQuestion patterns consistent
   - Files: Manual testing
 
+### Phase 10: Documentation & Testing [parallel:none]
+**Goal**: Document all changes and finalize version
+**Note**: Moved to end - complete after all implementation work
+
+- [ ] Task 10.1: Update README.md
+  - Document agent invocation patterns
+  - Add background execution examples
+  - Document workflow loop and fresh start features
+  - Files: `plugins/devloop/README.md`
+
+- [ ] Task 10.2: Update docs/agents.md
+  - Comprehensive agent reference
+  - Invocation examples
+  - Updated capabilities from Phases 5-9
+  - Files: `plugins/devloop/docs/agents.md`
+
+- [ ] Task 10.3: Create testing checklist
+  - Manual validation steps
+  - Expected agent invocations per command
+  - Integration test scenarios
+  - Files: `plugins/devloop/docs/testing.md`
+
+- [ ] Task 10.4: Version bump to 2.1.0
+  - Update plugin.json
+  - Update CHANGELOG with all changes from v2.0.3
+  - Tag release
+  - Files: `plugins/devloop/.claude-plugin/plugin.json`
+
+## Notes
 
 - Use `~/.devloop-agent-invocations.log` for debugging (requires hook fix)
 - Background execution: `run_in_background: true` + `TaskOutput` to collect
