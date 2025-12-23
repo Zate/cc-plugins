@@ -1,9 +1,9 @@
 # Devloop Plan: Component Polish v2.1
 
 **Created**: 2025-12-21
-**Updated**: 2025-12-23 12:15
+**Updated**: 2025-12-23 14:45
 **Status**: Active
-**Current Phase**: Phase 6 - Engineer Agent Enhancements (was Phase 7) - Ready to start
+**Current Phase**: Phase 6 - Engineer Agent Enhancements - In Progress (2/6 tasks complete)
 
 ## Overview
 
@@ -195,17 +195,17 @@ Comprehensive review and enhancement of all devloop components to improve:
 **Goal**: Improve engineer agent prompts, modes, and capabilities
 **Reference**: `.devloop/spikes/engineer-agent-improvements.md`
 
-- [ ] Task 6.1: Add core prompt enhancements to engineer.md [parallel:A]
-  - Add model escalation guidance (when to suggest opus)
-  - Add anti-pattern constraints section
-  - Add limitations/self-awareness section
-  - Files: `plugins/devloop/agents/engineer.md`
+- [x] Task 6.1: Add core prompt enhancements to engineer.md [parallel:A]
+  - Add model escalation guidance (when to suggest opus) ✓
+  - Add anti-pattern constraints section ✓
+  - Add limitations/self-awareness section ✓
+  - Files: `plugins/devloop/agents/engineer.md` ✓
 
-- [ ] Task 6.2: Improve skill integration in engineer.md [parallel:A]
-  - Add skill workflow section (which skills in which modes)
-  - Document skill invocation order per mode
-  - Add examples of skill combinations
-  - Files: `plugins/devloop/agents/engineer.md`
+- [x] Task 6.2: Improve skill integration in engineer.md [parallel:A]
+  - Add skill workflow section (which skills in which modes) ✓
+  - Document skill invocation order per mode ✓
+  - Add examples of skill combinations ✓
+  - Files: `plugins/devloop/agents/engineer.md` ✓
 
 - [ ] Task 6.3: Enhance mode handling in engineer.md [parallel:B]
   - Add complexity-aware mode selection
@@ -404,6 +404,8 @@ Comprehensive review and enhancement of all devloop components to improve:
 - 2025-12-23: Task 5.1 complete - Added 6 missing skills to engineer.md (complexity-estimation, project-context, api-design, database-patterns, testing-strategies). Verified no conflicts with refactoring-analysis.
 - 2025-12-23: Task 5.2 complete - Created workflow-loop skill (668 lines). Documents checkpoint patterns, state transitions, error recovery, and context management.
 - 2025-12-23: Task 5.3 complete - Created AskUserQuestion standards document (1,008 lines). Covers when to ask/not ask, batching patterns, standard formats, and token efficiency. Phase 5 complete!
+- 2025-12-23: Task 6.1 complete - Added core prompt enhancements to engineer.md (model escalation, anti-pattern constraints, limitations/self-awareness). Phase 6 started!
+- 2025-12-23: Task 6.2 complete - Improved skill integration in engineer.md. Added mode-specific skill workflows with invocation order and examples for Explorer, Architect, Refactorer, and Git modes.
 
 ## Notes
 

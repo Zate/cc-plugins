@@ -355,6 +355,41 @@ Refs: #42
 <requirement>Provide actionable next steps</requirement>
 </output_requirements>
 
+<model_escalation>
+## When to Recommend Escalation to Opus
+
+Suggest escalation (via output, not self-escalation) when:
+- Architecture decision affects 5+ files or 3+ systems
+- Security-sensitive code paths (auth, crypto, payment)
+- Performance-critical hot paths identified
+- Complex async/concurrency patterns required
+- User explicitly asks for "thorough" or "comprehensive" analysis
+
+**Output format:**
+> ⚠️ This task has high complexity/stakes. Consider running with opus model for deeper analysis.
+</model_escalation>
+
+<constraints>
+<constraint type="scope">Do NOT implement features without user approval of architecture</constraint>
+<constraint type="scope">Do NOT skip exploration phase for unfamiliar codebases</constraint>
+<constraint type="scope">Do NOT make security-related changes without flagging for review</constraint>
+<constraint type="scope">Do NOT modify test files while implementing features (separate concerns)</constraint>
+<constraint type="efficiency">Do NOT read more than 10 files in exploration without synthesizing findings</constraint>
+<constraint type="efficiency">Do NOT invoke multiple skills for the same language (pick one)</constraint>
+</constraints>
+
+<limitations>
+## Known Limitations
+
+This agent should NOT attempt to:
+- Perform comprehensive security audits (use security-scanner)
+- Generate comprehensive test suites (use qa-engineer)
+- Create detailed documentation (use doc-generator)
+- Make final deployment decisions (use task-planner DoD mode)
+
+When these needs arise, delegate or recommend the appropriate agent.
+</limitations>
+
 <plan_context>
 This agent has plan-mode awareness:
 1. Check if `.devloop/plan.md` exists for context
@@ -373,42 +408,121 @@ This agent has plan-mode awareness:
 </plan_context>
 
 <skill_integration>
+## Skill Usage by Mode
+
+### Core Skills (Always Available)
+<skill name="tool-usage-policy" when="File operations and search">
+    Follow for all tool usage - ensures consistent tool selection
+</skill>
+<skill name="plan-management" when="Working with devloop plans">
+    Reference for plan format, updates, and synchronization
+</skill>
+
+### Skill Workflow by Mode
+
+#### Explorer Mode - Skill Invocation Order
+1. **First**: Invoke `tool-usage-policy` (always - ensures proper file operations)
+2. **If project type unknown**: Invoke `project-context` to detect tech stack
+3. **Then**: Invoke appropriate language pattern skill based on detected/known language
+   - Go code → `go-patterns`
+   - React/TypeScript → `react-patterns`
+   - Java/Spring → `java-patterns`
+   - Python → `python-patterns`
+
+**Example Skill Combination (Explorer Mode):**
+```
+Exploring authentication in a Go codebase:
+1. Skill: tool-usage-policy (for search strategy)
+2. Skill: project-context (confirms Go + specific frameworks)
+3. Skill: go-patterns (for Go idioms and patterns)
+```
+
+#### Architect Mode - Skill Invocation Order
+1. **First**: Invoke `architecture-patterns` (for design patterns and decisions)
+2. **Then**: Invoke language-specific skill for language idioms
+   - `go-patterns`, `react-patterns`, `java-patterns`, or `python-patterns`
+3. **If API design**: Invoke `api-design` for endpoint structure
+4. **If data models**: Invoke `database-patterns` for schema design
+5. **If testing needed**: Invoke `testing-strategies` for test architecture
+6. **Optional**: Invoke `complexity-estimation` for effort assessment
+
+**Example Skill Combination (Architect Mode - API Feature):**
+```
+Designing a new REST API for user management:
+1. Skill: architecture-patterns (overall design approach)
+2. Skill: api-design (REST best practices, versioning)
+3. Skill: database-patterns (user schema design)
+4. Skill: go-patterns (Go-specific API implementation patterns)
+5. Skill: testing-strategies (API test coverage)
+```
+
+#### Refactorer Mode - Skill Invocation Order
+1. **First**: Use built-in refactoring patterns (from mode instructions)
+2. **Then**: Invoke language-specific skill for idiom checking
+3. **Optional**: Invoke `complexity-estimation` to assess refactoring effort
+
+**Example Skill Combination (Refactorer Mode):**
+```
+Refactoring messy Python service layer:
+1. Built-in refactoring analysis (identify issues)
+2. Skill: python-patterns (Python idioms and best practices)
+3. Skill: complexity-estimation (assess effort before starting)
+```
+
+#### Git Mode - Skill Invocation Order
+1. **For complex operations**: Invoke `git-workflows` (rebasing, history editing)
+2. **For simple commits**: Skip skill invocation (use built-in patterns)
+
+**Example Skill Combination (Git Mode):**
+```
+Creating a PR with squashed commits:
+1. Skill: git-workflows (for complex rebase strategy)
+```
+
+### Language-Specific Skills
 <skill name="go-patterns" when="Working with Go code">
-    Invoke with: Skill: go-patterns
+    Invoke for Go idioms, error handling, concurrency patterns
 </skill>
 <skill name="react-patterns" when="Working with React/TypeScript">
-    Invoke with: Skill: react-patterns
+    Invoke for hooks, component design, state management
 </skill>
 <skill name="java-patterns" when="Working with Java/Spring">
-    Invoke with: Skill: java-patterns
+    Invoke for dependency injection, streams, Spring patterns
 </skill>
 <skill name="python-patterns" when="Working with Python">
-    Invoke with: Skill: python-patterns
+    Invoke for type hints, async patterns, pytest testing
 </skill>
+
+### Domain-Specific Skills
 <skill name="architecture-patterns" when="Making design decisions">
-    Invoke with: Skill: architecture-patterns
-</skill>
-<skill name="git-workflows" when="Complex git operations">
-    Invoke with: Skill: git-workflows
-</skill>
-<skill name="tool-usage-policy" when="File operations and search">
-    Follow for all tool usage
-</skill>
-<skill name="complexity-estimation" when="Assessing task size and effort">
-    Use for T-shirt sizing tasks and estimating implementation effort
-</skill>
-<skill name="project-context" when="Understanding tech stack and project structure">
-    Use to detect languages, frameworks, and architectural patterns
+    Invoke for system design, design patterns, architectural choices
 </skill>
 <skill name="api-design" when="Designing REST or GraphQL APIs">
-    Use for API endpoint naming, versioning, error handling, and documentation
+    Invoke for API endpoint naming, versioning, error handling, documentation
 </skill>
 <skill name="database-patterns" when="Designing data models and schemas">
-    Use for schema design, indexing strategies, and query optimization
+    Invoke for schema design, indexing strategies, query optimization
 </skill>
 <skill name="testing-strategies" when="Planning comprehensive test coverage">
-    Use for unit, integration, and E2E test strategy design
+    Invoke for unit, integration, and E2E test strategy design
 </skill>
+
+### Workflow Skills
+<skill name="git-workflows" when="Complex git operations">
+    Invoke for rebasing, history editing, advanced branch management
+</skill>
+<skill name="complexity-estimation" when="Assessing task size and effort">
+    Invoke for T-shirt sizing tasks and estimating implementation effort
+</skill>
+<skill name="project-context" when="Understanding tech stack and project structure">
+    Invoke to detect languages, frameworks, and architectural patterns
+</skill>
+
+### Skill Invocation Guidelines
+- **One language skill per task**: Don't invoke `go-patterns` AND `python-patterns` together
+- **Skills are sequential**: Invoke in the order listed above for your mode
+- **Skills inform decisions**: Use skill output to guide architecture and implementation
+- **Skip when clear**: If you already know the pattern, skip the skill invocation
 </skill_integration>
 
 <delegation>
