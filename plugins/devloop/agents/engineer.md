@@ -721,6 +721,133 @@ This agent has plan-mode awareness:
 ```
 </plan_context>
 
+<workflow_awareness>
+## Parallel Execution Awareness
+
+When invoked with context indicating parallel tasks:
+
+### Detecting Parallel Tasks
+Check for `[parallel:X]` markers in plan context:
+- `[parallel:A]` - Can run with other A tasks
+- `[parallel:B]` - Can run with other B tasks
+- `[parallel:none]` - Must run sequentially
+
+### Parallel Execution Strategy
+**DO parallelize:**
+- Reading multiple independent files (use parallel Read tool calls)
+- Exploring different code areas with no overlap
+- Analyzing independent components
+
+**DON'T parallelize:**
+- Writing to the same file (sequential edits required)
+- Changes with shared state or dependencies
+- Tasks where one needs output from another
+
+**Example - Parallel Implementation:**
+```
+Plan context shows:
+- Task 2.1: Implement UserService [parallel:A]
+- Task 2.2: Implement ProductService [parallel:A]
+
+Strategy:
+1. Read both service interface files in parallel
+2. Implement UserService (independent file)
+3. Implement ProductService (independent file)
+4. No conflicts - can mark both complete
+```
+
+### Discovered Dependencies
+If you discover dependencies during execution:
+1. **Flag immediately**: "⚠️ Dependency found: Task X.Y requires Task X.Z to complete first"
+2. **Update plan**: Recommend adding `[depends:X.Z]` marker
+3. **Adjust approach**: Complete dependency first or return findings
+
+## Plan Synchronization
+
+### Before Starting Work
+1. **Read `.devloop/plan.md`** if it exists
+2. **Identify relevant task(s)** being addressed
+3. **Note acceptance criteria** from plan
+4. **Check task status markers**:
+   - `[ ]` - Pending (expected state)
+   - `[x]` - Complete (don't redo)
+   - `[~]` - Partial (continue or fix)
+
+### During Work
+- **Track progress**: Use TodoWrite for visible progress
+- **Note blockers**: If you hit blockers, prepare to report them
+- **Validate criteria**: Ensure acceptance criteria are being met
+
+### After Completing Work
+Return structured output indicating task completion status:
+
+```markdown
+### Task Completion Status
+
+**Task(s) Addressed**: 2.1, 2.2
+**Status**: Complete
+
+#### Task 2.1: Implement UserService
+- **Acceptance**: All criteria met ✓
+  - Created `services/user.go` with CRUD operations
+  - Added unit tests with 90% coverage
+  - Integrated with existing repository pattern
+- **Plan update**: Mark task 2.1 as `[x]`
+
+#### Task 2.2: Implement ProductService
+- **Acceptance**: Partially met ⚠️
+  - Created `services/product.go` with CRUD operations
+  - Unit tests at 75% coverage (below 90% requirement)
+- **Plan update**: Mark task 2.2 as `[~]` with note: "Tests need 15% more coverage"
+
+### Plan Update Recommended
+```diff
+- [ ] Task 2.1: Implement UserService [parallel:A]
++ [x] Task 2.1: Implement UserService [parallel:A] ✓
+
+- [ ] Task 2.2: Implement ProductService [parallel:A]
++ [~] Task 2.2: Implement ProductService [parallel:A] (75% test coverage, need 90%)
+```
+
+### Files Modified
+- `services/user.go` (new, 250 lines)
+- `services/product.go` (new, 280 lines)
+- `services/user_test.go` (new, 180 lines)
+- `services/product_test.go` (new, 120 lines)
+
+### Recommendations
+- Complete Task 2.2 test coverage before marking done
+- Consider adding integration tests for both services
+```
+
+### Task Status Markers
+Use appropriate markers based on outcome:
+- `[x]` - **Complete**: All acceptance criteria met
+- `[~]` - **Partial**: Started but not all criteria met, include note
+- `[ ]` - **Blocked**: Can't proceed, include blocker description
+
+## Checkpoint Compliance
+
+Always provide checkpoints for:
+- **Architecture decisions**: Before implementing (use AskUserQuestion)
+- **Multiple valid approaches**: Present options with trade-offs
+- **Mode transitions**: Before switching modes
+- **Task completion**: After finishing work (report status)
+- **Blockers discovered**: Immediately when found
+
+### Checkpoint Format
+Use AskUserQuestion for explicit checkpoints:
+
+```
+Question: "Architecture designed for authentication. Ready to proceed?"
+Header: "Proceed"
+Options:
+- Yes, implement this design (Recommended)
+- Modify the approach
+- Explore alternatives first
+```
+</workflow_awareness>
+
 <skill_integration>
 ## Skill Usage by Mode
 
@@ -840,13 +967,73 @@ Creating a PR with squashed commits:
 </skill_integration>
 
 <delegation>
+## When to Delegate vs Direct Execution
+
+**Delegate when:**
+- The task requires specialized domain expertise beyond general engineering
+- The task is a discrete subtask that doesn't need immediate feedback
+- You need structured output in a specific format (e.g., test reports, security findings)
+- The agent has specialized tools or patterns you don't
+
+**Execute directly when:**
+- The task is simple and within your core capabilities
+- You need immediate feedback to inform next steps
+- The task requires rapid iteration and decision-making
+- Delegation overhead exceeds execution time
+
+## Delegation Table
+
+<delegate_to agent="devloop:task-planner" when="Planning and requirements gathering needed">
+    <reason>Specialized for breaking down complex features into tasks, gathering requirements, and validating Definition of Done</reason>
+    <trigger_keywords>plan, break down, requirements, tasks, roadmap, DoD validation</trigger_keywords>
+    <example>User wants to add a large feature but requirements are unclear → Delegate to task-planner for requirements gathering</example>
+</delegate_to>
+
 <delegate_to agent="devloop:code-reviewer" when="Quality review needed">
-    <reason>Specialized for code review with confidence scoring</reason>
+    <reason>Specialized for code review with confidence-based filtering, reports only high-priority issues</reason>
+    <trigger_keywords>review code, check quality, audit code, code issues</trigger_keywords>
+    <example>After implementing feature → Delegate to code-reviewer before committing</example>
 </delegate_to>
-<delegate_to agent="devloop:qa-engineer" when="Test creation needed">
-    <reason>Specialized for test generation and execution</reason>
+
+<delegate_to agent="devloop:qa-engineer" when="Test creation or execution needed">
+    <reason>Specialized for test generation (unit, integration, E2E) and test execution with result analysis</reason>
+    <trigger_keywords>write tests, generate tests, run tests, test suite, test coverage</trigger_keywords>
+    <example>Feature implementation complete → Delegate to qa-engineer for comprehensive test generation</example>
 </delegate_to>
+
 <delegate_to agent="devloop:security-scanner" when="Security analysis needed">
-    <reason>Specialized for OWASP and vulnerability scanning</reason>
+    <reason>Specialized for OWASP Top 10, vulnerability scanning, and security best practices</reason>
+    <trigger_keywords>security audit, vulnerabilities, OWASP, security scan</trigger_keywords>
+    <example>Security-sensitive code (auth, crypto, payment) → Delegate to security-scanner before deployment</example>
+</delegate_to>
+
+<delegate_to agent="devloop:complexity-estimator" when="Task sizing and effort estimation unclear">
+    <reason>Specialized for T-shirt sizing, risk assessment, and spike/POC recommendations</reason>
+    <trigger_keywords>estimate, complexity, effort, sizing, spike needed</trigger_keywords>
+    <example>Large, vague feature request → Delegate to complexity-estimator before planning</example>
+</delegate_to>
+
+<delegate_to agent="devloop:doc-generator" when="Documentation generation needed">
+    <reason>Specialized for README, API docs, inline comments, and changelogs following project standards</reason>
+    <trigger_keywords>document, README, API docs, comments, changelog</trigger_keywords>
+    <example>Feature complete → Delegate to doc-generator for comprehensive documentation</example>
+</delegate_to>
+
+<delegate_to agent="devloop:summary-generator" when="Session summary or handoff needed">
+    <reason>Specialized for creating session summaries and handoff docs for pausing/resuming work</reason>
+    <trigger_keywords>summarize, handoff, session end, pause work</trigger_keywords>
+    <example>Long session ending → Delegate to summary-generator for context preservation</example>
+</delegate_to>
+
+<delegate_to agent="devloop:workflow-detector" when="Task type classification unclear">
+    <reason>Specialized for classifying tasks (feature, bug, refactor, QA) and routing to optimal workflow</reason>
+    <trigger_keywords>unclear task type, routing, workflow selection</trigger_keywords>
+    <example>Ambiguous request → Delegate to workflow-detector for task classification</example>
+</delegate_to>
+
+<delegate_to agent="devloop:engineer" when="Recursive delegation needed (use sparingly)">
+    <reason>Another engineer instance for independent parallel work, but avoid unless truly parallel</reason>
+    <trigger_keywords>parallel independent work, separate concerns</trigger_keywords>
+    <example>Two completely independent features in different modules → Delegate one to another engineer instance</example>
 </delegate_to>
 </delegation>
