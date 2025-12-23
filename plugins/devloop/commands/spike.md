@@ -195,7 +195,7 @@ Initial request: $ARGUMENTS
 
 3. Form recommendation
 
-### Phase 5: Report
+### Phase 5a: Report
 
 **Goal**: Document spike findings
 
@@ -251,19 +251,142 @@ Initial request: $ARGUMENTS
 - [ ] [Mark parallelism opportunities if any]
 ```
 
-2. Ask user about next steps:
+2. Display spike report summary to user
+
+### Phase 5b: Apply Plan Updates
+
+**Goal**: Programmatically apply spike findings to existing plan
+
+**CRITICAL**: This phase only applies if:
+- Spike report includes "Plan Updates Required" section
+- The plan updates are NOT "None" or "Independent"
+- User chooses to apply changes
+
+**Actions**:
+
+1. **Check if plan updates are needed**:
+   - Read the spike report "Plan Updates Required" section
+   - If `Relationship = "Independent"` → Skip to Phase 5c
+   - If `Relationship = "New work"` and no existing plan → Skip to Phase 5c
+   - Otherwise, continue
+
+2. **Read current plan state**:
    ```
-   Use AskUserQuestion:
-   - question: "Based on spike findings, how would you like to proceed?"
-   - header: "Next"
-   - options:
-     - Proceed (Start full implementation with /devloop)
-     - More exploration (Continue spike in specific area)
-     - Defer (Save findings for later)
-     - Abandon (This isn't viable)
+   Read .devloop/plan.md
+   - Identify current tasks and structure
+   - Locate insertion/modification points from spike recommendations
    ```
 
-3. If proceeding, offer to launch full devloop workflow
+3. **Generate diff-style preview**:
+   - Show what will change in clear format
+   - Example:
+   ```markdown
+   ## Plan Update Preview
+
+   **Spike**: [Topic]
+   **Relationship**: [Replaces Task 2.3 | Adds to Phase 2 | etc.]
+
+   ### Changes
+
+   #### Phase 2: Implementation
+
+   Tasks 2.1-2.2 (unchanged)
+
+   + Task 2.3: Create authentication middleware [NEW]
+   +   - Acceptance: JWT validation working
+   +   - Files: middleware/auth.go
+
+   - Task 2.3: Add basic auth [REMOVED]
+
+   ~ Task 2.4: Wire up routes [MODIFIED]
+   ~   - Acceptance: Routes use new auth middleware (was: "basic auth")
+   ~   - Files: routes/routes.go, middleware/auth.go (was: "routes/routes.go")
+
+   Tasks 2.5-2.7 (unchanged)
+
+   #### Parallelism Changes
+
+   + Mark Tasks 2.3 and 2.5 as [parallel:A] (can run together)
+   ```
+
+4. **Ask user to apply changes** using Format 4 (Plan Application):
+   ```yaml
+   Use AskUserQuestion:
+     question: "Spike recommends [N] plan changes. Apply to .devloop/plan.md?"
+     header: "Apply"
+     options:
+       - label: "Apply and start"
+         description: "Update plan and immediately run /devloop:continue"
+       - label: "Apply only"
+         description: "Update plan, then review before starting work"
+       - label: "Review changes"
+         description: "Show full diff with line numbers"
+       - label: "Skip updates"
+         description: "Continue without applying changes"
+   ```
+
+5. **Handle user response**:
+
+   **If "Apply and start"**:
+   - Apply all recommended changes to `.devloop/plan.md`
+   - Add Progress Log entry: `- [Date Time]: Applied spike findings: [Topic]`
+   - Update plan timestamp
+   - **Immediately invoke** `/devloop:continue` to start work
+   - Exit spike command (continue takes over)
+
+   **If "Apply only"**:
+   - Apply all recommended changes to `.devloop/plan.md`
+   - Add Progress Log entry: `- [Date Time]: Applied spike findings: [Topic]`
+   - Update plan timestamp
+   - Display confirmation: "Plan updated. Run `/devloop:continue` when ready to start."
+   - Continue to Phase 5c
+
+   **If "Review changes"**:
+   - Display full diff with line numbers showing exact changes
+   - Loop back to step 4 (ask again with same options)
+
+   **If "Skip updates"**:
+   - Display: "Plan unchanged. Spike findings saved to `.devloop/spikes/{topic}.md`."
+   - Continue to Phase 5c
+
+6. **Edge case handling**:
+
+   | Scenario | Action |
+   |----------|--------|
+   | No plan exists | Skip Phase 5b, proceed to Phase 5c |
+   | Plan file corrupted | Show error, offer to backup and create fresh |
+   | Conflicting tasks | Highlight conflicts in diff, ask user to resolve |
+   | Archived phases | Apply updates to active plan only, note if changes affect archived content |
+
+### Phase 5c: Next Steps
+
+**Goal**: Determine post-spike direction
+
+**Actions**:
+1. Ask user about next steps (only if NOT "Apply and start" in Phase 5b):
+   ```yaml
+   Use AskUserQuestion:
+     question: "Spike complete. How would you like to proceed?"
+     header: "Next"
+     options:
+       - label: "Start work"
+         description: "Launch /devloop:continue to begin implementation"
+       - label: "Full workflow"
+         description: "Run /devloop for comprehensive feature development"
+       - label: "More exploration"
+         description: "Continue spike in specific area"
+       - label: "Defer"
+         description: "Save findings for later"
+       - label: "Abandon"
+         description: "This approach isn't viable"
+   ```
+
+2. **Handle response**:
+   - **Start work** → Invoke `/devloop:continue`
+   - **Full workflow** → Invoke `/devloop` (let it discover the existing plan)
+   - **More exploration** → Ask what to investigate, loop back to Phase 2
+   - **Defer** → Display "Findings saved. Review `.devloop/spikes/{topic}.md` when ready."
+   - **Abandon** → Display "Spike complete. Consider alternative approaches."
 
 ---
 

@@ -64,7 +64,7 @@ This command assumes:
    - question: "What would you like to do?"
    - header: "Ship Mode"
    - options:
-     - Full validation (DoD check, tests, then commit/PR)
+     - Full validation (DoD check, tests, then commit/PR - Recommended)
      - Quick commit (Skip validation, just commit)
      - PR only (Changes already committed, create PR)
    ```
@@ -91,7 +91,7 @@ This command assumes:
    - question: "DoD validation found issues. How to proceed?"
    - header: "DoD Status"
    - options:
-     - Fix blockers (Address failing criteria first)
+     - Fix blockers (Address failing criteria first - Recommended)
      - Override (Proceed with documented exceptions)
      - Cancel (Stop shipping process)
    ```
@@ -120,7 +120,7 @@ This command assumes:
      - question: "Tests are failing. How to proceed?"
      - header: "Tests"
      - options:
-       - Fix tests (Address test failures)
+       - Fix tests (Address test failures - Recommended)
        - Skip tests (Proceed anyway - not recommended)
        - Cancel (Stop shipping process)
      ```
@@ -151,8 +151,8 @@ This command assumes:
    - question: "Git integration - what would you like to create?"
    - header: "Git Op"
    - options:
+     - Commit + PR (Create commit and open pull request - Recommended)
      - Commit only (Create commit on current branch)
-     - Commit + PR (Create commit and open pull request)
      - PR only (Changes already committed)
    ```
 
@@ -166,7 +166,7 @@ This command assumes:
      - question: "Proposed commit message. Approve?"
      - header: "Commit"
      - options:
-       - Approve (Use this message)
+       - Approve (Use this message - Recommended)
        - Edit (Let me modify it)
        - Cancel (Don't commit yet)
      ```
@@ -209,7 +209,7 @@ Invoke `Skill: version-management` for detailed guidance.
    - question: "Based on commits, suggest [MINOR] bump. Update version?"
    - header: "Version"
    - options:
-     - Accept (Bump to suggested version)
+     - Accept (Bump to suggested version - Recommended)
      - Different (Let me choose the bump type)
      - Skip (No version change)
    ```
@@ -244,7 +244,7 @@ Invoke `Skill: version-management` for detailed guidance.
    - question: "Create git tag for vX.Y.Z?"
    - header: "Tag"
    - options:
-     - Yes (Create annotated tag)
+     - Yes (Create annotated tag - Recommended)
      - No (Skip tagging)
    ```
 

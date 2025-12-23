@@ -54,29 +54,73 @@ Senior software engineer combining four specialized roles:
 | "What should I refactor?" | Refactorer | Analysis, quality, debt |
 | "Commit this" / "Create PR" | Git | Version control operations |
 
+**Complexity-Aware Mode Selection** (v2.1):
+- **Simple**: Proceed directly with standard workflow
+- **Medium**: Execute with checkpoints (2-5 files, some new patterns)
+- **Complex**: Invoke complexity-estimation, present 2-3 approaches with trade-offs (5+ files, new architecture)
+
+**Multi-Mode Task Patterns** (v2.1):
+- **"Add [Feature] to [Component]"**: Explorer → Architect → (Checkpoint) → Return architecture
+- **"Refactor and Commit"**: Refactorer → Git
+- **"Trace [Feature] and Fix Issues"**: Explorer → Refactorer → (Checkpoint) → Return findings
+
 **When to Use**:
 - Understanding how existing features work
 - Designing new features
 - Analyzing refactoring opportunities
 - Managing git operations (commits, PRs)
 
-**Skills Auto-loaded**:
-- architecture-patterns, go-patterns, react-patterns, java-patterns, python-patterns
-- git-workflows, refactoring-analysis, plan-management, tool-usage-policy
+**Skills Auto-loaded** (v2.1 - Enhanced):
+- **Core**: architecture-patterns, tool-usage-policy, plan-management, git-workflows, refactoring-analysis
+- **Language**: go-patterns, react-patterns, java-patterns, python-patterns
+- **Design**: api-design, database-patterns
+- **Analysis**: complexity-estimation, project-context, testing-strategies
+
+**Mode-Specific Skill Workflows** (v2.1):
+- **Explorer**: tool-usage-policy → project-context → language patterns
+- **Architect**: architecture-patterns → language patterns → api-design/database-patterns → testing-strategies → complexity-estimation (optional)
+- **Refactorer**: built-in analysis → language patterns → complexity-estimation
+- **Git**: git-workflows (for complex operations only)
+
+**Output Format Standards** (v2.1):
+- **Explorer**: Structured format with entry points table, execution flow, key components, architecture insights (max 500 tokens)
+- **Architect**: Component design with responsibilities, data flow, implementation map, build sequence (max 800 tokens)
+- **Refactorer**: Codebase health summary, findings by category, quick wins, implementation roadmap (max 1000 tokens)
+- **Git**: Operation summary, commit message, changes summary, next steps (max 200 tokens)
+- **File references**: Always use `file:line` or `file:start-end` format
+
+**Model Escalation** (v2.1):
+- Suggests opus model for: 5+ files affected, security-sensitive code, complex async/concurrency patterns
+- Output format: "⚠️ This task has high complexity/stakes. Consider running with opus model for deeper analysis."
+
+**Delegation** (v2.1):
+- Code quality review → `code-reviewer`
+- Security analysis → `security-scanner`
+- Documentation → `doc-generator`
+- Session summary → `summary-generator`
+- Test generation → `qa-engineer`
+- Task planning → `task-planner`
+- Task classification → `workflow-detector`
+- Complexity assessment → `complexity-estimator`
 
 **Example Invocations**:
 ```
 User: "How does the payment processing work?"
 → Engineer in explore mode
+→ Output: Structured exploration with entry points, flow, components
 
 User: "I need to add user authentication"
 → Engineer in architect mode
+→ Complexity: High → Invokes complexity-estimation
+→ Presents OAuth vs JWT vs session approaches
+→ Output: Architecture blueprint with component design
 
 User: "Create a PR for this feature"
 → Engineer in git mode
+→ Output: PR created with summary and next steps
 ```
 
-**Output**: Varies by mode - feature analysis, architecture blueprints, refactoring plans, or git operation summaries.
+**Output**: Varies by mode - feature analysis, architecture blueprints, refactoring plans, or git operation summaries. All outputs follow token-conscious guidelines and offer to elaborate on specific areas.
 
 ---
 

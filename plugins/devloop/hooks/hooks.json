@@ -139,18 +139,9 @@
           }
         ]
       }
-    ],
-    "SubagentStop": [
-      {
-        "matcher": ".*",
-        "hooks": [
-          {
-            "type": "prompt",
-            "prompt": "An agent has just completed. Based on the agent type and workflow context, suggest the next logical step.\n\nAgent Chaining Rules:\n1. engineer (explore) → engineer (architect) - if exploration revealed architecture needs\n2. engineer (architect) → task-planner - if architecture is ready for implementation\n3. task-planner → (user decides when to implement)\n4. qa-engineer (generator) → qa-engineer (runner) - if tests were generated\n5. qa-engineer (runner) → (user reviews results)\n6. code-reviewer → engineer (git) - if review passed\n7. engineer (git) → (workflow complete)\n\nAnalyze the context:\n- Which agent just completed? (check AGENT_TYPE or agent name in context)\n- What was the outcome? (success, partial, needs follow-up)\n- Is there a clear next step in the workflow?\n\nIf a follow-up makes sense, respond with:\n{\"suggest\": true, \"agent\": \"agent-name\", \"reason\": \"Brief explanation of why this agent should run next\"}\n\nIf no follow-up is needed or context is unclear:\n{\"suggest\": false}\n\nBe helpful but not pushy. Only suggest when there's a clear workflow progression.",
-            "timeout": 15
-          }
-        ]
-      }
     ]
+  },
+  "notes": {
+    "SubagentStop": "REMOVED in v2.1.0 - Task 9.3. Rationale: Hook cannot detect agent modes (engineer:explore vs engineer:architect vs engineer:refactorer) which is required for 5/7 chaining rules. Only 2/7 rules worked reliably (qa-engineer transitions). Adds noise without benefit. User autonomy preferred for workflow decisions."
   }
 }

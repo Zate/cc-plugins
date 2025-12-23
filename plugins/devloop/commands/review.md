@@ -40,7 +40,7 @@ Initial request: $ARGUMENTS
    - question: "What would you like to review?"
    - header: "Scope"
    - options:
-     - Uncommitted changes (Review git diff)
+     - Uncommitted changes (Review git diff - Recommended)
      - Staged changes (Review git diff --cached)
      - Recent commits (Review last N commits)
      - Specific files (I'll specify paths)
@@ -200,8 +200,8 @@ Initial request: $ARGUMENTS
    - question: "Review complete. How would you like to proceed?"
    - header: "Action"
    - options:
+     - Fix critical only (Address blockers only - Recommended)
      - Fix all issues (Apply suggested fixes)
-     - Fix critical only (Address blockers only)
      - Discuss (Let's talk about specific findings)
      - Accept as-is (Acknowledge and proceed)
    ```

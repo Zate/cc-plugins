@@ -2,7 +2,7 @@
 
 **A complete, token-conscious feature development workflow for professional software engineering.**
 
-[![Version](https://img.shields.io/badge/version-2.0.0-blue)](./CHANGELOG.md) [![Agents](https://img.shields.io/badge/agents-9-green)](#agents) [![Skills](https://img.shields.io/badge/skills-28-purple)](#skills) [![Commands](https://img.shields.io/badge/commands-14-orange)](#commands)
+[![Version](https://img.shields.io/badge/version-2.1.0-blue)](./CHANGELOG.md) [![Agents](https://img.shields.io/badge/agents-9-green)](#agents) [![Skills](https://img.shields.io/badge/skills-29-purple)](#skills) [![Commands](https://img.shields.io/badge/commands-16-orange)](#commands)
 
 ---
 
@@ -78,6 +78,7 @@ devloop provides a 12-phase workflow that mirrors how senior engineers approach 
 | `/devloop:analyze` | Codebase refactoring analysis | Technical debt, messy code, large files |
 | `/devloop:bootstrap` | New project setup | Greenfield projects with docs |
 | `/devloop:continue` | Resume existing plan | Continuing previous work |
+| `/devloop:fresh` | Save state & clear context | Context heavy, long sessions |
 | `/devloop:quick` | Fast implementation | Small, well-defined tasks |
 | `/devloop:spike` | Technical exploration | Unknown feasibility |
 | `/devloop:review` | Code review | Before commits, PR review |
@@ -119,6 +120,9 @@ devloop provides a 12-phase workflow that mirrors how senior engineers approach 
 
 # Resume where you left off
 /devloop:continue
+
+# Save state and start fresh when context heavy
+/devloop:fresh
 
 # Track issues for later
 /devloop:new Add dark mode support eventually
@@ -335,6 +339,106 @@ See `Skill: file-locations` for complete documentation.
 
 ---
 
+## Workflow Loop & Checkpoints
+
+devloop v2.1 introduces a structured workflow loop that ensures reliable task completion:
+
+### The Loop Pattern
+
+```
+┌──────────┐    ┌──────────┐    ┌───────────────┐
+│  PLAN    │───▶│  WORK    │───▶│  CHECKPOINT   │
+│(continue)│    │ (agent)  │    │  (mandatory)  │
+└──────────┘    └──────────┘    └───────┬───────┘
+     ▲                                   │
+     │           ┌──────────────────────┼─────┐
+     │           │                      ▼     │
+     │           │  ┌────────┐    ┌─────────┐│
+     │           │  │ COMMIT │◀───│ DECIDE  ││
+     │           │  └────┬───┘    └────┬────┘│
+     │           │       │             │     │
+     │           │       ▼             ▼     │
+     │           │  ┌─────────┐  ┌─────────┐│
+     └───────────┼──│CONTINUE │  │  STOP   ││
+                 │  │ (next)  │  │(summary)││
+                 │  └─────────┘  └─────────┘│
+                 └──────────────────────────┘
+```
+
+### Mandatory Checkpoints
+
+After every task, `/devloop:continue` runs a mandatory checkpoint that:
+
+1. **Verifies** agent output (success/failure/partial)
+2. **Updates** plan markers (`[ ]` → `[x]` or `[~]`)
+3. **Decides** next action with user:
+   - **Commit now**: Create atomic commit for this work
+   - **Continue working**: Group with related tasks before committing
+   - **Fresh start**: Save state, clear context, resume in new session
+   - **Stop here**: Generate summary and end session
+
+### Loop Completion Detection
+
+When all tasks are complete, devloop:
+- Auto-updates plan status to "Review" or "Complete"
+- Offers options: Ship it, Review, Add more tasks, End session
+- Handles edge cases (partial tasks, blocked tasks, archived phases)
+
+### Context Management
+
+devloop tracks session metrics and suggests fresh starts when:
+- Tasks completed > 5 in session
+- Agent invocations > 10 in session
+- Session duration > 2 hours active
+- Context feels heavy or slow
+
+See `Skill: workflow-loop` for complete documentation.
+
+---
+
+## Fresh Start Feature
+
+When context gets heavy, use `/devloop:fresh` to save state and resume with fresh context:
+
+### How It Works
+
+1. **Save**: `/devloop:fresh` saves current plan state to `.devloop/next-action.json`
+2. **Clear**: Run `/clear` to reset conversation
+3. **Resume**: Run `/devloop:continue` in new session - automatically detects saved state
+
+### When to Use Fresh Start
+
+- After completing 5-10 tasks in one session
+- When conversation history is getting long
+- Context feels slow or confused
+- Suggested at checkpoint with "Fresh start" option
+
+### Example
+
+```bash
+# After several tasks
+/devloop:fresh
+
+# Output shows:
+# ✓ State saved to .devloop/next-action.json
+# Last completed: Task 3.2
+# Next up: Task 3.3
+#
+# To resume: /clear then /devloop:continue
+
+# Clear context
+/clear
+
+# New session - automatically detects state
+/devloop:continue
+
+# Continues from Task 3.3 with fresh context
+```
+
+The SessionStart hook automatically detects saved state and displays a reminder.
+
+---
+
 ## Parallel Task Execution
 
 devloop can run independent tasks in parallel for faster feature development:
@@ -533,6 +637,7 @@ During transition, both systems work:
 | Ready to commit | `/devloop:ship` |
 | Reviewing code | `/devloop:review` |
 | Continuing work | `/devloop:continue` |
+| Context heavy/long | `/devloop:fresh` |
 | Track for later | `/devloop:new` |
 | View/manage issues | `/devloop:issues` |
 
@@ -588,7 +693,35 @@ plugins/devloop/
 
 ## Changelog
 
-### 2.0.0 (Current)
+### 2.1.0 (Current)
+
+**Workflow loop enforcement, fresh start mechanism, and engineer agent improvements.**
+
+- **Workflow Loop**: Mandatory checkpoints after every task
+  - Loop completion detection (5-state task counting)
+  - Context management (6 session metrics with staleness thresholds)
+  - Standardized 11 checkpoint questions across `/devloop:continue`
+- **Fresh Start Mechanism**: Clear context while preserving progress
+  - `/devloop:fresh` command saves state to `.devloop/next-action.json`
+  - SessionStart hook detects and displays saved state
+  - `/devloop:continue` auto-resumes from saved state
+- **Engineer Agent Enhancements**:
+  - Added 6 missing skills (complexity-estimation, project-context, api-design, database-patterns, testing-strategies)
+  - Complexity-aware mode selection (simple/medium/complex)
+  - Multi-mode task patterns with checkpoints
+  - Token-conscious output formats (500/800/1000/200 token budgets per mode)
+- **Skills & Documentation**:
+  - Added `workflow-loop` skill (668 lines)
+  - Created AskUserQuestion standards document (1,008 lines)
+  - Enhanced `task-checkpoint` skill with mandatory worklog sync
+- **Integration**:
+  - Spike plan application (Phase 5b in `/devloop:spike`)
+  - Removed unreliable SubagentStop hook
+  - Applied AskUserQuestion standards to review.md and ship.md
+
+See [CHANGELOG.md](./CHANGELOG.md) for complete details.
+
+### 2.0.0
 
 **Major architectural refactoring for reduced token usage and improved agent coordination.**
 
