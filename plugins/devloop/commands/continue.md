@@ -299,37 +299,473 @@ Task:
 
 ---
 
-## Step 6: Post-Task Checkpoint
+## Step 5a: MANDATORY Post-Agent Checkpoint
 
-After agent completes:
+**CRITICAL**: This step MUST run after every agent execution. Never skip.
 
-1. **Update plan**: Mark task `[x]`, add Progress Log entry
-2. **Present results**: Summarize what was done
-3. **Decide on commit**:
-   ```
-   AskUserQuestion:
-   - question: "Task complete. Commit now?"
-   - header: "Commit"
-   - options:
-     - Commit now (Recommended) → Launch devloop:engineer (git mode)
-     - Group with next task
-     - Review changes first
-   ```
+**Reference**: `Skill: workflow-loop` - Checkpoint requirements
 
-4. **Continue or stop**:
+### Checkpoint Sequence
+
+#### 1. Verify Agent Output
+
+Analyze agent result to determine completion status:
+
+**Success Indicators**:
+- ✓ Agent explicitly states task is complete
+- ✓ Acceptance criteria met (if defined in plan)
+- ✓ No errors reported in agent output
+- ✓ Required files created/modified as expected
+
+**Partial Completion Indicators**:
+- ~ Agent completed but with acknowledged limitations
+- ~ Some acceptance criteria met, others pending
+- ~ Non-blocking errors encountered but recovered
+- ~ Core functionality works, refinements needed
+
+**Failure Indicators**:
+- ✗ Agent encountered blocking error
+- ✗ Task not addressed or attempted
+- ✗ Critical requirements missing
+- ✗ Agent output indicates failure
+
+#### 2. Update Plan Markers
+
+If `.devloop/plan.md` exists, update task status:
+
+```bash
+# Based on verification:
+# Success:  - [ ] → - [x]
+# Partial:  - [ ] → - [~]
+# Blocked:  - [ ] → - [!]
+
+# Add Progress Log entry
+- [YYYY-MM-DD HH:MM]: Completed Task X.Y - [Description]
+# OR
+- [YYYY-MM-DD HH:MM]: Partially completed Task X.Y - [What was done]
+# OR
+- [YYYY-MM-DD HH:MM]: Task X.Y blocked - [Reason]
+
+# Update timestamp
+**Updated**: [Current ISO timestamp]
+```
+
+#### 3. Present Checkpoint Question
+
+**For Successful Completion**:
+
+```yaml
+AskUserQuestion:
+  question: "Task [X.Y] complete: [Brief summary of work]. What's next?"
+  header: "Checkpoint"
+  options:
+    - label: "Continue to next task"
+      description: "Proceed to Task [X.Y+1] in current context"
+    - label: "Commit this work"
+      description: "Create atomic commit, then continue"
+    - label: "Fresh start"
+      description: "Save state, clear context, resume in new session"
+    - label: "Stop here"
+      description: "Generate summary and end session"
+```
+
+**For Partial Completion**:
+
+```yaml
+AskUserQuestion:
+  question: "Task [X.Y] partially complete. [What's missing/incomplete]. How should we proceed?"
+  header: "Partial Completion"
+  options:
+    - label: "Mark done and continue"
+      description: "Accept current state, move to next task"
+    - label: "Continue work on this task"
+      description: "Keep working to complete remaining criteria"
+    - label: "Note as tech debt"
+      description: "Mark blocked with TODO, move on"
+    - label: "Fresh start"
+      description: "Save state, clear context for better focus"
+```
+
+**For Failure/Error**:
+
+```yaml
+AskUserQuestion:
+  question: "Task [X.Y] failed: [Error description]. How should we recover?"
+  header: "Error Recovery"
+  options:
+    - label: "Retry"
+      description: "Attempt again with adjusted approach"
+    - label: "Skip and mark blocked"
+      description: "Move to next task, track as blocker"
+    - label: "Investigate error"
+      description: "Show full error output for review"
+    - label: "Abort workflow"
+      description: "Stop and save state"
+```
+
+#### 4. Handle Selected Action
+
+**If "Continue to next task"**:
+1. No commit - changes remain uncommitted
+2. Return to Step 2 (Parse and Present Status) with next task
+3. Loop continues
+
+**If "Commit this work"**:
+1. Prepare conventional commit message:
+   - Type: feat/fix/refactor/docs/test/chore
+   - Scope: [component]
+   - Message: Task X.Y - [description]
+2. Stage changes with `git add`
+3. Execute `git commit` OR invoke `devloop:engineer` (git mode)
+4. Verify commit succeeded
+5. Update worklog with commit hash
+6. Ask: "Continue to next task or stop?"
+
+**If "Fresh start"**:
+1. Generate brief session summary
+2. Write state to `.devloop/next-action.json`:
+   ```json
+   {
+     "last_completed": "Task X.Y",
+     "next_pending": "Task X.Z",
+     "summary": "Brief description",
+     "timestamp": "ISO timestamp"
+   }
    ```
-   AskUserQuestion:
-   - question: "Continue to next task?"
-   - header: "Next"
-   - options:
-     - Continue (Recommended)
-     - Stop here
-     - Review plan status
-   ```
+3. Display message: "State saved. Run `/clear` to reset context, then `/devloop:continue` to resume."
+4. END workflow
+
+**If "Stop here"**:
+1. Generate summary of session work
+2. List completed tasks
+3. Show next task recommendation
+4. END workflow
+
+**If "Mark done and continue"** (partial):
+1. Mark task `[x]` in plan
+2. Add note in Progress Log about limitations
+3. Return to Step 2 with next task
+
+**If "Continue work on this task"** (partial):
+1. Keep task `[~]` in plan
+2. Return to Step 5 (Execute with Agent) with same task
+3. Provide agent with context about what's missing
+
+**If "Note as tech debt"** (partial):
+1. Mark task `[!]` in plan
+2. Add TODO note to Progress Log
+3. Return to Step 2 with next task
+
+**If "Retry"** (error):
+1. Keep task `[ ]` in plan
+2. Add retry note to Progress Log
+3. Return to Step 5 with same task and error context
+
+**If "Skip and mark blocked"** (error):
+1. Mark task `[!]` in plan
+2. Add blocker note: "Task X.Y blocked - [reason]"
+3. Return to Step 2 with next task
+
+**If "Investigate error"** (error):
+1. Display complete agent output
+2. Show relevant error messages
+3. Ask follow-up: Retry / Skip / Abort
+
+**If "Abort workflow"** (error):
+1. Save current state
+2. Generate summary of what was attempted
+3. END workflow
+
+#### 5. Track Session Metrics
+
+After every checkpoint, track context health:
+
+```bash
+tasks_completed=$((tasks_completed + 1))
+agent_calls=$((agent_calls + 1))
+session_duration=$((current_time - session_start))
+
+# Check thresholds (see Skill: workflow-loop)
+if [ $tasks_completed -gt 5 ] || [ $agent_calls -gt 10 ]; then
+  # Proactively suggest fresh start in checkpoint options
+fi
+```
 
 ---
 
-## Step 7: Handle Parallel Tasks
+## Step 5b: Loop Completion Detection
+
+**CRITICAL**: This step runs after Step 5a (checkpoint) to detect when all tasks are complete.
+
+**Reference**: `Skill: plan-management` - Task markers and status
+
+### Completion Detection Logic
+
+After the checkpoint completes successfully (user chose "Continue to next task"), check for completion:
+
+#### 1. Count Remaining Tasks
+
+Parse `.devloop/plan.md` to count task status:
+
+```bash
+# Count task markers
+pending_tasks=$(grep -E '^\s*-\s*\[\s\]' .devloop/plan.md | wc -l)
+partial_tasks=$(grep -E '^\s*-\s*\[~\]' .devloop/plan.md | wc -l)
+completed_tasks=$(grep -E '^\s*-\s*\[x\]' .devloop/plan.md | wc -l)
+
+# Total incomplete = pending + partial
+incomplete=$((pending_tasks + partial_tasks))
+```
+
+**Task markers reference**:
+- `[ ]` - Pending (not started)
+- `[~]` - In progress / partial
+- `[x]` - Complete
+- `[-]` - Skipped (counts as "done" for completion)
+- `[!]` - Blocked (counts as incomplete)
+
+**Dependency checking**:
+- Tasks with `[depends:X.Y]` only count as eligible if dependencies are complete
+- If task depends on incomplete task, it's not eligible yet
+
+#### 2. Detect Completion State
+
+```bash
+if [ $incomplete -eq 0 ]; then
+  # All tasks complete OR all remaining are blocked
+  completion_state="complete"
+elif [ $pending_tasks -eq 0 ] && [ $partial_tasks -gt 0 ]; then
+  # No pending, but some partial remain
+  completion_state="partial_completion"
+else
+  # Work remaining
+  completion_state="in_progress"
+fi
+```
+
+#### 3. Handle Completion States
+
+**If `completion_state == "complete"`**:
+
+All tasks are marked `[x]`, `[-]`, or all remaining are `[!]` (blocked).
+
+Present completion options:
+
+```yaml
+AskUserQuestion:
+  question: "All tasks complete! Plan finished. What's next?"
+  header: "Plan Complete"
+  options:
+    - label: "Ship it (Recommended)"
+      description: "Run validation and prepare for deployment via /devloop:ship"
+    - label: "Review plan"
+      description: "Show summary of completed work and tasks"
+    - label: "Add more tasks"
+      description: "Extend the plan with additional work"
+    - label: "End session"
+      description: "Update plan status to Complete and stop"
+```
+
+**If `completion_state == "partial_completion"`**:
+
+No pending tasks, but some tasks marked `[~]` (partial).
+
+```yaml
+AskUserQuestion:
+  question: "All tasks attempted, but {N} remain partially complete. How to proceed?"
+  header: "Partial Completion"
+  options:
+    - label: "Finish partials"
+      description: "Work through {N} partial tasks to complete them"
+    - label: "Ship anyway"
+      description: "Accept current state and run /devloop:ship"
+    - label: "Review partials"
+      description: "Show which tasks are partial and what's missing"
+    - label: "Mark as complete"
+      description: "Accept partials as done, update plan to Complete"
+```
+
+**If `completion_state == "in_progress"`**:
+
+Work remains - return to Step 6 (Handle Parallel Tasks) to continue the loop.
+
+#### 4. Handle Completion Options
+
+**If "Ship it" (Recommended)**:
+
+1. Update plan status to "Review"
+2. Add Progress Log entry: "All tasks complete - launching ship workflow"
+3. Display message: "Launching /devloop:ship for validation and deployment prep"
+4. **Launch ship workflow**: Invoke `/devloop:ship` command
+5. END continue workflow (ship takes over)
+
+**If "Review plan"**:
+
+1. Display plan summary:
+   ```markdown
+   ## Plan Summary: [Plan Name]
+
+   **Status**: Complete
+   **Total Tasks**: {total}
+   **Completed**: {completed_count}
+   **Skipped**: {skipped_count}
+
+   ### Completed Work
+   - [x] Task 1.1: [Description]
+   - [x] Task 1.2: [Description]
+   ...
+
+   ### Commits (from worklog)
+   - abc1234: feat: Task 1.1 - [description]
+   - def5678: feat: Task 1.2 - [description]
+   ```
+
+2. Ask follow-up:
+   ```yaml
+   AskUserQuestion:
+     question: "Plan review complete. Next action?"
+     header: "Next"
+     options:
+       - label: "Ship it"
+         description: "Run /devloop:ship workflow"
+       - label: "Add tasks"
+         description: "Extend with additional work"
+       - label: "End session"
+         description: "Stop here, update plan to Complete"
+   ```
+
+**If "Add more tasks"**:
+
+1. Ask user what to add (free-form or structured):
+   ```yaml
+   AskUserQuestion:
+     question: "What additional work should be added to the plan?"
+     header: "Add Tasks"
+     options:
+       - label: "Enter plan mode"
+         description: "Use EnterPlanMode to design additional tasks"
+       - label: "Quick add"
+         description: "Describe tasks in text, I'll add to plan"
+       - label: "New phase"
+         description: "Start a new phase with structured tasks"
+   ```
+
+2. Based on selection:
+   - **Enter plan mode**: Use `EnterPlanMode`, then update `.devloop/plan.md`
+   - **Quick add**: Parse user input, append to current phase or create new phase
+   - **New phase**: Create "Phase N+1" section with tasks
+
+3. After adding tasks:
+   - Update Progress Log: "Extended plan with {N} new tasks"
+   - Return to Step 2 (Parse and Present Status) with updated plan
+
+**If "End session"**:
+
+1. Update plan status from "In Progress" → "Complete"
+2. Add final Progress Log entry:
+   ```markdown
+   - [YYYY-MM-DD HH:MM]: Plan marked complete - all tasks done
+   ```
+3. Update timestamp
+4. Display completion message:
+   ```markdown
+   ## Plan Complete! 🎉
+
+   **Work completed**: {completed_count} tasks
+   **Duration**: [From plan Created to now]
+
+   ### Next Steps
+   - Run `/devloop:ship` when ready to deploy
+   - Review commits in worklog
+   - Archive plan if needed: `/devloop:archive`
+   ```
+5. END workflow
+
+**If "Finish partials"** (partial_completion state):
+
+1. Find first task marked `[~]`
+2. Return to Step 5 (Execute with Agent) with that task
+3. Agent should focus on completing remaining acceptance criteria
+4. Continue loop
+
+**If "Ship anyway"** (partial_completion state):
+
+1. Confirm with user:
+   ```yaml
+   AskUserQuestion:
+     question: "{N} tasks are partial. Ship with incomplete work?"
+     header: "Confirm"
+     options:
+       - label: "Yes, ship"
+         description: "Accept partial state, run validation"
+       - label: "No, go back"
+         description: "Return to finish partials"
+   ```
+
+2. If confirmed:
+   - Update plan status to "Review"
+   - Add note: "Shipped with {N} partial tasks - see Progress Log for details"
+   - Launch `/devloop:ship`
+
+**If "Review partials"** (partial_completion state):
+
+1. List all `[~]` tasks with their acceptance criteria
+2. Show what's complete vs. what's missing
+3. Ask follow-up: "Finish partials" / "Ship anyway" / "Mark complete"
+
+**If "Mark as complete"** (partial_completion state):
+
+1. Convert all `[~]` → `[x]` in plan
+2. Add Progress Log note: "Marked {N} partial tasks as complete"
+3. Update plan status to "Complete"
+4. Display completion message (same as "End session")
+5. END workflow
+
+#### 5. Update Plan Metadata
+
+When marking plan complete (any completion path):
+
+```markdown
+**Status**: Complete
+**Updated**: [Current ISO timestamp]
+**Completed**: [Current date]
+
+## Progress Log
+- [YYYY-MM-DD HH:MM]: All tasks complete - plan marked Complete
+- [YYYY-MM-DD HH:MM]: {Previous entries...}
+```
+
+### Edge Cases
+
+| Scenario | Detection | Action |
+|----------|-----------|--------|
+| Empty plan (no tasks) | `pending_tasks == 0 && completed_tasks == 0` | Ask: "No tasks in plan. Add tasks or end?" |
+| All blocked (no eligible tasks) | `pending_tasks > 0 && all have unmet deps` | Present completion options (treat as done) |
+| Archived phases only | Plan has archive notes but no active tasks | Check archives, offer restoration |
+| Plan already "Complete" | Status field == "Complete" | Inform user, suggest /devloop:ship or add tasks |
+
+### Integration with Step 5a Checkpoint
+
+**Flow**:
+
+```
+Step 5: Execute with Agent
+  ↓
+Step 5a: Post-Agent Checkpoint
+  ↓
+[User selects "Continue to next task"]
+  ↓
+Step 5b: Check Completion ← YOU ARE HERE
+  ↓
+[If incomplete] → Step 6: Handle Parallel Tasks → Loop continues
+[If complete] → Present completion options → Launch ship OR extend plan OR end
+```
+
+**Critical**: Step 5b ONLY runs if user chose "Continue to next task" at checkpoint. Other checkpoint options (commit/fresh/stop) bypass completion detection.
+
+---
+
+## Step 6: Handle Parallel Tasks
 
 If next tasks have `[parallel:X]` markers:
 
@@ -356,7 +792,7 @@ If next tasks have `[parallel:X]` markers:
 
 ---
 
-## Plan Mode Integration
+## Step 7: Plan Mode Integration
 
 If user selects "Update the plan first" or needs to create a new plan:
 
@@ -367,12 +803,13 @@ If user selects "Update the plan first" or needs to create a new plan:
 
 ---
 
-## Recovery Scenarios
+## Step 8: Recovery Scenarios
 
 | Scenario | Detection | Action |
 |----------|-----------|--------|
 | No plan | `.devloop/plan.md` missing | Offer /devloop or EnterPlanMode |
-| Plan complete | All tasks `[x]` | Congratulate, suggest /devloop:ship |
+| Plan complete | All tasks `[x]` (detected in Step 5b) | Present completion options: ship/review/add/end |
+| Partial completion | No `[ ]`, but `[~]` remain | Offer finish/ship/review/mark-complete |
 | Stale plan | Updated > 24h ago | Offer to refresh |
 | Uncommitted work | git status shows changes | Offer devloop:engineer (git) |
 | Failed tests | Previous run failed | Offer devloop:qa-engineer (runner) |

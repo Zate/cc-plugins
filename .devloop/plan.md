@@ -1,9 +1,9 @@
 # Devloop Plan: Component Polish v2.1
 
 **Created**: 2025-12-21
-**Updated**: 2025-12-23 15:30
+**Updated**: 2025-12-23 16:30
 **Status**: Active
-**Current Phase**: Phase 6 - Engineer Agent Enhancements - COMPLETE! Moving to Phase 7
+**Current Phase**: Phase 7 - Workflow Loop Core Improvements (2/4 complete)
 
 ## Overview
 
@@ -236,21 +236,24 @@ Comprehensive review and enhancement of all devloop components to improve:
 **Reference**: `.devloop/spikes/continue-improvements.md`
 **Dependencies**: Phase 5 must be complete (workflow-loop skill, AskUserQuestion standards)
 
-- [ ] Task 7.1: Add mandatory post-task checkpoint to continue.md
-  - Add Step 5a: MANDATORY Post-Agent Checkpoint
-  - Verify agent output (success/failure/partial)
-  - Update plan markers ([ ] → [x] or [~])
-  - Add commit decision question
-  - Add "Fresh start" option to checkpoint
-  - Handle error/partial completion
-  - Files: `plugins/devloop/commands/continue.md`
+- [x] Task 7.1: Add mandatory post-task checkpoint to continue.md
+  - Added Step 5a: MANDATORY Post-Agent Checkpoint ✓
+  - Verify agent output (success/failure/partial) with indicators ✓
+  - Update plan markers ([ ] → [x] or [~]) documented ✓
+  - Add commit decision question with 4 options ✓
+  - Add "Fresh start" option to checkpoint ✓
+  - Handle error/partial completion with dedicated questions ✓
+  - Added session metrics tracking ✓
+  - Files: `plugins/devloop/commands/continue.md` ✓
 
-- [ ] Task 7.2: Add loop completion detection to continue.md [depends:7.1]
-  - Count remaining tasks after each checkpoint
-  - Detect when all tasks complete
-  - Present completion options (ship/review/add more/end)
-  - Auto-update plan status to "Review"
-  - Files: `plugins/devloop/commands/continue.md`
+- [x] Task 7.2: Add loop completion detection to continue.md [depends:7.1]
+  - Added Step 5b: Loop Completion Detection (271 lines) ✓
+  - Task counting with dependency checking (5 states: complete/partial/in_progress/blocked/empty) ✓
+  - Context-aware completion options (8 option handlers: ship/review/add-more/end/finish-partials/ship-anyway/review-partials/mark-complete) ✓
+  - Auto-update plan status to "Review" or "Complete" ✓
+  - Edge case handling (empty plan, blocked tasks, archived phases) ✓
+  - Updated recovery scenarios table ✓
+  - Files: `plugins/devloop/commands/continue.md:496-766` ✓
 
 - [ ] Task 7.3: Add context management to continue.md [depends:7.1]
   - Context staleness detection thresholds
@@ -409,6 +412,8 @@ Comprehensive review and enhancement of all devloop components to improve:
 - 2025-12-23: Task 6.3 complete - Enhanced mode handling in engineer.md. Added complexity-aware mode selection (simple/medium/complex), multi-mode task patterns (3 examples), and cross-mode transition rules.
 - 2025-12-23: Task 6.4 complete - Added output format standards to engineer.md. Structured formats for Explorer/Architect/Refactorer/Git modes, token-conscious guidelines (500/800/1000/200 token budgets), and file:line reference standards.
 - 2025-12-23: Tasks 6.5-6.6 complete (parallel execution) - Enhanced delegation (all 9 agents with criteria and examples) and workflow awareness (parallel execution, plan sync, task completion reporting). Phase 6 COMPLETE!
+- 2025-12-23: Task 7.1 complete - Added mandatory post-task checkpoint to continue.md. Comprehensive checkpoint sequence with success/partial/failure paths, plan marker updates, session metrics tracking, and fresh start integration. Phase 7 started!
+- 2025-12-23: Task 7.2 complete - Added loop completion detection to continue.md. Step 5b with task counting, dependency checking, 8 completion option handlers, and plan status updates to "Review"/"Complete".
 
 ## Notes
 
