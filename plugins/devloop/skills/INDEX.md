@@ -8,11 +8,11 @@ Quick reference for all 28 devloop skills. Invoke with `Skill: <skill-name>`.
 
 | Skill | Description |
 |-------|-------------|
-| `go-patterns` | Go interfaces, error handling, goroutines, channels, testing patterns (Go 1.21+) |
-| `python-patterns` | Type hints, async patterns, pytest testing, error handling (Python 3.10+) |
-| `java-patterns` | Spring DI, streams, exception handling, JUnit testing (Java 17+) |
-| `react-patterns` | Hooks, component design, state management, performance, accessibility (React 18+) |
-| `language-patterns-base` | Base template for language skills - do not invoke directly |
+| `go-patterns` | Go-specific best practices including interfaces, error handling, goroutines, channels, testing patterns, and common idioms |
+| `python-patterns` | Python-specific best practices including type hints, async patterns, testing with pytest, error handling, and common idioms |
+| `java-patterns` | Java and Spring best practices including dependency injection, stream patterns, exception handling, testing, and common idioms |
+| `react-patterns` | React and TypeScript best practices including hooks, component design, state management, performance optimization, and accessibility |
+| `language-patterns-base` | Base template for language-specific pattern skills (defines common sections - do not invoke directly) |
 
 ---
 
@@ -20,12 +20,12 @@ Quick reference for all 28 devloop skills. Invoke with `Skill: <skill-name>`.
 
 | Skill | Description |
 |-------|-------------|
-| `workflow-selection` | Choose optimal workflow (devloop/quick/spike) based on task type |
-| `plan-management` | Plan file format, location, and update procedures |
-| `phase-templates` | Reusable phase definitions for discovery, implementation, review |
-| `task-checkpoint` | Verification checklist before marking tasks complete |
-| `requirements-patterns` | User stories, acceptance criteria, scope management |
-| `complexity-estimation` | T-shirt sizing, risk factors, spike/POC decision criteria |
+| `workflow-selection` | Guide users in selecting the optimal development workflow based on task type |
+| `plan-management` | Central reference for devloop plan file location, format, and update procedures |
+| `phase-templates` | Reusable phase definitions for devloop workflows (discovery, implementation, review, handoff) |
+| `task-checkpoint` | Complete checklist and verification for task completion in devloop workflows |
+| `requirements-patterns` | Patterns for gathering, documenting, and validating software requirements |
+| `complexity-estimation` | Framework for estimating task complexity using T-shirt sizing |
 
 ---
 
@@ -33,12 +33,12 @@ Quick reference for all 28 devloop skills. Invoke with `Skill: <skill-name>`.
 
 | Skill | Description |
 |-------|-------------|
-| `architecture-patterns` | Design patterns for Go, TypeScript/React, Java, general software |
-| `refactoring-analysis` | Identify tech debt, code smells, refactoring opportunities |
-| `testing-strategies` | Unit/integration/E2E test design and coverage planning |
-| `security-checklist` | OWASP Top 10, auth, data protection, secure coding |
-| `api-design` | REST/GraphQL endpoint naming, versioning, error handling |
-| `database-patterns` | Schema design, indexing, query optimization, migrations |
+| `architecture-patterns` | Guide architecture decisions with proven patterns for Go, TypeScript/React, Java, and general software design |
+| `refactoring-analysis` | Comprehensive codebase analysis to identify refactoring opportunities, technical debt, and code quality issues |
+| `testing-strategies` | Design comprehensive test strategies including unit tests, integration tests, E2E tests, and deployment validation |
+| `security-checklist` | Security checklist covering OWASP Top 10, authentication, authorization, data protection, and secure coding practices |
+| `api-design` | Best practices for designing RESTful and GraphQL APIs (endpoint naming, versioning, error handling, pagination) |
+| `database-patterns` | Database design patterns including schema design, indexing strategies, query optimization, and migration best practices |
 
 ---
 
@@ -46,10 +46,10 @@ Quick reference for all 28 devloop skills. Invoke with `Skill: <skill-name>`.
 
 | Skill | Description |
 |-------|-------------|
-| `git-workflows` | Branching strategies, commit conventions, code review |
-| `atomic-commits` | Logical commit grouping and reviewable commit structure |
-| `version-management` | Semantic versioning, CHANGELOG generation, releases |
-| `worklog-management` | Completed work history format and commit integration |
+| `git-workflows` | Git workflow patterns including branching strategies, commit conventions, code review, and release management |
+| `atomic-commits` | Guidance for creating reviewable, atomic commits that capture logical units of work |
+| `version-management` | Semantic versioning, CHANGELOG generation, and release management for devloop projects |
+| `worklog-management` | Reference for managing the devloop worklog (completed work history with commit references) |
 
 ---
 
@@ -57,10 +57,10 @@ Quick reference for all 28 devloop skills. Invoke with `Skill: <skill-name>`.
 
 | Skill | Description |
 |-------|-------------|
-| `issue-tracking` | Unified issue tracking (BUG/FEAT/TASK/CHORE/SPIKE IDs) |
-| `project-context` | Detect tech stack, languages, frameworks, project type |
-| `project-bootstrap` | CLAUDE.md setup, new project initialization |
-| `deployment-readiness` | Production validation checklist and deployment tests |
+| `issue-tracking` | Unified issue tracking for bugs, features, tasks, and other work items (type-based IDs, smart routing) |
+| `project-context` | Detects project tech stack, languages, frameworks, and features for development workflows |
+| `project-bootstrap` | Best practices for bootstrapping new projects with CLAUDE.md and preparing them for devloop workflows |
+| `deployment-readiness` | Comprehensive deployment validation checklist and test design for production readiness |
 
 ---
 
@@ -68,9 +68,9 @@ Quick reference for all 28 devloop skills. Invoke with `Skill: <skill-name>`.
 
 | Skill | Description |
 |-------|-------------|
-| `file-locations` | .devloop/ directory structure, git tracking guidelines |
-| `tool-usage-policy` | Standard tool usage for file ops, search, permissions |
-| `model-selection-guide` | Opus/sonnet/haiku selection based on task complexity |
+| `file-locations` | Authoritative reference for .devloop/ directory structure and file locations (git-tracked vs local-only) |
+| `tool-usage-policy` | Consolidated guidance on which tools to use for common operations (prevents permission prompts) |
+| `model-selection-guide` | Guidelines for choosing the optimal model (opus/sonnet/haiku) based on complexity and token budget |
 
 ---
 

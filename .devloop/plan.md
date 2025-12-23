@@ -1,9 +1,9 @@
 # Devloop Plan: Component Polish v2.1
 
 **Created**: 2025-12-21
-**Updated**: 2025-12-23 09:45
+**Updated**: 2025-12-23 10:00
 **Status**: Active
-**Current Phase**: Phase 3 - Skill Refinement (5/6 complete)
+**Current Phase**: Phase 3 - Skill Refinement (6/6 complete) ✓
 
 ## Overview
 
@@ -85,9 +85,11 @@ Comprehensive review and enhancement of all devloop components to improve:
   - Apply same checks ✓
   - Files: All remaining skills ✓
 
-- [ ] Task 3.6: Update skill INDEX.md [depends:3.5]
-  - Ensure index reflects improved descriptions
-  - Files: `plugins/devloop/skills/INDEX.md`
+- [x] Task 3.6: Update skill INDEX.md [depends:3.5]
+  - Updated all 28 skill descriptions to match current SKILL.md frontmatter ✓
+  - Enhanced descriptions across all 6 categories for clarity ✓
+  - Reflects Phase 3 improvements (plan-management, atomic-commits, version-management, task-checkpoint, project-bootstrap) ✓
+  - Files: `plugins/devloop/skills/INDEX.md` ✓
 
 ### Phase 4: Hook Integration [parallel:none]
 **Goal**: Hooks support debugging and consistent behavior
@@ -385,6 +387,7 @@ Comprehensive review and enhancement of all devloop components to improve:
 - 2025-12-23: Task 3.3 complete - Audited 4 quality skills. All already compliant (testing-strategies, security-checklist, deployment-readiness, complexity-estimation)
 - 2025-12-23: Task 3.4 complete - Audited 3 design skills. All already compliant (architecture-patterns, api-design, database-patterns)
 - 2025-12-23: Task 3.5 complete - Audited remaining 13 skills. Added frontmatter to 4 skills (project-bootstrap, atomic-commits, version-management, task-checkpoint). 9 skills already compliant
+- 2025-12-23: Task 3.6 complete - Updated INDEX.md with all 28 skill descriptions matching current frontmatter. Phase 3 complete!
 
 ## Notes
 
