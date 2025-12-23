@@ -1,22 +1,138 @@
 # Devloop Agents
 
-This document provides comprehensive information about the 12 specialized agents in the devloop plugin.
+**Comprehensive reference for all 9 devloop agents, their capabilities, and collaboration patterns.**
+
+---
+
+## Table of Contents
+
+1. [Overview](#overview)
+2. [Quick Reference](#quick-reference)
+3. [Agent Color Scheme](#agent-color-scheme)
+4. [Super-Agents](#super-agents-consolidated) - engineer, qa-engineer, task-planner
+5. [Standalone Agents](#standalone-agents) - code-reviewer, security-scanner, complexity-estimator, workflow-detector, summary-generator, doc-generator
+6. [Invocation Patterns](#invocation-patterns) - How agents are invoked and routed
+7. [Agent Comparison Tables](#agent-comparison-tables)
+8. [Common Workflows](#common-workflows)
+9. [Agent Collaboration Patterns](#agent-collaboration-patterns)
+10. [Best Practices](#best-practices) - Decision trees, model selection, token efficiency, error handling
+11. [Writing Agent Descriptions](#writing-agent-descriptions) - Guidelines for creating new agents
+12. [Migration from v1.x](#migration-from-v1x)
+13. [Related Documentation](#related-documentation)
+
+---
 
 ## Overview
 
-Devloop agents are specialized sub-agents that handle specific aspects of the development workflow. In v2.0, agents have been consolidated into "super-agents" that combine related capabilities:
+Devloop agents are specialized sub-agents that handle specific aspects of the development workflow. They represent the execution layer of devloop's methodology, transforming plans into code, tests, and documentation.
 
-- **engineer** - Combines exploration, architecture, refactoring, and git operations
-- **qa-engineer** - Combines test generation, execution, bug tracking, and QA validation
-- **task-planner** - Combines planning, requirements gathering, issue management, and DoD validation
+### Architecture: Super-Agents + Specialists
+
+In v2.0+, devloop uses a hybrid agent architecture:
+
+**3 Super-Agents** (multi-mode, high-flexibility):
+- **engineer** - Exploration, architecture, refactoring, git operations (4 modes)
+- **qa-engineer** - Test generation, execution, bug tracking, QA validation (4 modes)
+- **task-planner** - Planning, requirements, issue management, DoD validation (4 modes)
+
+**6 Specialist Agents** (single-purpose, high-efficiency):
+- **code-reviewer** - Code quality and bug detection
+- **security-scanner** - OWASP Top 10 vulnerability scanning
+- **complexity-estimator** - T-shirt sizing and risk assessment
+- **workflow-detector** - Task classification and routing
+- **summary-generator** - Session summaries and handoff docs
+- **doc-generator** - READMEs, API docs, changelogs
+
+### Key Principles (v2.1)
+
+**1. Strategic Model Selection**
+- opus (5x cost): Critical code review, security-sensitive work
+- sonnet (1x cost): Standard implementation, design, planning
+- haiku (0.2x cost): Classification, estimation, summaries
+
+**2. Mode-Based Operation**
+- Super-agents detect operating mode from task context
+- Single agent handles multiple related capabilities
+- Reduces context switching, improves coherence
+
+**3. Automatic Invocation**
+- `/devloop:continue` routes to agents via routing table
+- Agents auto-invoke skills based on file type and context
+- Background execution for parallel independent tasks
+
+**4. Checkpoint-Driven Workflow** (Phase 7)
+- Mandatory checkpoints after every agent execution
+- Plan synchronization with `[x]`/`[ ]`/`[~]` markers
+- Session metrics tracking (tasks/agents/duration/tokens)
+- Context management with staleness thresholds
+
+**5. Fresh Start Support** (Phase 8)
+- `/devloop:fresh` saves state and clears context
+- Auto-detection on session startup
+- State preservation in `.devloop/next-action.json`
+- Single-use state file (auto-deleted after reading)
+
+### What's New in v2.1 (Phases 5-9)
+
+**Engineer Agent Enhancements** (Phase 6):
+- 6 new skills: complexity-estimation, project-context, api-design, database-patterns, testing-strategies, refactoring-analysis
+- Mode-specific skill workflows with invocation order
+- Complexity-aware mode selection (simple/medium/complex)
+- Output format standards (token budgets per mode)
+- Model escalation guidance (when to suggest opus)
+- Enhanced delegation to all 9 agents
+
+**Workflow Loop** (Phase 7):
+- Mandatory post-task checkpoint (Step 5a in continue.md)
+- Loop completion detection with 8 option handlers
+- Context management with 6 session metrics
+- Standardized AskUserQuestion patterns (11 questions)
+
+**Fresh Start Mechanism** (Phase 8):
+- `/devloop:fresh` command for state preservation
+- `session-start.sh` auto-detection with jq + fallback parsing
+- Integration with `/devloop:continue` workflow
+- Complete lifecycle documentation in Step 9
+
+**Integration & Refinements** (Phase 9):
+- Spike → plan application with diff previews
+- Enhanced task-checkpoint skill with mandatory worklog sync
+- Applied AskUserQuestion standards to review.md and ship.md
+- Comprehensive integration testing (5/5 scenarios passed)
 
 Each agent is optimized with:
-- **Mode-based operation**: Multiple capabilities within a single agent
+- **Mode-based operation**: Multiple capabilities within a single agent (super-agents)
 - **Strategic model selection**: Right model (opus/sonnet/haiku) for their task
 - **Color coding**: Visual organization by category
 - **Focused tools**: Only the tools they need
+- **Auto-loaded skills**: Relevant domain knowledge based on context
 
-Agents are invoked automatically by the devloop workflow or can be spawned explicitly using the `Task` tool.
+Agents are invoked automatically by the devloop workflow (via `/devloop:continue`) or can be spawned explicitly using the `Task` tool.
+
+---
+
+## Quick Reference
+
+**Most Common Agent Invocations:**
+
+| I want to... | Use this agent | Mode/Notes |
+|--------------|----------------|------------|
+| Understand how code works | `engineer` | Explore mode, max 10 files |
+| Design a new feature | `engineer` | Architect mode, consider 2-3 approaches |
+| Implement approved design | `engineer` | Default mode |
+| Improve code quality | `engineer` | Refactor mode OR `/devloop:analyze` |
+| Make a commit/PR | `engineer` | Git mode |
+| Break down a feature | `task-planner` | Planner mode |
+| Clarify vague requirements | `task-planner` | Requirements mode |
+| Generate tests | `qa-engineer` | Generator mode |
+| Run tests | `qa-engineer` | Runner mode |
+| Review code | `code-reviewer` | Standalone, use opus for critical |
+| Check security | `security-scanner` | Standalone, always haiku |
+| Estimate complexity | `complexity-estimator` | Auto-invoked, not manual |
+| Resume work | `/devloop:continue` | Routes automatically |
+| Clear context | `/devloop:fresh` | Command, not agent |
+
+**Agent Routing**: See full routing table in [Invocation Patterns](#invocation-patterns) section.
 
 ---
 
@@ -313,21 +429,95 @@ Technical documentation specialist creating READMEs, API docs, inline comments, 
 
 ---
 
+## Invocation Patterns
+
+### How Agents Are Invoked
+
+Agents can be invoked in three ways:
+
+1. **Automatic Routing** - `/devloop:continue` determines the right agent based on task type
+2. **Explicit Invocation** - Use Task tool directly: `Task(subagent_type="devloop:agent-name")`
+3. **Background Execution** - Parallel execution with `run_in_background: true`
+
+**Example: Automatic Routing**
+
+When you run `/devloop:continue` with a task "Implement user authentication", the command:
+1. Reads the plan and identifies the task
+2. Consults the Agent Routing Table (see `continue.md` Step 4)
+3. Determines task type = "implement feature"
+4. Routes to `devloop:engineer` agent
+5. Engineer detects mode = "architect" (new feature)
+6. Engineer may invoke other skills/agents as needed
+
+**Example: Background Execution**
+
+```markdown
+Task(
+  subagent_type="devloop:engineer",
+  prompt="Explore payment processing flow",
+  run_in_background=true
+)
+Task(
+  subagent_type="devloop:engineer",
+  prompt="Explore authentication system",
+  run_in_background=true
+)
+Task(
+  subagent_type="devloop:engineer",
+  prompt="Explore notification service",
+  run_in_background=true
+)
+
+# Poll for results
+TaskOutput to check completion status
+```
+
+**When to Use Background Execution:**
+- 3+ exploration tasks in parallel
+- Independent code reviews across modules
+- Multi-component architecture analysis
+- **NOT** for sequential dependencies
+
+### Agent Routing Table Reference
+
+See `/devloop:continue` (Step 4) for the authoritative routing table. Summary:
+
+| Task Type | Routes To | Mode/Notes |
+|-----------|-----------|------------|
+| Implement feature/code | engineer | Default/architect mode |
+| Explore/understand code | engineer | Explore mode |
+| Design architecture | engineer | Architect mode |
+| Refactor code | engineer | Refactor mode |
+| Git operations | engineer | Git mode |
+| Plan tasks/breakdown | task-planner | Planner mode |
+| Gather requirements | task-planner | Requirements mode |
+| Validate completion | task-planner | DoD validator mode |
+| Write tests | qa-engineer | Generator mode |
+| Run tests | qa-engineer | Runner mode |
+| Track bugs/issues | qa-engineer | Bug tracker mode |
+| Code review | code-reviewer | Standalone |
+| Security scan | security-scanner | Standalone |
+| Generate docs | doc-generator | Standalone |
+| Estimate complexity | complexity-estimator | Auto-invoked only |
+| Spike/exploration | Suggest `/devloop:spike` | Command, not agent |
+
+---
+
 ## Agent Comparison Tables
 
 ### By Invocation Pattern
 
-| Agent | User-Invoked | Auto-Invoked | Multi-Mode |
-|-------|--------------|--------------|------------|
-| engineer | ✅ | ✅ | ✅ (explore, architect, refactor, git) |
-| qa-engineer | ✅ | ✅ | ✅ (generate, run, bug, validate) |
-| task-planner | ✅ | ✅ | ✅ (plan, requirements, issues, DoD) |
-| code-reviewer | ✅ | ✅ | ❌ |
-| security-scanner | ✅ | ✅ | ❌ |
-| complexity-estimator | ❌ | ✅ | ❌ |
-| workflow-detector | ❌ | ✅ | ❌ |
-| summary-generator | ❌ | ✅ | ❌ |
-| doc-generator | ✅ | ✅ | ❌ |
+| Agent | User-Invoked | Auto-Invoked | Multi-Mode | Background Capable |
+|-------|--------------|--------------|------------|--------------------|
+| engineer | ✅ | ✅ | ✅ (explore, architect, refactor, git) | ✅ |
+| qa-engineer | ✅ | ✅ | ✅ (generate, run, bug, validate) | ✅ |
+| task-planner | ✅ | ✅ | ✅ (plan, requirements, issues, DoD) | ⚠️ Limited |
+| code-reviewer | ✅ | ✅ | ❌ | ✅ |
+| security-scanner | ✅ | ✅ | ❌ | ✅ |
+| complexity-estimator | ❌ | ✅ | ❌ | ✅ |
+| workflow-detector | ❌ | ✅ | ❌ | ✅ |
+| summary-generator | ❌ | ✅ | ❌ | ✅ |
+| doc-generator | ✅ | ✅ | ❌ | ⚠️ Limited |
 
 ### By Model Selection
 
@@ -370,6 +560,372 @@ Technical documentation specialist creating READMEs, API docs, inline comments, 
 1. **code-reviewer**: Primary review (x3 parallel focuses)
 2. **security-scanner**: Security analysis
 3. **qa-engineer** (runner mode): Validate tests still pass
+
+---
+
+## Agent Collaboration Patterns
+
+Agents work together to accomplish complex workflows. Understanding these patterns helps you leverage devloop's full capabilities.
+
+### Engineer → Code Reviewer Flow
+
+**Scenario**: Feature implementation complete, needs validation
+
+```markdown
+1. Engineer (architect mode) designs feature
+   Output: Architecture blueprint
+
+2. Engineer (default mode) implements feature
+   Output: Code changes
+
+3. Code Reviewer validates implementation
+   - Launched automatically or manually
+   - Checks against CLAUDE.md guidelines
+   - Identifies high-confidence issues (≥80%)
+   Output: Review findings
+
+4. Engineer addresses review findings
+   - If issues found, iterate
+   - If clean, proceed to testing
+```
+
+**Key Points**:
+- Code reviewer runs with sonnet/opus based on complexity
+- Only high-confidence issues reported (reduces noise)
+- Engineer has context from previous steps
+
+### QA Engineer → Bug Tracker Flow
+
+**Scenario**: Tests reveal non-blocking issues
+
+```markdown
+1. QA Engineer (generator mode) creates tests
+   Output: Test files
+
+2. QA Engineer (runner mode) executes tests
+   Output: Test results + failures
+
+3. QA Engineer (bug tracker mode) logs issues
+   - Auto-creates bug reports for failures
+   - Links to failing test cases
+   - Categorizes severity
+   Output: Bug issues in .devloop/issues/
+
+4. Continue workflow or address immediately
+   - Critical bugs: Fix now
+   - Non-blocking: Track for later
+```
+
+**Key Points**:
+- QA engineer handles full testing lifecycle
+- Bug tracking integrated with issue system
+- User decides priority for fixes
+
+### Task Planner → Engineer Handoff
+
+**Scenario**: Complex feature needs structured planning
+
+```markdown
+1. Task Planner (requirements mode) gathers specs
+   - Asks clarifying questions
+   - Documents requirements
+   Output: Requirements document
+
+2. Complexity Estimator assesses scope
+   Output: T-shirt size + risk factors
+
+3. Engineer (architect mode) designs solution
+   - References requirements
+   - Considers complexity assessment
+   Output: Architecture blueprint
+
+4. Task Planner (planner mode) creates implementation plan
+   - Breaks architecture into tasks
+   - Adds acceptance criteria
+   - Identifies dependencies
+   Output: .devloop/plan.md
+
+5. Engineer executes tasks from plan
+   - Uses /devloop:continue for workflow
+   - Updates plan markers as tasks complete
+```
+
+**Key Points**:
+- Clear requirements → better architecture
+- Complexity informs design decisions
+- Plan provides structured execution path
+
+### Multi-Agent Parallel Execution
+
+**Scenario**: Large codebase exploration across multiple modules
+
+```markdown
+1. Launch 3x Engineer (explore mode) in parallel
+   Task 1: Explore payment processing
+   Task 2: Explore authentication system
+   Task 3: Explore notification service
+   All with run_in_background=true
+
+2. Poll TaskOutput for completion
+   - Check status every few seconds
+   - Collect results as they complete
+
+3. Engineer (architect mode) synthesizes findings
+   - Reads all 3 exploration reports
+   - Identifies integration points
+   - Designs unified architecture
+
+4. Code Reviewer validates design (3x parallel)
+   Task 1: Review payment integration
+   Task 2: Review auth integration
+   Task 3: Review notification integration
+```
+
+**Key Points**:
+- Background execution for independent tasks
+- Max 3-5 parallel agents (token efficiency)
+- Synthesis step combines findings
+- See "Background Execution Best Practices" in continue.md Step 5c
+
+### Engineer Mode Transitions
+
+**Scenario**: Multi-phase task requiring different capabilities
+
+**Example 1: "Add feature X to component Y"**
+```markdown
+1. Engineer (explore mode) understands existing component
+   - Traces current implementation
+   - Identifies extension points
+   Output: Exploration report
+
+2. User checkpoint: "Based on this analysis, design the feature"
+
+3. Engineer (architect mode) designs feature integration
+   - References exploration findings
+   - Proposes architecture approach
+   Output: Architecture blueprint
+
+4. User approves design
+
+5. Engineer (default mode) implements feature
+   Output: Code changes
+```
+
+**Example 2: "Refactor and commit"**
+```markdown
+1. Engineer (refactor mode) analyzes codebase
+   - Identifies tech debt
+   - Proposes improvements
+   Output: Refactoring plan
+
+2. User selects improvements to implement
+
+3. Engineer (default mode) executes refactoring
+   Output: Code changes
+
+4. Code Reviewer validates changes
+   Output: Review findings
+
+5. Engineer (git mode) creates commit/PR
+   Output: Git operation summary
+```
+
+**Key Points**:
+- Single agent, multiple modes within one workflow
+- Checkpoints between mode transitions
+- Context preserved across modes
+- See `engineer.md` "Multi-Mode Task Patterns" section
+
+---
+
+## Best Practices
+
+### When to Use Which Agent
+
+**Decision Tree for Common Scenarios**
+
+```
+Need to understand existing code?
+  └─> engineer (explore mode)
+      - Use 3x parallel for large codebases
+      - Max 10 files per exploration
+      - Combine with project-context skill
+
+Need to design a feature?
+  └─> Is scope unclear?
+      ├─> Yes: task-planner (requirements mode) first
+      │          Then engineer (architect mode)
+      └─> No: engineer (architect mode) directly
+          - Invoke complexity-estimation for complex features
+          - Consider 2-3 alternative approaches
+
+Need to implement code?
+  └─> Has design been approved?
+      ├─> Yes: engineer (default mode)
+      └─> No: Don't implement yet
+          - Run architect mode first
+          - Get user approval
+
+Need to refactor?
+  └─> Large codebase (10+ files)?
+      ├─> Yes: /devloop:analyze command
+      │         (comprehensive analysis)
+      └─> No: engineer (refactor mode)
+          - Focuses on specific module
+
+Need to review code?
+  └─> Is it security-sensitive?
+      ├─> Yes: Run both code-reviewer + security-scanner
+      │         (recommend opus model for code-reviewer)
+      └─> No: code-reviewer only (sonnet)
+
+Need to test?
+  └─> qa-engineer (generator mode for new tests)
+      Then qa-engineer (runner mode for execution)
+      Log failures with qa-engineer (bug tracker mode)
+
+Ready to ship?
+  └─> Are all tasks complete?
+      ├─> Yes: task-planner (DoD validator mode)
+      │         Then engineer (git mode)
+      └─> No: Use /devloop:continue to finish tasks
+```
+
+### Model Selection Per Agent
+
+**Strategic Model Choice for Token Efficiency**
+
+| Agent | Default Model | When to Escalate | Reasoning |
+|-------|---------------|------------------|-----------|
+| **engineer** | sonnet | 5+ files, security code, complex patterns | Most work is standard coding |
+| **qa-engineer** | sonnet | Critical test coverage gaps | Test generation is formulaic |
+| **task-planner** | sonnet | Never | Planning is straightforward |
+| **code-reviewer** | sonnet | Security-sensitive, complex logic | Opus for catching subtle bugs |
+| **security-scanner** | haiku | Never | Pattern matching, fast |
+| **complexity-estimator** | haiku | Never | Quick assessment |
+| **workflow-detector** | haiku | Never | Classification only |
+| **summary-generator** | haiku | Never | Document synthesis |
+| **doc-generator** | sonnet | Never | Documentation needs clarity |
+
+**Token Cost Impact** (relative to sonnet = 1x):
+- opus = 5x tokens
+- sonnet = 1x tokens
+- haiku = 0.2x tokens
+
+**Example Session**:
+```
+1. workflow-detector (haiku) - 0.2x
+2. complexity-estimator (haiku) - 0.2x
+3. engineer explore x3 (sonnet) - 3x
+4. engineer architect (sonnet) - 1x
+5. task-planner (sonnet) - 1x
+6. engineer implement (sonnet) - 1x
+7. qa-engineer generate (sonnet) - 1x
+8. qa-engineer run (sonnet) - 1x
+9. code-reviewer (opus) - 5x ← Critical phase
+10. security-scanner (haiku) - 0.2x
+11. engineer git (sonnet) - 1x
+12. summary-generator (haiku) - 0.2x
+
+Total: 15.0x (vs 60x if all opus, or 12x if all sonnet)
+```
+
+### Token Efficiency Considerations
+
+**Parallel Execution Trade-offs**
+
+Running 3 agents in parallel = 3x tokens consumed simultaneously.
+
+**When it's worth it:**
+- Large exploration (saves sequential time)
+- Independent code reviews (comprehensive coverage)
+- Critical path bottleneck (user waiting)
+
+**When to avoid:**
+- Sequential dependencies (wasted context)
+- Simple tasks (overhead > benefit)
+- Near token budget limits (risk of failures)
+
+**Best practices:**
+1. Limit to 3-5 parallel agents maximum
+2. Use haiku agents for parallel when possible
+3. Poll TaskOutput every 10-15 seconds (not continuously)
+4. Have synthesis step after parallel execution
+
+### Error Handling and Recovery
+
+**Common Agent Failures and Solutions**
+
+| Error Type | Cause | Solution |
+|------------|-------|----------|
+| **Agent timeout** | Task too complex | Break into smaller tasks |
+| **Context overflow** | Too much code read | Use /devloop:fresh to reset |
+| **Mode detection failure** | Ambiguous task description | Be explicit: "explore the auth system" |
+| **Skill not found** | Missing language support | Check skills/INDEX.md for available skills |
+| **Plan out of sync** | Manual edits | Use plan-management skill to fix |
+| **Background agent stuck** | Infinite loop | Check ~/.devloop-agent-invocations.log |
+
+**Recovery Patterns**
+
+**If engineer gets stuck exploring:**
+```markdown
+1. Check how many files it's reading
+2. If > 10 files, it's too broad
+3. Refine prompt: "Explore only the UserService class"
+4. Or split: "Explore auth" + "Explore users" separately
+```
+
+**If checkpoint questions are confusing:**
+```markdown
+1. Check .devloop/plan.md for task status
+2. Verify which tasks are complete [x] vs pending [ ]
+3. Answer based on actual completion, not intent
+4. Use "partial completion" option if uncertain
+```
+
+**If fresh start state is wrong:**
+```markdown
+1. Use /devloop:fresh --dismiss to clear
+2. Manually check .devloop/plan.md
+3. Use /devloop:continue normally
+4. State file is single-use, auto-deletes
+```
+
+### Context Management
+
+**When to Use /devloop:fresh**
+
+Trigger fresh start when:
+- Session has processed 5+ tasks
+- Plan size > 500 lines
+- Token count approaching limits
+- Conversation feels "sluggish"
+- Switching to different phase
+
+**Fresh Start Workflow:**
+```bash
+# 1. Save current state
+/devloop:fresh
+
+# 2. Start new conversation
+# (Or restart Claude Code)
+
+# 3. State auto-detected on startup
+# Displays: Plan, Phase, Progress, Next task
+
+# 4. Continue normally
+/devloop:continue
+
+# State file auto-deleted after reading
+```
+
+**State Preservation:**
+- Plan file: `.devloop/plan.md` (git-tracked)
+- Worklog: `.devloop/worklog.md` (git-tracked)
+- Issues: `.devloop/issues/` (git-tracked)
+- Fresh start state: `.devloop/next-action.json` (temporary, auto-deleted)
+
+See Step 9 in `continue.md` for complete fresh start documentation.
 
 ---
 

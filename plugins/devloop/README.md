@@ -181,6 +181,153 @@ This reduces token overhead from agent context while maintaining all capabilitie
 
 ---
 
+## Agent Invocation Patterns
+
+Commands orchestrate workflows by routing tasks to specialized agents using the Task tool.
+
+### How Commands Route to Agents
+
+Commands use the Task tool with explicit `subagent_type` to invoke agents:
+
+```yaml
+Task:
+  subagent_type: devloop:engineer
+  description: "Implement user authentication"
+  prompt: |
+    Implement JWT-based authentication for the user service.
+
+    Requirements:
+    - Token generation with RS256
+    - Token validation middleware
+    - Refresh token support
+```
+
+### Agent Routing Table
+
+| Task Type | Agent | Mode/Focus |
+|-----------|-------|------------|
+| Implement feature/code | `devloop:engineer` | Default mode |
+| Explore/understand code | `devloop:engineer` | Explore mode |
+| Design architecture | `devloop:engineer` | Architect mode |
+| Refactor code | `devloop:engineer` | Refactor mode |
+| Git commit/branch/PR | `devloop:engineer` | Git mode |
+| Plan tasks/breakdown | `devloop:task-planner` | Planner mode |
+| Gather requirements | `devloop:task-planner` | Requirements mode |
+| Validate completion | `devloop:task-planner` | DoD validator mode |
+| Write tests | `devloop:qa-engineer` | Generator mode |
+| Run tests | `devloop:qa-engineer` | Runner mode |
+| Track bugs/issues | `devloop:qa-engineer` | Bug tracker mode |
+| Code review | `devloop:code-reviewer` | - |
+| Security scan | `devloop:security-scanner` | - |
+| Generate docs | `devloop:doc-generator` | - |
+
+### Automatic vs Explicit Invocation
+
+**Automatic (Command-Driven)**:
+- `/devloop:continue` - Analyzes next task, routes to appropriate agent
+- `/devloop:review` - Automatically invokes `code-reviewer`
+- `/devloop:ship` - Invokes `qa-engineer` (validator) then `engineer` (git)
+
+**Explicit (User-Directed)**:
+- `/devloop:analyze` - Directly invokes `engineer` (refactor mode)
+- `/devloop:spike` - Uses `engineer` (explore mode)
+- `/devloop:quick` - Routes to `engineer` (default mode)
+
+### Mode Detection Example
+
+The `engineer` agent detects its mode from task keywords:
+
+```yaml
+# Exploration task
+Task:
+  subagent_type: devloop:engineer
+  description: "Explore authentication flow"
+  prompt: "Understand how JWT tokens are currently generated"
+# → Agent detects "explore", "understand" → Explore mode
+
+# Architecture task
+Task:
+  subagent_type: devloop:engineer
+  description: "Design caching strategy"
+  prompt: "Design Redis caching for user sessions"
+# → Agent detects "design", "strategy" → Architect mode
+
+# Implementation task
+Task:
+  subagent_type: devloop:engineer
+  description: "Add rate limiting"
+  prompt: "Implement rate limiting middleware"
+# → Agent detects "implement", "add" → Default mode
+```
+
+### Background Execution
+
+For parallel independent tasks, use `run_in_background: true`:
+
+```yaml
+# Launch multiple agents in parallel
+Task:
+  subagent_type: devloop:engineer
+  description: "Implement user model"
+  run_in_background: true
+
+Task:
+  subagent_type: devloop:engineer
+  description: "Implement product model"
+  run_in_background: true
+
+# Poll for results
+TaskOutput(block=false)  # Non-blocking check
+# Continue with other work while agents run
+
+# Wait for completion when needed
+TaskOutput(block=true)   # Blocking wait
+```
+
+**Best Practices**:
+- Max 3-4 parallel agents (beyond this, coordination costs exceed benefits)
+- Use for independent tasks (models, services, tests)
+- Poll periodically with `TaskOutput(block=false)`
+- Block only when no other work remains
+
+**Example from `/devloop:continue`**:
+
+```yaml
+# Step 6: Handle Parallel Tasks
+# If tasks marked [parallel:A]:
+
+AskUserQuestion:
+  question: "Tasks 2.1, 2.2, 2.3 can run in parallel. Run together?"
+  options:
+    - Run all in parallel (Recommended)
+    - Run sequentially
+
+# If parallel selected:
+Task: devloop:engineer, description: "Task 2.1", run_in_background: true
+Task: devloop:engineer, description: "Task 2.2", run_in_background: true
+Task: devloop:engineer, description: "Task 2.3", run_in_background: true
+
+# Poll and display progress
+while agents_running:
+  result = TaskOutput(block=false)
+  if result:
+    update_progress(result)
+```
+
+### Token Cost Awareness
+
+Parallel agents increase token usage:
+
+| Scenario | Token Cost | When to Use |
+|----------|------------|-------------|
+| 3x haiku agents | Low (~3k tokens) | Simple tasks (formatting, config) |
+| 3x sonnet agents | Medium (~15k tokens) | Implementation, exploration |
+| 3x opus agents | High (~60k tokens) | Avoid unless critical |
+
+**Recommendation**: Use parallel execution for high-value gains (3-4 hours → 1 hour), not for marginal savings (30 min → 20 min).
+
+---
+
 ## Skills
 
 devloop provides 26 skills—domain knowledge that Claude automatically applies when relevant:
@@ -371,11 +518,88 @@ After every task, `/devloop:continue` runs a mandatory checkpoint that:
 
 1. **Verifies** agent output (success/failure/partial)
 2. **Updates** plan markers (`[ ]` → `[x]` or `[~]`)
-3. **Decides** next action with user:
+3. **Updates** worklog with pending entry
+4. **Decides** next action with user:
    - **Commit now**: Create atomic commit for this work
    - **Continue working**: Group with related tasks before committing
    - **Fresh start**: Save state, clear context, resume in new session
    - **Stop here**: Generate summary and end session
+
+### Checkpoint Examples
+
+**Successful Completion**:
+```yaml
+# Task 2.1 complete: Implemented JWT token generation
+
+AskUserQuestion:
+  question: "Task 2.1 complete: Implemented JWT token generation. What's next?"
+  header: "Checkpoint"
+  options:
+    - Continue to next task (Proceed to Task 2.2)
+    - Commit this work (Create atomic commit)
+    - Fresh start (Save state, clear context)
+    - Stop here (Generate summary)
+
+# User selects: Continue to next task
+→ Task 2.1 marked [x] in plan
+→ Worklog entry added: - [ ] Task 2.1: Implement JWT tokens (pending)
+→ Loop continues to Task 2.2
+```
+
+**Partial Completion**:
+```yaml
+# Task 3.2 partially complete: Basic validation added, edge cases pending
+
+AskUserQuestion:
+  question: "Task 3.2 partially complete. Missing: edge case handling for null values. How proceed?"
+  header: "Partial"
+  options:
+    - Mark done and continue (Accept current state)
+    - Continue work on this task (Complete remaining criteria)
+    - Note as tech debt (Mark blocked, track issue)
+    - Fresh start (Clear context for focus)
+
+# User selects: Continue work
+→ Task 3.2 marked [~] in plan
+→ Agent relaunches with context about missing edge cases
+```
+
+**Error Recovery**:
+```yaml
+# Task 4.1 failed: Database migration error
+
+AskUserQuestion:
+  question: "Task 4.1 failed: Migration error 'duplicate column'. How recover?"
+  header: "Error"
+  options:
+    - Retry (Attempt again with adjusted approach)
+    - Skip and mark blocked (Move to next task)
+    - Investigate error (Show full error output)
+    - Abort workflow (Stop and save state)
+
+# User selects: Investigate
+→ Display agent output and error details
+→ User suggests fix
+→ Retry with new approach
+```
+
+**Grouped Commit**:
+```yaml
+# Task 2.1, 2.2, 2.3 all complete (auth flow)
+
+AskUserQuestion:
+  question: "Tasks 2.1-2.3 complete (auth flow). Commit grouped?"
+  header: "Commit"
+  options:
+    - Commit all together (Single atomic commit: "feat(auth): complete flow")
+    - Commit individually (Three separate commits)
+    - Review changes first (Show combined diff)
+
+# User selects: Commit all together
+→ Creates commit: feat(auth): implement authentication flow - Tasks 2.1, 2.2, 2.3
+→ Worklog updated with commit hash for all three tasks
+→ Loop continues to next phase
+```
 
 ### Loop Completion Detection
 
@@ -384,15 +608,55 @@ When all tasks are complete, devloop:
 - Offers options: Ship it, Review, Add more tasks, End session
 - Handles edge cases (partial tasks, blocked tasks, archived phases)
 
+**Completion Example**:
+```yaml
+# All 15 tasks complete
+
+AskUserQuestion:
+  question: "🎉 All plan tasks complete! What would you like to do?"
+  header: "Complete"
+  options:
+    - Ship it (Run /devloop:ship for validation - Recommended)
+    - Add more tasks (Extend the plan)
+    - Review (Show completed work summary)
+    - End session (Generate summary and finish)
+
+# User selects: Ship it
+→ Plan status updated to "Review"
+→ Launches /devloop:ship workflow
+→ Validates code, tests, docs
+→ Creates PR or final commit
+```
+
 ### Context Management
 
 devloop tracks session metrics and suggests fresh starts when:
-- Tasks completed > 5 in session
-- Agent invocations > 10 in session
-- Session duration > 2 hours active
-- Context feels heavy or slow
 
-See `Skill: workflow-loop` for complete documentation.
+| Metric | Threshold | Action |
+|--------|-----------|--------|
+| Tasks completed | > 10 in session | Suggest fresh start |
+| Agent invocations | > 15 in session | Context getting heavy |
+| Session duration | > 2 hours active | Conversation likely stale |
+| Estimated tokens | > 150k tokens | Context nearly full (Critical) |
+
+**Context Warning Example**:
+```markdown
+⚠️ Context Health Warning
+
+The following metrics suggest a fresh start may improve performance:
+- 12 tasks completed in session
+- 18 agent invocations
+- Session running for 2.5 hours
+
+Recommendations:
+- Run /devloop:fresh to save state and clear context (Recommended)
+- Continue anyway if close to completion
+- Use /devloop:archive to compress plan if large
+
+Would you like to continue or take action?
+```
+
+See `Skill: workflow-loop` and `Skill: task-checkpoint` for complete documentation.
 
 ---
 
