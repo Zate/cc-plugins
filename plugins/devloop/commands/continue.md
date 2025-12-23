@@ -55,15 +55,19 @@ Also read `.devloop/worklog.md` if it exists to understand completed work.
 - Archives contain complete historical phase details if referenced
 
 **If no plan found:**
-```
+```yaml
 AskUserQuestion:
-- question: "No plan found. What would you like to do?"
-- header: "No Plan"
-- options:
-  - Start feature workflow (Recommended) → Launch /devloop
-  - Quick implementation → Launch /devloop:quick
-  - Explore/spike first → Launch /devloop:spike
-  - Create plan now → Use EnterPlanMode, save to .devloop/plan.md
+  question: "No plan found. What would you like to do?"
+  header: "No Plan"
+  options:
+    - label: "Start feature workflow"
+      description: "Launch /devloop (Recommended)"
+    - label: "Quick implementation"
+      description: "Launch /devloop:quick for single task"
+    - label: "Explore/spike first"
+      description: "Launch /devloop:spike to investigate"
+    - label: "Create plan now"
+      description: "Use plan mode, save to .devloop/plan.md"
 ```
 
 ---
@@ -138,15 +142,19 @@ Analyze the next task description to determine its type:
 
 Based on task classification, present targeted options:
 
-```
+```yaml
 AskUserQuestion:
-- question: "Next task: [Task description]. How would you like to proceed?"
-- header: "Action"
-- options:
-  - [Primary action based on task type] (Recommended)
-  - Different approach
-  - Skip this task
-  - Update the plan first
+  question: "Next task: [Task description]. How proceed?"
+  header: "Action"
+  options:
+    - label: "[Primary action based on task type]"
+      description: "(Recommended)"
+    - label: "Different approach"
+      description: "Alternate implementation strategy"
+    - label: "Skip this task"
+      description: "Mark as blocked, move to next"
+    - label: "Update plan first"
+      description: "Revise plan before proceeding"
 ```
 
 **Primary actions by type:**
@@ -303,7 +311,9 @@ Task:
 
 **CRITICAL**: This step MUST run after every agent execution. Never skip.
 
-**Reference**: `Skill: workflow-loop` - Checkpoint requirements
+**References**:
+- `Skill: task-checkpoint` - Standard checkpoint patterns and formats
+- `Skill: workflow-loop` - Checkpoint requirements in loop context
 
 ### Checkpoint Sequence
 
@@ -373,8 +383,8 @@ AskUserQuestion:
 
 ```yaml
 AskUserQuestion:
-  question: "Task [X.Y] partially complete. [What's missing/incomplete]. How should we proceed?"
-  header: "Partial Completion"
+  question: "Task [X.Y] partially complete. [What's missing/incomplete]. How proceed?"
+  header: "Partial"
   options:
     - label: "Mark done and continue"
       description: "Accept current state, move to next task"
@@ -390,8 +400,8 @@ AskUserQuestion:
 
 ```yaml
 AskUserQuestion:
-  question: "Task [X.Y] failed: [Error description]. How should we recover?"
-  header: "Error Recovery"
+  question: "Task [X.Y] failed: [Error description]. How recover?"
+  header: "Error"
   options:
     - label: "Retry"
       description: "Attempt again with adjusted approach"
@@ -554,16 +564,16 @@ Present completion options:
 ```yaml
 AskUserQuestion:
   question: "All tasks complete! Plan finished. What's next?"
-  header: "Plan Complete"
+  header: "Complete"
   options:
-    - label: "Ship it (Recommended)"
-      description: "Run validation and prepare for deployment via /devloop:ship"
+    - label: "Ship it"
+      description: "Run validation and deploy via /devloop:ship (Recommended)"
     - label: "Review plan"
-      description: "Show summary of completed work and tasks"
+      description: "Show summary of completed work"
     - label: "Add more tasks"
-      description: "Extend the plan with additional work"
+      description: "Extend plan with additional work"
     - label: "End session"
-      description: "Update plan status to Complete and stop"
+      description: "Mark plan Complete and stop"
 ```
 
 **If `completion_state == "partial_completion"`**:
@@ -572,17 +582,17 @@ No pending tasks, but some tasks marked `[~]` (partial).
 
 ```yaml
 AskUserQuestion:
-  question: "All tasks attempted, but {N} remain partially complete. How to proceed?"
-  header: "Partial Completion"
+  question: "All tasks attempted, but {N} remain partially complete. How proceed?"
+  header: "Partial"
   options:
     - label: "Finish partials"
-      description: "Work through {N} partial tasks to complete them"
+      description: "Work through {N} partial tasks to complete"
     - label: "Ship anyway"
-      description: "Accept current state and run /devloop:ship"
+      description: "Accept state and run /devloop:ship"
     - label: "Review partials"
-      description: "Show which tasks are partial and what's missing"
+      description: "Show partial tasks and what's missing"
     - label: "Mark as complete"
-      description: "Accept partials as done, update plan to Complete"
+      description: "Accept as done, update plan to Complete"
 ```
 
 **If `completion_state == "in_progress"`**:
@@ -627,11 +637,11 @@ Work remains - return to Step 6 (Handle Parallel Tasks) to continue the loop.
      header: "Next"
      options:
        - label: "Ship it"
-         description: "Run /devloop:ship workflow"
+         description: "Run /devloop:ship workflow (Recommended)"
        - label: "Add tasks"
          description: "Extend with additional work"
        - label: "End session"
-         description: "Stop here, update plan to Complete"
+         description: "Mark plan Complete and stop"
    ```
 
 **If "Add more tasks"**:
@@ -639,15 +649,15 @@ Work remains - return to Step 6 (Handle Parallel Tasks) to continue the loop.
 1. Ask user what to add (free-form or structured):
    ```yaml
    AskUserQuestion:
-     question: "What additional work should be added to the plan?"
+     question: "What additional work should be added?"
      header: "Add Tasks"
      options:
        - label: "Enter plan mode"
-         description: "Use EnterPlanMode to design additional tasks"
+         description: "Use plan mode to design tasks"
        - label: "Quick add"
-         description: "Describe tasks in text, I'll add to plan"
+         description: "Describe tasks, I'll add to plan"
        - label: "New phase"
-         description: "Start a new phase with structured tasks"
+         description: "Start new phase with structured tasks"
    ```
 
 2. Based on selection:
@@ -694,7 +704,7 @@ Work remains - return to Step 6 (Handle Parallel Tasks) to continue the loop.
    ```yaml
    AskUserQuestion:
      question: "{N} tasks are partial. Ship with incomplete work?"
-     header: "Confirm"
+     header: "Confirm Ship"
      options:
        - label: "Yes, ship"
          description: "Accept partial state, run validation"
@@ -1085,14 +1095,17 @@ If next tasks have `[parallel:X]` markers:
 
 1. Group tasks by marker letter
 2. Present grouped option:
-   ```
+   ```yaml
    AskUserQuestion:
-   - question: "Tasks A, B, C can run in parallel. Run together?"
-   - header: "Parallel"
-   - options:
-     - Run all in parallel (Recommended)
-     - Run sequentially
-     - Pick specific tasks
+     question: "Tasks A, B, C can run in parallel. Run together?"
+     header: "Parallel"
+     options:
+       - label: "Run all in parallel"
+         description: "Execute all tasks together (Recommended)"
+       - label: "Run sequentially"
+         description: "Execute tasks one by one"
+       - label: "Pick specific tasks"
+         description: "Select which tasks to run"
    ```
 
 3. If parallel, launch multiple Task tools simultaneously:

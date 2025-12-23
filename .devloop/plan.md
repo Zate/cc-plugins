@@ -1,9 +1,9 @@
 # Devloop Plan: Component Polish v2.1
 
 **Created**: 2025-12-21
-**Updated**: 2025-12-23 16:45
+**Updated**: 2025-12-23 17:15
 **Status**: Active
-**Current Phase**: Phase 7 - Workflow Loop Core Improvements (3/4 complete)
+**Current Phase**: Phase 8 - Fresh Start Mechanism (0/4 complete)
 
 ## Overview
 
@@ -266,12 +266,16 @@ Comprehensive review and enhancement of all devloop components to improve:
   - Edge cases and testing guidance ✓
   - Files: `plugins/devloop/commands/continue.md:768-1080` ✓
 
-- [ ] Task 7.4: Standardize checkpoint questions in continue.md [depends:7.1]
-  - Apply AskUserQuestion standards from Task 5.3
-  - Use standard checkpoint question format
-  - Use standard error question format
-  - Batch related questions
-  - Files: `plugins/devloop/commands/continue.md`
+- [x] Task 7.4: Standardize checkpoint questions in continue.md [depends:7.1]
+  - Applied AskUserQuestion standards from Task 5.3 ✓
+  - Standardized 11 AskUserQuestion instances across 208 diff lines ✓
+  - Fixed header length compliance (max 12 chars): "Partial Completion" → "Partial", "Error Recovery" → "Error", "Plan Complete" → "Complete" ✓
+  - Applied token-efficient question text patterns ✓
+  - Trimmed descriptions while maintaining clarity ✓
+  - Standardized recommended option patterns ✓
+  - Added Skill: task-checkpoint references to Step 5a ✓
+  - Established 4 standard formats: checkpoint, error recovery, partial completion, loop completion ✓
+  - Files: `plugins/devloop/commands/continue.md` ✓
 
 ### Phase 8: Fresh Start Mechanism [parallel:partial]
 **Goal**: Enable context clearing with state preservation
@@ -419,6 +423,7 @@ Comprehensive review and enhancement of all devloop components to improve:
 - 2025-12-23: Task 7.1 complete - Added mandatory post-task checkpoint to continue.md. Comprehensive checkpoint sequence with success/partial/failure paths, plan marker updates, session metrics tracking, and fresh start integration. Phase 7 started!
 - 2025-12-23: Task 7.2 complete - Added loop completion detection to continue.md. Step 5b with task counting, dependency checking, 8 completion option handlers, and plan status updates to "Review"/"Complete".
 - 2025-12-23: Task 7.3 complete - Added context management to continue.md. Step 5c with 6 session metrics, staleness thresholds, refresh decision tree, and background agent best practices (313 lines).
+- 2025-12-23: Task 7.4 complete - Standardized checkpoint questions in continue.md. Applied AskUserQuestion standards from Task 5.3. Fixed 11 questions across 208 diff lines. Fixed header compliance, token efficiency, and established 4 standard formats. Phase 7 COMPLETE!
 
 ## Notes
 
