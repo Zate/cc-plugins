@@ -1,6 +1,6 @@
 ---
 name: python-patterns
-description: Python-specific best practices including type hints, async patterns, testing with pytest, error handling, and common idioms. Use when working on Python codebases.
+description: Python-specific best practices including type hints, async patterns, testing with pytest, error handling, and common idioms. Use when working on Python codebases or making Python-specific design decisions.
 ---
 
 # Python Patterns

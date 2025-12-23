@@ -1,6 +1,6 @@
 ---
 name: java-patterns
-description: Java and Spring best practices including dependency injection, stream patterns, exception handling, testing, and common idioms. Use when working on Java codebases.
+description: Java and Spring best practices including dependency injection, stream patterns, exception handling, testing, and common idioms. Use when working on Java codebases or making Java-specific design decisions.
 ---
 
 # Java Patterns

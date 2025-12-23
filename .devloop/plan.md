@@ -1,9 +1,9 @@
 # Devloop Plan: Component Polish v2.1
 
 **Created**: 2025-12-21
-**Updated**: 2025-12-23 08:03
+**Updated**: 2025-12-23 09:15
 **Status**: Active
-**Current Phase**: Phase 6 - Plan Archival (4/5 complete), Phase 3 pending
+**Current Phase**: Phase 3 - Skill Refinement (2/6 complete)
 
 ## Overview
 
@@ -53,16 +53,18 @@ Comprehensive review and enhancement of all devloop components to improve:
 ### Phase 3: Skill Refinement [parallel:partial]
 **Goal**: All 28 skills have clear invocation triggers
 
-- [ ] Task 3.1: Audit pattern skills [parallel:A]
-  - go-patterns, react-patterns, java-patterns, python-patterns
-  - Ensure descriptions trigger on file type/context
-  - Add clear "when NOT to use"
-  - Files: `plugins/devloop/skills/*-patterns/SKILL.md`
+- [x] Task 3.1: Audit pattern skills [parallel:A]
+  - go-patterns, react-patterns, java-patterns, python-patterns ✓
+  - Ensure descriptions trigger on file type/context ✓
+  - Add clear "when NOT to use" ✓
+  - Updated: java-patterns, python-patterns (enhanced descriptions) ✓
+  - Files: `plugins/devloop/skills/*-patterns/SKILL.md` ✓
 
-- [ ] Task 3.2: Audit workflow skills [parallel:A]
-  - phase-templates, plan-management, worklog-management, workflow-selection
-  - Ensure descriptions match command triggers
-  - Files: `plugins/devloop/skills/*/SKILL.md`
+- [x] Task 3.2: Audit workflow skills [parallel:A]
+  - phase-templates, plan-management, worklog-management, workflow-selection ✓
+  - Ensure descriptions match command triggers ✓
+  - Updated: plan-management (added "When to Use" section) ✓
+  - Files: `plugins/devloop/skills/*/SKILL.md` ✓
 
 - [ ] Task 3.3: Audit quality skills [parallel:B]
   - testing-strategies, security-checklist, deployment-readiness, complexity-estimation
@@ -374,6 +376,8 @@ Comprehensive review and enhancement of all devloop components to improve:
 - 2025-12-23: Task 6.4 complete - Updated plan-management skill with archival documentation
 - 2025-12-23: Task 6.5 complete - Tested archival workflow. Archived Phases 1-2 (11 tasks), compressed plan from 460 to 381 lines
 - 2025-12-23: Archived Phase 1, Phase 2 to .devloop/archive/
+- 2025-12-23: Task 3.1 complete - Audited 4 pattern skills (go, react, java, python). Updated java-patterns and python-patterns descriptions for consistency
+- 2025-12-23: Task 3.2 complete - Audited 4 workflow skills. Added "When to Use" section to plan-management skill
 
 ## Notes
 

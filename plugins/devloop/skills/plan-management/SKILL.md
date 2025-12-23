@@ -7,6 +7,15 @@ description: Central reference for devloop plan file location, format, and updat
 
 **CRITICAL**: All devloop agents and commands MUST follow these conventions to ensure plan consistency.
 
+## When to Use This Skill
+
+- **Creating or updating plans**: When commands/agents need plan format reference
+- **Reading existing plans**: When `/devloop:continue` or other commands resume work
+- **Plan synchronization**: Ensuring plan updates follow conventions
+- **Understanding plan structure**: When agents need to parse task status, dependencies, or parallelism markers
+- **Enforcement checks**: Pre-commit hooks validating plan updates
+- **Archive operations**: When compressing or restoring archived phases
+
 ## When NOT to Use This Skill
 
 - **Quick tasks**: Simple fixes don't need formal plans - use `/devloop:quick`
