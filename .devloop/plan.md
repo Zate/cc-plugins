@@ -1,9 +1,9 @@
 # Devloop Plan: Component Polish v2.1
 
 **Created**: 2025-12-21
-**Updated**: 2025-12-23 10:30
+**Updated**: 2025-12-23 10:45
 **Status**: Active
-**Current Phase**: Phase 4 - Hook Integration (2/3 complete)
+**Current Phase**: Phase 4 - Hook Integration (3/3 complete) ✓
 
 ## Overview
 
@@ -108,10 +108,13 @@ Comprehensive review and enhancement of all devloop components to improve:
   - Recommendations documented (Priority 1-4) ✓
   - Files: `plugins/devloop/hooks/hooks.json` ✓
 
-- [ ] Task 4.3: Review SubagentStop chaining
-  - Verify agent chaining logic
-  - Test transitions work correctly
-  - Files: `plugins/devloop/hooks/hooks.json`
+- [x] Task 4.3: Review SubagentStop chaining
+  - Reviewed agent chaining logic against all 9 agents ✓
+  - Identified fundamental limitation: hook can't detect agent modes ✓
+  - Found only 2/7 rules work reliably (qa-engineer transitions) ✓
+  - Missing 5 agents in chaining rules ✓
+  - Recommendation: Remove hook OR simplify to high-value transitions ✓
+  - Files: `plugins/devloop/hooks/hooks.json` ✓
 
 ### Phase 5: Documentation & Testing [parallel:none]
 **Goal**: Document changes and validate
@@ -394,6 +397,7 @@ Comprehensive review and enhancement of all devloop components to improve:
 - 2025-12-23: Task 3.6 complete - Updated INDEX.md with all 28 skill descriptions matching current frontmatter. Phase 3 complete!
 - 2025-12-23: Task 4.1 complete - Fixed task logging hook JSON parsing. Added jq + fallback, extracts subagent_type/description/prompt. Version 2.0.3
 - 2025-12-23: Task 4.2 complete - Reviewed all 5 PreToolUse hooks. No redundancy found. Identified 4 priorities for improvements (logging, comments, prompts, conditions)
+- 2025-12-23: Task 4.3 complete - Reviewed SubagentStop chaining. Found fundamental mode detection limitation. Only 2/7 rules work reliably. Recommendation: Remove or simplify. Phase 4 complete!
 
 ## Notes
 
