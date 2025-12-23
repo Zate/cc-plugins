@@ -412,6 +412,36 @@ get_language_skill() {
     esac
 }
 
+# Check for fresh start state from /devloop:fresh
+get_fresh_start_state() {
+    local state_file=".devloop/next-action.json"
+
+    if [ ! -f "$state_file" ]; then
+        echo ""
+        return
+    fi
+
+    # Parse JSON - prefer jq, fallback to grep/sed
+    if command -v jq &> /dev/null; then
+        local plan=$(jq -r '.plan // ""' "$state_file" 2>/dev/null || echo "")
+        local phase=$(jq -r '.phase // ""' "$state_file" 2>/dev/null || echo "")
+        local summary=$(jq -r '.summary // ""' "$state_file" 2>/dev/null || echo "")
+        local next_task=$(jq -r '.next_pending // ""' "$state_file" 2>/dev/null || echo "")
+    else
+        # Fallback: grep/sed parsing
+        local plan=$(grep -o '"plan"[[:space:]]*:[[:space:]]*"[^"]*"' "$state_file" 2>/dev/null | sed 's/.*: *"\([^"]*\)".*/\1/' || echo "")
+        local phase=$(grep -o '"phase"[[:space:]]*:[[:space:]]*"[^"]*"' "$state_file" 2>/dev/null | sed 's/.*: *"\([^"]*\)".*/\1/' || echo "")
+        local summary=$(grep -o '"summary"[[:space:]]*:[[:space:]]*"[^"]*"' "$state_file" 2>/dev/null | sed 's/.*: *"\([^"]*\)".*/\1/' || echo "")
+        local next_task=$(grep -o '"next_pending"[[:space:]]*:[[:space:]]*"[^"]*"' "$state_file" 2>/dev/null | sed 's/.*: *"\([^"]*\)".*/\1/' || echo "")
+    fi
+
+    if [ -n "$plan" ] && [ -n "$summary" ]; then
+        echo "plan=$plan,phase=$phase,summary=$summary,next=$next_task"
+    else
+        echo ""
+    fi
+}
+
 # Check for existing devloop plan (prefer .devloop/, fallback to .claude/)
 get_active_plan() {
     local plan_file=""
@@ -478,6 +508,7 @@ CLAUDE_MD=$(get_claude_md_summary)
 CONFIG_FILES=$(get_config_files)
 PROJECT_SIZE=$(get_project_size)
 ACTIVE_PLAN=$(get_active_plan)
+FRESH_START=$(get_fresh_start_state)
 OPEN_BUGS=$(get_bug_count)
 NEEDS_MIGRATION=$(check_migration_needed)
 LANGUAGE_SKILL=$(get_language_skill "$LANGUAGE" "$FRAMEWORK")
@@ -576,6 +607,30 @@ if [ -n "$ACTIVE_PLAN" ]; then
         CONTEXT_MSG="$CONTEXT_MSG ($PLAN_DONE/$PLAN_TOTAL tasks complete)
   → Use \`/devloop:continue\` to resume"
     fi
+fi
+
+# Add fresh start detection
+if [ -n "$FRESH_START" ]; then
+    # Parse fresh start state (values may contain commas, so use delimiters carefully)
+    FS_PLAN=$(echo "$FRESH_START" | sed 's/^plan=\(.*\),phase=.*/\1/')
+    FS_PHASE=$(echo "$FRESH_START" | sed 's/.*,phase=\(.*\),summary=.*/\1/')
+    FS_SUMMARY=$(echo "$FRESH_START" | sed 's/.*,summary=\(.*\),next=.*/\1/')
+    FS_NEXT=$(echo "$FRESH_START" | sed 's/.*,next=//')
+
+    CONTEXT_MSG="$CONTEXT_MSG
+
+**Fresh Start Detected**: Resuming \"$FS_PLAN\""
+    if [ -n "$FS_PHASE" ]; then
+        CONTEXT_MSG="$CONTEXT_MSG at $FS_PHASE"
+    fi
+    CONTEXT_MSG="$CONTEXT_MSG
+  → Progress: $FS_SUMMARY"
+    if [ -n "$FS_NEXT" ]; then
+        CONTEXT_MSG="$CONTEXT_MSG
+  → Next: $FS_NEXT"
+    fi
+    CONTEXT_MSG="$CONTEXT_MSG
+  → Run \`/devloop:continue\` to resume work, or \`/devloop:fresh --dismiss\` to clear this state"
 fi
 
 # Add bug count if any
