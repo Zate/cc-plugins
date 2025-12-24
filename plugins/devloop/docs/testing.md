@@ -14,12 +14,13 @@
 2. [Quick Checklist](#quick-checklist-smoke-tests)
 3. [Command Testing](#command-testing)
 4. [Agent Invocation Verification](#agent-invocation-verification)
-5. [Integration Test Scenarios](#integration-test-scenarios)
-6. [Regression Testing Checklist](#regression-testing-checklist)
-7. [Performance Testing](#performance-testing)
-8. [Edge Cases and Known Issues](#edge-cases-and-known-issues)
-9. [Testing Tools and Utilities](#testing-tools-and-utilities)
-10. [Success Criteria](#success-criteria)
+5. [Hook Testing](#hook-testing)
+6. [Integration Test Scenarios](#integration-test-scenarios)
+7. [Regression Testing Checklist](#regression-testing-checklist)
+8. [Performance Testing](#performance-testing)
+9. [Edge Cases and Known Issues](#edge-cases-and-known-issues)
+10. [Testing Tools and Utilities](#testing-tools-and-utilities)
+11. [Success Criteria](#success-criteria)
 
 ---
 
@@ -657,6 +658,375 @@ Test routing for each task type from `continue.md` Step 4:
 - [ ] **Documentation** → `devloop:doc-generator`
 - [ ] **Estimation** → `devloop:complexity-estimator`
 - [ ] **Validation** → `devloop:task-planner` (DoD validator mode)
+
+---
+
+## Hook Testing
+
+### Purpose
+
+Validate devloop hook behavior for lifecycle events (Stop, session start, task logging, etc.).
+
+**Note**: Hooks execute automatically based on events. Full testing requires triggering actual events (session stops, tool calls, etc.).
+
+---
+
+### Hook Test 1: Stop Hook with Pending Tasks
+
+**Feature**: FEAT-005 Stop Hook with Plan-Aware Routing
+**Component**: `plugins/devloop/hooks/hooks.json` (Stop hook, lines 113-177)
+
+**Setup**:
+1. Ensure `.devloop/plan.md` exists with pending tasks
+2. Verify plan has at least one `[ ]` marker (pending task)
+3. Example plan state:
+   ```markdown
+   - [x] Task 1.1: Complete task
+   - [ ] Task 1.2: Pending task  ← At least one pending
+   - [ ] Task 1.3: Another pending
+   ```
+
+**Execution**:
+1. End Claude Code session (trigger Stop event)
+2. Hook executes automatically
+
+**Expected Behavior**:
+The Stop hook should:
+1. Detect `.devloop/plan.md` exists
+2. Parse task markers and find pending tasks
+3. Count pending tasks (example: 2)
+4. Identify next task (example: "Task 1.2: Pending task")
+5. Return structured JSON with routing options
+
+**Expected Output** (JSON format):
+```json
+{
+  "decision": "route",
+  "pending_tasks": 2,
+  "next_task": "Task 1.2: Pending task",
+  "options": [
+    {
+      "label": "Continue next task",
+      "action": "continue",
+      "description": "Resume work immediately with /devloop:continue"
+    },
+    {
+      "label": "Fresh start",
+      "action": "fresh",
+      "description": "Save state and prepare for /clear (hook-based resume)"
+    },
+    {
+      "label": "Stop",
+      "action": "stop",
+      "description": "End session, resume manually later"
+    }
+  ],
+  "uncommitted_changes": false
+}
+```
+
+**Validation Criteria**:
+- ✅ Hook detects plan file
+- ✅ Hook parses pending tasks correctly
+- ✅ Hook returns three routing options (continue, fresh, stop)
+- ✅ Hook includes pending task count and next task description
+- ✅ Hook executes within 20s timeout
+- ✅ User sees routing prompt before session ends
+
+**Edge Cases**:
+- If uncommitted changes exist: `"uncommitted_changes": true` with auto-commit suggestion
+- If only in-progress tasks `[~]`: Treat as pending
+- If blocked tasks `[!]`: Count as pending
+
+---
+
+### Hook Test 2: Stop Hook without Plan
+
+**Feature**: FEAT-005 Stop Hook Graceful Degradation
+**Component**: `plugins/devloop/hooks/hooks.json` (Stop hook)
+
+**Setup**:
+1. Ensure `.devloop/plan.md` does NOT exist (rename or move temporarily)
+2. OR: Create empty plan with no task markers
+
+**Execution**:
+1. End Claude Code session
+
+**Expected Behavior**:
+The Stop hook should:
+1. Check for `.devloop/plan.md` → not found
+2. Skip plan parsing
+3. Return simple approval message
+
+**Expected Output**:
+```json
+{
+  "decision": "approve",
+  "message": "No active plan detected. Session ending normally."
+}
+```
+
+**Validation Criteria**:
+- ✅ Hook gracefully handles missing plan file
+- ✅ Hook approves stop without blocking
+- ✅ No errors or exceptions thrown
+- ✅ Message is clear and informative
+- ✅ Session ends normally
+
+---
+
+### Hook Test 3: Stop Hook with Complete Plan
+
+**Feature**: FEAT-005 Stop Hook Completion Detection
+**Component**: `plugins/devloop/hooks/hooks.json` (Stop hook)
+
+**Setup**:
+1. Ensure `.devloop/plan.md` exists
+2. Mark ALL tasks as complete `[x]`
+3. No pending `[ ]` or in-progress `[~]` tasks remain
+4. Example plan state:
+   ```markdown
+   - [x] Task 1.1: Complete
+   - [x] Task 1.2: Complete
+   - [x] Task 1.3: Complete
+   ```
+
+**Execution**:
+1. End Claude Code session
+
+**Expected Behavior**:
+The Stop hook should:
+1. Detect `.devloop/plan.md` exists
+2. Parse all task markers
+3. Find zero pending tasks
+4. Recognize completion state
+5. Suggest `/devloop:ship` workflow
+
+**Expected Output**:
+```json
+{
+  "decision": "complete",
+  "message": "All tasks complete! Consider running /devloop:ship to validate and deploy.",
+  "show_ship": true
+}
+```
+
+**Validation Criteria**:
+- ✅ Hook detects plan completion (all tasks `[x]`)
+- ✅ Hook suggests ship workflow
+- ✅ Message is congratulatory and actionable
+- ✅ `show_ship: true` flag present
+- ✅ Session ends normally after message
+
+---
+
+### Hook Test 4: Stop Hook with Uncommitted Changes
+
+**Feature**: FEAT-005 Auto-Commit Detection
+**Component**: `plugins/devloop/hooks/hooks.json` (Stop hook)
+
+**Setup**:
+1. Ensure `.devloop/plan.md` exists with pending tasks
+2. Create uncommitted changes:
+   ```bash
+   echo "// test change" >> some-file.js
+   git status  # Shows modified files
+   ```
+3. Do NOT stage or commit changes
+
+**Execution**:
+1. End Claude Code session
+
+**Expected Behavior**:
+The Stop hook should:
+1. Detect pending tasks (routing mode)
+2. Check git status
+3. Find uncommitted changes
+4. Include auto-commit suggestion in response
+
+**Expected Output**:
+```json
+{
+  "decision": "route",
+  "pending_tasks": 3,
+  "next_task": "Task 2.1: ...",
+  "options": [
+    {"label": "Continue next task", "action": "continue", ...},
+    {"label": "Fresh start", "action": "fresh", ...},
+    {"label": "Stop", "action": "stop", ...}
+  ],
+  "uncommitted_changes": true  ← Key field
+}
+```
+
+**Validation Criteria**:
+- ✅ Hook detects uncommitted changes via git status
+- ✅ `uncommitted_changes: true` in response
+- ✅ Auto-commit suggestion appears in routing prompt
+- ✅ User can choose to commit or skip
+- ✅ If commit chosen: lint → test → commit sequence suggested
+
+**Edge Cases**:
+- If lint fails: Warn but don't block
+- If tests fail: Warn but don't block
+- If no .git directory: Skip uncommitted check
+
+---
+
+### Hook Test 5: Session Start with Fresh Start State
+
+**Feature**: FEAT-005 Fresh Start Auto-Resume
+**Component**: `plugins/devloop/hooks/session-start.sh` (lines 415-443)
+
+**Status**: Phase 2 implementation (not yet complete)
+
+**Setup**:
+1. Create `.devloop/next-action.json` with fresh start state:
+   ```json
+   {
+     "timestamp": "2025-12-24T10:00:00Z",
+     "plan": "Feature Implementation",
+     "phase": "Phase 2",
+     "next_pending": "Task 2.3: Implement API",
+     "summary": "Completed 5 of 10 tasks"
+   }
+   ```
+2. Start new Claude Code session
+
+**Execution**:
+1. Session start hook runs automatically
+2. Hook detects `next-action.json`
+
+**Expected Behavior** (Phase 2 implementation):
+The session start hook should:
+1. Detect `next-action.json` exists
+2. Parse JSON and extract state
+3. Auto-invoke `/devloop:continue` (no user prompt)
+4. Pass fresh start context to continue command
+5. Delete `next-action.json` after reading
+
+**Expected Output**:
+- Display: "Fresh start detected - resuming work..."
+- Auto-run: `/devloop:continue` command
+- Show: Plan status with next task from state file
+- Cleanup: State file deleted after use
+
+**Validation Criteria**:
+- ✅ Hook detects fresh start state file
+- ✅ Hook parses JSON correctly
+- ✅ Hook auto-invokes continue command
+- ✅ State file deleted after reading (single-use)
+- ✅ User sees "resuming from fresh start" message
+- ✅ Next task matches state file's `next_pending`
+
+---
+
+### Hook Test 6: Session Start with Stale State
+
+**Feature**: FEAT-005 Stale State Detection
+**Component**: `plugins/devloop/hooks/session-start.sh`
+
+**Status**: Phase 2 implementation (Task 2.2)
+
+**Setup**:
+1. Create `.devloop/next-action.json` with old timestamp (>7 days):
+   ```json
+   {
+     "timestamp": "2025-12-10T10:00:00Z",  ← 14 days old
+     "plan": "Old Feature",
+     "next_pending": "Task 3.1: Outdated task"
+   }
+   ```
+2. Start new session
+
+**Execution**:
+1. Session start hook runs
+2. Hook detects stale state (timestamp >7 days)
+
+**Expected Behavior**:
+1. Parse state file
+2. Calculate age: `now - timestamp`
+3. Detect stale (>7 days)
+4. Display warning message
+5. Ask user: "State is 14 days old. Resume anyway?"
+
+**Expected Output**:
+```
+⚠️ Fresh start state detected but is 14 days old (created 2025-12-10).
+The plan or tasks may have changed since then.
+
+Resume from this state? [y/N]:
+```
+
+**Validation Criteria**:
+- ✅ Hook detects stale state (>7 day threshold)
+- ✅ Hook displays clear age warning
+- ✅ User can confirm or cancel resume
+- ✅ If canceled: State file deleted, normal session start
+- ✅ If confirmed: Resume with warning acknowledgment
+
+---
+
+### Hook Test 7: Stop Hook with Invalid Plan
+
+**Feature**: FEAT-005 Error Handling
+**Component**: `plugins/devloop/hooks/hooks.json` (Stop hook)
+
+**Setup**:
+1. Create corrupted `.devloop/plan.md`:
+   ```markdown
+   # Devloop Plan: Corrupted
+   - [ ] Task 1.1: Valid task
+   This is not valid markdown structure
+   [[[ corrupted syntax
+   ```
+2. Ensure plan is readable but malformed
+
+**Execution**:
+1. End Claude Code session
+
+**Expected Behavior**:
+The Stop hook should:
+1. Attempt to read plan.md
+2. Encounter parsing error or malformed content
+3. Handle gracefully without crashing
+4. Log error but approve stop
+
+**Expected Output**:
+```json
+{
+  "decision": "approve",
+  "message": "Plan file detected but appears corrupted. Session ending normally. Check .devloop/plan.md for issues."
+}
+```
+
+**Validation Criteria**:
+- ✅ Hook doesn't crash on malformed plan
+- ✅ Hook logs error in message
+- ✅ Hook approves stop (fail-safe behavior)
+- ✅ User informed about corruption
+- ✅ No exceptions thrown
+- ✅ Session ends normally
+
+---
+
+### Hook Testing Summary
+
+| Test | Status | Component | Validation |
+|------|--------|-----------|------------|
+| Hook Test 1: Pending tasks routing | ✅ Documented | Stop hook | Manual validation in Phase 4 |
+| Hook Test 2: No plan → approve | ✅ Documented | Stop hook | Manual validation in Phase 4 |
+| Hook Test 3: Complete plan → ship | ✅ Documented | Stop hook | Manual validation in Phase 4 |
+| Hook Test 4: Uncommitted changes | ✅ Documented | Stop hook | Manual validation in Phase 4 |
+| Hook Test 5: Fresh start resume | ⏳ Phase 2 | Session start | Implementation pending |
+| Hook Test 6: Stale state warning | ⏳ Phase 2 | Session start | Implementation pending |
+| Hook Test 7: Invalid plan handling | ✅ Documented | Stop hook | Manual validation in Phase 4 |
+
+**Testing Notes**:
+- Hook Tests 1-4, 7: Behavior defined, manual validation in Phase 4 (Task 4.1)
+- Hook Tests 5-6: Implementation in Phase 2 (Tasks 2.1, 2.2)
+- All tests require actual event triggers (session stops, starts)
+- Recommend end-to-end testing before version 2.2.0 release
 
 ---
 
@@ -1480,6 +1850,264 @@ Test routing for each task type from `continue.md` Step 4:
 - ✓ SessionStart detects fresh start in new session
 - ✓ State file deleted after reading in continue
 - ✓ Error handling prevents data corruption
+
+---
+
+### Scenario 10: Continue → Archive and Start Fresh
+
+**Goal**: Verify completion routing from continue workflow to archive + new plan creation
+
+**Reference**: Spike Report - Plan Completion & Post-Completion Routing (Phase 2)
+
+**Test Steps**:
+
+1. **Setup - Completed Plan (>200 lines)**
+   ```bash
+   # Ensure plan is complete (all tasks [x])
+   # Ensure plan.md is large (>200 lines for archive recommendation)
+   wc -l .devloop/plan.md  # Should show 200+ lines
+   git status  # Should show clean state or pending commits
+   ```
+
+2. **Run Continue to Completion**
+   ```bash
+   /devloop:continue
+
+   # Complete final task (if any pending)
+   # Proceed through checkpoint (Step 5a)
+   # Trigger completion detection (Step 5b)
+   ```
+
+3. **Verify Completion Routing Options (Step 5b)**
+   ```bash
+   # After all tasks complete
+
+   # Verify completion question
+   - [ ] "All tasks complete! Plan finished. What's next?" question displayed
+   - [ ] Header: "Complete"
+   - [ ] 6 routing options presented:
+         1. "Ship it" (Recommended)
+         2. "Review plan"
+         3. "Add more tasks"
+         4. "Archive and start fresh"
+         5. "Work on issues"
+         6. "End session"
+   - [ ] "Ship it" marked as recommended
+   ```
+
+4. **Select "Archive and start fresh"**
+   ```bash
+   # Choose option 4: "Archive and start fresh"
+
+   # Verify routing to archive command
+   - [ ] `/devloop:archive` command invoked automatically
+   - [ ] Continue command pauses, archive takes over
+   - [ ] Archive workflow begins (compress plan, move to .devloop/archive/)
+   ```
+
+5. **Verify Archive Completion**
+   ```bash
+   # After archive completes
+
+   # Verify archived plan
+   - [ ] Plan moved to .devloop/archive/[plan-name]_[timestamp].md
+   - [ ] Archive file contains complete plan with all tasks
+   - [ ] Archive preserves Progress Log entries
+   - [ ] Archive includes completion metadata
+   ```
+
+6. **Verify New Plan Creation**
+   ```bash
+   # After archive, verify follow-up workflow
+
+   # Verify new plan question
+   - [ ] "Plan archived. Create new plan?" question displayed
+   - [ ] Header: "New Plan"
+   - [ ] 3 options presented:
+         1. "Create empty plan"
+         2. "Start feature workflow (/devloop)"
+         3. "Leave archived"
+   ```
+
+7. **Select "Create empty plan"**
+   ```bash
+   # Choose option 1
+
+   # Verify new plan created
+   - [ ] New .devloop/plan.md created with template
+   - [ ] Plan includes: Name, Created, Status, Overview sections
+   - [ ] Status = "Draft"
+   - [ ] Progress Log initialized with "Plan created" entry
+   - [ ] Old plan fully archived (not in active plan.md)
+   ```
+
+8. **Verify Error Handling**
+   ```bash
+   # Simulate archive failure (e.g., no write permissions)
+   chmod -w .devloop/
+
+   # Re-run continue and select "Archive and start fresh"
+
+   # Verify
+   - [ ] Error displayed gracefully
+   - [ ] Error message explains the problem (e.g., "Failed to archive plan")
+   - [ ] Recovery options offered (retry/skip)
+   - [ ] Original plan.md NOT modified or deleted
+   - [ ] No partial archives created
+   ```
+
+9. **Verify Worklog Integration**
+   ```bash
+   # After successful archive
+
+   # Verify worklog updated
+   cat .devloop/worklog.md
+
+   - [ ] Worklog includes entry for archived plan
+   - [ ] Entry format: "Archived [plan name] - [N] tasks completed"
+   - [ ] Entry includes archive file path reference
+   - [ ] Commit hashes from completed tasks preserved
+   ```
+
+**Success Criteria**:
+- ✓ Completion routing question displays with 6 options
+- ✓ "Archive and start fresh" option invokes `/devloop:archive`
+- ✓ Command handoff works cleanly (continue pauses, archive starts)
+- ✓ Plan archived to .devloop/archive/ with complete history
+- ✓ New plan creation workflow offered after archive
+- ✓ New empty plan.md created with template structure
+- ✓ Error handling prevents plan corruption or data loss
+- ✓ Worklog updated with archive reference
+
+---
+
+### Scenario 11: Continue → Work on Issues
+
+**Goal**: Verify completion routing from continue workflow to issue tracking
+
+**Reference**: Spike Report - Plan Completion & Post-Completion Routing (Phase 2)
+
+**Test Steps**:
+
+1. **Setup - Completed Plan with Open Issues**
+   ```bash
+   # Ensure plan is complete (all tasks [x])
+   # Ensure .devloop/issues/ has open issues
+   ls .devloop/issues/*.md
+   # Should show: BUG-001.md, FEAT-001.md, TASK-001.md, etc.
+   ```
+
+2. **Run Continue to Completion**
+   ```bash
+   /devloop:continue
+
+   # Complete final task (if any pending)
+   # Proceed through checkpoint (Step 5a)
+   # Trigger completion detection (Step 5b)
+   ```
+
+3. **Verify Completion Routing Options (Step 5b)**
+   ```bash
+   # After all tasks complete
+
+   # Verify completion question
+   - [ ] "All tasks complete! Plan finished. What's next?" question displayed
+   - [ ] Header: "Complete"
+   - [ ] 6 routing options presented (including "Work on issues")
+   - [ ] "Ship it" marked as recommended
+   ```
+
+4. **Select "Work on issues"**
+   ```bash
+   # Choose option 5: "Work on issues"
+
+   # Verify routing to issues command
+   - [ ] `/devloop:issues` command invoked automatically
+   - [ ] Continue command exits cleanly
+   - [ ] Issues command takes over
+   ```
+
+5. **Verify Issues List Display**
+   ```bash
+   # After issues command invoked
+
+   # Verify issue list displayed
+   - [ ] All open issues shown (BUG, FEAT, TASK, etc.)
+   - [ ] Issue list grouped by type (Bugs, Features, Tasks)
+   - [ ] Issue IDs and descriptions visible
+   - [ ] User prompted with action options:
+         1. "View issue"
+         2. "Fix bug"
+         3. "Start feature"
+         4. "Work on task"
+         5. "Create new issue"
+   ```
+
+6. **Verify Error Handling - No Issues Directory**
+   ```bash
+   # Simulate no issues directory
+   rm -rf .devloop/issues
+
+   # Re-run continue and select "Work on issues"
+
+   # Verify
+   - [ ] Error displayed gracefully (not a crash)
+   - [ ] Error message: "No issues directory found"
+   - [ ] Recovery options offered:
+         1. "Create issues directory"
+         2. "Start new feature instead"
+         3. "End session"
+   - [ ] Continue command doesn't crash
+   ```
+
+7. **Verify Error Handling - No Open Issues**
+   ```bash
+   # Simulate no open issues (all closed)
+   # Ensure .devloop/issues/index.md shows all issues closed
+
+   # Re-run continue and select "Work on issues"
+
+   # Verify
+   - [ ] Message displayed: "No open issues found"
+   - [ ] Follow-up options offered:
+         1. "Create new issue"
+         2. "Start new feature"
+         3. "Review closed issues"
+         4. "End session"
+   ```
+
+8. **Verify Plan Update**
+   ```bash
+   # Before routing to issues (during completion detection)
+   cat .devloop/plan.md
+
+   # Verify plan metadata updated
+   - [ ] Status = "Complete"
+   - [ ] Progress Log entry added: "All tasks complete - routing to issues"
+   - [ ] Timestamp updated to completion time
+   ```
+
+9. **Verify Worklog Integration**
+   ```bash
+   # After completion
+   cat .devloop/worklog.md
+
+   # Verify worklog entry
+   - [ ] Entry added for completed plan
+   - [ ] Entry format: "[plan name] - Complete ([N] tasks)"
+   - [ ] Commit hashes from tasks preserved
+   - [ ] Entry includes timestamp of completion
+   ```
+
+**Success Criteria**:
+- ✓ Completion routing question displays with 6 options
+- ✓ "Work on issues" option invokes `/devloop:issues`
+- ✓ Command handoff works cleanly (continue exits, issues starts)
+- ✓ Issue list displayed with all open issues
+- ✓ Error handling for missing directory/no issues
+- ✓ Recovery options prevent dead ends
+- ✓ Plan status updated to "Complete" before routing
+- ✓ Worklog updated with completion entry
 
 ---
 
