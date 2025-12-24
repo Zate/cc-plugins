@@ -2,11 +2,138 @@
 
 **Project**: cc-plugins
 **Reconstructed From**: Git history (30 days)
-**Last Updated**: 2025-12-23
+**Last Updated**: 2025-12-24
+
+---
+
+## 2025-12-24
+
+### Post-Completion Routing v2.2 - Phase 1 Complete ✓
+
+**Phase 1: Ship-Then-Route Implementation** - Enhanced ship workflow with post-completion routing.
+
+**Tasks Completed**:
+- Task 1.1: Modified ship.md Phase 7 with 5 routing options (issues, new feature, archive, fresh start, end)
+- Task 1.2: Added routing handlers with error handling and smart plan size detection
+- Task 1.3: Added 2 comprehensive integration test cases (Scenario 8 & 9) to testing.md
+- Task 1.4: Manual validation - all routing paths validated, no regressions detected
+
+**Commits**: `8d4d75b`, `3bafbf1`
+
+**Files Modified**:
+- `plugins/devloop/commands/ship.md` - Phase 7 Post-Ship routing enhanced
+- `plugins/devloop/docs/testing.md` - Added 2 integration test scenarios (217 lines)
+- `.devloop/plan.md` - Task markers updated
+
+**Test Coverage**:
+- Scenario 8: Ship → Route to Issues (6 steps, error handling)
+- Scenario 9: Ship → Route to Fresh Start (10 steps, state validation)
+
+**Validation Results**:
+- All routing paths validated (issues, fresh start, archive, new feature, end)
+- Error handling robust across all routes
+- Archive includes smart size check (>200 lines threshold)
+- No regressions in existing ship workflow
+
+**Next**: Phase 2 (continue.md completion routing)
 
 ---
 
 ## 2025-12-23
+
+### Component Polish v2.1 - Phase 3 Complete (Archived)
+
+**Phase 3: Skill Refinement** - Audited all 28 skills for clear invocation triggers.
+
+**Tasks Completed**:
+- Task 3.1: Audited 4 pattern skills (go, react, java, python) - updated java-patterns and python-patterns
+- Task 3.2: Audited 4 workflow skills - added "When to Use" to plan-management skill
+- Task 3.3: Audited 4 quality skills - all already compliant
+- Task 3.4: Audited 3 design skills - all already compliant
+- Task 3.5: Audited remaining 13 skills - added frontmatter to 4 skills
+- Task 3.6: Updated INDEX.md with all 28 skill descriptions
+
+**Archived Plan**: `.devloop/archive/component-polish-v2.1_phase_3_20251223_211607.md`
+
+---
+
+### Component Polish v2.1 - Phase 4 Complete (Archived)
+
+**Phase 4: Hook Integration** - Hooks support debugging and consistent behavior.
+
+**Tasks Completed**:
+- Task 4.1: Fixed task logging hook JSON parsing - jq + fallback, version 2.0.3
+- Task 4.2: Reviewed all 5 PreToolUse hooks - identified 4 priorities for improvements
+- Task 4.3: Reviewed SubagentStop chaining - found fundamental mode detection limitation
+
+**Archived Plan**: `.devloop/archive/component-polish-v2.1_phase_4_20251223_211607.md`
+
+---
+
+### Component Polish v2.1 - Phase 5 Complete (Archived)
+
+**Phase 5: Foundation - Skills & Patterns** - Added missing skills and standardized patterns.
+
+**Tasks Completed**:
+- Task 5.1: Added 6 missing skills to engineer.md (complexity-estimation, project-context, etc.)
+- Task 5.2: Created workflow-loop skill (668 lines) - checkpoint patterns, state transitions
+- Task 5.3: Created AskUserQuestion standards document (1,008 lines) - when to ask, batching, formats
+
+**Commits**: `f24ef82`
+
+**Archived Plan**: `.devloop/archive/component-polish-v2.1_phase_5_20251223_211607.md`
+
+---
+
+### Component Polish v2.1 - Phase 7 Complete (Archived)
+
+**Phase 7: Workflow Loop Core Improvements** - Fixed workflow loop with mandatory checkpoints.
+
+**Tasks Completed**:
+- Task 7.1: Added mandatory post-task checkpoint to continue.md
+- Task 7.2: Added loop completion detection with 8 option handlers
+- Task 7.3: Added context management with 6 session metrics
+- Task 7.4: Standardized 11 checkpoint questions
+
+**Commits**: `a2e44df`, `16feab6`, `78a30f7`, `ef7aa50`
+
+**Archived Plan**: `.devloop/archive/component-polish-v2.1_phase_7_20251223_211607.md`
+
+---
+
+### Component Polish v2.1 - Phase 9 Complete (Archived)
+
+**Phase 9: Integration & Refinements** - Complete spike integration, worklog enforcement, AskUserQuestion standards.
+
+**Tasks Completed**:
+- Task 9.1: Added Phase 5b to spike.md for plan application
+- Task 9.2: Enhanced task-checkpoint skill - worklog sync requirements
+- Task 9.3: Removed SubagentStop hook - mode detection impossible
+- Task 9.4: Applied AskUserQuestion standards to review.md and ship.md
+- Task 9.5: Updated documentation - CHANGELOG, README, docs/agents.md
+- Task 9.6: Integration testing - 5/5 scenarios passed
+
+**Commits**: `63953e9`
+
+**Archived Plan**: `.devloop/archive/component-polish-v2.1_phase_9_20251223_211607.md`
+
+---
+
+### Component Polish v2.1 - Phase 10 Complete ✓ (Archived, v2.1.0 Release)
+
+**Phase 10: Documentation & Testing** - Finalize comprehensive documentation and version bump.
+
+**Tasks Completed**:
+- Task 10.1: Updated README.md - agent invocation patterns (+180 lines)
+- Task 10.2: Updated docs/agents.md - comprehensive agent reference (+558 lines, 96% increase)
+- Task 10.3: Created docs/testing.md - comprehensive testing checklist (900+ lines)
+- Task 10.4: Version bump to 2.1.0 - updated plugin.json and description
+
+**Version**: 2.1.0
+
+**Archived Plan**: `.devloop/archive/component-polish-v2.1_phase_10_20251223_211607.md`
+
+---
 
 ### Component Polish v2.1 - Phases 1-2 Complete (Archived)
 
