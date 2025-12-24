@@ -73,13 +73,13 @@ Enhance devloop completion workflows to guide users to next work after completin
 **Complexity**: S-sized (2-3 hours)
 **Dependencies**: None (can run in parallel with Phase 1)
 
-- [ ] Task 2.1: Modify continue.md Step 5b with routing options [parallel:B]
+- [x] Task 2.1: Modify continue.md Step 5b with routing options [parallel:B]
   - Extend existing completion prompt (lines 649-661)
   - Add "Archive and start fresh" option
   - Add "Work on issues" option
   - Maintain existing "Ship it" (recommended), "Add more tasks", "Review plan"
   - Files: `plugins/devloop/commands/continue.md`
-  - Acceptance: User has 5 routing options at completion
+  - Acceptance: User has 6 routing options at completion ✓
 
 - [ ] Task 2.2: Add routing option handlers [parallel:B]
   - "Archive and start fresh" → `/devloop:archive` → Create new empty plan.md
@@ -119,6 +119,7 @@ Enhance devloop completion workflows to guide users to next work after completin
 - [2025-12-24 03:15]: Completed Task 1.1 and 1.2 - Enhanced ship.md Phase 7 with routing options and handlers
 - [2025-12-24 03:25]: Completed Task 1.3 - Added 2 comprehensive integration test cases (Scenario 8 & 9) to testing.md
 - [2025-12-24 03:45]: Completed Task 1.4 - Manual validation passed: all routing paths validated, no regressions, error handling robust. Phase 1 complete!
+- [2025-12-24 04:15]: Completed Task 2.1 - Extended continue.md Step 5b with 6 routing options (added "Archive and start fresh" and "Work on issues"). Handlers implemented for both new routes.
 
 ## Success Criteria
 

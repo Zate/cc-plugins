@@ -652,6 +652,10 @@ AskUserQuestion:
   options:
     - label: "Ship it"
       description: "Run validation and deploy via /devloop:ship (Recommended)"
+    - label: "Archive and start fresh"
+      description: "Archive completed phases, then create new plan"
+    - label: "Work on issues"
+      description: "Switch to issue tracking via /devloop:issues"
     - label: "Review plan"
       description: "Show summary of completed work"
     - label: "Add more tasks"
@@ -692,6 +696,37 @@ Work remains - return to Step 6 (Handle Parallel Tasks) to continue the loop.
 3. Display message: "Launching /devloop:ship for validation and deployment prep"
 4. **Launch ship workflow**: Invoke `/devloop:ship` command
 5. END continue workflow (ship takes over)
+
+**If "Archive and start fresh"**:
+
+1. Display message: "Archiving completed plan phases..."
+2. **Launch archive workflow**: Invoke `/devloop:archive` command
+3. Wait for archive completion
+4. Ask follow-up:
+   ```yaml
+   AskUserQuestion:
+     question: "Plan archived. Start new plan now?"
+     header: "New Plan"
+     options:
+       - label: "Start feature workflow"
+         description: "Launch /devloop to create new plan (Recommended)"
+       - label: "Enter plan mode"
+         description: "Design new plan manually"
+       - label: "End session"
+         description: "Archive complete, stop here"
+   ```
+5. Based on selection:
+   - **Start feature workflow**: Invoke `/devloop` command, END continue workflow
+   - **Enter plan mode**: Use `EnterPlanMode`, save to `.devloop/plan.md`, END continue workflow
+   - **End session**: Display "Archive complete" message, END continue workflow
+
+**If "Work on issues"**:
+
+1. Update plan status to "Complete"
+2. Add Progress Log entry: "Plan complete - switching to issue tracking"
+3. Display message: "Launching /devloop:issues for issue management"
+4. **Launch issues workflow**: Invoke `/devloop:issues` command
+5. END continue workflow (issues takes over)
 
 **If "Review plan"**:
 
