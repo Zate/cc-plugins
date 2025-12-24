@@ -876,9 +876,9 @@ The Stop hook should:
 ### Hook Test 5: Session Start with Fresh Start State
 
 **Feature**: FEAT-005 Fresh Start Auto-Resume
-**Component**: `plugins/devloop/hooks/session-start.sh` (lines 415-443)
+**Component**: `plugins/devloop/hooks/session-start.sh` (lines 527-666)
 
-**Status**: Phase 2 implementation (not yet complete)
+**Status**: Phase 2 implementation complete (Tasks 2.1, 2.2)
 
 **Setup**:
 1. Create `.devloop/next-action.json` with fresh start state:
@@ -897,19 +897,28 @@ The Stop hook should:
 1. Session start hook runs automatically
 2. Hook detects `next-action.json`
 
-**Expected Behavior** (Phase 2 implementation):
+**Expected Behavior** (Implemented in Tasks 2.1, 2.2):
 The session start hook should:
-1. Detect `next-action.json` exists
-2. Parse JSON and extract state
-3. Auto-invoke `/devloop:continue` (no user prompt)
-4. Pass fresh start context to continue command
-5. Delete `next-action.json` after reading
+1. Detect `next-action.json` exists (line 530)
+2. Validate state using `validate_fresh_start_state()` function (lines 498-557, 588-653):
+   - Parse timestamp field (ISO 8601 format)
+   - Calculate age in days
+   - Check if timestamp <7 days old
+   - Verify `.devloop/plan.md` exists
+3. If validation passes:
+   - Set FRESH_START_DETECTED=true
+   - Add CRITICAL auto-resume instruction to Claude's context (lines 646-666)
+   - Display "🔄 Fresh start detected - auto-resuming work..." to user
+4. Claude automatically invokes `/devloop:continue` (no user prompt)
+5. Continue command (Step 1a) reads and deletes state file
 
 **Expected Output**:
-- Display: "Fresh start detected - resuming work..."
-- Auto-run: `/devloop:continue` command
-- Show: Plan status with next task from state file
-- Cleanup: State file deleted after use
+- Hook output: "🔄 Fresh start detected - auto-resuming work..."
+- CRITICAL instruction in additionalContext: "Execute /devloop:continue command NOW"
+- Claude auto-runs: `/devloop:continue` command
+- Continue displays: "Resuming from Fresh Start"
+- Continue shows: Plan status with next task from state file
+- Cleanup: State file deleted by continue command (single-use)
 
 **Validation Criteria**:
 - ✅ Hook detects fresh start state file
@@ -924,9 +933,9 @@ The session start hook should:
 ### Hook Test 6: Session Start with Stale State
 
 **Feature**: FEAT-005 Stale State Detection
-**Component**: `plugins/devloop/hooks/session-start.sh`
+**Component**: `plugins/devloop/hooks/session-start.sh` (lines 498-775)
 
-**Status**: Phase 2 implementation (Task 2.2)
+**Status**: Phase 2 implementation complete (Task 2.2)
 
 **Setup**:
 1. Create `.devloop/next-action.json` with old timestamp (>7 days):
@@ -943,27 +952,43 @@ The session start hook should:
 1. Session start hook runs
 2. Hook detects stale state (timestamp >7 days)
 
-**Expected Behavior**:
-1. Parse state file
-2. Calculate age: `now - timestamp`
-3. Detect stale (>7 days)
-4. Display warning message
-5. Ask user: "State is 14 days old. Resume anyway?"
+**Expected Behavior** (Implemented in Task 2.2):
+1. `validate_fresh_start_state()` function (lines 498-557):
+   - Parse `timestamp` field from JSON
+   - Calculate age: `current_date - timestamp_date` (in days)
+   - Detect stale if age >7 days
+   - Return status: `stale:<age>` (e.g., "stale:14")
+2. Validation logic (lines 588-653):
+   - Case statement handles `stale:*` result
+   - Extract age from validation status
+   - Build warning message with age and creation date
+   - Set FRESH_START_DETECTED=false (skip auto-resume)
+3. Warning display (lines 768-775):
+   - Inject validation warning into context message
+   - Show stale state warning to user
 
 **Expected Output**:
 ```
-⚠️ Fresh start state detected but is 14 days old (created 2025-12-10).
-The plan or tasks may have changed since then.
+⚠️ Fresh Start State Warning
 
-Resume from this state? [y/N]:
+A fresh start state file was detected but it is 14 days old (created 2025-12-10).
+The plan or tasks may have changed significantly since then.
+
+Options:
+- Delete the stale state file and start fresh
+- Force resume anyway (run /devloop:continue manually)
+- Review the state file at .devloop/next-action.json
 ```
 
+**Note**: Unlike the original specification, the implemented version does NOT auto-resume stale state. It displays a warning and requires manual action. This is safer than prompting for confirmation.
+
 **Validation Criteria**:
-- ✅ Hook detects stale state (>7 day threshold)
-- ✅ Hook displays clear age warning
-- ✅ User can confirm or cancel resume
-- ✅ If canceled: State file deleted, normal session start
-- ✅ If confirmed: Resume with warning acknowledgment
+- ✅ Hook detects stale state (>7 day threshold via date arithmetic)
+- ✅ Hook calculates age in days accurately
+- ✅ Hook displays clear age warning with creation date
+- ✅ Auto-resume is disabled (FRESH_START_DETECTED=false)
+- ✅ User sees options: delete state, force resume, or review
+- ✅ Normal session start proceeds (state file left for manual review)
 
 ---
 
@@ -1010,6 +1035,171 @@ The Stop hook should:
 
 ---
 
+### Hook Test 8: Session Start with Missing Plan
+
+**Feature**: FEAT-005 Plan Validation
+**Component**: `plugins/devloop/hooks/session-start.sh` (lines 498-775)
+
+**Status**: Phase 2 implementation complete (Task 2.2)
+
+**Setup**:
+1. Create `.devloop/next-action.json` with valid fresh start state:
+   ```json
+   {
+     "timestamp": "2025-12-24T10:00:00Z",
+     "plan": "Missing Plan",
+     "next_pending": "Task 2.1: Some task"
+   }
+   ```
+2. Ensure `.devloop/plan.md` does NOT exist (rename or delete)
+3. Start new session
+
+**Execution**:
+1. Session start hook runs
+2. Hook detects next-action.json
+3. Validation checks for plan.md
+
+**Expected Behavior** (Implemented in Task 2.2):
+1. `validate_fresh_start_state()` function:
+   - Parse timestamp (valid, <7 days)
+   - Check for `.devloop/plan.md` existence
+   - File not found → Return status: `no_plan`
+2. Validation logic:
+   - Case statement handles `no_plan` result
+   - Build warning message about missing plan
+   - Set FRESH_START_DETECTED=false (skip auto-resume)
+3. Warning display:
+   - Inject validation warning into context
+   - User sees missing plan warning
+
+**Expected Output**:
+```
+⚠️ Fresh Start State Warning
+
+A fresh start state file references plan "Missing Plan", but .devloop/plan.md does not exist.
+The plan may have been deleted or moved.
+
+Options:
+- Delete the state file if plan is no longer needed
+- Restore the plan file and run /devloop:continue manually
+- Review the state file at .devloop/next-action.json
+```
+
+**Validation Criteria**:
+- ✅ Hook detects missing plan file
+- ✅ Hook displays clear warning about missing plan
+- ✅ Auto-resume is disabled (FRESH_START_DETECTED=false)
+- ✅ User sees options: delete state, restore plan, or review
+- ✅ Normal session start proceeds
+- ✅ No errors or exceptions thrown
+
+---
+
+### Hook Test 9: End-to-End Fresh Start Workflow
+
+**Feature**: FEAT-005 Complete Fresh Start Loop
+**Component**: Multiple (Stop hook, /devloop:fresh, session-start.sh, /devloop:continue)
+
+**Status**: Phase 2 implementation complete (Tasks 2.1, 2.2)
+
+**Setup**:
+1. Have an active plan with pending tasks in `.devloop/plan.md`
+2. Complete a task during work session
+3. Have uncommitted changes (optional, for full test)
+
+**Execution Steps**:
+
+**Step 1: Stop with Pending Tasks**
+1. User ends Claude Code session (Stop event)
+2. Stop hook (hooks.json lines 113-177) executes:
+   - Detects `.devloop/plan.md` with pending tasks
+   - Returns routing options JSON with 3 choices
+
+**Step 2: User Selects "Fresh Start"**
+1. User chooses "Fresh start" option from routing prompt
+2. User runs `/devloop:fresh` command
+3. Fresh command:
+   - Reads current plan state
+   - Creates `.devloop/next-action.json` with state
+   - Displays "Run /clear then /devloop:continue to resume" message
+
+**Step 3: Clear Context**
+1. User runs `/clear` to reset conversation context
+2. New session starts with empty context
+3. Session start hook (session-start.sh) runs
+
+**Step 4: Auto-Resume Detection**
+1. Hook detects `.devloop/next-action.json` exists
+2. Validates state:
+   - Timestamp <7 days old ✓
+   - `.devloop/plan.md` exists ✓
+   - Status: `valid`
+3. Sets FRESH_START_DETECTED=true
+4. Adds CRITICAL auto-resume instruction to context
+5. Displays "🔄 Fresh start detected - auto-resuming work..."
+
+**Step 5: Auto-Resume Execution**
+1. Claude receives CRITICAL instruction
+2. Claude automatically invokes `/devloop:continue` (no user prompt)
+3. Continue command (Step 1a):
+   - Reads `.devloop/next-action.json`
+   - Parses state (plan, phase, next_pending)
+   - Deletes state file (single-use)
+   - Displays "Resuming from Fresh Start" message
+4. Continue proceeds with next pending task from state
+
+**Expected Output Timeline**:
+
+```
+[Session End - Stop Hook]
+User: [Ends session]
+Hook: {
+  "decision": "route",
+  "pending_tasks": 5,
+  "next_task": "Task 3.1: Implement feature",
+  "options": ["Continue next task", "Fresh start", "Stop"]
+}
+
+[User Chooses Fresh Start]
+User: /devloop:fresh
+Fresh: State saved to .devloop/next-action.json
+       Run /clear to reset context, then /devloop:continue to resume
+
+[User Clears Context]
+User: /clear
+System: Context cleared
+
+[New Session - Auto-Resume]
+SessionStart Hook: 🔄 Fresh start detected - auto-resuming work...
+Claude: [Automatically invokes /devloop:continue]
+Continue: Resuming from Fresh Start
+          Plan: Feature Implementation
+          Progress: 8 of 13 tasks (62%)
+          Next: Task 3.1: Implement feature
+```
+
+**Validation Criteria**:
+- ✅ Stop hook detects pending tasks and presents routing options
+- ✅ Fresh command saves state to next-action.json
+- ✅ State file contains correct fields (timestamp, plan, next_pending)
+- ✅ Session start hook detects state file
+- ✅ Validation passes (timestamp fresh, plan exists)
+- ✅ CRITICAL auto-resume instruction sent to Claude
+- ✅ Claude automatically invokes /devloop:continue without user prompt
+- ✅ Continue reads, parses, and deletes state file
+- ✅ User sees "Resuming from Fresh Start" message
+- ✅ Next task matches state's next_pending field
+- ✅ Work resumes seamlessly with fresh context
+
+**Edge Cases to Test**:
+- Uncommitted changes during Stop: Auto-commit suggestion appears
+- Stale state (>7 days): Warning displayed, auto-resume skipped
+- Missing plan during resume: Warning displayed, auto-resume skipped
+- Corrupted state file: Warning displayed, auto-resume skipped
+- Multiple fresh starts in succession: Each creates new state, old state deleted
+
+---
+
 ### Hook Testing Summary
 
 | Test | Status | Component | Validation |
@@ -1018,15 +1208,23 @@ The Stop hook should:
 | Hook Test 2: No plan → approve | ✅ Documented | Stop hook | Manual validation in Phase 4 |
 | Hook Test 3: Complete plan → ship | ✅ Documented | Stop hook | Manual validation in Phase 4 |
 | Hook Test 4: Uncommitted changes | ✅ Documented | Stop hook | Manual validation in Phase 4 |
-| Hook Test 5: Fresh start resume | ⏳ Phase 2 | Session start | Implementation pending |
-| Hook Test 6: Stale state warning | ⏳ Phase 2 | Session start | Implementation pending |
+| Hook Test 5: Fresh start resume | ✅ Implemented | Session start | Phase 2 complete (Tasks 2.1, 2.2) |
+| Hook Test 6: Stale state warning | ✅ Implemented | Session start | Phase 2 complete (Task 2.2) |
 | Hook Test 7: Invalid plan handling | ✅ Documented | Stop hook | Manual validation in Phase 4 |
+| Hook Test 8: Missing plan warning | ✅ Implemented | Session start | Phase 2 complete (Task 2.2) |
+| Hook Test 9: End-to-end workflow | ✅ Documented | Full loop | Manual validation in Phase 4 |
 
 **Testing Notes**:
 - Hook Tests 1-4, 7: Behavior defined, manual validation in Phase 4 (Task 4.1)
-- Hook Tests 5-6: Implementation in Phase 2 (Tasks 2.1, 2.2)
+- Hook Tests 5-6, 8: Implementation complete in Phase 2 (Tasks 2.1, 2.2)
+- Hook Test 9: End-to-end scenario documented, manual validation in Phase 4 (Task 4.1)
 - All tests require actual event triggers (session stops, starts)
 - Recommend end-to-end testing before version 2.2.0 release
+
+**Implementation Status**:
+- Phase 1 (Stop hook): Tasks 1.2-1.3 complete → Hook Tests 1-4, 7 specified
+- Phase 2 (Auto-resume): Tasks 2.1-2.2 complete → Hook Tests 5-6, 8 implemented, Test 9 specified
+- Phase 4 (Validation): Task 4.1 will execute all 9 test scenarios
 
 ---
 
