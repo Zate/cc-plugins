@@ -123,20 +123,34 @@ Use the `Skill: project-context` to detect project configuration if `.claude/pro
 
 3. **Map features to relevant auditors**:
 
+   **v2.0 Consolidated Auditors** (18 → 6 auditors for better efficiency)
+
    | Detected Feature | Relevant Auditors |
    |------------------|-------------------|
-   | authentication | authentication-auditor, session-auditor |
-   | oauth | oauth-auditor, token-auditor |
-   | file-upload | file-auditor |
-   | api | api-auditor, validation-auditor, encoding-auditor |
-   | database | encoding-auditor, data-protection-auditor |
-   | frontend/web | frontend-auditor |
-   | payments | crypto-auditor, logging-auditor |
+   | authentication | auth-security-auditor |
+   | oauth | auth-security-auditor |
+   | sessions | auth-security-auditor |
+   | authorization | auth-security-auditor |
+   | api | web-security-auditor, injection-auditor |
+   | database | injection-auditor |
+   | frontend/web | web-security-auditor |
+   | file-upload | data-security-auditor |
+   | crypto/encryption | data-security-auditor |
+   | logging | data-security-auditor |
+   | tls/https | web-security-auditor |
+   | webrtc | web-security-auditor |
    | config/secrets | config-auditor |
-   | tls/https | communication-auditor |
-   | webrtc | webrtc-auditor |
+   | architecture | architecture-auditor |
 
-4. **Only select auditors matching detected features** - do NOT run all 17 auditors
+   **Auditor Capabilities**:
+   - `injection-auditor`: SQL, NoSQL, Command, Template, Deserialization (V1)
+   - `auth-security-auditor`: Auth, AuthZ, Session, JWT, OAuth (V6-V10)
+   - `data-security-auditor`: Crypto, Data Protection, Files, Logging (V5, V11, V14, V16)
+   - `web-security-auditor`: XSS, CSP, Validation, API, TLS, WebRTC (V2-V4, V12, V17)
+   - `config-auditor`: Configuration security (V9)
+   - `architecture-auditor`: Architecture and design (V2 architecture)
+
+4. **Only select auditors matching detected features** - Typical audit runs 3-5 auditors
 
 5. Write plan to `.claude/security/plan.json`:
    ```json
@@ -144,18 +158,19 @@ Use the `Skill: project-context` to detect project configuration if `.claude/pro
      "timestamp": "2025-12-16T...",
      "level": "L2",
      "selectedAuditors": [
-       {"name": "encoding-auditor", "reason": "API with database detected"},
-       {"name": "authentication-auditor", "reason": "Auth feature detected"}
+       {"name": "injection-auditor", "reason": "API with database detected"},
+       {"name": "auth-security-auditor", "reason": "Authentication feature detected"},
+       {"name": "web-security-auditor", "reason": "Web frontend and API detected"}
      ],
      "excludedPaths": ["node_modules/", "vendor/"],
-     "estimatedRequirements": 150
+     "estimatedRequirements": 80
    }
    ```
 
 6. **Present plan to user for approval**:
    ```
    Use AskUserQuestion:
-   - question: "Here's the proposed audit plan:\n\n**Level**: L2 (Standard)\n**Auditors to run** ([N] total):\n- encoding-auditor: API with database detected\n- authentication-auditor: Auth feature detected\n- [etc.]\n\n**Estimated requirements**: ~150\n\nProceed with this plan?"
+   - question: "Here's the proposed audit plan:\n\n**Level**: L2 (Standard)\n**Auditors to run** (3 total):\n- injection-auditor: API with database detected\n- auth-security-auditor: Authentication feature detected\n- web-security-auditor: Web frontend and API detected\n\n**Estimated ASVS requirements**: ~80\n\nProceed with this plan?"
    - header: "Audit Plan"
    - options:
      - Proceed (Run these auditors)
@@ -194,31 +209,31 @@ Use the `Skill: project-context` to detect project configuration if `.claude/pro
    - [x] Phase 1: Discovery
    - [x] Phase 2: Planning
    - [~] Phase 3: Execution
-     - [ ] encoding-auditor
-     - [ ] authentication-auditor
-     - [ ] session-auditor
+     - [ ] injection-auditor
+     - [ ] auth-security-auditor
+     - [ ] web-security-auditor
    - [ ] Phase 4: Review
    - [ ] Phase 5: Report
    ```
 
 5. **Launch auditors in batches** using Task tool:
-   - Launch 3-4 auditors in parallel (use `run_in_background: true`)
-   - Each auditor should output structured JSON findings
+   - Launch 2-3 auditors in parallel (use `run_in_background: true`)
+   - Each super-auditor uses mode detection to focus on relevant areas
    - Provide context: project type, languages, relevant directories
 
 6. **Poll for progress** using TaskOutput:
    - Check status periodically with `block: false`
    - Display progress updates:
      ```
-     ⏳ encoding-auditor: running...
-     ✓ authentication-auditor: 3 findings
-     ⏳ session-auditor: running...
+     ⏳ injection-auditor: running...
+     ✓ auth-security-auditor: 5 findings
+     ⏳ web-security-auditor: running...
      ```
 
 7. **As each completes**, save findings to `.claude/security/findings/{auditor}.json`:
    ```json
    {
-     "auditor": "encoding-auditor",
+     "auditor": "injection-auditor",
      "timestamp": "2025-12-16T...",
      "findings": [
        {
@@ -421,9 +436,12 @@ All audit artifacts are saved to `.claude/security/`:
 ├── discovery.json          # Phase 1 output - detected tech stack
 ├── plan.json               # Phase 2 output - selected auditors
 ├── findings/               # Phase 3 output - raw auditor results
-│   ├── encoding-auditor.json
-│   ├── authentication-auditor.json
-│   └── ...
+│   ├── injection-auditor.json
+│   ├── auth-security-auditor.json
+│   ├── web-security-auditor.json
+│   ├── data-security-auditor.json (if applicable)
+│   ├── config-auditor.json (if applicable)
+│   └── architecture-auditor.json (if applicable)
 ├── reviewed-findings.json  # Phase 4 output - user-approved findings
 ├── audit-2025-12-16.md     # Phase 5 output - final report
 └── audit-2025-12-16.json   # Phase 5 output - machine-readable
