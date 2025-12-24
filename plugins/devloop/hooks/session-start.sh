@@ -495,6 +495,67 @@ get_project_size() {
     fi
 }
 
+# Validate fresh start state file
+# Returns: "valid", "stale:<age_days>", "no_plan", "invalid"
+validate_fresh_start_state() {
+    local state_file=".devloop/next-action.json"
+
+    if [ ! -f "$state_file" ]; then
+        echo "invalid"
+        return
+    fi
+
+    # Parse timestamp - prefer jq, fallback to grep/sed
+    local timestamp=""
+    if command -v jq &> /dev/null; then
+        timestamp=$(jq -r '.timestamp // ""' "$state_file" 2>/dev/null || echo "")
+    else
+        timestamp=$(grep -o '"timestamp"[[:space:]]*:[[:space:]]*"[^"]*"' "$state_file" 2>/dev/null | sed 's/.*: *"\([^"]*\)".*/\1/' || echo "")
+    fi
+
+    if [ -z "$timestamp" ]; then
+        echo "invalid"
+        return
+    fi
+
+    # Calculate age in days
+    local age_days=0
+    local state_epoch=0
+    local now_epoch=0
+
+    # Try date conversion (Linux vs macOS compatibility)
+    if command -v date &> /dev/null; then
+        # Try Linux date format first
+        state_epoch=$(date -d "$timestamp" +%s 2>/dev/null || echo "0")
+
+        # If that failed, try macOS date format
+        if [ "$state_epoch" -eq 0 ]; then
+            state_epoch=$(date -j -f "%Y-%m-%dT%H:%M:%SZ" "$timestamp" +%s 2>/dev/null || echo "0")
+        fi
+
+        now_epoch=$(date +%s)
+
+        if [ "$state_epoch" -gt 0 ]; then
+            age_days=$(( (now_epoch - state_epoch) / 86400 ))
+        fi
+    fi
+
+    # Check if state is stale (>7 days)
+    if [ "$age_days" -gt 7 ]; then
+        echo "stale:$age_days"
+        return
+    fi
+
+    # Check if plan.md still exists
+    if [ ! -f ".devloop/plan.md" ]; then
+        echo "no_plan"
+        return
+    fi
+
+    # All checks passed
+    echo "valid"
+}
+
 # Main execution
 LANGUAGE=$(detect_language)
 FRAMEWORK=$(detect_framework "$LANGUAGE")
@@ -526,8 +587,69 @@ fi
 
 # Check for fresh start auto-resume first
 FRESH_START_DETECTED=false
+VALIDATION_WARNING=""
+STATE_AGE_DAYS=0
+STATE_TIMESTAMP=""
+
 if [ -f ".devloop/next-action.json" ]; then
-    FRESH_START_DETECTED=true
+    # Run validation
+    VALIDATION_RESULT=$(validate_fresh_start_state)
+
+    case "$VALIDATION_RESULT" in
+        valid)
+            # All checks passed - proceed with auto-resume
+            FRESH_START_DETECTED=true
+            ;;
+        stale:*)
+            # State is too old (>7 days)
+            STATE_AGE_DAYS=$(echo "$VALIDATION_RESULT" | cut -d: -f2)
+
+            # Extract timestamp for display
+            if command -v jq &> /dev/null; then
+                STATE_TIMESTAMP=$(jq -r '.timestamp // ""' ".devloop/next-action.json" 2>/dev/null || echo "unknown")
+            else
+                STATE_TIMESTAMP=$(grep -o '"timestamp"[[:space:]]*:[[:space:]]*"[^"]*"' ".devloop/next-action.json" 2>/dev/null | sed 's/.*: *"\([^"]*\)".*/\1/' || echo "unknown")
+            fi
+
+            # Format timestamp for display (just date part)
+            STATE_DATE=$(echo "$STATE_TIMESTAMP" | cut -d'T' -f1 || echo "$STATE_TIMESTAMP")
+
+            VALIDATION_WARNING="⚠️ **Fresh Start State Detected - Stale**
+
+A fresh start state file exists at \`.devloop/next-action.json\`, but it is **${STATE_AGE_DAYS} days old** (created ${STATE_DATE}).
+
+The plan or tasks may have changed significantly since then. **Automatic resume has been disabled** for safety.
+
+**Options**:
+- Delete state and continue normally: \`rm .devloop/next-action.json\`
+- Force resume anyway: \`/devloop:continue\` (will consume and delete state file)
+- Review state: \`cat .devloop/next-action.json\`"
+            ;;
+        no_plan)
+            # Plan file is missing
+            VALIDATION_WARNING="⚠️ **Fresh Start State Detected - Plan Missing**
+
+A fresh start state file exists at \`.devloop/next-action.json\`, but the plan file \`.devloop/plan.md\` no longer exists.
+
+The state references a plan that has been removed. **Automatic resume has been disabled** for safety.
+
+**Options**:
+- Delete stale state: \`rm .devloop/next-action.json\`
+- Review state: \`cat .devloop/next-action.json\`"
+            ;;
+        invalid)
+            # State file is corrupted or missing required fields
+            VALIDATION_WARNING="⚠️ **Fresh Start State Detected - Invalid**
+
+A fresh start state file exists at \`.devloop/next-action.json\`, but it appears to be corrupted or missing required fields.
+
+**Automatic resume has been disabled** for safety.
+
+**Options**:
+- Delete invalid state: \`rm .devloop/next-action.json\`
+- Review state: \`cat .devloop/next-action.json\`"
+            ;;
+    esac
 fi
 
 # Build rich context message
@@ -643,7 +765,16 @@ CONTEXT_MSG="$CONTEXT_MSG
 
 **Available Commands**: /devloop, /devloop:continue, /devloop:quick, /devloop:spike, /devloop:review, /devloop:ship, /devloop:bug, /devloop:bugs"
 
-# Add fresh start auto-resume instruction if detected
+# Add validation warning if state file exists but validation failed
+if [ -n "$VALIDATION_WARNING" ]; then
+    CONTEXT_MSG="$CONTEXT_MSG
+
+---
+
+$VALIDATION_WARNING"
+fi
+
+# Add fresh start auto-resume instruction if detected and validated
 if [ "$FRESH_START_DETECTED" = true ]; then
     CONTEXT_MSG="$CONTEXT_MSG
 
