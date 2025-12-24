@@ -20,11 +20,31 @@ devloop is a Claude Code plugin that brings structure and efficiency to software
 # Install
 /plugin install devloop
 
-# Start a feature
-/devloop Add user authentication with OAuth
+# Recommended workflow: spike → fresh → continue loop
+/devloop:spike How should we add user authentication?
+/devloop:fresh
+/clear
+/devloop:continue
 
 # That's it. devloop guides you through the rest.
 ```
+
+### The Recommended Workflow
+
+devloop works best with the **spike → fresh → continue loop**:
+
+```
+Spike → Fresh → /clear → Continue → [5-10 tasks] → Fresh → /clear → Continue → ...
+```
+
+**Why this pattern?**
+
+1. **Spike first** - Explore the problem, create a solid plan with all context
+2. **Fresh regularly** - Clear context every 5-10 tasks to maintain speed
+3. **Continue seamlessly** - Pick up exactly where you left off with fresh focus
+4. **Better results** - Fresh context = faster responses, sharper reasoning
+
+This iterative cycle is how professional developers work: plan, execute, reassess, continue.
 
 ### Using devloop with Other AI Agents
 
@@ -890,18 +910,38 @@ During transition, both systems work:
 
 ## Best Practices
 
+### Start with the Loop Pattern
+
+For any non-trivial work, use the spike → fresh → continue loop:
+
+```bash
+# 1. Start with spike to create a plan
+/devloop:spike [What you want to build]
+
+# 2. Save and clear context
+/devloop:fresh
+/clear
+
+# 3. Resume and work
+/devloop:continue
+
+# 4. After 5-10 tasks, repeat step 2-3
+```
+
+This pattern keeps context fresh and responses fast.
+
 ### Use the Right Command
 
 | Situation | Command |
 |-----------|---------|
-| New feature, complex | `/devloop` |
+| Starting any work | `/devloop:spike` then loop |
 | Messy code, tech debt | `/devloop:analyze` |
 | Small fix, clear scope | `/devloop:quick` |
 | Unknown if possible | `/devloop:spike` |
 | Ready to commit | `/devloop:ship` |
 | Reviewing code | `/devloop:review` |
 | Continuing work | `/devloop:continue` |
-| Context heavy/long | `/devloop:fresh` |
+| Context heavy/long | `/devloop:fresh` + `/clear` |
 | Track for later | `/devloop:new` |
 | View/manage issues | `/devloop:issues` |
 

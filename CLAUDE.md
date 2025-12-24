@@ -161,6 +161,83 @@ This shows plugin loading, manifest validation, and component registration.
 - [Skills Documentation](https://code.claude.com/docs/en/skills/overview) - Creating skills
 - [Commands Documentation](https://code.claude.com/docs/en/commands) - Custom slash commands
 
+## Recommended Workflow Pattern (devloop)
+
+**The devloop workflow has evolved to use an iterative cycle that manages context effectively:**
+
+### The Spike → Fresh → Continue Loop
+
+```
+┌──────────────────────────────────────────────────┐
+│  1. /devloop:spike [exploration topic]          │
+│     └─→ Creates plan with findings               │
+└─────────────────┬────────────────────────────────┘
+                  ↓
+┌──────────────────────────────────────────────────┐
+│  2. /devloop:fresh                               │
+│     └─→ Saves state to .devloop/next-action.json│
+└─────────────────┬────────────────────────────────┘
+                  ↓
+┌──────────────────────────────────────────────────┐
+│  3. /clear                                       │
+│     └─→ Reset conversation context               │
+└─────────────────┬────────────────────────────────┘
+                  ↓
+┌──────────────────────────────────────────────────┐
+│  4. /devloop:continue                            │
+│     └─→ Resumes work from saved state            │
+│     └─→ Executes tasks with checkpoints          │
+└─────────────────┬────────────────────────────────┘
+                  │
+                  ↓
+            After 5-10 tasks?
+                  │
+                  ├─→ Yes: Loop back to step 2
+                  └─→ No: Keep working
+```
+
+### Why This Pattern Works
+
+1. **Spike first** - Understand the problem, create a solid plan
+2. **Fresh regularly** - Clear context every 5-10 tasks to avoid slowness
+3. **Continue seamlessly** - Pick up exactly where you left off
+4. **Better results** - Fresh context = faster responses, better focus
+
+### Example Session
+
+```bash
+# Start with exploration
+/devloop:spike How should we implement user authentication?
+
+# After spike creates plan, save and clear
+/devloop:fresh
+/clear
+
+# Resume and work on tasks
+/devloop:continue  # Completes Task 1.1, 1.2, 1.3...
+
+# After several tasks, fresh start again
+/devloop:fresh
+/clear
+
+# Continue working
+/devloop:continue  # Completes Task 2.1, 2.2...
+
+# Repeat until done
+```
+
+### When to Use Fresh Start
+
+- After completing 5-10 tasks
+- When responses feel slow
+- After long agent invocations
+- When context feels heavy
+- Suggested at checkpoints
+
+See `plugins/devloop/commands/fresh.md` and `plugins/devloop/skills/workflow-loop/SKILL.md` for details.
+
+---
+
 ## Command Orchestration Pattern
 
 **Critical**: All plugins in this marketplace MUST follow the command orchestration pattern for complex workflows. This ensures consistent user experience across plugins.

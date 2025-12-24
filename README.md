@@ -15,13 +15,30 @@
 # Install the devloop plugin
 /plugin install devloop
 
-# Start building immediately
-/devloop Add user authentication with OAuth
+# Start with exploration (recommended)
+/devloop:spike How should I implement user authentication?
+
+# Save state and clear context
+/devloop:fresh
+/clear
+
+# Resume work with fresh context
+/devloop:continue
 ```
 
 That's it. You're ready to go.
 
 **New to plugins?** Check out the [Getting Started Guide](docs/GETTING_STARTED.md) for a complete walkthrough, or grab the [Quick Reference](docs/QUICK_REFERENCE.md) cheat sheet.
+
+### The Recommended Workflow
+
+devloop works best with the **spike → fresh → continue loop**:
+
+1. **Spike first** - `/devloop:spike` explores and creates a solid plan
+2. **Fresh regularly** - `/devloop:fresh` + `/clear` resets context every 5-10 tasks
+3. **Continue seamlessly** - `/devloop:continue` picks up exactly where you left off
+
+This pattern keeps responses fast and focused while maintaining progress.
 
 ---
 
@@ -40,29 +57,37 @@ The flagship plugin for professional software development. A complete 12-phase w
 ```bash
 /plugin install devloop
 
-# Start a new feature
-/devloop Add user authentication with OAuth
+# The recommended workflow: spike → fresh → continue loop
+/devloop:spike How should we add user authentication?
+/devloop:fresh
+/clear
+/devloop:continue  # Work on tasks...
+/devloop:fresh     # After 5-10 tasks
+/clear
+/devloop:continue  # Keep going...
 
-# Analyze codebase for refactoring
-/devloop:analyze
-
-# Resume work on an existing plan
-/devloop:continue
-
-# Quick implementation for small tasks
+# Other powerful commands
+/devloop:analyze   # Find tech debt and refactoring opportunities
 /devloop:quick Fix the typo in the header
-
-# Code review
-/devloop:review
+/devloop:review    # Code review before shipping
 ```
 
 **Why devloop?**
 
+- **Fresh Start Loop**: Clear context regularly for faster, more focused responses
 - **Token-conscious**: Strategic model selection (20% opus / 60% sonnet / 20% haiku)
+- **Workflow Loop**: Mandatory checkpoints ensure tasks are actually completed
+- **Consolidated Agents**: 9 super-agents (down from 18) with multi-mode operation
 - **Refactoring Analysis**: Identify technical debt, large files, and code quality issues
 - **Language-aware**: Built-in patterns for Go, React, Java, and Python
-- **Agent-powered**: 17 specialized agents for exploration, architecture, testing, analysis, and review
 - **Quality-focused**: Security scanning, code review, and Definition of Done validation
+
+**Recent Updates (v2.2.1)**:
+- Fresh start mechanism for context management
+- Workflow loop enforcement with mandatory checkpoints
+- Spike-to-plan application workflow
+- Agent consolidation reducing token overhead
+- Unified issue tracking system
 
 [Read the full devloop documentation →](plugins/devloop/README.md)
 

@@ -1,7 +1,7 @@
 {
   "name": "devloop",
-  "version": "2.2.1",
-  "description": "Token-conscious feature development workflow with enhanced engineer agent (6 new skills, mode-specific workflows, complexity-aware selection), mandatory checkpoint enforcement, loop completion detection, context management, fresh start mechanism, spike-to-plan application, worklog sync automation, consolidated super-agents (18→9), XML-structured prompts, unified language patterns, strategic model selection (opus/sonnet/haiku), and comprehensive documentation (agents.md, testing.md)",
+  "version": "2.2.2",
+  "description": "Token-conscious feature development workflow with enhanced engineer agent (6 new skills, mode-specific workflows, complexity-aware selection), mandatory checkpoint enforcement, loop completion detection, context management, fresh start mechanism, spike-to-plan application, worklog sync automation, consolidated super-agents (18→9), XML-structured prompts, unified language patterns, strategic model selection (opus/sonnet/haiku), and comprehensive documentation (agents.md, testing.md). Recommended workflow: spike → fresh → continue loop for optimal context management.",
   "author": {
     "name": "Zate",
     "email": "zate75+claude-code-plugins@gmail.com"
