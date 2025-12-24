@@ -5,6 +5,65 @@ All notable changes to the devloop plugin are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.2.0] - 2025-12-24
+
+### Added - Hook-Based Fresh Start Loop Workflow (FEAT-005)
+
+**Stop Hook with Plan-Aware Routing (Phase 1)**
+- Implemented comprehensive Stop hook in `hooks.json` (lines 113-177, +64 lines)
+  - Detects `.devloop/plan.md` and evaluates plan state (pending/complete/no plan)
+  - Returns structured JSON with routing options: "Continue next task", "Fresh start", "Stop"
+  - Detects uncommitted changes and suggests auto-commit workflow (lint → test → commit)
+  - Handles edge cases: missing plan, corrupted plan, complete plan
+  - Congratulatory message when all tasks complete, suggests `/devloop:ship`
+- Documented 9 comprehensive hook test scenarios in `testing.md` (lines 663-1230, +568 lines)
+  - Hook Tests 1-4, 7: Stop hook behaviors (pending tasks, no plan, complete plan, uncommitted changes, invalid plan)
+  - Hook Tests 5-6, 8: Session start auto-resume, stale state detection, missing plan validation
+  - Hook Test 9: End-to-end fresh start workflow with 5-step execution timeline
+  - Updated Table of Contents with "Hook Testing" section
+
+**Fresh Start Auto-Resume (Phase 2)**
+- Extended `session-start.sh` for automatic resume (lines 498-775, +163 lines net)
+  - Detects `.devloop/next-action.json` on session start
+  - Validates state with `validate_fresh_start_state()` function (lines 498-557)
+    - Timestamp age check (warns if >7 days old, skips auto-resume)
+    - Plan existence validation (`.devloop/plan.md` must exist)
+    - Escape hatch for invalid state (skips auto-resume, displays warning)
+  - Auto-invokes `/devloop:continue` via CRITICAL instruction (no user prompt)
+  - Displays "🔄 Fresh start detected - auto-resuming work..." message to user
+  - Continue command (Step 1a) reads, validates, and deletes state file (single-use)
+
+**Benefits**
+- **Seamless development loop**: Stop → routing options → fresh start → auto-resume
+- **No manual steps**: Fully automatic resume from fresh start state
+- **Safety validation**: Stale state detection (>7 days), plan existence, graceful error handling
+- **Enforces best practices**: Auto-commit suggestions when uncommitted changes detected
+- **Clear user experience**: Consistent routing prompts, automatic transitions, no confusion
+- **Fresh context enabled**: Supports context clearing with automatic resume on next session
+
+**Architecture**
+- Hook-based design (non-invasive, leverages existing infrastructure)
+- Stop hook: Plan evaluation and routing (hooks.json)
+- Fresh command: State persistence (`/devloop:fresh` from Phase 8)
+- Session start hook: Auto-resume detection and validation (session-start.sh)
+- Continue command: State file reading and cleanup (continue.md Step 1a)
+
+**Files Modified**
+- `plugins/devloop/hooks/hooks.json` (lines 113-177, +64 lines)
+- `plugins/devloop/hooks/session-start.sh` (lines 498-775, +163 lines net)
+- `plugins/devloop/docs/testing.md` (lines 663-1230, +568 lines)
+- `.devloop/plan.md` (Tasks 1.2, 1.3, 2.1, 2.2, 2.3, 3.1, 3.2 marked complete)
+- `.devloop/issues/FEAT-005.md` (status: done, Resolution section added)
+
+**Commits**
+- `2b8dd1d`: feat(devloop): implement Stop hook with plan-aware routing (FEAT-005 Task 1.2)
+- `7773d73`: docs(devloop): document hook test scenarios (FEAT-005 Task 1.3)
+- `a1f355b`: feat(devloop): add auto-resume on fresh start detection (FEAT-005 Task 2.1)
+- `09c0092`: feat(devloop): add safety validation for fresh start auto-resume (FEAT-005 Task 2.2)
+- `3a69e36`: docs(devloop): update auto-resume test documentation (FEAT-005 Task 2.3)
+
+---
+
 ## [2.1.0] - 2025-12-23
 
 ### Added - Workflow Loop & Fresh Start System
