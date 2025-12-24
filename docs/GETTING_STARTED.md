@@ -50,26 +50,41 @@ devloop transforms how you build features. Instead of ad-hoc prompting, it guide
 
 ## Your First 5 Minutes
 
-### Try these commands right now:
+### Try the recommended workflow:
 
-**1. Start a feature** (full workflow)
+**The spike → fresh → continue loop** (best for any real work)
 ```bash
-/devloop Add a dark mode toggle to the settings page
+# 1. Start with exploration
+/devloop:spike Add a dark mode toggle to the settings page
+
+# 2. Save state and clear context
+/devloop:fresh
+/clear
+
+# 3. Resume and work on tasks
+/devloop:continue
+
+# 4. After 5-10 tasks, repeat step 2-3
+/devloop:fresh
+/clear
+/devloop:continue
 ```
 
-**2. Quick fix** (skip the ceremony for simple tasks)
+**Other useful commands:**
+
+**Quick fix** (skip the ceremony for simple tasks)
 ```bash
 /devloop:quick Fix the typo in the header component
 ```
 
-**3. Explore feasibility** (when you're not sure if something is possible)
+**Analyze codebase** (find tech debt and refactoring opportunities)
 ```bash
-/devloop:spike Can we migrate from REST to GraphQL?
+/devloop:analyze
 ```
 
-**4. Resume work** (pick up where you left off)
+**Review code** (before committing)
 ```bash
-/devloop:continue
+/devloop:review
 ```
 
 ---
@@ -90,22 +105,44 @@ devloop transforms how you build features. Instead of ad-hoc prompting, it guide
 
 ## Understanding the Workflow
 
-When you run `/devloop`, you'll see a structured conversation:
+### The Recommended Pattern: Spike → Fresh → Continue Loop
+
+**Modern devloop usage follows this iterative cycle:**
 
 ```
-[Devloop Phase 1: Discovery]
-I'll analyze your requirements and identify edge cases...
-
-[Devloop Phase 3: Exploration]
-Let me find similar patterns in your codebase...
-
-[Devloop Phase 5: Architecture]
-Here are three approaches we could take...
+┌─────────────────────────────────────────────┐
+│ 1. /devloop:spike                           │
+│    └─→ Explore problem, create plan         │
+└──────────────────┬──────────────────────────┘
+                   ↓
+┌─────────────────────────────────────────────┐
+│ 2. /devloop:fresh + /clear                  │
+│    └─→ Save state, reset context            │
+└──────────────────┬──────────────────────────┘
+                   ↓
+┌─────────────────────────────────────────────┐
+│ 3. /devloop:continue                        │
+│    └─→ Work on tasks with checkpoints       │
+└──────────────────┬──────────────────────────┘
+                   │
+                   ↓ After 5-10 tasks
+                   └─→ Loop back to step 2
 ```
+
+**Why this works:**
+
+- **Spike** creates a comprehensive plan with full context
+- **Fresh** keeps responses fast by clearing heavy context
+- **Continue** picks up exactly where you left off
+- **Loop** maintains momentum while staying efficient
+
+### The Traditional Workflow
+
+When you run `/devloop` (traditional full workflow), you'll see a structured conversation through 12 phases. However, **the spike → fresh → continue loop is now recommended** for better context management.
 
 **You're in control**: devloop asks clarifying questions when needed. Answer them thoughtfully—it prevents rework later.
 
-**Plans are saved**: Your progress is stored in `.claude/devloop-plan.md`. If you need to stop, just run `/devloop:continue` later to pick up where you left off.
+**Plans are saved**: Your progress is stored in `.devloop/plan.md`. The fresh start mechanism ensures you can always resume with `/devloop:continue`.
 
 ---
 
