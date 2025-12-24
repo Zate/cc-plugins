@@ -1,9 +1,9 @@
 # Devloop Plan: FEAT-005 Hook-Based Fresh Start Loop
 
 **Created**: 2025-12-24
-**Updated**: 2025-12-24 06:35
+**Updated**: 2025-12-24 11:45
 **Status**: In Progress
-**Current Phase**: Phase 1
+**Current Phase**: Phase 2
 **Estimate**: M (5-7 hours)
 
 ## Overview
@@ -89,13 +89,13 @@ Using the existing hook infrastructure:
 **Complexity**: S-sized (1-2 hours)
 **Dependencies**: Phase 1 complete
 
-- [ ] Task 2.1: Extend session-start.sh for auto-resume
-  - Detect next-action.json (existing logic at lines 415-443)
-  - Auto-invoke /devloop:continue (no user prompt)
-  - Pass fresh start context to continue command
-  - Handle errors gracefully (stale state, missing plan)
-  - Acceptance: Session start auto-resumes when next-action.json present
-  - Files: `plugins/devloop/hooks/session-start.sh`
+- [x] Task 2.1: Extend session-start.sh for auto-resume
+  - Detect next-action.json (existing logic at lines 415-443) ✓
+  - Auto-invoke /devloop:continue (no user prompt) ✓
+  - Pass fresh start context to continue command ✓
+  - Handle errors gracefully (stale state, missing plan) ✓
+  - Acceptance: Session start auto-resumes when next-action.json present ✓
+  - Files: `plugins/devloop/hooks/session-start.sh` (modified lines 527-531, 612-619, 646-666, 669-685)
 
 - [ ] Task 2.2: Add safety validation
   - Check next-action.json timestamp (warn if >7 days old)
@@ -193,6 +193,7 @@ Using the existing hook infrastructure:
 
 ## Progress Log
 
+- 2025-12-24 11:45: Completed Task 2.1 - Extended session-start.sh for auto-resume. Hook now detects next-action.json and adds CRITICAL instruction to Claude's context to immediately invoke /devloop:continue. User sees "🔄 Fresh start detected - auto-resuming work..." message. Continue command handles state file parsing and deletion.
 - 2025-12-24 06:50: Completed Task 1.3 - Documented 7 comprehensive hook test scenarios in testing.md (368 lines): Stop hook routing, no plan, complete plan, uncommitted changes, fresh start resume, stale state, invalid plan
 - 2025-12-24 06:35: Completed Task 1.2 - Stop hook implemented in hooks.json with plan detection, routing options (continue/fresh/stop), auto-commit logic, and comprehensive edge case handling
 - 2025-12-24 07:45: Fresh start initiated - state saved to next-action.json

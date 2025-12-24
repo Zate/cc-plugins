@@ -524,6 +524,12 @@ if [ -n "${CLAUDE_ENV_FILE:-}" ]; then
     } >> "$CLAUDE_ENV_FILE"
 fi
 
+# Check for fresh start auto-resume first
+FRESH_START_DETECTED=false
+if [ -f ".devloop/next-action.json" ]; then
+    FRESH_START_DETECTED=true
+fi
+
 # Build rich context message
 CONTEXT_MSG="## Devloop Project Context
 
@@ -609,29 +615,8 @@ if [ -n "$ACTIVE_PLAN" ]; then
     fi
 fi
 
-# Add fresh start detection
-if [ -n "$FRESH_START" ]; then
-    # Parse fresh start state (values may contain commas, so use delimiters carefully)
-    FS_PLAN=$(echo "$FRESH_START" | sed 's/^plan=\(.*\),phase=.*/\1/')
-    FS_PHASE=$(echo "$FRESH_START" | sed 's/.*,phase=\(.*\),summary=.*/\1/')
-    FS_SUMMARY=$(echo "$FRESH_START" | sed 's/.*,summary=\(.*\),next=.*/\1/')
-    FS_NEXT=$(echo "$FRESH_START" | sed 's/.*,next=//')
-
-    CONTEXT_MSG="$CONTEXT_MSG
-
-**Fresh Start Detected**: Resuming \"$FS_PLAN\""
-    if [ -n "$FS_PHASE" ]; then
-        CONTEXT_MSG="$CONTEXT_MSG at $FS_PHASE"
-    fi
-    CONTEXT_MSG="$CONTEXT_MSG
-  → Progress: $FS_SUMMARY"
-    if [ -n "$FS_NEXT" ]; then
-        CONTEXT_MSG="$CONTEXT_MSG
-  → Next: $FS_NEXT"
-    fi
-    CONTEXT_MSG="$CONTEXT_MSG
-  → Run \`/devloop:continue\` to resume work, or \`/devloop:fresh --dismiss\` to clear this state"
-fi
+# Fresh start auto-resume handled by FRESH_START_DETECTED flag
+# The context message will instruct Claude to auto-invoke /devloop:continue
 
 # Add bug count if any
 if [ -n "$OPEN_BUGS" ] && [ "$OPEN_BUGS" -gt 0 ]; then
@@ -658,18 +643,45 @@ CONTEXT_MSG="$CONTEXT_MSG
 
 **Available Commands**: /devloop, /devloop:continue, /devloop:quick, /devloop:spike, /devloop:review, /devloop:ship, /devloop:bug, /devloop:bugs"
 
-# Build brief status message for user display
-STATUS_MSG="devloop: $PROJECT_NAME"
-if [ "$LANGUAGE" != "unknown" ]; then
-    STATUS_MSG="$STATUS_MSG ($LANGUAGE"
-    if [ "$FRAMEWORK" != "none" ]; then
-        STATUS_MSG="$STATUS_MSG/$FRAMEWORK"
-    fi
-    STATUS_MSG="$STATUS_MSG)"
+# Add fresh start auto-resume instruction if detected
+if [ "$FRESH_START_DETECTED" = true ]; then
+    CONTEXT_MSG="$CONTEXT_MSG
+
+---
+
+**CRITICAL - Fresh Start Auto-Resume Detected**
+
+A fresh start state file exists at \`.devloop/next-action.json\`.
+
+**Your immediate action**: Execute \`/devloop:continue\` command NOW.
+
+Do NOT wait for user input. Do NOT ask questions. Immediately invoke the continue command.
+The continue command will:
+1. Read and parse the next-action.json file
+2. Delete the state file (single-use)
+3. Display the resumption context to the user
+4. Continue with the next pending task
+
+This is an automatic resume from a previous fresh start. Proceed immediately."
 fi
-if [ -n "$ACTIVE_PLAN" ]; then
-    PLAN_NAME=$(echo "$ACTIVE_PLAN" | sed 's/name=\([^,]*\).*/\1/')
-    STATUS_MSG="$STATUS_MSG | plan: $PLAN_NAME"
+
+# Build brief status message for user display
+if [ "$FRESH_START_DETECTED" = true ]; then
+    # Show fresh start resuming message prominently
+    STATUS_MSG="🔄 Fresh start detected - auto-resuming work..."
+else
+    STATUS_MSG="devloop: $PROJECT_NAME"
+    if [ "$LANGUAGE" != "unknown" ]; then
+        STATUS_MSG="$STATUS_MSG ($LANGUAGE"
+        if [ "$FRAMEWORK" != "none" ]; then
+            STATUS_MSG="$STATUS_MSG/$FRAMEWORK"
+        fi
+        STATUS_MSG="$STATUS_MSG)"
+    fi
+    if [ -n "$ACTIVE_PLAN" ]; then
+        PLAN_NAME=$(echo "$ACTIVE_PLAN" | sed 's/name=\([^,]*\).*/\1/')
+        STATUS_MSG="$STATUS_MSG | plan: $PLAN_NAME"
+    fi
 fi
 
 # Escape for JSON - use jq if available, fallback to more robust escaping
