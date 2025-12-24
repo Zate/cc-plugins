@@ -16,6 +16,7 @@ allowed-tools:
   - Read
   - Glob
   - Grep
+  - TodoWrite
 model: sonnet
 color: purple
 skills: asvs-requirements, vuln-patterns-core, vuln-patterns-languages
@@ -296,6 +297,40 @@ Focus scanning on detected patterns to minimize false positives.
 
 <workflow>
 
+## Progress Tracking
+
+**IMPORTANT**: Use TodoWrite to provide visibility during long-running scans.
+
+1. **At start of workflow**, create todo list:
+   ```
+   TodoWrite:
+   - [ ] Context analysis
+   - [ ] File discovery
+   - [ ] Mode scanning (will expand per mode)
+   - [ ] Deduplication
+   - [ ] Generate report
+   ```
+
+2. **During mode scanning**, expand with active modes:
+   ```
+   TodoWrite:
+   - [x] Context analysis
+   - [x] File discovery
+   - [~] Mode scanning
+     - [ ] XSS Prevention
+     - [ ] CSP Analysis
+     - [ ] Input Validation
+     - [ ] API Security
+     [... other active modes]
+   - [ ] Deduplication
+   - [ ] Generate report
+   ```
+
+3. **Mark each mode complete** as you finish scanning it
+4. **Update progress** between phases so user sees activity
+
+This prevents the appearance of "hanging" during file-intensive operations.
+
 ## Phase 1: Context Analysis
 
 1. **Read project context**
@@ -326,18 +361,27 @@ Focus scanning on detected patterns to minimize false positives.
 
 ## Phase 2: Deterministic File Discovery
 
-1. **Get source directories**
-2. **Glob relevant files sorted**:
+1. **Mark context analysis complete** with TodoWrite
+2. **Mark file discovery in_progress** with TodoWrite
+3. **Get source directories**
+4. **Glob relevant files sorted**:
    - Frontend: `**/components/**`, `**/pages/**`, `**/views/**`
    - Backend: `**/routes/**`, `**/controllers/**`, `**/api/**`
    - Config: `**/config/**`, nginx/apache configs
    - Middleware: `**/middleware/**`
 
-3. **Process alphabetically, depth-first**
+5. **Process alphabetically, depth-first**
+6. **Mark file discovery complete** with TodoWrite
 
 ## Phase 3: Mode-Specific Scanning
 
+**Before starting**: Expand todos with active modes (XSS Prevention, CSP, Input Validation, etc.)
+
+**For each mode**: Mark as in_progress → scan → mark as completed
+
 ### XSS Prevention Scan
+
+**Mark XSS Prevention as in_progress**
 1. **Find DOM manipulation**
    ```
    Invoke `Skill: vuln-patterns-core` → "XSS Prevention Patterns"
@@ -368,7 +412,11 @@ Focus scanning on detected patterns to minimize false positives.
    - Verify auto-escaping enabled
    - Check for HTML output contexts
 
+**Mark XSS Prevention as completed**
+
 ### CSP Scan
+
+**Mark CSP as in_progress**
 1. **Find CSP configuration**
    - Header middleware (helmet, csp middleware)
    - Meta tags in HTML
@@ -390,7 +438,11 @@ Focus scanning on detected patterns to minimize false positives.
    - report-uri configured
    ```
 
+**Mark CSP as completed**
+
 ### Input Validation Scan
+
+**Mark Input Validation as in_progress**
 1. **Find request handling**
    - API endpoints
    - Form submissions
@@ -413,7 +465,11 @@ Focus scanning on detected patterns to minimize false positives.
    - Type coercion explicit
    ```
 
+**Mark Input Validation as completed**
+
 ### Mass Assignment Scan
+
+**Mark Mass Assignment as in_progress**
 1. **Find model operations**
    ```
    Grep for:
@@ -436,7 +492,11 @@ Focus scanning on detected patterns to minimize false positives.
    - Protected fields in model config
    ```
 
+**Mark Mass Assignment as completed**
+
 ### Business Logic Scan
+
+**Mark Business Logic as in_progress**
 1. **Find multi-step processes**
    - Checkout flows
    - Registration processes
@@ -459,7 +519,11 @@ Focus scanning on detected patterns to minimize false positives.
    - Atomic operations
    ```
 
+**Mark Business Logic as completed**
+
 ### API Security Scan
+
+**Mark API Security as in_progress**
 1. **Check API endpoints**
    ```
    Required protections:
@@ -483,7 +547,11 @@ Focus scanning on detected patterns to minimize false positives.
    - No sensitive info in errors
    ```
 
+**Mark API Security as completed**
+
 ### GraphQL Security Scan
+
+**Mark GraphQL Security as in_progress** (if GraphQL detected)
 1. **Check configuration**
    ```
    Required:
@@ -498,7 +566,11 @@ Focus scanning on detected patterns to minimize false positives.
    - N+1 query problems
    - Missing DataLoader
 
+**Mark GraphQL Security as completed**
+
 ### WebSocket Security Scan
+
+**Mark WebSocket Security as in_progress** (if WebSockets detected)
 1. **Check connection handling**
    ```
    Required:
@@ -509,7 +581,11 @@ Focus scanning on detected patterns to minimize false positives.
    - Origin validation
    ```
 
+**Mark WebSocket Security as completed**
+
 ### TLS Security Scan
+
+**Mark TLS Security as in_progress**
 1. **Check TLS configuration**
    ```
    Find in nginx/Apache/app config:
@@ -538,7 +614,12 @@ Focus scanning on detected patterns to minimize false positives.
    - InsecureSkipVerify: true
    ```
 
+**Mark TLS Security as completed**
+
 ### WebRTC Security Scan
+
+**Mark WebRTC Security as in_progress** (if WebRTC detected)
+
 **First check if WebRTC is used**
 
 1. **TURN server security**
@@ -554,13 +635,20 @@ Focus scanning on detected patterns to minimize false positives.
    - Secure WebSocket (WSS)
    - Signaling authentication
 
+**Mark WebRTC Security as completed**
+
 ## Phase 4: Deduplication
+
+**Mark mode scanning complete, mark deduplication as in_progress**
 
 1. **Group by** (file_path, line_number, domain)
 2. **For duplicates**: Keep highest severity
 3. **Sort** by severity, domain, file
+4. **Mark deduplication complete**
 
 ## Phase 5: Findings Report
+
+**Mark generate report as in_progress**
 
 Return structured JSON (for /security:audit) OR markdown (direct).
 

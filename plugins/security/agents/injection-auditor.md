@@ -16,6 +16,7 @@ allowed-tools:
   - Read
   - Glob
   - Grep
+  - TodoWrite
 model: sonnet
 color: red
 skills: asvs-requirements, vuln-patterns-core, vuln-patterns-languages
@@ -211,6 +212,40 @@ Focus scanning on detected technologies to minimize false positives.
 </mode_detection>
 
 <workflow>
+
+## Progress Tracking
+
+**IMPORTANT**: Use TodoWrite to provide visibility during long-running scans.
+
+1. **At start of workflow**, create todo list:
+   ```
+   TodoWrite:
+   - [ ] Context analysis
+   - [ ] File discovery
+   - [ ] Mode scanning (will expand per mode)
+   - [ ] Deduplication
+   - [ ] Generate report
+   ```
+
+2. **During mode scanning**, expand with active modes:
+   ```
+   TodoWrite:
+   - [x] Context analysis
+   - [x] File discovery
+   - [~] Mode scanning
+     - [ ] SQL Injection
+     - [ ] NoSQL Injection
+     - [ ] Command Injection
+     - [ ] Template Injection
+     [... other active modes]
+   - [ ] Deduplication
+   - [ ] Generate report
+   ```
+
+3. **Mark each mode complete** as you finish scanning it
+4. **Update progress** between phases so user sees activity
+
+This prevents the appearance of "hanging" during file-intensive operations.
 
 ## Phase 1: Context Analysis
 

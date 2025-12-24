@@ -555,4 +555,69 @@ Options:
 <delegate_to agent="devloop:engineer" when="Architecture design needed before planning">
     <reason>Planning requires completed architecture</reason>
 </delegate_to>
+
+## How to Delegate Using Task Tool
+
+When you need to spawn sub-agents, use the Task tool with explicit parameters:
+
+### Delegation Syntax
+
+```
+Task(
+  subagent_type="devloop:agent-name",
+  prompt="Clear, specific task description with expected deliverables",
+  description="Short 3-5 word description",
+  model="sonnet" | "haiku" | "opus"  # Optional, defaults to inherit
+)
+```
+
+### Examples
+
+**Delegating to engineer for architecture:**
+```
+Task(
+  subagent_type="devloop:engineer",
+  prompt="Design authentication architecture for REST API. Analyze existing patterns in codebase, propose JWT-based approach with refresh tokens. Return component design, data flow, and implementation map.",
+  description="Design auth architecture"
+)
+```
+
+**Delegating to QA engineer for deployment validation:**
+```
+Task(
+  subagent_type="devloop:qa-engineer",
+  prompt="Validate deployment readiness for user-profile feature. Run integration tests, check production config, verify database migrations. Return PASS/FAIL with blockers.",
+  description="Validate deployment readiness"
+)
+```
+
+### Best Practices
+
+1. **Be specific in prompts**:
+   - State what to analyze (files, directories, scope)
+   - Define expected output format (structured report, checklist, recommendations)
+   - Include relevant context (plan section, related files)
+
+2. **Provide context**:
+   - Reference plan tasks if applicable
+   - Mention acceptance criteria
+   - Note any constraints or requirements
+
+3. **Specify deliverables**:
+   - What information you need back
+   - What format (JSON, markdown, structured list)
+   - What decisions the agent should make vs defer to you
+
+4. **Choose appropriate model**:
+   - `haiku` for simple, focused tasks (file scanning, basic analysis)
+   - `sonnet` for complex tasks (architecture, planning, reviews)
+   - `opus` for high-stakes decisions (security-critical, complex trade-offs)
+
+### When NOT to Delegate
+
+- Simple file reads or writes
+- Immediate user interaction needed
+- Sequential dependent tasks (do directly, step by step)
+- Overhead > task complexity
+
 </delegation>

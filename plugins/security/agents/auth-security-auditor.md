@@ -16,6 +16,7 @@ allowed-tools:
   - Read
   - Glob
   - Grep
+  - TodoWrite
 model: sonnet
 color: blue
 skills: asvs-requirements, vuln-patterns-core, remediation-auth
@@ -248,6 +249,41 @@ Focus scanning on detected technologies to minimize false positives.
 
 <workflow>
 
+## Progress Tracking
+
+**IMPORTANT**: Use TodoWrite to provide visibility during long-running scans.
+
+1. **At start of workflow**, create todo list:
+   ```
+   TodoWrite:
+   - [ ] Context analysis
+   - [ ] File discovery
+   - [ ] Mode scanning (will expand per mode)
+   - [ ] Deduplication
+   - [ ] Generate report
+   ```
+
+2. **During mode scanning**, expand with active modes:
+   ```
+   TodoWrite:
+   - [x] Context analysis
+   - [x] File discovery
+   - [~] Mode scanning
+     - [ ] Password Security
+     - [ ] MFA Security
+     - [ ] Session Security
+     - [ ] JWT Security
+     - [ ] Authorization
+     [... other active modes]
+   - [ ] Deduplication
+   - [ ] Generate report
+   ```
+
+3. **Mark each mode complete** as you finish scanning it
+4. **Update progress** between phases so user sees activity
+
+This prevents the appearance of "hanging" during file-intensive operations.
+
 ## Phase 1: Context Analysis
 
 1. **Read project context**
@@ -280,20 +316,30 @@ Focus scanning on detected technologies to minimize false positives.
 
 **CRITICAL for consistency**: Always process files in the same order.
 
-1. **Get source directories from context**
-2. **Glob relevant files sorted alphabetically**:
+1. **Mark context analysis complete** with TodoWrite
+2. **Mark file discovery in_progress** with TodoWrite
+3. **Get source directories from context**
+4. **Glob relevant files sorted alphabetically**:
    - Auth-related files: `**/auth/**`, `**/login/**`, `**/user/**`
    - Middleware: `**/middleware/**`, `**/guards/**`
    - Models: `**/models/**`, `**/entities/**`
    - API routes: `**/routes/**`, `**/controllers/**`
 
-3. **Process depth-first, alphabetically**
+5. **Process depth-first, alphabetically**
+6. **Mark file discovery complete** with TodoWrite
 
 ## Phase 3: Mode-Specific Scanning
+
+**Before starting**: Expand todos with active modes (Password Security, Session Security, JWT Security, Authorization, etc.)
+
+**For each mode**: Mark as in_progress → scan → mark as completed
 
 For each active mode, in priority order:
 
 ### Password Security Scan
+
+**Mark Password Security as in_progress**
+
 1. **Find password handling code**
    - Glob for User/Account models
    - Grep for password fields
@@ -324,7 +370,11 @@ For each active mode, in priority order:
    - Search for HIBP (Have I Been Pwned) integration
    - Password breach checking on registration/change
 
+**Mark Password Security as completed**
+
 ### MFA Security Scan
+
+**Mark MFA Security as in_progress** (if MFA detected)
 1. **Find MFA enrollment flows**
 2. **Check TOTP implementation**
    - Time window configuration (30s standard)
@@ -340,7 +390,11 @@ For each active mode, in priority order:
    - Proper challenge-response
    - Attestation verification
 
+**Mark MFA Security as completed**
+
 ### Session Security Scan
+
+**Mark Session Security as in_progress**
 1. **Analyze session configuration**
    ```
    Search for session middleware setup:
@@ -378,7 +432,11 @@ For each active mode, in priority order:
    - sameSite: 'lax' or 'strict'
    ```
 
+**Mark Session Security as completed**
+
 ### JWT Security Scan
+
+**Mark JWT Security as in_progress** (if JWT detected)
 1. **Find JWT verification code**
    - Search for `jwt.verify`, `decode`, `validate`
 
@@ -413,7 +471,11 @@ For each active mode, in priority order:
    - aud (audience)
    ```
 
+**Mark JWT Security as completed**
+
 ### Authorization Scan
+
+**Mark Authorization as in_progress**
 1. **IDOR Detection**
    ```
    Search for patterns:
@@ -452,7 +514,11 @@ For each active mode, in priority order:
    - Admin privilege required for role changes
    ```
 
+**Mark Authorization as completed**
+
 ### OAuth/OIDC Scan
+
+**Mark OAuth/OIDC as in_progress** (if OAuth/OIDC detected)
 1. **PKCE Implementation**
    ```
    For public clients, verify:
@@ -483,7 +549,11 @@ For each active mode, in priority order:
    - Claims validated (iss, aud, exp)
    - Token endpoint authentication
 
+**Mark OAuth/OIDC as completed**
+
 ### Credential Recovery Scan
+
+**Mark Credential Recovery as in_progress** (if password reset detected)
 1. **Reset Token Analysis**
    ```
    Check password reset:
@@ -498,7 +568,11 @@ For each active mode, in priority order:
    - No enumeration via responses
    - Generic success message
 
+**Mark Credential Recovery as completed**
+
 ### Account Lockout Scan
+
+**Mark Account Lockout as in_progress**
 1. **Failed Attempt Tracking**
    - Login failures tracked
    - Lockout after threshold (5-10 attempts)
@@ -508,14 +582,21 @@ For each active mode, in priority order:
    - Recovery mechanism exists
    - No username enumeration
 
+**Mark Account Lockout as completed**
+
 ## Phase 4: Deduplication
+
+**Mark mode scanning complete, mark deduplication as in_progress**
 
 **Before returning findings:**
 1. **Group by** (file_path, line_number, domain)
 2. **For duplicates**: Keep highest severity
 3. **Sort** by severity, then domain, then file
+4. **Mark deduplication complete**
 
 ## Phase 5: Findings Report
+
+**Mark generate report as in_progress**
 
 Return structured JSON (for /security:audit) OR readable markdown (direct invocation).
 
