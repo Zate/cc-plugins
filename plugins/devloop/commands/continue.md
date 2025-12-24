@@ -444,26 +444,84 @@ If `.devloop/plan.md` exists, update task status:
 **Updated**: [Current ISO timestamp]
 ```
 
-#### 3. Present Checkpoint Question
+#### 3. Commit Changes (For Successful Completion Only)
 
-**For Successful Completion**:
+**CRITICAL**: If the task completed successfully (not partial, not failed), AUTOMATICALLY commit changes BEFORE presenting checkpoint question.
+
+**Skip commit if**:
+- Task is partial completion (marked `[~]`)
+- Task failed or blocked (marked `[!]`)
+- No changes detected (`git status` shows clean working directory)
+
+**Commit sequence**:
+
+1. **Check for changes**:
+   ```bash
+   git status --short
+   # If empty, skip commit
+   ```
+
+2. **Prepare conventional commit message**:
+   - **Type**: feat/fix/refactor/docs/test/chore (based on task type)
+   - **Scope**: [component] (from task context if available)
+   - **Message**: Task X.Y - [brief task description]
+
+   Example: `feat(auth): Task 3.2 - Add authentication middleware`
+
+3. **Stage and commit**:
+   ```bash
+   # Stage all changes
+   git add .
+
+   # Commit with message
+   git commit -m "$(cat <<'EOF'
+   [type]([scope]): Task X.Y - [description]
+   EOF
+   )"
+   ```
+
+4. **Verify commit succeeded**:
+   ```bash
+   git log -1 --oneline
+   # Should show new commit
+   ```
+
+5. **Update worklog** (if `.devloop/worklog.md` exists):
+   ```markdown
+   ## [Date]
+
+   ### Completed
+   - [abc1234] Task X.Y - [description]
+   ```
+
+6. **Display commit confirmation**:
+   ```markdown
+   ✓ Changes committed: [commit-hash] - Task X.Y
+   ```
+
+**Error handling**:
+- If commit fails, display error and continue to checkpoint
+- User can manually commit or fix issues
+- Don't block workflow on commit failure
+
+#### 4. Present Checkpoint Question
+
+**For Successful Completion** (after auto-commit in step 3):
 
 ```yaml
 AskUserQuestion:
-  question: "Task [X.Y] complete: [Brief summary of work]. What's next?"
+  question: "Task [X.Y] complete: [Brief summary of work]. Changes committed. What's next?"
   header: "Checkpoint"
   options:
     - label: "Continue to next task"
       description: "Proceed to Task [X.Y+1] in current context"
-    - label: "Commit this work"
-      description: "Create atomic commit, then continue"
     - label: "Fresh start"
       description: "Save state, clear context, resume in new session"
     - label: "Stop here"
       description: "Generate summary and end session"
 ```
 
-**For Partial Completion**:
+**For Partial Completion** (no auto-commit - changes remain uncommitted):
 
 ```yaml
 AskUserQuestion:
@@ -471,11 +529,11 @@ AskUserQuestion:
   header: "Partial"
   options:
     - label: "Mark done and continue"
-      description: "Accept current state, move to next task"
+      description: "Accept current state, commit changes, move to next task"
     - label: "Continue work on this task"
       description: "Keep working to complete remaining criteria"
     - label: "Note as tech debt"
-      description: "Mark blocked with TODO, move on"
+      description: "Mark blocked with TODO, commit what's done, move on"
     - label: "Fresh start"
       description: "Save state, clear context for better focus"
 ```
@@ -497,23 +555,12 @@ AskUserQuestion:
       description: "Stop and save state"
 ```
 
-#### 4. Handle Selected Action
+#### 5. Handle Selected Action
 
 **If "Continue to next task"**:
-1. No commit - changes remain uncommitted
+1. Changes already committed (from step 3)
 2. Return to Step 2 (Parse and Present Status) with next task
 3. Loop continues
-
-**If "Commit this work"**:
-1. Prepare conventional commit message:
-   - Type: feat/fix/refactor/docs/test/chore
-   - Scope: [component]
-   - Message: Task X.Y - [description]
-2. Stage changes with `git add`
-3. Execute `git commit` OR invoke `devloop:engineer` (git mode)
-4. Verify commit succeeded
-5. Update worklog with commit hash
-6. Ask: "Continue to next task or stop?"
 
 **If "Fresh start"**:
 1. Generate brief session summary
@@ -538,17 +585,20 @@ AskUserQuestion:
 **If "Mark done and continue"** (partial):
 1. Mark task `[x]` in plan
 2. Add note in Progress Log about limitations
-3. Return to Step 2 with next task
+3. **Commit changes** (same as step 3 above for successful completion)
+4. Return to Step 2 with next task
 
 **If "Continue work on this task"** (partial):
 1. Keep task `[~]` in plan
 2. Return to Step 5 (Execute with Agent) with same task
 3. Provide agent with context about what's missing
+4. No commit (work continues on same task)
 
 **If "Note as tech debt"** (partial):
 1. Mark task `[!]` in plan
 2. Add TODO note to Progress Log
-3. Return to Step 2 with next task
+3. **Commit changes** with note about tech debt in message
+4. Return to Step 2 with next task
 
 **If "Retry"** (error):
 1. Keep task `[ ]` in plan
@@ -570,7 +620,7 @@ AskUserQuestion:
 2. Generate summary of what was attempted
 3. END workflow
 
-#### 5. Track Session Metrics
+#### 6. Track Session Metrics
 
 After every checkpoint, track context health:
 
