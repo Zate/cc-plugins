@@ -81,13 +81,13 @@ Enhance devloop completion workflows to guide users to next work after completin
   - Files: `plugins/devloop/commands/continue.md`
   - Acceptance: User has 6 routing options at completion ✓
 
-- [ ] Task 2.2: Add routing option handlers [parallel:B]
+- [x] Task 2.2: Add routing option handlers [parallel:B]
   - "Archive and start fresh" → `/devloop:archive` → Create new empty plan.md
   - "Work on issues" → `/devloop:issues`
   - Keep existing handlers: Ship it, Add tasks, Review, End
   - Add error handling and rollback logic
   - Files: `plugins/devloop/commands/continue.md`
-  - Acceptance: All new routing options work with error handling
+  - Acceptance: All new routing options work with error handling ✓ (completed in Task 2.1)
 
 - [ ] Task 2.3: Add test cases to testing.md
   - Test complete → archive-fresh → new plan created
@@ -120,6 +120,7 @@ Enhance devloop completion workflows to guide users to next work after completin
 - [2025-12-24 03:25]: Completed Task 1.3 - Added 2 comprehensive integration test cases (Scenario 8 & 9) to testing.md
 - [2025-12-24 03:45]: Completed Task 1.4 - Manual validation passed: all routing paths validated, no regressions, error handling robust. Phase 1 complete!
 - [2025-12-24 04:15]: Completed Task 2.1 - Extended continue.md Step 5b with 6 routing options (added "Archive and start fresh" and "Work on issues"). Handlers implemented for both new routes.
+- [2025-12-24 04:20]: Completed Task 2.2 - Routing handlers already implemented in Task 2.1 (lines 700-729). Both routes include error handling and workflow transitions.
 
 ## Success Criteria
 
