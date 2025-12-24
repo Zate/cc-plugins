@@ -294,16 +294,81 @@ Invoke `Skill: version-management` for detailed guidance.
    - [ ] [Suggested action]
    ```
 
-2. Ask about follow-up:
+2. **Route to Next Work** (Enhanced Post-Completion Routing):
    ```
    Use AskUserQuestion:
-   - question: "What's next?"
-   - header: "Follow-up"
+   - question: "Feature shipped! What's next?"
+   - header: "Next"
    - options:
-     - Continue (Start another feature)
-     - Monitor PR (I'll watch for reviews)
-     - Done (End session)
+     - Work on existing issue (Review tracked issues and start work)
+     - Start new feature (Launch /devloop for fresh work - Recommended)
+     - Archive this plan (Compress completed plan if >200 lines)
+     - Fresh start (Save state and clear context)
+     - End session (Done for now)
    ```
+
+3. **Handle routing selection**:
+
+   **If "Work on existing issue"**:
+   ```bash
+   # Invoke /devloop:issues command
+   /devloop:issues
+   ```
+   - Error handling: If command fails, display error and offer to retry or end session
+
+   **If "Start new feature"**:
+   ```bash
+   # Invoke /devloop command for new feature
+   /devloop
+   ```
+   - Error handling: If command fails, display error and offer to retry or end session
+
+   **If "Archive this plan"**:
+   ```bash
+   # Check plan size first
+   plan_lines=$(wc -l < .devloop/plan.md)
+   if [ "$plan_lines" -lt 200 ]; then
+     echo "⚠️ Plan is only $plan_lines lines (threshold: 200)"
+     echo "Archive is typically used for large plans (>200 lines)."
+     # Ask user to confirm
+     Use AskUserQuestion:
+     - question: "Plan is small ($plan_lines lines). Archive anyway?"
+     - header: "Confirm"
+     - options:
+       - Yes (Archive this plan anyway)
+       - No (Skip archiving, choose different option - Recommended)
+   fi
+
+   # If confirmed or plan is large, invoke archive
+   /devloop:archive
+   ```
+   - Error handling: If archive fails, display error with rollback info and offer to retry or end
+
+   **If "Fresh start"**:
+   ```bash
+   # Invoke /devloop:fresh to save state
+   /devloop:fresh
+   ```
+   - Error handling: If command fails, display error and offer to retry or end session
+
+   **If "End session"**:
+   - Display final summary:
+     ```markdown
+     ## Session Complete
+
+     ### Work Shipped
+     - Commit: [hash]
+     - PR: [url if created]
+     - Version: [if bumped]
+
+     ### Next Time
+     - Run `/devloop:continue` to resume from plan
+     - Run `/devloop:issues` to review tracked issues
+     - Run `/devloop` to start a new feature
+
+     Thank you for using devloop!
+     ```
+   - **END** (do not continue to next routing)
 
 ---
 
