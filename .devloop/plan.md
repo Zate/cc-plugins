@@ -50,12 +50,12 @@ Enhance devloop completion workflows to guide users to next work after completin
   - Files: `plugins/devloop/commands/ship.md`
   - Acceptance: All routing options invoke correct commands with error handling ✓
 
-- [ ] Task 1.3: Add test cases to testing.md
+- [x] Task 1.3: Add test cases to testing.md
   - Test ship → route to issues
   - Test ship → route to fresh start
   - Add to "Integration Tests" section
   - Files: `plugins/devloop/docs/testing.md`
-  - Acceptance: 2 new integration test cases documented
+  - Acceptance: 2 new integration test cases documented ✓
 
 - [ ] Task 1.4: Manual validation and integration testing
   - Test ship → issues → issues command launches
@@ -117,6 +117,7 @@ Enhance devloop completion workflows to guide users to next work after completin
 
 - [2025-12-24 02:30]: Plan created from spike findings - Post-Completion Routing v2.2
 - [2025-12-24 03:15]: Completed Task 1.1 and 1.2 - Enhanced ship.md Phase 7 with routing options and handlers
+- [2025-12-24 03:25]: Completed Task 1.3 - Added 2 comprehensive integration test cases (Scenario 8 & 9) to testing.md
 
 ## Success Criteria
 

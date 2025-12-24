@@ -1264,6 +1264,225 @@ Test routing for each task type from `continue.md` Step 4:
 
 ---
 
+### Scenario 8: Ship → Route to Issues
+
+**Goal**: Verify post-completion routing from ship workflow to issue tracking
+
+**Reference**: Spike Report - Plan Completion & Post-Completion Routing
+
+**Test Steps**:
+
+1. **Setup - Completed Plan with Open Issues**
+   ```bash
+   # Ensure plan is complete
+   # Ensure .devloop/issues/ has open issues (BUG-001, FEAT-001, etc.)
+   ls .devloop/issues/*.md
+   ```
+
+2. **Run Ship Workflow**
+   ```bash
+   /devloop:ship
+
+   # Complete all ship phases (Pre-flight → DoD → Tests → Build → Git → Version)
+   # Proceed through all validation steps
+   ```
+
+3. **Verify Phase 7: Post-Ship Routing**
+   ```bash
+   # After successful ship completion
+
+   # Verify routing question (Phase 7)
+   - [ ] "Feature shipped! What's next?" question displayed
+   - [ ] Header: "Next"
+   - [ ] 5 routing options presented:
+         1. "Work on existing issue"
+         2. "Start new feature"
+         3. "Archive this plan"
+         4. "Fresh start"
+         5. "End session"
+   - [ ] "Start new feature" marked as recommended
+   ```
+
+4. **Select "Work on existing issue"**
+   ```bash
+   # Choose option 1
+
+   # Verify routing
+   - [ ] `/devloop:issues` command invoked automatically
+   - [ ] Ship command exits cleanly
+   - [ ] Issues command takes over
+   - [ ] Issue list displayed (open issues shown)
+   ```
+
+5. **Verify Error Handling**
+   ```bash
+   # Simulate issues command failure (e.g., no .devloop/issues/ directory)
+   rm -rf .devloop/issues
+
+   # Re-run ship and select "Work on existing issue"
+
+   # Verify
+   - [ ] Error displayed gracefully
+   - [ ] Error message explains the problem
+   - [ ] Recovery options offered (retry/end)
+   - [ ] Ship command doesn't crash
+   ```
+
+6. **Verify Plan Update**
+   ```bash
+   # After successful ship (before routing)
+   cat .devloop/plan.md
+
+   # Verify plan updates (Phase 6)
+   - [ ] Status updated to "Complete"
+   - [ ] Progress Log entry added with timestamp
+   - [ ] Entry includes: "Feature shipped - [commit hash or PR URL]"
+   - [ ] Plan timestamps updated
+   ```
+
+**Success Criteria**:
+- ✓ Routing question displays after ship completion
+- ✓ "Work on existing issue" option invokes `/devloop:issues`
+- ✓ Command handoff works cleanly (ship exits, issues starts)
+- ✓ Error handling prevents crashes
+- ✓ Plan file updated correctly before routing
+
+---
+
+### Scenario 9: Ship → Route to Fresh Start
+
+**Goal**: Verify post-completion routing from ship workflow to fresh start
+
+**Reference**: Spike Report - Plan Completion & Post-Completion Routing
+
+**Test Steps**:
+
+1. **Setup - Completed Plan, Long Session**
+   ```bash
+   # Ensure plan is complete (all tasks [x])
+   # Simulate long session (10+ tasks completed)
+   # Ensure uncommitted changes don't exist (ship creates commits)
+   git status  # Should show clean state after ship
+   ```
+
+2. **Run Ship Workflow**
+   ```bash
+   /devloop:ship
+
+   # Complete all ship phases
+   # Proceed through validation and git integration
+   ```
+
+3. **Verify Phase 7: Post-Ship Routing**
+   ```bash
+   # After successful ship completion
+
+   # Verify routing question
+   - [ ] "Feature shipped! What's next?" question displayed
+   - [ ] 5 routing options presented
+   - [ ] Options include: "Fresh start (Save state and clear context)"
+   ```
+
+4. **Select "Fresh start"**
+   ```bash
+   # Choose option 4: "Fresh start"
+
+   # Verify routing
+   - [ ] `/devloop:fresh` command invoked automatically
+   - [ ] Ship command exits cleanly
+   - [ ] Fresh start command takes over
+   ```
+
+5. **Verify Fresh Start State Creation**
+   ```bash
+   # After fresh start invoked
+
+   # Verify state file created (Phase 1-2 of fresh.md)
+   - [ ] .devloop/next-action.json exists
+   - [ ] State file contains valid JSON
+   - [ ] State includes: plan, phase, summary, next_pending
+   - [ ] Reason field = "fresh_start"
+   - [ ] Plan status = "Complete" (from ship update)
+   ```
+
+6. **Verify State File Format**
+   ```bash
+   cat .devloop/next-action.json | jq .
+
+   # Verify required fields
+   - [ ] timestamp (ISO 8601 format)
+   - [ ] plan (plan name from completed plan)
+   - [ ] phase (last phase)
+   - [ ] total_tasks (task count)
+   - [ ] completed_tasks (should equal total_tasks)
+   - [ ] pending_tasks (should be 0)
+   - [ ] last_completed (last task from plan)
+   - [ ] next_pending ("None" or similar, since plan complete)
+   - [ ] summary (<200 chars, mentions completion)
+   ```
+
+7. **Verify Fresh Start Instructions**
+   ```bash
+   # After state file created
+
+   # Verify fresh start output
+   - [ ] Continuation instructions displayed
+   - [ ] Instructions mention: "Run `/devloop:continue` to resume"
+   - [ ] Instructions mention: "Or start new session with `/clear`"
+   - [ ] Progress Log updated in plan
+   ```
+
+8. **Test Fresh Start Detection (New Session)**
+   ```bash
+   # Start new Claude Code session (or run /clear)
+
+   # Verify SessionStart hook detection
+   - [ ] State file detected by session-start.sh
+   - [ ] Fresh start message displayed:
+         "**Fresh Start Detected**: Resuming '[plan name]' at [phase]"
+   - [ ] Progress summary shown: "Completed [N] of [N] tasks (100%)"
+   - [ ] Next action: "Plan is complete - consider new feature"
+   - [ ] Instructions: "Run `/devloop:continue` to resume"
+   ```
+
+9. **Verify Fresh Start Cleanup**
+   ```bash
+   # Run continue in new session
+   /devloop:continue
+
+   # Verify state file cleanup (Step 1a in continue.md)
+   - [ ] State file read successfully
+   - [ ] State info displayed in status
+   - [ ] State file DELETED after reading
+   - [ ] Fresh start context shown in plan summary
+   ```
+
+10. **Verify Error Handling**
+    ```bash
+    # Simulate fresh command failure (e.g., corrupted plan.md)
+    echo "Invalid plan content" > .devloop/plan.md
+
+    # Re-run ship and select "Fresh start"
+
+    # Verify
+    - [ ] Error displayed gracefully
+    - [ ] Error message explains the problem
+    - [ ] Recovery options offered
+    - [ ] State file not created (safety check)
+    ```
+
+**Success Criteria**:
+- ✓ Routing question displays after ship completion
+- ✓ "Fresh start" option invokes `/devloop:fresh`
+- ✓ Command handoff works cleanly (ship exits, fresh starts)
+- ✓ State file created with correct format
+- ✓ Plan updated to "Complete" before fresh start
+- ✓ SessionStart detects fresh start in new session
+- ✓ State file deleted after reading in continue
+- ✓ Error handling prevents data corruption
+
+---
+
 ## Regression Testing Checklist
 
 ### Breaking Changes to Watch For
