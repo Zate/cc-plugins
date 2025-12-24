@@ -8,6 +8,133 @@
 
 ## 2025-12-24
 
+### FEAT-005 Hook-Based Fresh Start Loop - Phase 3 Complete ✓ (v2.2.0 Release)
+
+**Phase 3: Testing & Documentation** - Document behavior and add comprehensive test cases.
+
+**Tasks Completed**:
+- Task 3.1: Test scenarios already documented in Tasks 1.3 and 2.3 (9 tests total, exceeded 7 requirement)
+  - Hook Tests 1-9 complete in testing.md
+  - Comprehensive coverage of all workflows
+
+- Task 3.2: Updated FEAT-005 issue with resolution (commit `3ce1c9c` - part of Phase 3 commit)
+  - 126-line Resolution section documenting hook-based architecture
+  - Files modified breakdown (Phase 1: +432 lines, Phase 2: +363 lines)
+  - 5 commit hashes from Phases 1-2 (`2b8dd1d`, `7773d73`, `a1f355b`, `09c0092`, `3a69e36`)
+  - Acceptance criteria status (7/7 met)
+  - Implementation highlights and architecture rationale
+
+- Task 3.3: Updated CHANGELOG.md (commit `3ce1c9c`)
+  - Version 2.2.0 entry (+59 lines)
+  - Stop Hook with Plan-Aware Routing (Phase 1) documented
+  - Fresh Start Auto-Resume (Phase 2) documented
+  - Benefits: seamless dev loop, auto-resume, safety validation
+  - Architecture: hook-based design leveraging existing infrastructure
+  - 5 commit references
+
+- Task 3.4: Version bump to 2.2.0 (commit `3ce1c9c`)
+  - Updated plugin.json: 2.1.0 → 2.2.0
+  - Reflects new hook-based fresh start loop feature
+
+**Commit**: `3ce1c9c`
+
+**Commit Message**: "docs(devloop): complete FEAT-005 Phase 3 documentation and version 2.2.0"
+
+**Files Modified**:
+- `.devloop/issues/FEAT-005.md` - Resolution section (+126 lines, status: done)
+- `plugins/devloop/CHANGELOG.md` - Version 2.2.0 entry (+59 lines)
+- `plugins/devloop/.claude-plugin/plugin.json` - Version bump (2.1.0 → 2.2.0)
+
+**Version**: 2.2.0
+
+**Next**: Phase 4 - Validation & Ship (Tasks 4.1-4.4)
+
+---
+
+### FEAT-005 Hook-Based Fresh Start Loop - Phase 2 Complete ✓
+
+**Phase 2: Fresh Start Auto-Resume** - Enable automatic resume when fresh start state exists.
+
+**Tasks Completed**:
+- Task 2.1: Extended session-start.sh for auto-resume (commit `a1f355b`)
+  - Detect next-action.json on session start (lines 527-531)
+  - Auto-invoke /devloop:continue via CRITICAL instruction (lines 646-666)
+  - Pass fresh start context to continue command
+  - User sees "🔄 Fresh start detected - auto-resuming work..." message
+  - No user prompt required - fully automatic
+
+- Task 2.2: Added safety validation (commit `09c0092`)
+  - New validate_fresh_start_state() function (lines 498-557)
+  - Timestamp age check (warns if >7 days old)
+  - Plan existence validation (.devloop/plan.md)
+  - Escape hatch (skips auto-resume on validation failure)
+  - Validation logic integration (lines 588-653)
+  - Warning display (lines 768-775)
+
+- Task 2.3: Updated auto-resume test documentation (commit `3a69e36`)
+  - Hook Tests 5-6 updated with implementation details
+  - Hook Test 8 added: Missing plan validation scenario
+  - Hook Test 9 added: End-to-end fresh start workflow (5 steps)
+  - Hook Testing Summary updated (9 tests, 4 implemented)
+
+**Commits**: `a1f355b`, `09c0092`, `3a69e36`
+
+**Files Modified**:
+- `plugins/devloop/hooks/session-start.sh` - Auto-resume + validation (lines 498-775, +163 lines net)
+- `plugins/devloop/docs/testing.md` - Hook Tests 5, 6, 8, 9 (+200 lines)
+- `.devloop/plan.md` - Tasks 2.1-2.3 marked complete
+
+**Next**: Phase 3 - Testing & Documentation (Tasks 3.1-3.4)
+
+---
+
+### FEAT-005 Hook-Based Fresh Start Loop - Phase 1 Complete ✓
+
+**Phase 1: Stop Hook Implementation** - Replace Stop hook validation with plan-aware routing.
+
+**Tasks Completed**:
+- Task 1.2: Implemented Stop hook in hooks.json with plan-aware routing (commit `2b8dd1d`)
+  - Plan detection and parsing (.devloop/plan.md)
+  - Task status evaluation (pending/complete/no plan)
+  - Auto-commit awareness (lint → test → commit)
+  - Three routing options: Continue next task, Fresh start, Stop
+  - Edge case handling (missing plan, corrupted plan, empty plan)
+- Task 1.3: Documented 7 comprehensive hook test scenarios (commit `7773d73`)
+  - Hook Test 1-4, 7: Stop hook behaviors documented for Phase 4 validation
+  - Hook Test 5-6: Session start auto-resume specifications for Phase 2
+  - Added Hook Testing section to testing.md (368 lines)
+  - Updated Table of Contents
+
+**Commits**: `2b8dd1d`, `7773d73`
+
+**Files Modified**:
+- `plugins/devloop/hooks/hooks.json` - Stop hook prompt (lines 113-177, +64 lines)
+- `plugins/devloop/docs/testing.md` - Hook Testing section (+368 lines)
+- `.devloop/plan.md` - Tasks 1.2-1.3 marked complete
+
+---
+
+### Post-Completion Routing v2.2 - Phase 2 In Progress
+
+**Phase 2: Enhanced Completion Prompt** - Add routing options at plan completion.
+
+**Tasks Completed**:
+- Task 2.1: Extended continue.md Step 5b completion prompt with 6 routing options (was 4)
+  - Added "Archive and start fresh" → `/devloop:archive` → new plan workflow
+  - Added "Work on issues" → `/devloop:issues` for issue management
+  - Implemented full handlers for both routes with error handling and follow-up options
+- Task 2.2: Routing handlers already implemented in Task 2.1 (lines 700-729) - no additional work needed
+
+**Commits**: `d9b4f10`, `d020dc2`
+
+**Files Modified**:
+- `plugins/devloop/commands/continue.md` - Step 5b completion detection (lines 652-729, +36 lines)
+- `.devloop/plan.md` - Task 2.1 marked complete
+
+**Next**: Task 2.2 (Note: Handlers already implemented in Task 2.1), Task 2.3 (test cases), Task 2.4 (validation)
+
+---
+
 ### Post-Completion Routing v2.2 - Phase 1 Complete ✓
 
 **Phase 1: Ship-Then-Route Implementation** - Enhanced ship workflow with post-completion routing.
@@ -34,8 +161,6 @@
 - Error handling robust across all routes
 - Archive includes smart size check (>200 lines threshold)
 - No regressions in existing ship workflow
-
-**Next**: Phase 2 (continue.md completion routing)
 
 ---
 
