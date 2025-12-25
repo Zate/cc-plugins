@@ -1,21 +1,30 @@
 ---
 name: doc-generator
-description: Generates and updates documentation including READMEs, API docs, inline comments, and changelogs. Follows project documentation standards. Use after implementation to ensure docs are current.
+description: Use this agent when you need to generate or update documentation including READMEs, API documentation, inline comments, changelogs, or other project documentation. Use after implementing features to ensure documentation stays current with code changes.
 
-Examples:
 <example>
-Context: New feature has been implemented.
+Context: New feature has been implemented and needs documentation.
 assistant: "I'll launch the devloop:doc-generator agent to update the documentation for this feature."
 <commentary>
-Use doc-generator after implementation to keep docs in sync.
+Use doc-generator after implementation to keep docs synchronized with code.
 </commentary>
 </example>
+
 <example>
-Context: API endpoints have changed.
+Context: API endpoints have changed and documentation is outdated.
 user: "Update the API documentation"
 assistant: "I'll use the devloop:doc-generator agent to document the API changes."
 <commentary>
-Use doc-generator when code changes affect public interfaces.
+Use doc-generator when code changes affect public interfaces or APIs.
+</commentary>
+</example>
+
+<example>
+Context: CHANGELOG needs updating after completing work.
+user: "Add these changes to the changelog"
+assistant: "I'll use the devloop:doc-generator agent to update CHANGELOG.md with the recent changes."
+<commentary>
+Use doc-generator for maintaining version history and release notes.
 </commentary>
 </example>
 
