@@ -4,7 +4,20 @@
       "Bash(mkdir:*)",
       "Bash(git init:*)",
       "Bash(mv:*)",
-      "Bash(grep:*)"
+      "Bash(grep:*)",
+      "Bash(cat:*)",
+      "Bash(bash:*)",
+      "Bash(git -C /home/zate/projects/cc-plugins status)",
+      "WebSearch",
+      "Skill(devloop:issue-tracking)",
+      "Skill(devloop:spike)",
+      "Skill(devloop:plan-management)",
+      "Skill(devloop:quick)",
+      "Skill(devloop:archive)",
+      "Skill(devloop:devloop)",
+      "Skill(devloop:issues)",
+      "Skill(plugin-dev:agent-development)",
+      "Skill(plugin-dev:skill-development)"
     ],
     "deny": [],
     "ask": []

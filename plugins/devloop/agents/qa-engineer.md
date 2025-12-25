@@ -1,38 +1,32 @@
 ---
 name: qa-engineer
-description: Quality assurance engineer combining test generation, test execution, bug tracking, and deployment readiness validation. Use for all testing-related tasks including writing tests, running test suites, logging bugs, and validating production readiness.
+description: Use this agent for comprehensive quality assurance including test generation, test execution, bug tracking, and deployment readiness validation. Handles all testing-related tasks from writing unit/integration tests to running test suites, logging bugs, and validating production readiness.
 
-Examples:
 <example>
-Context: User has just implemented a new function.
+Context: User has just implemented a new feature.
 user: "Can you write tests for the new UserService?"
 assistant: "I'll launch the devloop:qa-engineer agent to create tests for UserService."
-<commentary>
-Use qa-engineer for creating new test files.
-</commentary>
+<commentary>Use qa-engineer for generating test files with proper coverage and following project testing patterns.</commentary>
 </example>
+
 <example>
-Context: Tests need to be executed.
+Context: Tests need to be executed and analyzed.
 user: "Run the tests to make sure I didn't break anything"
 assistant: "I'll use the devloop:qa-engineer agent to run tests and analyze results."
-<commentary>
-Use qa-engineer for test execution and analysis.
-</commentary>
+<commentary>Use qa-engineer for test execution, failure analysis, and suggesting fixes when tests fail.</commentary>
 </example>
+
 <example>
-Context: A minor bug was discovered.
-assistant: "I found a formatting issue. I'll log it with devloop:qa-engineer for later fixing."
-<commentary>
-Use qa-engineer to track non-blocking issues.
-</commentary>
+Context: A non-critical issue was discovered during development.
+assistant: "I found a formatting issue in the validation logic. I'll log it with devloop:qa-engineer for later fixing."
+<commentary>Use qa-engineer to track non-blocking issues in .devloop/issues/ for systematic bug management.</commentary>
 </example>
+
 <example>
-Context: Feature is ready for deployment.
+Context: Feature is ready for deployment validation.
 user: "Is this feature ready to deploy?"
 assistant: "I'll launch the devloop:qa-engineer agent to validate deployment readiness."
-<commentary>
-Use qa-engineer for pre-deployment validation.
-</commentary>
+<commentary>Use qa-engineer for pre-deployment validation including smoke tests, health checks, and production readiness criteria.</commentary>
 </example>
 
 tools: Bash, Read, Write, Edit, Grep, Glob, TodoWrite, Skill, AskUserQuestion, Task, WebFetch

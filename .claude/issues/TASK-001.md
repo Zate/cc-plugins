@@ -1,12 +1,11 @@
 ---
 id: TASK-001
 type: task
-title: Consolidate devloop files into .devloop/ directory
-status: done
+title: Consolidate devloop files into .claude/devloop/ directory
+status: open
 priority: medium
 created: 2025-12-18T12:10:00
-updated: 2025-12-20T21:30:00
-resolved: 2025-12-20T21:30:00
+updated: 2025-12-18T12:10:00
 reporter: user
 assignee: null
 labels: [devloop, refactor, migration]
@@ -14,13 +13,13 @@ estimate: M
 related-files:
   - plugins/devloop/skills/file-locations/SKILL.md
   - plugins/devloop/skills/plan-management/SKILL.md
-  - .devloop/plan.md
-  - .devloop/worklog.md
-  - .devloop/local.md
-  - .devloop/issues/
+  - .claude/devloop-plan.md
+  - .claude/devloop-worklog.md
+  - .claude/devloop.local.md
+  - .claude/issues/
 ---
 
-# TASK-001: Consolidate devloop files into .devloop/ directory
+# TASK-001: Consolidate devloop files into .claude/devloop/ directory
 
 ## Description
 
@@ -117,14 +116,7 @@ Need to create a migration utility that:
 
 ## Resolution
 
-- **Resolved in**: v1.12.0+
-- **Resolved by**: Devloop onboarding implementation
-- **Resolution summary**: Devloop files have been consolidated into a standalone `.devloop/` directory (not `.claude/devloop/` as originally proposed). This cleaner approach puts all devloop artifacts in one top-level directory:
-  - `.devloop/plan.md` - Active plan
-  - `.devloop/worklog.md` - Completed work history
-  - `.devloop/local.md` - Local settings (not git-tracked)
-  - `.devloop/issues/` - Issue tracking
-  - `.devloop/spikes/` - Spike reports (not git-tracked)
-  - `.devloop/context.json` - Project context cache
-
-Legacy files in `.claude/` (e.g., `devloop-plan.md`, old `issues/`) can be removed manually.
+<!-- Filled in when done -->
+- **Resolved in**:
+- **Resolved by**:
+- **Resolution summary**:
