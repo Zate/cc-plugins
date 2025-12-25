@@ -1,7 +1,7 @@
 # Devloop Plan: Plugin Best Practices Audit Fixes
 
 **Created**: 2025-12-25
-**Updated**: 2025-12-25 17:10
+**Updated**: 2025-12-25 17:20
 **Status**: In Progress
 **Current Phase**: Phase 1
 **Estimate**: L (7-10 hours)
@@ -106,7 +106,7 @@ Breaking fixes into phases by priority:
   - Acceptance: Matches plugin-dev format or confirmed correct
   - Files: `plugins/devloop/agents/task-planner.md`
 
-- [ ] Task 1.8: Fix summary-generator.md description (if exists) [parallel:A]
+- [x] Task 1.8: Fix summary-generator.md description (if exists) [parallel:A]
   - Check if summary-generator.md exists
   - Apply same pattern if needed
   - Acceptance: Matches plugin-dev format or confirmed correct
@@ -350,6 +350,7 @@ Breaking fixes into phases by priority:
 - 2025-12-25 17:00: Completed Task 1.6 - Fixed complexity-estimator.md description format (third-person with "Use this agent when...", integrated 2 examples covering feature complexity assessment and seemingly simple tasks)
 - 2025-12-25 17:05: Fresh start initiated - state saved to next-action.json
 - 2025-12-25 17:10: Completed Task 1.7 - Fixed task-planner.md description format (third-person with "Use this agent when...", integrated 4 examples covering planning, requirements, validation, and breakdown scenarios)
+- 2025-12-25 17:20: Completed Task 1.8 - Fixed summary-generator.md description format (third-person with "Use this agent when...", integrated 2 examples for session end and complex work documentation)
 
 ## Success Criteria
 

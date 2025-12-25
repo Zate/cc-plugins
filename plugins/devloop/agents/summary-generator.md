@@ -1,8 +1,7 @@
 ---
 name: summary-generator
-description: Creates session summaries and handoff documentation for pausing/resuming work. Captures context, decisions made, and next steps. Use at end of sessions or when switching contexts.
+description: Use this agent when the user is ending a work session, switching contexts, or when complex multi-session work needs documentation. Creates comprehensive session summaries and handoff documentation capturing context, decisions made, and next steps.
 
-Examples:
 <example>
 Context: User is ending their work session.
 user: "I need to stop for today"
@@ -11,6 +10,7 @@ assistant: "I'll launch the devloop:summary-generator agent to capture where we 
 Use summary-generator when pausing work to preserve context.
 </commentary>
 </example>
+
 <example>
 Context: Complex feature work needs documentation.
 assistant: "I'll use the devloop:summary-generator agent to document our progress and decisions."
