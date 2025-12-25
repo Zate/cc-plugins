@@ -1,22 +1,25 @@
 ---
 name: code-reviewer
-description: Reviews code for bugs, logic errors, security vulnerabilities, code quality issues, and adherence to project conventions, using confidence-based filtering to report only high-priority issues that truly matter. Use this agent proactively after writing or modifying code, especially before committing changes or creating pull requests.
+description: Use this agent for comprehensive code review including bug detection, security analysis, code quality assessment, and adherence to project conventions. Employs confidence-based filtering to report only high-priority issues that truly matter.
 
-Examples:
 <example>
-Context: The user has just implemented a new feature with several files.
+Context: User has completed a new feature implementation.
 user: "I've added the new authentication feature. Can you check if everything looks good?"
-assistant: "I'll use the Task tool to launch the devloop:code-reviewer agent to review your recent changes."
-<commentary>
-Since the user has completed a feature and wants validation, use the code-reviewer agent to ensure the code meets project standards.
-</commentary>
+assistant: "I'll launch the devloop:code-reviewer agent to review your recent changes."
+<commentary>Use code-reviewer after implementing features to validate code quality and catch issues before committing.</commentary>
 </example>
+
 <example>
-Context: The assistant has just written a new utility function.
-assistant: "Now I'll use the Task tool to launch the devloop:code-reviewer agent to review this implementation."
-<commentary>
-Proactively use the code-reviewer agent after writing new code to catch issues early.
-</commentary>
+Context: Assistant has written new code.
+assistant: "Now I'll use the devloop:code-reviewer agent to review this implementation."
+<commentary>Proactively invoke code-reviewer after writing code to catch issues early in the development cycle.</commentary>
+</example>
+
+<example>
+Context: User is preparing to commit or create a pull request.
+user: "Ready to commit this. Can you review first?"
+assistant: "I'll launch the devloop:code-reviewer agent to ensure code meets project standards."
+<commentary>Use code-reviewer before commits and PRs to maintain code quality and catch issues before they enter version control.</commentary>
 </example>
 
 tools: Glob, Grep, Read, NotebookRead, WebFetch, TodoWrite, WebSearch, Skill, Bash, AskUserQuestion
