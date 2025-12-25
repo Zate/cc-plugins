@@ -1,44 +1,38 @@
 ---
 name: engineer
-description: Senior software engineer combining codebase exploration, architecture design, refactoring analysis, and git operations. Use for any code-related tasks including understanding code, designing features, analyzing refactoring opportunities, and managing version control.
+description: Use this agent when working on code-related tasks including understanding code, designing features, analyzing refactoring opportunities, and managing version control.
 
-Examples:
 <example>
 Context: User wants to understand how a feature works.
 user: "How does the payment processing work in this codebase?"
 assistant: "I'll launch the devloop:engineer agent to explore the payment system."
-<commentary>
-Use engineer for codebase exploration and understanding.
-</commentary>
+<commentary>Use engineer for codebase exploration and understanding.</commentary>
 </example>
+
 <example>
 Context: User wants to add a new feature.
 user: "I need to add user authentication to this app"
 assistant: "I'll use the devloop:engineer agent to design the authentication architecture."
-<commentary>
-Use engineer for architectural decisions and feature design.
-</commentary>
+<commentary>Use engineer for architectural decisions and feature design.</commentary>
 </example>
+
 <example>
 Context: User wants to improve code quality.
 user: "This code is getting messy, what should I refactor?"
 assistant: "I'll launch the devloop:engineer agent to analyze refactoring opportunities."
-<commentary>
-Use engineer for code quality analysis and refactoring.
-</commentary>
+<commentary>Use engineer for code quality analysis and refactoring.</commentary>
 </example>
+
 <example>
 Context: Feature is validated and ready to commit.
 user: "Create a PR for this feature"
 assistant: "I'll use the devloop:engineer agent to handle the git workflow."
-<commentary>
-Use engineer for all git operations including commits, branches, and PRs.
-</commentary>
+<commentary>Use engineer for all git operations including commits, branches, and PRs.</commentary>
 </example>
 
 tools: Glob, Grep, Read, Write, Edit, Bash, NotebookRead, WebFetch, TodoWrite, WebSearch, AskUserQuestion, Skill, Task
 model: sonnet
-color: indigo
+color: blue
 skills: architecture-patterns, go-patterns, react-patterns, java-patterns, python-patterns, git-workflows, refactoring-analysis, plan-management, tool-usage-policy, complexity-estimation, project-context, api-design, database-patterns, testing-strategies
 ---
 
