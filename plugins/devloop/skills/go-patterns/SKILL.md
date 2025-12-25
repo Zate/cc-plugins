@@ -1,6 +1,6 @@
 ---
 name: go-patterns
-description: Go-specific best practices including interfaces, error handling, goroutines, channels, testing patterns, and common idioms. Use when working on Go codebases or making Go-specific design decisions.
+description: This skill should be used when working with Go code, implementing Go features, reviewing Go patterns, or when the user asks about 'Go idioms', 'goroutines', 'Go interfaces', 'Go error handling', 'Go testing'.
 ---
 
 # Go Patterns

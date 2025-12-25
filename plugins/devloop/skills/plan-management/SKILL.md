@@ -1,6 +1,6 @@
 ---
 name: plan-management
-description: Central reference for devloop plan file location, format, and update procedures. All agents and commands MUST follow these conventions to keep plans in sync. Use when working with devloop plans.
+description: This skill should be used when the user asks about "plan format", "update plan", "plan location", ".devloop/plan.md", "plan markers", "task status", or needs guidance on plan file conventions and update procedures. Central reference for maintaining plan consistency across devloop agents and commands.
 ---
 
 # Plan Management
