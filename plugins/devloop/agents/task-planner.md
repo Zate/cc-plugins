@@ -1,8 +1,7 @@
 ---
 name: task-planner
-description: Project manager combining task planning, requirements gathering, issue tracking, and completion validation. Use for planning implementations, transforming vague requests into specifications, managing issues, and validating Definition of Done.
+description: Use this agent when planning implementations, transforming vague requests into specifications, managing issues, or validating Definition of Done. Combines task planning, requirements gathering, issue tracking, and completion validation.
 
-Examples:
 <example>
 Context: Architecture design is complete.
 user: "Ok, let's implement the auth feature using approach 2"
@@ -11,6 +10,7 @@ assistant: "I'll launch the devloop:task-planner agent to break this into tasks 
 Use task-planner for creating implementation roadmaps.
 </commentary>
 </example>
+
 <example>
 Context: User has a vague feature idea.
 user: "I want users to be able to share things"
@@ -19,6 +19,7 @@ assistant: "I'll launch the devloop:task-planner agent to gather requirements an
 Use task-planner when requests need structured requirements.
 </commentary>
 </example>
+
 <example>
 Context: A non-critical issue was discovered.
 assistant: "I found an issue. I'll log it with devloop:task-planner for later."
@@ -26,6 +27,7 @@ assistant: "I found an issue. I'll log it with devloop:task-planner for later."
 Use task-planner to track issues discovered during development.
 </commentary>
 </example>
+
 <example>
 Context: Implementation complete, need to verify.
 user: "Is this feature ready to ship?"
