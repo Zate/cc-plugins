@@ -1,22 +1,26 @@
 ---
 name: security-scanner
-description: Scans code for common security vulnerabilities (OWASP Top 10, hardcoded secrets, injection risks). Provides severity ratings and remediation guidance. Use during code review or before deployment.
+description: Use this agent for scanning code for common security vulnerabilities including OWASP Top 10, hardcoded secrets, injection risks, authentication flaws, and insecure configurations. Provides severity ratings, OWASP coverage assessment, and specific remediation guidance with code examples.
 
-Examples:
 <example>
 Context: Code changes include user input handling.
+user: "I've added an API endpoint that processes user search queries"
 assistant: "I'll launch the devloop:security-scanner agent to check for injection vulnerabilities."
-<commentary>
-Use security-scanner when code handles user input or external data.
-</commentary>
+<commentary>Use security-scanner when code handles user input, external data, or performs database/shell operations with untrusted data.</commentary>
 </example>
+
 <example>
 Context: Reviewing authentication-related code.
 user: "Check if this auth code is secure"
 assistant: "I'll use the devloop:security-scanner agent to analyze the authentication implementation."
-<commentary>
-Use security-scanner for security-sensitive code areas.
-</commentary>
+<commentary>Use security-scanner for security-sensitive code areas including authentication, authorization, cryptography, payment processing, or file upload handling.</commentary>
+</example>
+
+<example>
+Context: Pre-deployment security validation.
+user: "We're ready to deploy. Can you do a security check?"
+assistant: "I'll launch the devloop:security-scanner agent to perform a security audit before deployment."
+<commentary>Use security-scanner before deployment, during code review, or when implementing security-critical features to identify vulnerabilities early.</commentary>
 </example>
 
 tools: Bash, Read, Grep, Glob, TodoWrite
