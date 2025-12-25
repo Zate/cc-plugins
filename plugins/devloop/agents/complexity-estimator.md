@@ -1,23 +1,19 @@
 ---
 name: complexity-estimator
-description: Estimates task complexity using T-shirt sizing, identifies risks and dependencies, and recommends whether a spike/POC is needed before committing to full implementation. Use at the start of new features to set expectations.
+description: Use this agent when starting new features to estimate task complexity using T-shirt sizing, identify risks and dependencies, and determine if a spike/POC is needed before full implementation.
 
-Examples:
 <example>
 Context: User describes a new feature request.
 user: "I want to add real-time notifications to the app"
 assistant: "I'll launch the devloop:complexity-estimator agent to assess the scope and identify any risks."
-<commentary>
-Use complexity-estimator at the start of significant features to set realistic expectations.
-</commentary>
+<commentary>Use complexity-estimator at the start of significant features to set realistic expectations.</commentary>
 </example>
+
 <example>
 Context: Task seems simple but might have hidden complexity.
 user: "Just add a logout button"
 assistant: "I'll quickly run the devloop:complexity-estimator agent to confirm this is straightforward."
-<commentary>
-Even seemingly simple tasks can have hidden complexity worth identifying early.
-</commentary>
+<commentary>Even seemingly simple tasks can have hidden complexity worth identifying early.</commentary>
 </example>
 
 tools: Glob, Grep, Read, AskUserQuestion
