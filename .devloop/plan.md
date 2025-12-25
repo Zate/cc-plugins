@@ -1,9 +1,9 @@
 # Devloop Plan: Plugin Best Practices Audit Fixes
 
 **Created**: 2025-12-25
-**Updated**: 2025-12-25 18:00
+**Updated**: 2025-12-26 10:00
 **Status**: In Progress
-**Current Phase**: Phase 1
+**Current Phase**: Phase 2
 **Estimate**: L (7-10 hours)
 
 ## Overview
@@ -135,14 +135,14 @@ Breaking fixes into phases by priority:
     - 18 skills ⚠️ need improvements (prioritized in 4 groups)
     - 4 skills missing "When NOT to Use" sections
 
-- [ ] Task 2.2: Fix plan-management skill description
+- [x] Task 2.2: Fix plan-management skill description
   - Current: "Central reference for devloop plan file..."
   - **New**: "This skill should be used when the user asks about 'plan format', 'update plan', 'plan location', '.devloop/plan.md', 'plan markers', 'task status', or needs guidance on plan file conventions and update procedures."
   - Add "When NOT to Use" section if missing
   - Acceptance: Clear trigger phrases, third-person format
   - Files: `plugins/devloop/skills/plan-management/SKILL.md`
 
-- [ ] Task 2.3: Fix workflow-loop skill description
+- [x] Task 2.3: Fix workflow-loop skill description
   - Current: "Standard patterns for multi-task workflows..."
   - **New**: "This skill should be used when the user asks to 'implement checkpoints', 'workflow loop', 'task completion pattern', 'mandate checkpoints', or needs patterns for multi-task workflows with decision points."
   - Add "When NOT to Use" section
@@ -358,6 +358,8 @@ Breaking fixes into phases by priority:
 - 2025-12-25 17:25: Fresh start initiated - state saved to next-action.json
 - 2025-12-25 17:30: Completed Task 1.9 - Fixed doc-generator.md description format (third-person with "Use this agent when...", integrated 3 examples covering feature documentation, API updates, and changelog maintenance)
 - 2025-12-25 18:00: Completed Task 2.1 - Audited all 29 skills, identified 18 needing improvements, created prioritized task list in .devloop/skill-audit-results.md
+- 2025-12-26 10:00: Completed Task 2.2 - Fixed plan-management skill description with third-person format and clear trigger phrases
+- 2025-12-26 10:15: Completed Task 2.3 - Fixed workflow-loop skill description with third-person format, trigger phrases, and added "When NOT to Use" section
 
 ## Success Criteria
 

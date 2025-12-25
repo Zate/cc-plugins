@@ -1,5 +1,5 @@
 ---
-description: Standard patterns for multi-task workflows with mandatory checkpoints, state management, and error recovery. Use when orchestrating sequential tasks with decision points.
+description: This skill should be used when the user asks to 'implement checkpoints', 'workflow loop', 'task completion pattern', 'mandate checkpoints', or needs patterns for multi-task workflows with mandatory checkpoints, state management, and error recovery.
 whenToUse: |
   - Implementing commands that control multi-phase workflows
   - Designing checkpoint logic between tasks
@@ -13,6 +13,13 @@ whenNotToUse: |
 ---
 
 # Workflow Loop Pattern
+
+## When NOT to Use This Skill
+
+- **Simple single-task operations**: One-off tasks don't need checkpoints
+- **Non-interactive background jobs**: Jobs that run without user decisions
+- **Exploratory work without checkpoints**: Spikes and investigation don't require the full loop
+- **Read-only operations**: Analysis and exploration without state changes
 
 ## The Standard Loop
 
