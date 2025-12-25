@@ -1,7 +1,7 @@
 # Devloop Plan: Plugin Best Practices Audit Fixes
 
 **Created**: 2025-12-25
-**Updated**: 2025-12-25 16:30
+**Updated**: 2025-12-25 16:45
 **Status**: In Progress
 **Current Phase**: Phase 1
 **Estimate**: L (7-10 hours)
@@ -88,7 +88,7 @@ Breaking fixes into phases by priority:
   - Acceptance: Matches plugin-dev format
   - Files: `plugins/devloop/agents/security-scanner.md`
 
-- [ ] Task 1.5: Fix workflow-detector.md description [parallel:A]
+- [x] Task 1.5: Fix workflow-detector.md description [parallel:A]
   - Apply same pattern as Task 1.1
   - Convert Examples → integrated `<example>` blocks
   - Acceptance: Matches plugin-dev format
@@ -346,6 +346,7 @@ Breaking fixes into phases by priority:
 - 2025-12-25 16:00: Completed Task 1.3 - Fixed qa-engineer.md description format (third-person, integrated 4 examples: test generation, test execution, bug tracking, deployment validation)
 - 2025-12-25 16:15: Fresh start initiated - state saved to next-action.json
 - 2025-12-25 16:30: Completed Task 1.4 - Fixed security-scanner.md description format (third-person, integrated 3 examples covering input handling, auth code, and pre-deployment security checks)
+- 2025-12-25 16:45: Completed Task 1.5 - Fixed workflow-detector.md description format (third-person, integrated 3 examples covering ambiguous tasks, code quality improvement, and issue tracking)
 
 ## Success Criteria
 

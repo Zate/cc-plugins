@@ -1,31 +1,26 @@
 ---
 name: workflow-detector
-description: Classifies development tasks to determine optimal workflow type (feature, bug fix, refactor, QA). Also routes issue tracking requests to appropriate commands. Use at the start of ambiguous tasks to route to the appropriate workflow.
+description: Use this agent when the task type is ambiguous and needs classification to determine the optimal workflow (feature, bug fix, refactor, QA, or issue tracking).
 
-Examples:
 <example>
 Context: User request is ambiguous about task type.
 user: "The login is broken, can you fix it?"
 assistant: "I'll launch the devloop:workflow-detector agent to classify this task."
-<commentary>
-"broken" suggests a bug fix workflow, not a new feature.
-</commentary>
+<commentary>"broken" suggests a bug fix workflow, not a new feature.</commentary>
 </example>
+
 <example>
 Context: User wants to improve code quality.
 user: "This code is messy, can you clean it up?"
 assistant: "I'll use the devloop:workflow-detector agent to determine if this is a refactor task."
-<commentary>
-"clean up" and "messy" suggest refactoring workflow.
-</commentary>
+<commentary>"clean up" and "messy" suggest refactoring workflow.</commentary>
 </example>
+
 <example>
 Context: User wants to track something for later.
 user: "We should add dark mode eventually"
 assistant: "I'll use the devloop:workflow-detector agent to determine if this should be tracked as an issue."
-<commentary>
-"eventually" and "should add" suggest issue tracking, not immediate implementation.
-</commentary>
+<commentary>"eventually" and "should add" suggest issue tracking, not immediate implementation.</commentary>
 </example>
 
 tools: Read, Grep, Glob, AskUserQuestion
