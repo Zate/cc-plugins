@@ -1,14 +1,99 @@
 # Continue.md Refactor Mapping
 
 **Analysis Date**: 2025-12-26
-**Current Size**: 1526 lines
-**Target Size**: ~400 lines (reduction of ~1100 lines)
+**Original Size**: 1526 lines
+**Final Size**: 425 lines (reduction of 1100 lines, 72.0%)
+**Status**: ✅ COMPLETE - Deployed 2025-12-26
 
 ## Executive Summary
 
-The continue.md command contains extensive content that duplicates or overlaps with existing devloop skills. This document maps each major section to its overlapping skill(s) and provides refactoring recommendations.
+The continue.md command contained extensive content that duplicated or overlapped with existing devloop skills. This refactoring applied progressive disclosure by replacing detailed implementations with skill references, achieving 72% size reduction while maintaining all functionality.
 
-**Total Estimated Line Reduction**: ~1100 lines (72% reduction)
+**Achieved Line Reduction**: 1100 lines (72.0% reduction)
+
+## Skill Dependencies
+
+After refactoring, continue.md depends on these core skills:
+
+### Primary Skills (Core References)
+
+1. **`workflow-loop`** - Checkpoint patterns, context management, fresh start workflows
+   - Referenced in: Step 5a (checkpoint), Step 5c (context management), Step 9 (fresh start)
+   - Provides: State transitions, error recovery, threshold detection, background agent patterns
+   - Lines saved: ~350 lines (context management + checkpoint details)
+
+2. **`task-checkpoint`** - Task completion verification and validation
+   - Referenced in: Step 5a (post-agent checkpoint)
+   - Provides: Verification sequence, update plan markers, commit decision, worklog sync
+   - Lines saved: ~230 lines (checkpoint implementation)
+
+3. **`plan-management`** - Plan file format, location, and update procedures
+   - Referenced in: Step 1 (plan discovery), Step 2 (status parsing), Step 5b (completion detection)
+   - Provides: Task status markers, plan location priority, parallelism markers, completion rules
+   - Lines saved: ~280 lines (plan format + completion logic)
+
+### Secondary Skills (Referenced but not core)
+
+4. **`phase-templates`** - Phase execution details
+   - Referenced in: Agent execution examples
+   - Provides: Standard phase patterns for discovery, implementation, review
+   - Usage: Optional reference for phase-specific workflows
+
+5. **`model-selection-guide`** - Model selection guidance
+   - Referenced in: Tips section
+   - Provides: When to use haiku/sonnet/opus based on complexity
+   - Usage: Referenced for performance optimization
+
+### Dependency Graph
+
+```
+continue.md
+    ├── workflow-loop (checkpoint patterns, context management)
+    │   ├── State transitions
+    │   ├── Error recovery patterns
+    │   ├── Context health thresholds
+    │   └── Fresh start state persistence
+    │
+    ├── task-checkpoint (task completion verification)
+    │   ├── Verification sequence
+    │   ├── Plan marker updates
+    │   ├── Commit decision logic
+    │   └── Worklog synchronization
+    │
+    ├── plan-management (plan format and rules)
+    │   ├── Plan file locations
+    │   ├── Task status markers ([x], [ ], [~], [!], [-])
+    │   ├── Parallelism markers ([parallel:X], [depends:N.M])
+    │   └── Completion detection logic
+    │
+    └── phase-templates (optional reference)
+        └── Standard phase patterns
+```
+
+### Skill Reference Locations in continue.md
+
+| Step | Section | Skill Reference | Line Numbers |
+|------|---------|-----------------|--------------|
+| 1a | Fresh Start State | `workflow-loop` | 60 |
+| 1b | Plan File Discovery | `plan-management` | 77 |
+| 2 | Task Status Parsing | `plan-management` | 107, 109 |
+| 5a | Post-Agent Checkpoint | `task-checkpoint`, `workflow-loop` | 247, 261 |
+| 5b | Completion Detection | `plan-management`, `workflow-loop` | 283, 285 |
+| 5c | Context Management | `workflow-loop` | 347, 361 |
+| 6 | Parallel Task Handling | `plan-management` | 384 |
+| 7 | Plan Mode Integration | `plan-management` | 394 |
+| 8 | Recovery Scenarios | `workflow-loop` | 411 |
+| Tips | Model Selection | `model-selection-guide` | 425 |
+
+**Total Skill References**: 14 references to 4 core skills
+
+### Benefits of Progressive Disclosure
+
+1. **Reduced Token Usage**: 72% smaller command = faster loading, less context bloat
+2. **Single Source of Truth**: Skills can be updated independently without touching continue.md
+3. **Better Maintainability**: Workflow logic centralized in skills, command orchestrates
+4. **Improved Readability**: Command shows structure, skills provide implementation
+5. **No Functionality Loss**: All features preserved, just reorganized for efficiency
 
 ---
 

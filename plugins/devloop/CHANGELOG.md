@@ -5,6 +5,54 @@ All notable changes to the devloop plugin are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.2.1] - 2025-12-26
+
+### Changed - Command Length Reduction (Progressive Disclosure)
+
+**Continue Command Refactoring**
+- Reduced `/devloop:continue` from 1,526 lines to 425 lines (72.0% reduction, 1,100 lines saved)
+- Applied progressive disclosure pattern to reference existing skills instead of duplicating content
+- Refactored sections:
+  - **Context Management** (Step 5c): 293 lines → Reference to `Skill: workflow-loop`
+  - **Post-Agent Checkpoint** (Step 5a): 230 lines → Reference to `Skill: task-checkpoint`
+  - **Loop Completion Detection** (Step 5b): 226 lines → Reference to `Skill: plan-management`
+  - **Agent Execution Templates**: Consolidated to single parameterized pattern
+  - **Classification Keywords**: Merged into agent routing table
+- Enhanced maintainability:
+  - Single source of truth for checkpoint patterns in `task-checkpoint` skill
+  - Single source of truth for context management in `workflow-loop` skill
+  - Single source of truth for plan completion logic in `plan-management` skill
+- All essential workflow steps preserved with skill references for detailed content
+- Tested scenarios: resume from plan, fresh start, completion detection, error recovery, parallel tasks
+- Backup created: `continue-v1-backup.md` (1,526 lines → 45KB)
+
+**Benefits**
+- **Reduced token usage**: 72% smaller command = faster loading, less context bloat
+- **Better maintainability**: Skills can be updated independently without touching continue.md
+- **Improved readability**: Command shows workflow structure, skills provide implementation details
+- **Consistent patterns**: Checkpoint/context/completion logic centralized in skills
+- **No functionality loss**: All features preserved, just reorganized
+
+**Files Modified**
+- `plugins/devloop/commands/continue.md` (1,526 → 425 lines)
+- Created backup: `plugins/devloop/commands/continue-v1-backup.md`
+- Analysis: `.devloop/continue-refactor-map.md` (473 lines, working document)
+
+**Architecture**
+- Progressive disclosure: Command orchestrates, skills provide detailed patterns
+- Skill references: 11 total references to 3 core skills (workflow-loop, task-checkpoint, plan-management)
+- Agent routing table: 11 agent types with classification keywords
+- Pattern templates: Single parameterized template replaces 11 mode-specific examples
+
+**Testing**
+- All workflow steps verified intact (8 main steps)
+- Skill references properly formatted (backtick syntax)
+- Agent routing table complete (11 agent types mapped)
+- Essential patterns present (AskUserQuestion, Task, subagent_type, CRITICAL markers)
+- Test plan documented in `.devloop/test-plan.md`
+
+---
+
 ## [2.2.0] - 2025-12-24
 
 ### Added - Hook-Based Fresh Start Loop Workflow (FEAT-005)
