@@ -1,6 +1,17 @@
 ---
 name: version-management
-description: Semantic versioning, CHANGELOG generation, and release management for devloop projects. Use when completing phases, shipping features, determining version bumps, updating CHANGELOG.md, or creating release tags.
+description: This skill should be used when the user asks about "version bump", "CHANGELOG", "semantic versioning", "release tag", or needs guidance on versioning and release management.
+whenToUse: |
+  - Completing a phase in the devloop plan
+  - Shipping a feature with /devloop:ship
+  - Determining what version bump is needed (major/minor/patch)
+  - Updating CHANGELOG.md with release notes
+  - Creating and pushing release tags
+whenNotToUse: |
+  - During active development - version at completion
+  - Commit message formatting - use git-workflows
+  - Minor internal changes that don't warrant a release
+  - Projects that don't use semantic versioning
 ---
 
 # Version Management Skill

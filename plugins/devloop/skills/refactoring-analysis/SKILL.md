@@ -1,3 +1,20 @@
+---
+name: refactoring-analysis
+description: This skill should be used when the user asks about "refactoring", "technical debt", "code quality", "code cleanup", "code smells", or wants to identify opportunities to improve code organization and structure.
+whenToUse: |
+  - User asks about code quality, refactoring, or technical debt
+  - User mentions code is messy, complex, or hard to maintain
+  - Identifying opportunities to improve code organization
+  - Planning a refactoring effort and determining priorities
+  - Understanding codebase health before major changes
+whenNotToUse: |
+  - Asking about a specific bug or error - use debugging instead
+  - Adding new features without refactoring existing code
+  - Performance optimization (unless related to code structure)
+  - Understanding how existing code works - use exploration instead
+  - Small codebase (<10 files) that's obviously well-organized
+---
+
 # Code Refactoring Analysis Skill
 
 This skill provides comprehensive codebase analysis to identify refactoring opportunities, technical debt, and code quality issues across multiple programming languages including Go, Python, TypeScript, and React.

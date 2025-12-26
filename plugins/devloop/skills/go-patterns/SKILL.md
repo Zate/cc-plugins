@@ -1,6 +1,17 @@
 ---
 name: go-patterns
-description: This skill should be used when working with Go code, implementing Go features, reviewing Go patterns, or when the user asks about 'Go idioms', 'goroutines', 'Go interfaces', 'Go error handling', 'Go testing'.
+description: This skill should be used when working with Go code, implementing Go features, reviewing Go patterns, or when the user asks about "Go idioms", "goroutines", "Go interfaces", "Go error handling", "Go testing".
+whenToUse: |
+  - Working with Go 1.21+ code
+  - Implementing idiomatic Go patterns
+  - Using goroutines, channels, and concurrency primitives
+  - Error handling with wrapping and context
+  - Testing with table-driven tests and benchmarks
+whenNotToUse: |
+  - Non-Go code - use python-patterns, java-patterns, react-patterns
+  - Match existing style - follow codebase conventions even if not idiomatic
+  - Performance-critical hot paths - profile first, optimize with benchmarks
+  - CGo interop - C integration has different patterns and constraints
 ---
 
 # Go Patterns
@@ -32,16 +43,12 @@ Idiomatic Go patterns and best practices. **Extends** `language-patterns-base` w
 
 ## Interface Design
 
-### Small, Focused Interfaces
+**Key Principle**: Accept interfaces, return structs. Keep interfaces small (1-3 methods).
 
 ```go
-// Good: Small, focused interfaces
+// Small, focused interfaces
 type Reader interface {
     Read(p []byte) (n int, err error)
-}
-
-type Writer interface {
-    Write(p []byte) (n int, err error)
 }
 
 // Compose when needed
@@ -49,110 +56,40 @@ type ReadWriter interface {
     Reader
     Writer
 }
+
+// Accept interface, return struct
+func ProcessData(r io.Reader) error { /* ... */ }
+func NewService() *Service { return &Service{} }
 ```
 
-### Accept Interfaces, Return Structs
-
-```go
-// Good: Accept interface for flexibility
-func ProcessData(r io.Reader) error {
-    // Can accept any Reader
-}
-
-// Good: Return concrete type
-func NewService() *Service {
-    return &Service{}
-}
-```
+**For detailed patterns**, see [references/interfaces.md](references/interfaces.md)
 
 ---
 
-## Error Handling (Go-Specific)
+## Error Handling
 
-### Wrapping with Context
+**Always wrap with context** using `%w` verb. Use `errors.Is` for sentinel errors, `errors.As` for custom types.
 
 ```go
+// Wrap errors
 if err != nil {
     return fmt.Errorf("failed to process user %s: %w", userID, err)
 }
 
+// Sentinel errors
+var ErrNotFound = errors.New("not found")
+
 // Check wrapped errors
 if errors.Is(err, ErrNotFound) { /* handle */ }
-
-// Extract error type
-var validationErr *ValidationError
-if errors.As(err, &validationErr) { /* handle */ }
 ```
 
-### Sentinel Errors
-
-```go
-var (
-    ErrNotFound     = errors.New("not found")
-    ErrUnauthorized = errors.New("unauthorized")
-)
-```
-
-### Custom Error Types
-
-```go
-type ValidationError struct {
-    Field   string
-    Message string
-}
-
-func (e *ValidationError) Error() string {
-    return fmt.Sprintf("validation failed on %s: %s", e.Field, e.Message)
-}
-```
+**For detailed patterns**, see [references/error-handling.md](references/error-handling.md)
 
 ---
 
-## Concurrency Patterns
+## Concurrency
 
-### Goroutines with WaitGroup
-
-```go
-func processItems(items []Item) error {
-    var wg sync.WaitGroup
-    errCh := make(chan error, len(items))
-
-    for _, item := range items {
-        wg.Add(1)
-        go func(item Item) {  // Pass item to avoid closure issue
-            defer wg.Done()
-            if err := process(item); err != nil {
-                errCh <- err
-            }
-        }(item)
-    }
-
-    wg.Wait()
-    close(errCh)
-    return errors.Join(slices.Collect(slices.Values(errCh))...)
-}
-```
-
-### Worker Pool
-
-```go
-func workerPool(jobs <-chan Job, results chan<- Result, workers int) {
-    var wg sync.WaitGroup
-    for i := 0; i < workers; i++ {
-        wg.Add(1)
-        go func() {
-            defer wg.Done()
-            for job := range jobs {
-                results <- process(job)
-            }
-        }()
-    }
-    wg.Wait()
-    close(results)
-}
-```
-
-### Context for Cancellation
+**Always provide cancellation** via context. Use `sync.WaitGroup` for goroutine lifecycle.
 
 ```go
 func longRunningOperation(ctx context.Context) error {
@@ -161,97 +98,41 @@ func longRunningOperation(ctx context.Context) error {
         case <-ctx.Done():
             return ctx.Err()
         default:
-            if done := doWorkChunk(); done {
-                return nil
-            }
+            doWorkChunk()
         }
     }
 }
 ```
 
+**For detailed patterns**, see [references/concurrency.md](references/concurrency.md)
+
 ---
 
-## Testing Patterns
+## Testing
 
-### Table-Driven Tests
+**Use table-driven tests** for multiple cases. Run with `-race` to detect concurrency bugs.
 
 ```go
 func TestAdd(t *testing.T) {
     tests := []struct {
-        name     string
-        a, b     int
-        expected int
+        name string
+        a, b, want int
     }{
         {"positive", 2, 3, 5},
         {"negative", -2, -3, -5},
-        {"mixed", -2, 3, 1},
     }
 
     for _, tt := range tests {
         t.Run(tt.name, func(t *testing.T) {
-            if got := Add(tt.a, tt.b); got != tt.expected {
-                t.Errorf("Add(%d, %d) = %d; want %d", tt.a, tt.b, got, tt.expected)
+            if got := Add(tt.a, tt.b); got != tt.want {
+                t.Errorf("got %d, want %d", got, tt.want)
             }
         })
     }
 }
 ```
 
-### Test Helpers with Cleanup
-
-```go
-func setupTestDB(t *testing.T) *sql.DB {
-    t.Helper()
-    db, err := sql.Open("sqlite3", ":memory:")
-    if err != nil {
-        t.Fatalf("failed to open db: %v", err)
-    }
-    t.Cleanup(func() { db.Close() })
-    return db
-}
-```
-
-### Interface Mocking
-
-```go
-type UserStore interface {
-    GetUser(id string) (*User, error)
-}
-
-type mockUserStore struct {
-    users map[string]*User
-    err   error
-}
-
-func (m *mockUserStore) GetUser(id string) (*User, error) {
-    if m.err != nil { return nil, m.err }
-    user, ok := m.users[id]
-    if !ok { return nil, ErrNotFound }
-    return user, nil
-}
-```
-
-### Race Detection
-
-Run with `go test -race` to detect data races.
-
-```go
-func TestConcurrentAccess(t *testing.T) {
-    counter := NewCounter()
-    var wg sync.WaitGroup
-    for i := 0; i < 100; i++ {
-        wg.Add(1)
-        go func() {
-            defer wg.Done()
-            counter.Increment()
-        }()
-    }
-    wg.Wait()
-    if got := counter.Value(); got != 100 {
-        t.Errorf("got %d, want 100", got)
-    }
-}
-```
+**For detailed patterns**, see [references/testing.md](references/testing.md)
 
 ---
 
@@ -282,8 +163,6 @@ func NewServer(opts ...ServerOption) *Server {
 }
 ```
 
----
-
 ## Project Structure
 
 ```
@@ -297,8 +176,6 @@ myproject/
 ├── go.mod
 └── Makefile
 ```
-
----
 
 ## Go Idioms
 
@@ -317,69 +194,14 @@ var buf bytes.Buffer  // Ready to use
 var mu  sync.Mutex    // Ready to use
 ```
 
-### Embedding for Composition
+## References
 
-```go
-type Logger struct {
-    *log.Logger  // All methods available
-    prefix string
-}
-```
+For detailed patterns and advanced usage:
 
----
-
-## Anti-Patterns (Go-Specific)
-
-### Goroutine Leaks
-
-```go
-// BAD: No way to stop
-go func() { for { doWork() } }()
-
-// GOOD: Context-controlled
-go func() {
-    for {
-        select {
-        case <-ctx.Done(): return
-        default: doWork()
-        }
-    }
-}()
-```
-
-### Closure Variable Capture (pre-Go 1.22)
-
-```go
-// BAD: Captures final value
-for _, item := range items {
-    go func() { process(item) }()  // Wrong!
-}
-
-// GOOD: Pass as parameter
-for _, item := range items {
-    go func(item Item) { process(item) }(item)
-}
-```
-
-### Swallowing Errors
-
-```go
-// BAD
-result, _ := dangerousOperation()
-
-// GOOD
-if err != nil {
-    return fmt.Errorf("operation failed: %w", err)
-}
-```
-
-### Interface Pollution
-
-- Don't define interfaces until you have 2+ implementations
-- Keep interfaces small (1-3 methods)
-- Don't abuse `init()` - prefer explicit initialization
-
----
+- **[references/concurrency.md](references/concurrency.md)** - Goroutines, channels, context, worker pools, race detection
+- **[references/testing.md](references/testing.md)** - Table-driven tests, mocking, benchmarks, golden files
+- **[references/interfaces.md](references/interfaces.md)** - Interface design, composition, embedding patterns
+- **[references/error-handling.md](references/error-handling.md)** - Error wrapping, custom errors, sentinel errors, inspection
 
 ## See Also
 

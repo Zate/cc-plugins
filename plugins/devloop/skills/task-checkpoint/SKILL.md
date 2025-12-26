@@ -1,6 +1,17 @@
 ---
 name: task-checkpoint
-description: Complete checklist and verification for task completion in devloop workflows with mandatory worklog sync. Use after completing implementation, before marking tasks complete, when /devloop:continue finishes a task, or before moving to the next task in a phase.
+description: This skill should be used when the user asks about "task completion", "checkpoint verification", "worklog sync", "mark task complete", or after implementing a task from the devloop plan.
+whenToUse: |
+  - After completing implementation of a task from the devloop plan
+  - Before marking a task as [x] complete in the plan
+  - When /devloop:continue finishes executing a task
+  - Before moving to the next task in a phase
+  - Verifying acceptance criteria are met
+whenNotToUse: |
+  - Quick one-off fixes not tracked in a plan
+  - Exploratory work or spikes - use /devloop:spike instead
+  - When explicitly told to skip checkpoints
+  - Partial work that will be continued immediately
 ---
 
 # Task Checkpoint Skill

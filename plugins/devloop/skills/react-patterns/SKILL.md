@@ -1,6 +1,18 @@
 ---
 name: react-patterns
-description: This skill should be used when working with React/TypeScript code, implementing React features, reviewing React patterns, or when the user asks about 'React hooks', 'React components', 'React state management', 'React performance', 'useEffect', 'useState', 'custom hooks', 'React context'.
+description: This skill should be used when working with React/TypeScript code, implementing React features, reviewing React patterns, or when the user asks about "React hooks", "React components", "React state management", "React performance", "useEffect", "useState", "custom hooks", "React context".
+whenToUse: |
+  - Working with React/TypeScript code
+  - Implementing React features and components
+  - Reviewing React patterns and best practices
+  - Understanding hooks (useState, useEffect, custom hooks)
+  - Performance optimization with useMemo, useCallback, React.memo
+whenNotToUse: |
+  - Non-React code - use Vue, Angular, or Svelte patterns
+  - React Native - mobile has different patterns
+  - Class components - prefer hooks for new code
+  - Server components only - RSC has different patterns
+  - Simple static sites - over-engineering for basic HTML/CSS
 ---
 
 # React Patterns
@@ -82,210 +94,6 @@ function Dashboard() {
 }
 ```
 
-## Hooks
-
-### Custom Hook Pattern
-
-```typescript
-function useUser(userId: string) {
-  const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<Error | null>(null);
-
-  useEffect(() => {
-    let cancelled = false;
-
-    async function fetchUser() {
-      try {
-        setLoading(true);
-        const data = await api.getUser(userId);
-        if (!cancelled) {
-          setUser(data);
-        }
-      } catch (err) {
-        if (!cancelled) {
-          setError(err as Error);
-        }
-      } finally {
-        if (!cancelled) {
-          setLoading(false);
-        }
-      }
-    }
-
-    fetchUser();
-
-    return () => {
-      cancelled = true;
-    };
-  }, [userId]);
-
-  return { user, loading, error };
-}
-```
-
-### useEffect Dependencies
-
-```typescript
-// Good: All dependencies listed
-useEffect(() => {
-  const handler = () => doSomething(value);
-  window.addEventListener('resize', handler);
-  return () => window.removeEventListener('resize', handler);
-}, [value]); // value is used, so it's a dependency
-
-// Good: Stable callback reference
-const handleClick = useCallback(() => {
-  console.log(count);
-}, [count]);
-```
-
-### Common Hooks Reference
-
-```typescript
-// State
-const [state, setState] = useState(initialValue);
-
-// Effect (side effects)
-useEffect(() => {
-  // effect
-  return () => { /* cleanup */ };
-}, [deps]);
-
-// Memoized values
-const memoized = useMemo(() => expensiveCalc(a, b), [a, b]);
-
-// Stable callbacks
-const callback = useCallback(() => fn(a), [a]);
-
-// Refs (mutable value that doesn't trigger re-render)
-const ref = useRef<HTMLDivElement>(null);
-
-// Context
-const value = useContext(MyContext);
-
-// Reducer (complex state)
-const [state, dispatch] = useReducer(reducer, initialState);
-```
-
-## State Management
-
-### Context + Reducer Pattern
-
-```typescript
-// Define types
-interface AuthState {
-  user: User | null;
-  loading: boolean;
-}
-
-type AuthAction =
-  | { type: 'LOGIN_START' }
-  | { type: 'LOGIN_SUCCESS'; user: User }
-  | { type: 'LOGOUT' };
-
-// Reducer
-function authReducer(state: AuthState, action: AuthAction): AuthState {
-  switch (action.type) {
-    case 'LOGIN_START':
-      return { ...state, loading: true };
-    case 'LOGIN_SUCCESS':
-      return { user: action.user, loading: false };
-    case 'LOGOUT':
-      return { user: null, loading: false };
-    default:
-      return state;
-  }
-}
-
-// Context
-const AuthContext = createContext<{
-  state: AuthState;
-  dispatch: React.Dispatch<AuthAction>;
-} | null>(null);
-
-// Provider
-function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [state, dispatch] = useReducer(authReducer, {
-    user: null,
-    loading: true,
-  });
-
-  return (
-    <AuthContext.Provider value={{ state, dispatch }}>
-      {children}
-    </AuthContext.Provider>
-  );
-}
-
-// Hook
-function useAuth() {
-  const context = useContext(AuthContext);
-  if (!context) {
-    throw new Error('useAuth must be used within AuthProvider');
-  }
-  return context;
-}
-```
-
-## Performance
-
-### React.memo for Expensive Components
-
-```typescript
-const ExpensiveList = React.memo(function ExpensiveList({
-  items,
-}: {
-  items: Item[];
-}) {
-  return (
-    <ul>
-      {items.map((item) => (
-        <ExpensiveItem key={item.id} item={item} />
-      ))}
-    </ul>
-  );
-});
-```
-
-### Virtualization for Long Lists
-
-```typescript
-import { FixedSizeList } from 'react-window';
-
-function VirtualizedList({ items }: { items: Item[] }) {
-  return (
-    <FixedSizeList
-      height={400}
-      itemCount={items.length}
-      itemSize={50}
-      width="100%"
-    >
-      {({ index, style }) => (
-        <div style={style}>
-          <Item item={items[index]} />
-        </div>
-      )}
-    </FixedSizeList>
-  );
-}
-```
-
-### Code Splitting
-
-```typescript
-// Lazy load components
-const Dashboard = React.lazy(() => import('./Dashboard'));
-
-function App() {
-  return (
-    <Suspense fallback={<Loading />}>
-      <Dashboard />
-    </Suspense>
-  );
-}
-```
-
 ## Forms
 
 ### Controlled Components
@@ -348,32 +156,6 @@ function LoginForm() {
 </button>
 ```
 
-## Testing
-
-### React Testing Library
-
-```typescript
-import { render, screen, fireEvent } from '@testing-library/react';
-
-test('submits form with user data', async () => {
-  const onSubmit = jest.fn();
-  render(<LoginForm onSubmit={onSubmit} />);
-
-  fireEvent.change(screen.getByLabelText('Email'), {
-    target: { value: 'test@example.com' },
-  });
-  fireEvent.change(screen.getByLabelText('Password'), {
-    target: { value: 'password123' },
-  });
-  fireEvent.click(screen.getByRole('button', { name: /submit/i }));
-
-  expect(onSubmit).toHaveBeenCalledWith({
-    email: 'test@example.com',
-    password: 'password123',
-  });
-});
-```
-
 ## Anti-Patterns to Avoid
 
 - **Prop drilling**: Use context instead
@@ -381,6 +163,44 @@ test('submits form with user data', async () => {
 - **Missing keys in lists**: React can't track items
 - **Direct DOM manipulation**: Use refs properly
 - **Overusing useEffect**: Consider alternatives first
+
+## References
+
+For comprehensive patterns and examples, see these reference files:
+
+### Hooks (`references/hooks.md`)
+- Custom hook patterns (data fetching, localStorage, debounce)
+- `useState`, `useEffect`, `useMemo`, `useCallback`, `useRef`
+- `useContext`, `useReducer`
+- Effect dependencies and cleanup
+- Rules of hooks
+
+### State Management (`references/state-management.md`)
+- Context + Reducer pattern (complete implementation)
+- Multiple contexts and provider composition
+- Local vs global state decision framework
+- State initialization and derived state
+- Advanced reducer patterns and middleware
+- State persistence (localStorage, sessionStorage)
+
+### Performance (`references/performance.md`)
+- `React.memo` and custom comparison
+- Virtualization for long lists (FixedSizeList, VariableSizeList, Grid)
+- Code splitting and lazy loading
+- Memoization strategies (`useMemo`, `useCallback`)
+- Bundle size optimization
+- Render optimization patterns
+- Performance monitoring with Profiler and Web Vitals
+
+### Testing (`references/testing.md`)
+- React Testing Library patterns
+- Querying elements (by role, label, text)
+- User interaction testing (forms, clicks, typing)
+- Async testing (`waitFor`, `findBy`)
+- Mocking (API calls, modules, MSW)
+- Testing hooks with `renderHook`
+- Testing context providers
+- Accessibility testing with jest-axe
 
 ## See Also
 

@@ -1,6 +1,17 @@
 ---
 name: file-locations
-description: Authoritative reference for .devloop/ directory structure and file locations. Documents which files are git-tracked vs local-only, their purposes, and naming conventions. Use when creating devloop artifacts or understanding project structure.
+description: This skill should be used when the user asks about ".devloop/ structure", "where to put files", "git-tracked vs local", "devloop artifacts", or needs guidance on file locations and directory structure.
+whenToUse: |
+  - Creating new devloop files (plans, reports, issues)
+  - Understanding what files to commit vs gitignore
+  - Setting up a new project with devloop
+  - Troubleshooting file location issues
+  - Migrating from old .claude/ paths to .devloop/
+whenNotToUse: |
+  - Working with application code (not .devloop/ files)
+  - General git operations - use git-workflows
+  - Claude Code configuration (.claude/ is separate)
+  - Non-devloop plugins with their own conventions
 ---
 
 # File Locations

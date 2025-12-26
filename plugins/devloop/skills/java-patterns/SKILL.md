@@ -1,6 +1,18 @@
 ---
 name: java-patterns
-description: This skill should be used when working with Java/Spring code, implementing Java features, reviewing Java patterns, or when the user asks about 'Spring dependency injection', 'Java streams', 'Java Optional', 'Spring Boot', 'JUnit', 'Java records', 'Lombok', 'Java exception handling'.
+description: This skill should be used when working with Java/Spring code, implementing Java features, reviewing Java patterns, or when the user asks about "Spring dependency injection", "Java streams", "Java Optional", "Spring Boot", "JUnit", "Java records", "Lombok", "Java exception handling".
+whenToUse: |
+  - Working with Java 17+ code
+  - Implementing Spring/Spring Boot patterns
+  - Using dependency injection and IoC
+  - Working with Stream API and functional patterns
+  - Testing with JUnit 5 and Mockito
+whenNotToUse: |
+  - Non-Java code - use go-patterns, python-patterns, react-patterns
+  - Legacy Java 8 - different patterns for older versions
+  - Non-Spring projects - some patterns are Spring-specific
+  - Android development - Android has its own conventions
+  - Kotlin codebase - Kotlin has different idioms on JVM
 ---
 
 # Java Patterns
@@ -29,349 +41,126 @@ Modern Java and Spring patterns. **Extends** `language-patterns-base` with Java-
 | Optional | Nullable value handling | `Optional.ofNullable(value)` |
 | Records | Immutable data classes | `record User(String name, int age) {}` |
 
-## Spring Dependency Injection
+## Core Patterns Overview
 
-### Constructor Injection (Preferred)
+### Dependency Injection
 
 ```java
 @Service
-@RequiredArgsConstructor // Lombok generates constructor
+@RequiredArgsConstructor // Lombok generates constructor for final fields
 public class UserService {
-    private final UserRepository userRepository;
+    private final UserRepository repository;
     private final EmailService emailService;
-    private final PasswordEncoder passwordEncoder;
-
-    // Business methods...
 }
 ```
 
-### Configuration Classes
+Use constructor injection (not field injection), make dependencies final.
+
+> **See**: `references/dependency-injection.md` - qualifiers, circular dependencies, bean lifecycle
+> **See**: `references/spring-patterns.md` - configuration, profiles, AOP, events
+
+### Stream API
 
 ```java
-@Configuration
-public class AppConfig {
-
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
-
-    @Bean
-    @Profile("production")
-    public EmailService productionEmailService() {
-        return new SmtpEmailService();
-    }
-
-    @Bean
-    @Profile("development")
-    public EmailService developmentEmailService() {
-        return new MockEmailService();
-    }
-}
+// Filter, transform, group
+List<String> names = users.stream().filter(User::isActive).map(User::getName).collect(toList());
+Map<Role, List<User>> byRole = users.stream().collect(groupingBy(User::getRole));
+Optional<User> admin = users.stream().filter(u -> u.getRole() == ADMIN).findFirst();
 ```
 
-## Stream API
+Use method references, extract complex predicates, prefer `mapToInt/Long/Double` for primitives.
 
-### Common Operations
+> **See**: `references/streams.md` - collectors, reduce, parallel streams, custom collectors
 
-```java
-// Filter and transform
-List<String> names = users.stream()
-    .filter(user -> user.isActive())
-    .map(User::getName)
-    .collect(Collectors.toList());
-
-// Find first matching
-Optional<User> admin = users.stream()
-    .filter(user -> user.getRole() == Role.ADMIN)
-    .findFirst();
-
-// Group by
-Map<Role, List<User>> byRole = users.stream()
-    .collect(Collectors.groupingBy(User::getRole));
-
-// Reduce
-int totalAge = users.stream()
-    .mapToInt(User::getAge)
-    .sum();
-
-// Parallel processing (for large datasets)
-List<Result> results = items.parallelStream()
-    .map(this::expensiveOperation)
-    .collect(Collectors.toList());
-```
-
-### Stream Best Practices
+### Optional
 
 ```java
-// Good: Readable chain
-users.stream()
-    .filter(User::isActive)
-    .filter(user -> user.getAge() >= 18)
-    .sorted(Comparator.comparing(User::getName))
-    .limit(10)
-    .collect(Collectors.toList());
-
-// Bad: Complex inline logic
-users.stream()
-    .filter(u -> u.isActive() && u.getAge() >= 18 &&
-                 u.getEmail() != null && u.getEmail().contains("@"))
-    .collect(Collectors.toList());
-
-// Good: Extract predicates
-Predicate<User> isEligible = user ->
-    user.isActive() && user.getAge() >= 18;
-Predicate<User> hasValidEmail = user ->
-    user.getEmail() != null && user.getEmail().contains("@");
-
-users.stream()
-    .filter(isEligible)
-    .filter(hasValidEmail)
-    .collect(Collectors.toList());
-```
-
-## Optional
-
-### Proper Usage
-
-```java
-// Good: Return Optional for potentially absent values
+// Return Optional from methods
 public Optional<User> findById(Long id) {
     return Optional.ofNullable(repository.find(id));
 }
 
-// Good: Transform and handle
+// Transform and provide default
 String email = findById(id)
     .map(User::getEmail)
     .orElse("no-email@example.com");
 
-// Good: Throw if required
+// Throw if missing
 User user = findById(id)
     .orElseThrow(() -> new NotFoundException("User not found: " + id));
+```
 
-// Bad: Don't use Optional for fields
-public class User {
-    private Optional<String> nickname; // Don't do this
-}
+**Anti-patterns:**
+- Don't use Optional for fields
+- Don't use Optional as method parameters
+- Don't call `get()` without checking `isPresent()`
 
-// Bad: Don't use Optional as parameter
-public void process(Optional<User> user) { // Don't do this
+### Records (Java 16+)
+
+```java
+// Immutable data class with validation
+public record UserDTO(Long id, String name, String email) {
+    public UserDTO {
+        Objects.requireNonNull(name, "name cannot be null");
+        Objects.requireNonNull(email, "email cannot be null");
+    }
 }
 ```
 
-## Exception Handling
-
-### Custom Exceptions
+### Exception Handling
 
 ```java
-// Base exception for domain errors
-public abstract class DomainException extends RuntimeException {
-    protected DomainException(String message) {
-        super(message);
-    }
-
-    protected DomainException(String message, Throwable cause) {
-        super(message, cause);
-    }
-}
-
-// Specific exception
-public class UserNotFoundException extends DomainException {
+// Custom exception
+public class UserNotFoundException extends RuntimeException {
     public UserNotFoundException(Long id) {
         super("User not found with id: " + id);
     }
 }
 
-// With additional context
-public class ValidationException extends DomainException {
-    private final Map<String, String> errors;
-
-    public ValidationException(Map<String, String> errors) {
-        super("Validation failed");
-        this.errors = errors;
-    }
-
-    public Map<String, String> getErrors() {
-        return errors;
-    }
-}
-```
-
-### Global Exception Handler
-
-```java
+// Global exception handler
 @RestControllerAdvice
 public class GlobalExceptionHandler {
-
     @ExceptionHandler(UserNotFoundException.class)
     public ResponseEntity<ErrorResponse> handleNotFound(UserNotFoundException e) {
-        return ResponseEntity
-            .status(HttpStatus.NOT_FOUND)
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
             .body(new ErrorResponse(e.getMessage()));
     }
-
-    @ExceptionHandler(ValidationException.class)
-    public ResponseEntity<ErrorResponse> handleValidation(ValidationException e) {
-        return ResponseEntity
-            .status(HttpStatus.BAD_REQUEST)
-            .body(new ErrorResponse("Validation failed", e.getErrors()));
-    }
-
-    @ExceptionHandler(Exception.class)
-    public ResponseEntity<ErrorResponse> handleGeneric(Exception e) {
-        log.error("Unexpected error", e);
-        return ResponseEntity
-            .status(HttpStatus.INTERNAL_SERVER_ERROR)
-            .body(new ErrorResponse("An unexpected error occurred"));
-    }
 }
 ```
 
-## Records (Java 14+)
-
-```java
-// Immutable data class
-public record UserDTO(
-    Long id,
-    String name,
-    String email,
-    LocalDateTime createdAt
-) {
-    // Compact constructor for validation
-    public UserDTO {
-        Objects.requireNonNull(name, "name cannot be null");
-        Objects.requireNonNull(email, "email cannot be null");
-    }
-
-    // Static factory method
-    public static UserDTO from(User user) {
-        return new UserDTO(
-            user.getId(),
-            user.getName(),
-            user.getEmail(),
-            user.getCreatedAt()
-        );
-    }
-}
-```
-
-## Builder Pattern
+### Builder Pattern
 
 ```java
 @Builder
-@Getter
 public class User {
-    private final Long id;
     private final String name;
     private final String email;
     @Builder.Default
     private final boolean active = true;
-    @Builder.Default
-    private final LocalDateTime createdAt = LocalDateTime.now();
 }
 
-// Usage
-User user = User.builder()
-    .name("John Doe")
-    .email("john@example.com")
-    .build();
+// Usage: User.builder().name("John").email("john@example.com").build()
 ```
 
 ## Testing
 
-### Unit Tests with JUnit 5
-
 ```java
 @ExtendWith(MockitoExtension.class)
 class UserServiceTest {
-
-    @Mock
-    private UserRepository repository;
-
-    @Mock
-    private EmailService emailService;
-
-    @InjectMocks
-    private UserService service;
+    @Mock private UserRepository repository;
+    @InjectMocks private UserService service;
 
     @Test
-    void createUser_withValidData_createsAndSendsEmail() {
-        // Given
-        CreateUserRequest request = new CreateUserRequest("john@example.com", "John");
-        when(repository.save(any())).thenAnswer(inv -> {
-            User user = inv.getArgument(0);
-            return user.toBuilder().id(1L).build();
-        });
-
-        // When
+    void createUser_withValidData_savesUser() {
+        when(repository.save(any())).thenReturn(savedUser);
         User result = service.createUser(request);
-
-        // Then
-        assertThat(result.getId()).isEqualTo(1L);
-        assertThat(result.getName()).isEqualTo("John");
-        verify(emailService).sendWelcomeEmail(result);
-    }
-
-    @Test
-    void createUser_withDuplicateEmail_throwsException() {
-        // Given
-        when(repository.existsByEmail(any())).thenReturn(true);
-
-        // When/Then
-        assertThatThrownBy(() -> service.createUser(request))
-            .isInstanceOf(DuplicateEmailException.class)
-            .hasMessageContaining("already exists");
+        assertThat(result.getId()).isNotNull();
+        verify(repository).save(any());
     }
 }
 ```
 
-### Integration Tests
-
-```java
-@SpringBootTest
-@AutoConfigureMockMvc
-@Transactional
-class UserControllerIntegrationTest {
-
-    @Autowired
-    private MockMvc mockMvc;
-
-    @Autowired
-    private UserRepository repository;
-
-    @Test
-    void getUser_returnsUser() throws Exception {
-        // Given
-        User user = repository.save(User.builder()
-            .name("John")
-            .email("john@example.com")
-            .build());
-
-        // When/Then
-        mockMvc.perform(get("/api/users/{id}", user.getId()))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$.name").value("John"))
-            .andExpect(jsonPath("$.email").value("john@example.com"));
-    }
-}
-```
-
-## Resource Management
-
-### Try-with-Resources
-
-```java
-// Good: Automatic resource cleanup
-try (var connection = dataSource.getConnection();
-     var statement = connection.prepareStatement(sql);
-     var resultSet = statement.executeQuery()) {
-
-    while (resultSet.next()) {
-        // Process results
-    }
-}
-// Resources automatically closed
-```
+> **See**: `references/testing-junit.md` - Mockito, parameterized tests, Spring Test, integration tests
 
 ## Anti-Patterns to Avoid
 
@@ -380,6 +169,40 @@ try (var connection = dataSource.getConnection();
 - **Returning null**: Use Optional or throw exception
 - **Mutable return types**: Return immutable collections
 - **God classes**: Keep classes focused
+- **Optional fields**: Don't use Optional as fields
+- **Complex streams**: Extract predicates for readability
+
+## References
+
+For detailed patterns and advanced topics, see:
+
+- **`references/spring-patterns.md`** (~100 lines)
+  - Spring Boot configuration and profiles
+  - Bean scopes and lifecycle management
+  - Aspect-Oriented Programming (AOP)
+  - Event-driven patterns
+  - Component scanning strategies
+
+- **`references/streams.md`** (~90 lines)
+  - Collectors (grouping, joining, summarizing)
+  - Reduce operations and specialized streams
+  - Parallel stream best practices
+  - Custom collectors
+  - Performance optimization tips
+
+- **`references/testing-junit.md`** (~80 lines)
+  - JUnit 5 lifecycle and assertions
+  - Mockito stubbing and verification
+  - Parameterized tests (CSV, Method, Enum sources)
+  - Spring Boot test slices (@WebMvcTest, @DataJpaTest)
+  - Integration testing with Testcontainers
+
+- **`references/dependency-injection.md`** (~60 lines)
+  - Constructor vs setter vs field injection
+  - Qualifiers and @Primary
+  - Conditional beans and profiles
+  - Circular dependency solutions
+  - Factory and strategy patterns with DI
 
 ## See Also
 

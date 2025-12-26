@@ -187,7 +187,7 @@ Breaking optimizations into 5 phases by priority and dependencies:
   - **Acceptance**: 10 skills have standardized YAML frontmatter
   - **Files**: 10 SKILL.md files in `plugins/devloop/skills/`
 
-- [ ] Task 3.4: Update skills 21-29 with standardized frontmatter [parallel:C]
+- [x] Task 3.4: Update skills 21-29 with standardized frontmatter [parallel:C]
   - Batch: version-management, file-locations, react-patterns, python-patterns, java-patterns, go-patterns, task-checkpoint, workflow-loop (verify existing), refactoring-analysis
   - Apply same pattern as Task 3.2
   - Note: workflow-loop already has whenToUse/whenNotToUse, verify format
@@ -417,6 +417,7 @@ Breaking optimizations into 5 phases by priority and dependencies:
 - 2025-12-26: Task 3.1 complete - Added "Skill Frontmatter Standard" section to docs/skills.md with template, examples, format guidelines
 - 2025-12-26: Task 3.2 complete - Updated 10 skills with whenToUse/whenNotToUse YAML: plan-management, tool-usage-policy, atomic-commits, worklog-management, model-selection-guide, api-design, database-patterns, testing-strategies, git-workflows, deployment-readiness
 - 2025-12-26: Task 3.3 complete - Updated 10 skills with whenToUse/whenNotToUse YAML: architecture-patterns, security-checklist, requirements-patterns, phase-templates, complexity-estimation, project-context, project-bootstrap, language-patterns-base, workflow-selection, issue-tracking
+- 2025-12-26: Task 3.4 complete - Updated 8 skills with whenToUse/whenNotToUse YAML: version-management, file-locations, react-patterns, python-patterns, java-patterns, go-patterns, task-checkpoint, refactoring-analysis. Verified workflow-loop already had YAML.
 
 ## Success Criteria
 

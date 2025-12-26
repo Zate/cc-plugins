@@ -1,6 +1,18 @@
 ---
 name: python-patterns
-description: This skill should be used when working with Python code, implementing Python features, reviewing Python patterns, or when the user asks about 'Python type hints', 'async/await', 'pytest', 'Python dataclasses', 'Pydantic', 'Python idioms', 'asyncio', 'Python error handling'.
+description: This skill should be used when working with Python code, implementing Python features, reviewing Python patterns, or when the user asks about "Python type hints", "async/await", "pytest", "Python dataclasses", "Pydantic", "Python idioms", "asyncio", "Python error handling".
+whenToUse: |
+  - Working with Python 3.10+ code
+  - Implementing type hints and type safety
+  - Using async/await patterns with asyncio
+  - Testing with pytest (fixtures, parametrize, mocking)
+  - Understanding dataclasses, Pydantic, context managers
+whenNotToUse: |
+  - Non-Python code - use go-patterns, java-patterns, react-patterns
+  - Python 2 - legacy Python has different patterns
+  - Jupyter notebooks - data science has different conventions
+  - MicroPython/CircuitPython - embedded Python has constraints
+  - Quick scripts - don't over-engineer one-off automation
 ---
 
 # Python Patterns
@@ -30,68 +42,6 @@ Idiomatic Python patterns and best practices. **Extends** `language-patterns-bas
 | Protocols | Structural typing | `class Readable(Protocol):` |
 
 ---
-
-## Type Hints
-
-### Basic Types
-```python
-from typing import Optional, List, Dict, Tuple, Union, Any
-
-def greet(name: str) -> str:
-    return f"Hello, {name}"
-
-def get_user(user_id: int) -> Optional[User]:
-    ...
-
-def process_items(items: List[str]) -> Dict[str, int]:
-    ...
-```
-
-### Generic Types (Python 3.9+)
-```python
-# Use built-in types directly
-def process(items: list[str]) -> dict[str, int]:
-    ...
-
-# Union with |
-def get_value(key: str) -> str | None:
-    ...
-```
-
-### TypedDict
-```python
-from typing import TypedDict
-
-class UserDict(TypedDict):
-    id: int
-    name: str
-    email: str
-    active: bool
-
-def create_user(data: UserDict) -> User:
-    ...
-```
-
-### Protocols (Structural Typing)
-```python
-from typing import Protocol
-
-class Readable(Protocol):
-    def read(self) -> str:
-        ...
-
-def process_readable(source: Readable) -> None:
-    content = source.read()
-    ...
-```
-
-### Type Aliases
-```python
-from typing import TypeAlias
-
-UserId: TypeAlias = int
-UserMap: TypeAlias = dict[UserId, User]
-```
 
 ## Dataclasses
 
@@ -168,191 +118,6 @@ class Order(BaseModel):
         return values
 ```
 
-## Async Patterns
-
-### Basic Async
-```python
-import asyncio
-
-async def fetch_user(user_id: int) -> User:
-    # Async database call
-    return await db.get_user(user_id)
-
-async def main():
-    user = await fetch_user(1)
-```
-
-### Concurrent Execution
-```python
-# Run multiple coroutines concurrently
-async def fetch_all_users(ids: list[int]) -> list[User]:
-    tasks = [fetch_user(id) for id in ids]
-    return await asyncio.gather(*tasks)
-
-# With error handling
-results = await asyncio.gather(*tasks, return_exceptions=True)
-for result in results:
-    if isinstance(result, Exception):
-        handle_error(result)
-```
-
-### Async Context Manager
-```python
-from contextlib import asynccontextmanager
-
-@asynccontextmanager
-async def get_connection():
-    conn = await create_connection()
-    try:
-        yield conn
-    finally:
-        await conn.close()
-
-async def query_db():
-    async with get_connection() as conn:
-        return await conn.execute("SELECT ...")
-```
-
-### Async Generator
-```python
-async def fetch_pages(url: str):
-    page = 1
-    while True:
-        data = await fetch_page(url, page)
-        if not data:
-            break
-        yield data
-        page += 1
-
-async for page in fetch_pages(url):
-    process(page)
-```
-
-## Error Handling
-
-### Custom Exceptions
-```python
-class AppError(Exception):
-    """Base exception for application"""
-    pass
-
-class NotFoundError(AppError):
-    """Resource not found"""
-    def __init__(self, resource: str, id: int):
-        self.resource = resource
-        self.id = id
-        super().__init__(f"{resource} with id {id} not found")
-
-class ValidationError(AppError):
-    """Validation failed"""
-    def __init__(self, field: str, message: str):
-        self.field = field
-        self.message = message
-        super().__init__(f"{field}: {message}")
-```
-
-### Exception Handling
-```python
-# Specific exceptions first
-try:
-    user = get_user(id)
-except NotFoundError:
-    return None
-except ValidationError as e:
-    logger.warning(f"Validation failed: {e}")
-    raise
-except Exception as e:
-    logger.exception("Unexpected error")
-    raise AppError("Internal error") from e
-```
-
-### Context Manager for Cleanup
-```python
-from contextlib import contextmanager
-
-@contextmanager
-def transaction():
-    conn = get_connection()
-    try:
-        yield conn
-        conn.commit()
-    except Exception:
-        conn.rollback()
-        raise
-    finally:
-        conn.close()
-```
-
-## Testing with Pytest
-
-### Basic Tests
-```python
-import pytest
-
-def test_user_creation():
-    user = User(name="John", email="john@example.com")
-    assert user.name == "John"
-    assert user.email == "john@example.com"
-
-def test_invalid_email():
-    with pytest.raises(ValidationError) as exc_info:
-        User(name="John", email="invalid")
-    assert "email" in str(exc_info.value)
-```
-
-### Fixtures
-```python
-@pytest.fixture
-def user():
-    return User(name="Test", email="test@example.com")
-
-@pytest.fixture
-def db_session():
-    session = create_session()
-    yield session
-    session.rollback()
-    session.close()
-
-def test_save_user(db_session, user):
-    db_session.add(user)
-    db_session.commit()
-    assert user.id is not None
-```
-
-### Parametrized Tests
-```python
-@pytest.mark.parametrize("input,expected", [
-    ("hello", "HELLO"),
-    ("world", "WORLD"),
-    ("", ""),
-])
-def test_uppercase(input, expected):
-    assert input.upper() == expected
-```
-
-### Mocking
-```python
-from unittest.mock import Mock, patch, AsyncMock
-
-def test_with_mock():
-    mock_service = Mock()
-    mock_service.get_user.return_value = User(id=1, name="Test")
-
-    result = process_user(mock_service, 1)
-
-    mock_service.get_user.assert_called_once_with(1)
-
-@patch('module.external_service')
-def test_with_patch(mock_service):
-    mock_service.call.return_value = "result"
-    ...
-
-# Async mock
-async def test_async():
-    mock = AsyncMock(return_value=User(id=1))
-    result = await mock()
-```
-
 ## Common Idioms
 
 ### List Comprehensions
@@ -426,25 +191,14 @@ myproject/
 └── README.md
 ```
 
-## Dependencies
+## Reference Files
 
-### pyproject.toml (Modern)
-```toml
-[project]
-name = "myproject"
-version = "1.0.0"
-dependencies = [
-    "pydantic>=2.0",
-    "httpx>=0.24",
-]
+For detailed patterns, see these reference files:
 
-[project.optional-dependencies]
-dev = [
-    "pytest>=7.0",
-    "mypy>=1.0",
-    "ruff>=0.1",
-]
-```
+- [type-hints.md](references/type-hints.md) - Type hints, protocols, generics, TypedDict (~90 lines)
+- [async-patterns.md](references/async-patterns.md) - Asyncio, coroutines, concurrent execution, async context managers (~100 lines)
+- [testing-pytest.md](references/testing-pytest.md) - Pytest fixtures, parametrize, mocking, coverage (~90 lines)
+- [error-handling.md](references/error-handling.md) - Custom exceptions, context managers, error recovery patterns (~60 lines)
 
 ## See Also
 
