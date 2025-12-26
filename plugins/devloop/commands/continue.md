@@ -65,6 +65,8 @@ If `.devloop/next-action.json` exists:
 
 ### 1b: Search for Plan File
 
+**Optional Validation**: Run `scripts/validate-plan.sh` to verify plan format before processing. Helps catch malformed task markers or dependency issues early.
+
 Search in order:
 1. **`.devloop/plan.md`** ← Primary (devloop standard)
 2. `docs/PLAN.md`, `docs/plan.md`

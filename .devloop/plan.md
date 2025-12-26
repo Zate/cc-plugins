@@ -288,7 +288,7 @@ Breaking optimizations into 5 phases by priority and dependencies:
 **Complexity**: L-sized (4-6 hours)
 **Expected Impact**: Consistency, maintainability, completeness
 
-- [ ] Task 5.1: Extract onboard.md templates
+- [x] Task 5.1: Extract onboard.md templates
   - Current: 492 lines (command for onboarding existing projects)
   - Create `plugins/devloop/templates/onboard/`:
     - `claudemd-template.md` - Default CLAUDE.md structure
@@ -298,7 +298,7 @@ Breaking optimizations into 5 phases by priority and dependencies:
   - **Acceptance**: onboard.md <300 lines, 3 template files created
   - **Files**: `commands/onboard.md`, `templates/onboard/*.md`
 
-- [ ] Task 5.2: Extract ship.md validation logic
+- [x] Task 5.2: Extract ship.md validation logic
   - Current: 462 lines (validation and deployment prep)
   - Create `scripts/ship-validation.sh`:
     - DoD checklist validation (tests pass, docs updated, etc.)
@@ -308,7 +308,7 @@ Breaking optimizations into 5 phases by priority and dependencies:
   - **Acceptance**: ship.md <300 lines, validation in script
   - **Files**: `commands/ship.md`, `scripts/ship-validation.sh`
 
-- [ ] Task 5.3: Split session-start.sh into smaller scripts [parallel:E]
+- [x] Task 5.3: Split session-start.sh into smaller scripts [parallel:E]
   - Current: 861 lines (largest hook script)
   - Create subscripts:
     - `scripts/detect-plan.sh` - Plan file discovery logic (~200 lines)
@@ -318,7 +318,7 @@ Breaking optimizations into 5 phases by priority and dependencies:
   - **Acceptance**: Main script <450 lines, 3 subscripts created
   - **Files**: `hooks/session-start.sh`, `scripts/detect-plan.sh`, `scripts/calculate-progress.sh`, `scripts/format-plan-status.sh`
 
-- [ ] Task 5.4: Create archive-phase.sh script [parallel:E]
+- [x] Task 5.4: Create archive-phase.sh script [parallel:E]
   - Extract phase archival logic from `/devloop:archive` command (361 lines)
   - Create `scripts/archive-phase.sh`:
     - Phase extraction logic
@@ -329,7 +329,7 @@ Breaking optimizations into 5 phases by priority and dependencies:
   - **Acceptance**: Reusable script, command simplified
   - **Files**: `scripts/archive-phase.sh`, `commands/archive.md`
 
-- [ ] Task 5.5: Create suggest-skills.sh script [parallel:E]
+- [x] Task 5.5: Create suggest-skills.sh script [parallel:E]
   - Centralized skill routing based on context
   - Inputs: file type, task type, keywords
   - Output: Recommended skills with rationale
@@ -338,7 +338,7 @@ Breaking optimizations into 5 phases by priority and dependencies:
   - **Acceptance**: Script suggests relevant skills accurately
   - **Files**: `scripts/suggest-skills.sh`
 
-- [ ] Task 5.6: Add version-management references/ [parallel:F]
+- [x] Task 5.6: Add version-management references/ [parallel:F]
   - Current: 420 lines
   - Create `plugins/devloop/skills/version-management/references/`:
     - `semver-guide.md` - Semantic versioning rules, examples (~100 lines)
@@ -429,6 +429,12 @@ Breaking optimizations into 5 phases by priority and dependencies:
   - Created: references/git-mode.md (231 lines)
   - engineer.md: 1,034 → 766 lines (26% reduction)
   - Per-invocation savings: ~350 lines now loaded on-demand
+- 2025-12-26: Phase 5 progress (Tasks 5.1-5.6 complete)
+  - onboard.md: 492 → 209 lines (57% reduction), 6 templates created
+  - ship.md: 463 → 188 lines (59% reduction), ship-validation.sh created
+  - session-start.sh: 871 → 384 lines (56% reduction), 3 subscripts created
+  - Created: archive-phase.sh, suggest-skills.sh utility scripts
+  - version-management skill: 431 → 139 lines (68% reduction), 3 references
 
 ## Success Criteria
 

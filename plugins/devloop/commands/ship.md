@@ -12,36 +12,36 @@ End-to-end workflow for validating a feature is complete and integrating it into
 
 ## Agent Routing
 
-This command routes to devloop agents at key validation points:
-
 | Phase | Agent | Mode/Focus |
 |-------|-------|------------|
 | DoD Validation | `devloop:task-planner` | DoD validator mode |
 | Test Analysis | `devloop:qa-engineer` | Runner mode (on failure) |
 | Git Operations | `devloop:engineer` | Git mode |
 
-## Plan Integration
-
-Before shipping, check if a devloop plan exists at `.devloop/plan.md`:
-1. Read the plan to verify all tasks are marked complete
-2. If incomplete tasks exist, warn the user before proceeding
-3. After successful ship, update the plan Status to "Complete"
-4. Add a Progress Log entry recording the ship event
-
 ## When to Use
 
 - After implementation is complete
-- Ready to commit changes
-- Ready to create a pull request
+- Ready to commit changes or create a pull request
 - Need pre-merge validation
 
-## Prerequisites
+## Validation Script
 
-This command assumes:
-- Implementation is complete
-- You have uncommitted or staged changes
-- You want to commit/PR these changes
-- All plan tasks are complete (if plan exists)
+This command uses `scripts/ship-validation.sh` for DoD, test, and build verification:
+
+```bash
+# Run all validations
+ship-validation.sh --all
+
+# Run specific validations
+ship-validation.sh --dod     # DoD checks only
+ship-validation.sh --tests   # Tests only
+ship-validation.sh --build   # Build only
+
+# Get JSON output for parsing
+ship-validation.sh --all --json
+```
+
+---
 
 ## Workflow
 
@@ -50,347 +50,89 @@ This command assumes:
 **Goal**: Assess readiness for shipping
 
 **Actions**:
-1. Check current git state:
-   ```bash
-   git status
-   git diff --stat
-   ```
-
+1. Check git state: `git status && git diff --stat`
 2. Create todo list for ship process
+3. Ask ship mode:
+   - Full validation (DoD + tests + build, then commit/PR)
+   - Quick commit (skip validation)
+   - PR only (changes already committed)
 
-3. Quick assessment:
-   ```
-   Use AskUserQuestion:
-   - question: "What would you like to do?"
-   - header: "Ship Mode"
-   - options:
-     - Full validation (DoD check, tests, then commit/PR - Recommended)
-     - Quick commit (Skip validation, just commit)
-     - PR only (Changes already committed, create PR)
-   ```
-
-### Phase 2: Definition of Done Validation
-
-**Goal**: Verify all completion criteria are met
+### Phase 2: Validation
 
 **Skip if**: User chose "Quick commit" or "PR only"
 
 **Actions**:
-1. Launch `devloop:task-planner` agent in DoD validator mode (model: haiku):
-   - Check code criteria (no TODOs, no debug statements)
-   - Check test criteria (tests exist and pass)
-   - Check quality criteria (review done, no critical issues)
-   - Check documentation criteria (docs updated)
-   - Check integration criteria (committable state)
-
-2. Review validation results
-
-3. If validation fails:
-   ```
-   Use AskUserQuestion:
-   - question: "DoD validation found issues. How to proceed?"
-   - header: "DoD Status"
-   - options:
-     - Fix blockers (Address failing criteria first - Recommended)
-     - Override (Proceed with documented exceptions)
-     - Cancel (Stop shipping process)
-   ```
-
-4. If override selected, document the exceptions
-
-### Phase 3: Test Verification
-
-**Goal**: Ensure all tests pass
-
-**Skip if**: User chose "Quick commit"
-
-**Actions**:
-1. Run test suite:
+1. Run validation script:
    ```bash
-   # Detect and run appropriate test command
-   npm test 2>&1 || go test ./... 2>&1 || pytest 2>&1
+   "${CLAUDE_PLUGIN_ROOT}/scripts/ship-validation.sh" --all
    ```
 
-2. If tests fail:
-   - Launch `devloop:qa-engineer` agent in runner mode to analyze failures
-   - Present failure analysis
-   - Ask how to proceed:
-     ```
-     Use AskUserQuestion:
-     - question: "Tests are failing. How to proceed?"
-     - header: "Tests"
-     - options:
-       - Fix tests (Address test failures - Recommended)
-       - Skip tests (Proceed anyway - not recommended)
-       - Cancel (Stop shipping process)
-     ```
+2. Parse results and present:
+   - **DoD issues**: TODO/FIXME, debug statements, secrets, large files
+   - **Test failures**: Show failure summary, offer `devloop:qa-engineer` analysis
+   - **Build failures**: Show error output
 
-### Phase 4: Build Verification
+3. If validation fails, ask:
+   - Fix blockers (address issues)
+   - Override (proceed with documented exceptions)
+   - Cancel (stop shipping)
 
-**Goal**: Ensure project builds successfully
-
-**Skip if**: User chose "Quick commit"
-
-**Actions**:
-1. Run build:
-   ```bash
-   # Detect and run appropriate build command
-   npm run build 2>&1 || go build ./... 2>&1 || mvn compile 2>&1
-   ```
-
-2. If build fails, stop and report errors
-
-### Phase 5: Git Integration
+### Phase 3: Git Integration
 
 **Goal**: Create commit and/or PR
 
 **Actions**:
-1. Determine git operation:
-   ```
-   Use AskUserQuestion:
-   - question: "Git integration - what would you like to create?"
-   - header: "Git Op"
-   - options:
-     - Commit + PR (Create commit and open pull request - Recommended)
-     - Commit only (Create commit on current branch)
-     - PR only (Changes already committed)
-   ```
+1. Ask git operation type:
+   - Commit + PR (create both)
+   - Commit only (current branch)
+   - PR only (already committed)
 
-2. Launch `devloop:engineer` agent in git mode for the operation
+2. Launch `devloop:engineer` agent in git mode
 
-3. **For commits:**
-   - Generate conventional commit message from changes
-   - Present for approval:
-     ```
-     Use AskUserQuestion:
-     - question: "Proposed commit message. Approve?"
-     - header: "Commit"
-     - options:
-       - Approve (Use this message - Recommended)
-       - Edit (Let me modify it)
-       - Cancel (Don't commit yet)
-     ```
-   - Create commit
+3. **For commits**: Generate conventional commit, present for approval, create commit
 
-4. **For PRs:**
-   - Generate PR title and description
-   - Present for approval
-   - Create PR using `gh pr create`
-   - Return PR URL
+4. **For PRs**: Generate PR description, create via `gh pr create`, return URL
 
-### Phase 5.5: Version & CHANGELOG
+### Phase 4: Version & CHANGELOG
 
 **Goal**: Update version and CHANGELOG if warranted
 
+Invoke `Skill: version-management` for guidance.
+
 **Actions**:
+1. Get commits since last tag, detect bump type from conventional commits
+2. Ask about version bump (MAJOR/MINOR/PATCH/Skip)
+3. Update version files: `package.json`, `plugin.json`, `VERSION`, etc.
+4. Update CHANGELOG.md if exists (Keep a Changelog format)
+5. Commit version bump, optionally create tag
 
-Invoke `Skill: version-management` for detailed guidance.
-
-1. **Determine if version bump is needed**:
-   ```bash
-   # Get commits since last tag
-   last_tag=$(git describe --tags --abbrev=0 2>/dev/null || echo "")
-   if [ -n "$last_tag" ]; then
-       git log ${last_tag}..HEAD --oneline
-   else
-       git log --oneline -20
-   fi
-   ```
-
-2. **Auto-detect bump type** from conventional commits:
-   - `BREAKING CHANGE:` or `!:` → MAJOR
-   - `feat:` → MINOR
-   - `fix:`, `perf:` → PATCH
-   - Other → No bump needed
-
-3. **If bump warranted**, ask user:
-   ```
-   Use AskUserQuestion:
-   - question: "Based on commits, suggest [MINOR] bump. Update version?"
-   - header: "Version"
-   - options:
-     - Accept (Bump to suggested version - Recommended)
-     - Different (Let me choose the bump type)
-     - Skip (No version change)
-   ```
-
-4. **Update version files** (if bumping):
-   - Check for: `package.json`, `plugin.json`, `VERSION`, `pyproject.toml`, `Cargo.toml`
-   - Update the version field
-
-5. **Update CHANGELOG** (if exists):
-   ```bash
-   ls CHANGELOG.md 2>/dev/null && echo "CHANGELOG found"
-   ```
-
-   If CHANGELOG.md exists:
-   - Generate entry from commits since last version
-   - Group by type (Added, Fixed, Changed)
-   - Insert under new version header
-   - Follow Keep a Changelog format
-
-6. **Commit version bump** (if changes made):
-   ```
-   git add -A
-   git commit -m "chore(release): bump version to vX.Y.Z
-
-   - Bump version to X.Y.Z
-   - Update CHANGELOG.md"
-   ```
-
-7. **Optionally create tag**:
-   ```
-   Use AskUserQuestion:
-   - question: "Create git tag for vX.Y.Z?"
-   - header: "Tag"
-   - options:
-     - Yes (Create annotated tag - Recommended)
-     - No (Skip tagging)
-   ```
-
-   If yes:
-   ```bash
-   git tag -a vX.Y.Z -m "Release vX.Y.Z"
-   ```
-
-### Phase 6: Post-Ship
+### Phase 5: Post-Ship
 
 **Goal**: Wrap up and next steps
 
 **Actions**:
-1. **Update Plan File** (if `.devloop/plan.md` exists):
-   - Set Status to "Complete"
-   - Add Progress Log entry: `[YYYY-MM-DD HH:MM]: Feature shipped - [commit hash or PR URL]`
-   - Update timestamps
-
-2. Summarize what was shipped:
-   ```markdown
-   ## Ship Complete
-
-   ### Commit
-   - **Hash**: [hash]
-   - **Message**: [message]
-   - **Branch**: [branch]
-
-   ### PR (if created)
-   - **URL**: [url]
-   - **Title**: [title]
-
-   ### Version (if bumped)
-   - **Previous**: [old version]
-   - **New**: [new version]
-   - **Tag**: [tag name if created]
-   - **CHANGELOG**: [Updated/Skipped]
-
-   ### Validation Results
-   - DoD: [PASS/OVERRIDE]
-   - Tests: [PASS/SKIP]
-   - Build: [PASS/SKIP]
-
-   ### Files Changed
-   - [list of files]
-
-   ### Next Steps
-   - [ ] [Suggested action]
-   ```
-
-2. **Route to Next Work** (Enhanced Post-Completion Routing):
-   ```
-   Use AskUserQuestion:
-   - question: "Feature shipped! What's next?"
-   - header: "Next"
-   - options:
-     - Work on existing issue (Review tracked issues and start work)
-     - Start new feature (Launch /devloop for fresh work - Recommended)
-     - Archive this plan (Compress completed plan if >200 lines)
-     - Fresh start (Save state and clear context)
-     - End session (Done for now)
-   ```
-
-3. **Handle routing selection**:
-
-   **If "Work on existing issue"**:
-   ```bash
-   # Invoke /devloop:issues command
-   /devloop:issues
-   ```
-   - Error handling: If command fails, display error and offer to retry or end session
-
-   **If "Start new feature"**:
-   ```bash
-   # Invoke /devloop command for new feature
-   /devloop
-   ```
-   - Error handling: If command fails, display error and offer to retry or end session
-
-   **If "Archive this plan"**:
-   ```bash
-   # Check plan size first
-   plan_lines=$(wc -l < .devloop/plan.md)
-   if [ "$plan_lines" -lt 200 ]; then
-     echo "⚠️ Plan is only $plan_lines lines (threshold: 200)"
-     echo "Archive is typically used for large plans (>200 lines)."
-     # Ask user to confirm
-     Use AskUserQuestion:
-     - question: "Plan is small ($plan_lines lines). Archive anyway?"
-     - header: "Confirm"
-     - options:
-       - Yes (Archive this plan anyway)
-       - No (Skip archiving, choose different option - Recommended)
-   fi
-
-   # If confirmed or plan is large, invoke archive
-   /devloop:archive
-   ```
-   - Error handling: If archive fails, display error with rollback info and offer to retry or end
-
-   **If "Fresh start"**:
-   ```bash
-   # Invoke /devloop:fresh to save state
-   /devloop:fresh
-   ```
-   - Error handling: If command fails, display error and offer to retry or end session
-
-   **If "End session"**:
-   - Display final summary:
-     ```markdown
-     ## Session Complete
-
-     ### Work Shipped
-     - Commit: [hash]
-     - PR: [url if created]
-     - Version: [if bumped]
-
-     ### Next Time
-     - Run `/devloop:continue` to resume from plan
-     - Run `/devloop:issues` to review tracked issues
-     - Run `/devloop` to start a new feature
-
-     Thank you for using devloop!
-     ```
-   - **END** (do not continue to next routing)
+1. **Update Plan**: Set Status to "Complete", add Progress Log entry
+2. Display summary (commit, PR, version, validation results)
+3. Route to next work:
+   - Work on existing issue (`/devloop:issues`)
+   - Start new feature (`/devloop`)
+   - Archive plan (`/devloop:archive`)
+   - Fresh start (`/devloop:fresh`)
+   - End session
 
 ---
 
-## Conventional Commit Generation
-
-The git-manager will analyze changes and generate:
-
-```
-<type>(<scope>): <description>
-
-[body explaining what and why]
-
-[footer with issue references]
-```
+## Conventional Commit Types
 
 Types based on changes:
-- `feat` - New files with functionality
-- `fix` - Changes to fix bugs
+- `feat` - New functionality
+- `fix` - Bug fixes
 - `refactor` - Code restructuring
-- `test` - Test additions/changes
-- `docs` - Documentation changes
-- `chore` - Build/config changes
+- `test` - Test changes
+- `docs` - Documentation
+- `chore` - Build/config
+
+Format: `<type>(<scope>): <description>`
 
 ---
 
@@ -398,65 +140,49 @@ Types based on changes:
 
 ```markdown
 ## Summary
-[Auto-generated from commits and changes]
+[Auto-generated from commits]
 
 ## Changes
-- [File-by-file or feature-by-feature summary]
+- [File-by-file summary]
 
 ## Testing
 - [ ] Unit tests pass
 - [ ] Integration tests pass
-- [ ] Manual testing completed
 
 ## DoD Checklist
-- [ ] Code follows project conventions
+- [ ] Code follows conventions
 - [ ] Tests added/updated
 - [ ] Documentation updated
-- [ ] No critical issues
-
-## Related Issues
-Closes #[issue-number]
 ```
 
 ---
 
 ## Safety Checks
 
-Before any git operation:
-- [ ] No secrets in staged files
-- [ ] No debug code committed
-- [ ] No large binary files
-- [ ] Branch is correct
-- [ ] No force push to protected branches
+Before git operations:
+- No secrets in staged files
+- No debug code committed
+- No large binary files
+- Correct branch
+- No force push to protected branches
 
 ---
 
 ## Model Usage
 
-| Phase | Model | Rationale |
-|-------|-------|-----------|
-| Pre-flight | haiku | Simple checks |
-| DoD Validation | haiku | Checklist verification |
-| Test Analysis | haiku | Pattern matching |
-| Git Operations | haiku | Formulaic |
-| Summary | haiku | Simple output |
-
-All phases use haiku since shipping is mostly verification and formulaic operations.
+All phases use **haiku** since shipping is mostly verification and formulaic operations.
 
 ---
 
 ## Rollback
 
-If something goes wrong after commit:
 ```bash
 # Undo last commit (keep changes)
 git reset --soft HEAD~1
 
 # Undo last commit (discard changes)
 git reset --hard HEAD~1
-```
 
-If PR was created but needs to be closed:
-```bash
+# Close PR
 gh pr close [number]
 ```

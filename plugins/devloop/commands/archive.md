@@ -17,7 +17,7 @@ Archive completed phases from `.devloop/plan.md` to reduce file size and improve
 **Reference**:
 - `Skill: plan-management` - Plan format specification
 - `Skill: worklog-management` - Worklog integration
-- `.devloop/spikes/plan-archival.md` - Implementation spike
+- `scripts/archive-phase.sh` - Phase extraction and archival script
 
 ---
 
@@ -33,6 +33,11 @@ Archive completed phases from `.devloop/plan.md` to reduce file size and improve
 ## Workflow
 
 ### Step 1: Find and Read Plan
+
+**Validation**: Before archiving, optionally validate plan format:
+```bash
+./plugins/devloop/scripts/validate-plan.sh .devloop/plan.md
+```
 
 **Actions**:
 1. Look for plan in standard locations:

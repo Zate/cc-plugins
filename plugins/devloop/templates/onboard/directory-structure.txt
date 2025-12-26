@@ -1,0 +1,17 @@
+.devloop/
+├── plan.md               # Active development plan (git-tracked)
+├── worklog.md            # Completed work history (git-tracked)
+├── local.md              # Local settings (NOT git-tracked)
+├── context.json          # Tech stack cache (git-tracked)
+├── issues/               # Issue tracking (git-tracked)
+│   ├── index.md          # Master index
+│   ├── bugs.md           # Bug view
+│   ├── features.md       # Feature view
+│   ├── backlog.md        # Backlog view
+│   ├── BUG-001.md        # Individual bug issues
+│   ├── FEAT-001.md       # Individual feature issues
+│   └── TASK-001.md       # Individual task issues
+├── spikes/               # Spike reports (NOT git-tracked)
+│   └── {topic}.md        # Individual spike reports
+└── archive/              # Archived phases (git-tracked)
+    └── phase-{N}.md      # Archived phase details

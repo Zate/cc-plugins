@@ -44,6 +44,29 @@ if [ -f "$LOCAL_CONFIG" ]; then
 fi
 
 # ============================================
+# Plan Format Validation (optional, uses central script)
+# ============================================
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+VALIDATE_SCRIPT="$SCRIPT_DIR/../scripts/validate-plan.sh"
+
+if [ -n "$PLAN_FILE" ] && [ -f "$VALIDATE_SCRIPT" ]; then
+    # Run validation in quiet mode (only show errors)
+    VALIDATE_OUTPUT=$("$VALIDATE_SCRIPT" "$PLAN_FILE" 2>&1) || true
+    if echo "$VALIDATE_OUTPUT" | grep -q "Validation failed"; then
+        if [ "$ENFORCEMENT" = "strict" ]; then
+            cat <<EOF
+{
+  "decision": "block",
+  "message": "Plan format validation failed. Run: validate-plan.sh $PLAN_FILE"
+}
+EOF
+            exit 0
+        fi
+        # Advisory mode: continue with warning
+    fi
+fi
+
+# ============================================
 # Plan Sync Check (only if plan file exists)
 # ============================================
 if [ -z "$PLAN_FILE" ]; then
