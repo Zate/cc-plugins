@@ -24,4 +24,6 @@ Previous worklog archived to: `.devloop/archive/worklog-2025-12-25.md`
 - [907f66c] Update worklog with Task 4.3
 - [3767a22] Task 4.4 - Document continue.md refactoring
 - [b50193d] Task 5.1 - Shorten plugin.json description
+- [135b8e5] Task 5.3 - Document skills field in agent frontmatter
+- [3e78691] Task 5.4 - Extract Stop hook prompt to separate file
 
