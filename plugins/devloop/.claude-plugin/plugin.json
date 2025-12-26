@@ -1,6 +1,6 @@
 {
   "name": "devloop",
-  "version": "2.2.2",
+  "version": "2.3.0",
   "description": "Complete feature development workflow with intelligent agents, plan management, and context optimization. Includes spike exploration, issue tracking, code review, and git integration.",
   "author": {
     "name": "Zate",
