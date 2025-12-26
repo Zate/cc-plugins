@@ -41,6 +41,8 @@ temp/
 # Devloop local files (not tracked)
 .devloop/local.md
 .devloop/spikes/
+.devloop/sessions.json
+.devloop/.current-session.json
 
 # Claude Code local settings
 .claude/settings.local.json

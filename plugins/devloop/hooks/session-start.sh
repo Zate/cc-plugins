@@ -3,11 +3,21 @@
 # Detects project context and provides rich initial context for the agent
 # Sets environment variables for use by agents
 # Runs worklog rotation check on session start
+# Initializes session tracking for context usage monitoring
 
 set -euo pipefail
 
-# Worklog rotation check (runs quietly, only rotates if needed)
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+# Session tracking initialization (runs quietly)
+SESSION_TRACKER="$SCRIPT_DIR/../scripts/session-tracker.sh"
+SESSION_ID="${CLAUDE_SESSION_ID:-$(date +%s)}"
+if [ -f "$SESSION_TRACKER" ]; then
+    # Start session tracking in background (don't block)
+    "$SESSION_TRACKER" start "$SESSION_ID" >/dev/null 2>&1 || true
+fi
+
+# Worklog rotation check (runs quietly, only rotates if needed)
 ROTATION_SCRIPT="$SCRIPT_DIR/../scripts/rotate-worklog.sh"
 if [ -f "$ROTATION_SCRIPT" ] && [ -f ".devloop/worklog.md" ]; then
     # Run rotation check quietly - only outputs if rotation happens

@@ -1,8 +1,10 @@
 #!/bin/bash
 # Devloop statusline for Claude Code
-# Displays: Model | Path | Git Branch | Plan Progress | Bugs
+# Displays: Model | Context | Tokens | API Limits | Path | Branch | Plan | Bugs
 
 set -euo pipefail
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 # ANSI color codes
 RESET="\033[0m"
@@ -13,6 +15,8 @@ YELLOW="\033[33m"
 RED="\033[31m"
 MAGENTA="\033[35m"
 BLUE="\033[34m"
+GREEN="\033[32m"
+WHITE="\033[37m"
 
 # Read JSON input from stdin
 input=$(cat)
@@ -32,11 +36,29 @@ if ! command -v jq &> /dev/null; then
     # Basic extraction without jq (limited functionality)
     CURRENT_DIR=$(echo "$input" | grep -o '"current_dir"[[:space:]]*:[[:space:]]*"[^"]*"' | head -1 | sed 's/.*:[[:space:]]*"\([^"]*\)".*/\1/' || echo "")
     PROJECT_DIR=$(echo "$input" | grep -o '"project_dir"[[:space:]]*:[[:space:]]*"[^"]*"' | head -1 | sed 's/.*:[[:space:]]*"\([^"]*\)".*/\1/' || echo "")
+
+    # No context tracking without jq
+    CONTEXT_SIZE=0
+    INPUT_TOKENS=0
+    CACHE_CREATE=0
+    CACHE_READ=0
+    TOTAL_INPUT=0
+    TOTAL_OUTPUT=0
 else
     # Extract values using jq
     MODEL_DISPLAY=$(echo "$input" | jq -r '.model.display_name // "Unknown"')
     CURRENT_DIR=$(echo "$input" | jq -r '.workspace.current_dir // ""')
     PROJECT_DIR=$(echo "$input" | jq -r '.workspace.project_dir // ""')
+
+    # Extract context window usage
+    CONTEXT_SIZE=$(echo "$input" | jq -r '.context_window.context_window_size // 0')
+    INPUT_TOKENS=$(echo "$input" | jq -r '.context_window.current_usage.input_tokens // 0')
+    CACHE_CREATE=$(echo "$input" | jq -r '.context_window.current_usage.cache_creation_input_tokens // 0')
+    CACHE_READ=$(echo "$input" | jq -r '.context_window.current_usage.cache_read_input_tokens // 0')
+
+    # Extract session totals
+    TOTAL_INPUT=$(echo "$input" | jq -r '.context_window.total_input_tokens // 0')
+    TOTAL_OUTPUT=$(echo "$input" | jq -r '.context_window.total_output_tokens // 0')
 fi
 
 # Get shortened path (last 2 directories)
@@ -44,6 +66,71 @@ if [ -n "$CURRENT_DIR" ]; then
     SHORT_PATH=$(echo "$CURRENT_DIR" | rev | cut -d'/' -f1-2 | rev)
 else
     SHORT_PATH="~"
+fi
+
+# Calculate context window percentage
+CONTEXT_PCT=0
+CONTEXT_DISPLAY=""
+if [ "${CONTEXT_SIZE:-0}" -gt 0 ] 2>/dev/null; then
+    CURRENT_CONTEXT=$((${INPUT_TOKENS:-0} + ${CACHE_CREATE:-0} + ${CACHE_READ:-0}))
+    CONTEXT_PCT=$((CURRENT_CONTEXT * 100 / CONTEXT_SIZE))
+
+    # Create mini progress bar (5 chars)
+    BAR_FILLED=$((CONTEXT_PCT * 5 / 100))
+    BAR_EMPTY=$((5 - BAR_FILLED))
+    FILLED_BAR=""
+    EMPTY_BAR=""
+    for ((i=0; i<BAR_FILLED; i++)); do FILLED_BAR="${FILLED_BAR}█"; done
+    for ((i=0; i<BAR_EMPTY; i++)); do EMPTY_BAR="${EMPTY_BAR}░"; done
+
+    # Color code by usage level
+    if [ "$CONTEXT_PCT" -ge 80 ]; then
+        CONTEXT_DISPLAY="${RED}${FILLED_BAR}${DIM}${EMPTY_BAR}${RESET}${RED}${CONTEXT_PCT}%${RESET}"
+    elif [ "$CONTEXT_PCT" -ge 60 ]; then
+        CONTEXT_DISPLAY="${YELLOW}${FILLED_BAR}${DIM}${EMPTY_BAR}${RESET}${YELLOW}${CONTEXT_PCT}%${RESET}"
+    else
+        CONTEXT_DISPLAY="${WHITE}${FILLED_BAR}${DIM}${EMPTY_BAR}${RESET}${CONTEXT_PCT}%"
+    fi
+fi
+
+# Calculate session tokens with K/M formatting
+SESSION_TOKENS=""
+SESSION_TOTAL=$((${TOTAL_INPUT:-0} + ${TOTAL_OUTPUT:-0}))
+if [ "$SESSION_TOTAL" -gt 0 ]; then
+    if [ "$SESSION_TOTAL" -ge 1000000 ]; then
+        SESSION_TOKENS=$(awk "BEGIN {printf \"%.1fM\", $SESSION_TOTAL/1000000}")
+    elif [ "$SESSION_TOTAL" -ge 1000 ]; then
+        SESSION_TOKENS=$(awk "BEGIN {printf \"%.1fK\", $SESSION_TOTAL/1000}")
+    else
+        SESSION_TOKENS="$SESSION_TOTAL"
+    fi
+fi
+
+# Fetch API usage (cached, fast)
+API_DISPLAY=""
+FETCH_SCRIPT="$SCRIPT_DIR/../scripts/fetch-api-usage.sh"
+if [ -f "$FETCH_SCRIPT" ]; then
+    API_USAGE=$("$FETCH_SCRIPT" 2>/dev/null) || API_USAGE=""
+    if [ -n "$API_USAGE" ] && command -v jq &> /dev/null; then
+        FIVE_HR=$(echo "$API_USAGE" | jq -r '.five_hour_pct // 0' 2>/dev/null)
+        SEVEN_DAY=$(echo "$API_USAGE" | jq -r '.seven_day_pct // 0' 2>/dev/null)
+
+        # Color code API usage
+        color_pct() {
+            local pct=$1
+            if [ "$pct" -ge 90 ]; then
+                echo "${RED}${pct}%${RESET}"
+            elif [ "$pct" -ge 60 ]; then
+                echo "${YELLOW}${pct}%${RESET}"
+            else
+                echo "${GREEN}${pct}%${RESET}"
+            fi
+        }
+
+        FIVE_HR_DISPLAY=$(color_pct "${FIVE_HR:-0}")
+        SEVEN_DAY_DISPLAY=$(color_pct "${SEVEN_DAY:-0}")
+        API_DISPLAY="${DIM}5h ${RESET}$FIVE_HR_DISPLAY ${DIM}7d ${RESET}$SEVEN_DAY_DISPLAY"
+    fi
 fi
 
 # Get git branch if in a git repo
@@ -66,9 +153,15 @@ elif [ -f "${PROJECT_DIR:-.}/.claude/devloop-plan.md" ]; then
 fi
 
 if [ -n "$PLAN_FILE" ] && [ -f "$PLAN_FILE" ]; then
-    TOTAL=$(grep -c "^\s*- \[" "$PLAN_FILE" 2>/dev/null || echo "0")
-    DONE=$(grep -c "^\s*- \[x\]" "$PLAN_FILE" 2>/dev/null || echo "0")
-    if [ "$TOTAL" -gt 0 ]; then
+    # grep -c returns 0 count but exits with 1 when no matches, so we capture output only
+    TOTAL=$(grep -c "^\s*- \[" "$PLAN_FILE" 2>/dev/null) || true
+    DONE=$(grep -c "^\s*- \[x\]" "$PLAN_FILE" 2>/dev/null) || true
+    # Trim whitespace and default to 0
+    TOTAL="${TOTAL//[[:space:]]/}"
+    DONE="${DONE//[[:space:]]/}"
+    TOTAL="${TOTAL:-0}"
+    DONE="${DONE:-0}"
+    if [ "$TOTAL" -gt 0 ] 2>/dev/null; then
         PLAN_STATUS="${MAGENTA}${DONE}/${TOTAL}${RESET}"
     fi
 fi
@@ -94,8 +187,24 @@ fi
 # Build statusline
 OUTPUT=""
 
-# Model (always shown)
-OUTPUT="${BOLD}${MODEL_DISPLAY}${RESET}"
+# Model (always shown, shortened)
+MODEL_SHORT=$(echo "$MODEL_DISPLAY" | sed 's/Claude //' | sed 's/ /-/g')
+OUTPUT="${BOLD}${MODEL_SHORT}${RESET}"
+
+# Context window (if available)
+if [ -n "$CONTEXT_DISPLAY" ]; then
+    OUTPUT="${OUTPUT} ${DIM}|${RESET} ${CONTEXT_DISPLAY}"
+fi
+
+# Session tokens (if available)
+if [ -n "$SESSION_TOKENS" ]; then
+    OUTPUT="${OUTPUT} ${DIM}|${RESET} ${CYAN}${SESSION_TOKENS}${RESET}"
+fi
+
+# API limits (if available)
+if [ -n "$API_DISPLAY" ]; then
+    OUTPUT="${OUTPUT} ${DIM}|${RESET} ${API_DISPLAY}"
+fi
 
 # Path (always shown)
 OUTPUT="${OUTPUT} ${DIM}|${RESET} ${BLUE}${SHORT_PATH}${RESET}"
@@ -107,12 +216,12 @@ fi
 
 # Plan progress (if exists)
 if [ -n "$PLAN_STATUS" ]; then
-    OUTPUT="${OUTPUT} ${DIM}|${RESET} Plan:${PLAN_STATUS}"
+    OUTPUT="${OUTPUT} ${DIM}|${RESET} ${DIM}P:${RESET}${PLAN_STATUS}"
 fi
 
 # Bug count (if any)
 if [ -n "$BUG_COUNT" ]; then
-    OUTPUT="${OUTPUT} ${DIM}|${RESET} Bugs:${BUG_COUNT}"
+    OUTPUT="${OUTPUT} ${DIM}|${RESET} ${DIM}B:${RESET}${BUG_COUNT}"
 fi
 
 # Output the statusline

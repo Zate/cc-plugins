@@ -1,15 +1,19 @@
 #!/bin/bash
-# Log Task tool invocations for debugging agent behavior
+# Log Task tool invocations and track token usage
 #
-# This hook captures Task tool invocations (when agents are spawned) and logs:
-# - Agent type/subagent being invoked
-# - Task description
-# - First 200 chars of the prompt
+# This hook captures Task tool invocations (when agents are spawned) and:
+# - Logs agent type, description, and prompt preview
+# - Starts token tracking for the invocation
+# - Stores invocation ID for PostToolUse to complete tracking
 #
 # Logs to: ~/.devloop-agent-invocations.log
+# Token stats: ~/.claude/devloop-stats/
 
 set -euo pipefail
 
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+TOKEN_TRACKER="$SCRIPT_DIR/../scripts/token-tracker.sh"
+ACTIVE_AGENTS_DIR="$HOME/.claude/devloop-stats/active-agents"
 LOG_FILE="${HOME}/.devloop-agent-invocations.log"
 TIMESTAMP=$(date '+%Y-%m-%d %H:%M:%S')
 
@@ -56,6 +60,20 @@ else
         fi
         echo ""
     } >> "$LOG_FILE"
+fi
+
+# Start token tracking for this agent invocation
+PROJECT=$(basename "$(pwd)")
+mkdir -p "$ACTIVE_AGENTS_DIR"
+
+if [ -f "$TOKEN_TRACKER" ]; then
+    INV_ID=$("$TOKEN_TRACKER" start "agent" "$AGENT_TYPE" "$PROJECT" 2>/dev/null) || INV_ID=""
+
+    if [ -n "$INV_ID" ]; then
+        # Store invocation ID for PostToolUse hook to retrieve
+        echo "$INV_ID" > "$ACTIVE_AGENTS_DIR/latest"
+        echo "  Tracking ID: $INV_ID" >> "$LOG_FILE"
+    fi
 fi
 
 # Always succeed - hooks should never block operations

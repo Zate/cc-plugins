@@ -37,6 +37,16 @@
         ]
       },
       {
+        "matcher": "Skill",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash ${CLAUDE_PLUGIN_ROOT}/hooks/track-skill-start.sh",
+            "timeout": 5
+          }
+        ]
+      },
+      {
         "matcher": "Write|Edit",
         "hooks": [
           {
@@ -99,9 +109,24 @@
         "matcher": "Task",
         "hooks": [
           {
+            "type": "command",
+            "command": "bash ${CLAUDE_PLUGIN_ROOT}/hooks/track-agent-end.sh",
+            "timeout": 5
+          },
+          {
             "type": "prompt",
             "prompt": "An agent task has completed. Briefly assess:\n\n1. Did the agent accomplish its goal?\n2. Were there any issues or warnings?\n3. Are follow-up actions needed?\n\nRespond with: {\"completed\": true|false, \"summary\": \"Brief outcome\", \"followUp\": \"none|action needed\"}",
             "timeout": 15
+          }
+        ]
+      },
+      {
+        "matcher": "Skill",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash ${CLAUDE_PLUGIN_ROOT}/hooks/track-skill-end.sh",
+            "timeout": 5
           }
         ]
       }
@@ -114,6 +139,18 @@
             "type": "prompt",
             "promptFile": "${CLAUDE_PLUGIN_ROOT}/hooks/prompts/stop-routing.md",
             "timeout": 20
+          }
+        ]
+      }
+    ],
+    "SessionEnd": [
+      {
+        "matcher": ".*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash ${CLAUDE_PLUGIN_ROOT}/hooks/session-end.sh",
+            "timeout": 15
           }
         ]
       }
