@@ -1,6 +1,17 @@
 ---
 name: workflow-selection
-description: Guide users in selecting the optimal development workflow based on task type. Use when task requirements are ambiguous or when user needs guidance on approach.
+description: This skill should be used when the user asks "which workflow", "feature or bug", "what approach", or needs guidance on selecting between devloop workflows (feature, bug fix, refactor, QA).
+whenToUse: |
+  - Task type is ambiguous or unclear
+  - User needs guidance on choosing a workflow
+  - Routing decisions between /devloop, /devloop:quick, /devloop:spike
+  - Understanding workflow differences
+whenNotToUse: |
+  - Explicit user choice - they already specified the workflow
+  - Obvious task type - clear feature or bug fix
+  - Continuation - using /devloop:continue to resume
+  - Review/ship phases - post-implementation workflows
+  - Documentation only - doc updates don't need workflow analysis
 ---
 
 # Workflow Selection

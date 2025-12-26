@@ -1,6 +1,18 @@
 ---
 name: issue-tracking
-description: Unified issue tracking for bugs, features, tasks, and other work items. Extends bug-tracking with type-based IDs, smart routing, and auto-generated view files.
+description: This skill should be used when the user asks about "track issue", "create bug", "create feature", "issue backlog", "BUG-001", "FEAT-001", or needs to manage work items in .devloop/issues/.
+whenToUse: |
+  - Tracking bugs, features, tasks, chores, or spikes
+  - Creating type-prefixed issue IDs (BUG-001, FEAT-001)
+  - Managing a backlog of work items
+  - Any agent discovering something worth tracking
+  - User mentions work items to capture for later
+whenNotToUse: |
+  - Blocking issues - fix critical problems immediately
+  - External issues - bugs in third-party deps, file upstream
+  - Already tracked - check existing issues first
+  - Trivial fixes - if it takes <2 minutes, just fix it
+  - Plan tasks - use .devloop/plan.md for active implementation
 ---
 
 # Issue Tracking Skill

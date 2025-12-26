@@ -1,6 +1,17 @@
 ---
 name: project-context
-description: Detects project tech stack, languages, frameworks, and features. Use when you need to understand the project structure for development workflows, architecture decisions, or tooling selection.
+description: This skill should be used when the user asks about "tech stack", "project structure", "detect language", "project type", or needs to understand the project context for development workflows.
+whenToUse: |
+  - Starting feature development to scope applicable agents
+  - Architecture planning to understand tech stack constraints
+  - Test strategy selection to determine applicable frameworks
+  - Project onboarding to quickly understand the stack
+  - Generating or refreshing .devloop/context.json
+whenNotToUse: |
+  - Context already known - don't re-detect if context.json is fresh
+  - Single file review - overkill for reviewing one file
+  - Non-code tasks - documentation, configuration-only work
+  - Already in an agent with context loaded
 ---
 
 # Project Context Detection

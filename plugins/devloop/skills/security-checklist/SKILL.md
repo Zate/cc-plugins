@@ -1,6 +1,18 @@
 ---
 name: security-checklist
-description: Security checklist covering OWASP Top 10, authentication, authorization, data protection, and secure coding practices. Use during code review or security assessment.
+description: This skill should be used when the user asks about "OWASP", "security review", "authentication security", "authorization", "XSS prevention", "SQL injection", or needs a security checklist for code review.
+whenToUse: |
+  - Reviewing code for security vulnerabilities
+  - Implementing authentication or authorization
+  - Validating OWASP Top 10 compliance
+  - Security assessment before deployment
+  - Designing data protection measures
+whenNotToUse: |
+  - Internal tools with lower security bar
+  - Prototypes/spikes - don't security-audit throwaway code
+  - Static content sites with no user input
+  - Already audited recently - don't re-audit
+  - Third-party code - report upstream instead
 ---
 
 # Security Checklist

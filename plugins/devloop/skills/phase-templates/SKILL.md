@@ -1,6 +1,15 @@
 ---
 name: phase-templates
-description: Reusable phase definitions for devloop workflows. Provides standardized patterns for discovery, implementation, review, and handoff phases. Commands reference these templates instead of duplicating content.
+description: This skill should be used when commands need "phase definitions", "workflow phases", "discovery phase", "implementation phase", or when referencing standardized devloop phase templates.
+whenToUse: |
+  - Commands referencing phase templates to reduce duplication
+  - Agents needing consistent phase execution patterns
+  - Plan execution referencing standard phases
+  - Understanding phase structure and goals
+whenNotToUse: |
+  - Direct user queries - run /devloop or /devloop:continue instead
+  - Non-devloop workflows - define custom phases for other plugins
+  - Single-task operations without phases
 ---
 
 # Phase Templates

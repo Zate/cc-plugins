@@ -1,6 +1,18 @@
 ---
 name: requirements-patterns
-description: Patterns for gathering, documenting, and validating software requirements. Includes user story formats, acceptance criteria templates, and scope management. Use during requirements gathering phase.
+description: This skill should be used when the user asks about "user stories", "acceptance criteria", "requirements gathering", "scope definition", or needs patterns for documenting software requirements.
+whenToUse: |
+  - Gathering requirements from vague requests
+  - Writing user stories with acceptance criteria
+  - Defining scope and boundaries for features
+  - Documenting non-functional requirements
+  - Validating requirements completeness
+whenNotToUse: |
+  - Clear requirements already provided - just implement
+  - Bug fixes - the bug report IS the requirement
+  - Refactoring - technical improvements don't need user stories
+  - Spike/exploration - discovery work, not requirements gathering
+  - Trivial features - over-documenting wastes time
 ---
 
 # Requirements Patterns

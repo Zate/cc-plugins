@@ -1,6 +1,16 @@
 ---
 name: language-patterns-base
-description: Base template for language-specific pattern skills. Defines common sections (error handling, testing, project structure, anti-patterns) that language skills extend with language-specific details.
+description: Base template for language-specific pattern skills. Defines common sections (error handling, testing, project structure, anti-patterns) that language skills extend. DO NOT invoke directly - use go-patterns, python-patterns, java-patterns, or react-patterns instead.
+whenToUse: |
+  - Creating new language pattern skills
+  - Understanding universal programming principles
+  - Reference for language skill authors
+whenNotToUse: |
+  - DO NOT invoke directly - this is a template only
+  - Use go-patterns for Go code
+  - Use python-patterns for Python code
+  - Use java-patterns for Java code
+  - Use react-patterns for React/TypeScript code
 ---
 
 # Language Patterns Base Template

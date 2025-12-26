@@ -181,7 +181,7 @@ Breaking optimizations into 5 phases by priority and dependencies:
   - **Acceptance**: 10 skills have standardized YAML frontmatter
   - **Files**: 10 SKILL.md files in `plugins/devloop/skills/`
 
-- [ ] Task 3.3: Update skills 11-20 with standardized frontmatter [parallel:C]
+- [x] Task 3.3: Update skills 11-20 with standardized frontmatter [parallel:C]
   - Batch: architecture-patterns, security-checklist, requirements-patterns, phase-templates, complexity-estimation, project-context, project-bootstrap, language-patterns-base, workflow-selection, issue-tracking
   - Apply same pattern as Task 3.2
   - **Acceptance**: 10 skills have standardized YAML frontmatter
@@ -416,6 +416,7 @@ Breaking optimizations into 5 phases by priority and dependencies:
 - 2025-12-26 17:30: Fresh start initiated - state saved to next-action.json
 - 2025-12-26: Task 3.1 complete - Added "Skill Frontmatter Standard" section to docs/skills.md with template, examples, format guidelines
 - 2025-12-26: Task 3.2 complete - Updated 10 skills with whenToUse/whenNotToUse YAML: plan-management, tool-usage-policy, atomic-commits, worklog-management, model-selection-guide, api-design, database-patterns, testing-strategies, git-workflows, deployment-readiness
+- 2025-12-26: Task 3.3 complete - Updated 10 skills with whenToUse/whenNotToUse YAML: architecture-patterns, security-checklist, requirements-patterns, phase-templates, complexity-estimation, project-context, project-bootstrap, language-patterns-base, workflow-selection, issue-tracking
 
 ## Success Criteria
 

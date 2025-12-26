@@ -1,6 +1,18 @@
 ---
 name: complexity-estimation
-description: Framework for estimating task complexity using T-shirt sizing. Provides scoring criteria, risk factors, and guidance on when spikes/POCs are needed. Use at the start of features to set expectations.
+description: This skill should be used when the user asks about "task complexity", "T-shirt sizing", "effort estimation", "risk assessment", or needs to determine if a spike/POC is needed before implementation.
+whenToUse: |
+  - Estimating task complexity at feature start
+  - Determining T-shirt size (XS/S/M/L/XL)
+  - Identifying risks and unknowns
+  - Deciding if a spike/POC is needed
+  - Setting expectations for effort
+whenNotToUse: |
+  - Well-understood tasks with clear requirements - just start
+  - Bug fixes - the bug itself defines the scope
+  - Trivial changes - config updates, typo fixes
+  - Already estimated mid-implementation - don't re-estimate
+  - Spike results pending - wait until exploration is complete
 ---
 
 # Complexity Estimation

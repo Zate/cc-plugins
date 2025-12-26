@@ -1,6 +1,18 @@
 ---
 name: architecture-patterns
-description: This skill should be used when designing feature architecture, making architectural decisions, choosing design patterns, or when the user asks about 'architecture design', 'design patterns', 'layered architecture', 'hexagonal architecture', 'microservices', 'SOLID principles', 'service layer', 'repository pattern'.
+description: This skill should be used when designing feature architecture, making architectural decisions, choosing design patterns, or when the user asks about "architecture design", "design patterns", "layered architecture", "hexagonal architecture", "microservices", "SOLID principles", "service layer", "repository pattern".
+whenToUse: |
+  - Designing feature architecture for new functionality
+  - Making architectural decisions (layered, hexagonal, microservices)
+  - Choosing design patterns (Factory, Strategy, Observer, etc.)
+  - Understanding SOLID principles application
+  - Planning service layer or repository patterns
+whenNotToUse: |
+  - Simple CRUD - don't over-architect basic data operations
+  - Prototypes/spikes - architecture decisions come after validation
+  - Existing patterns - match codebase conventions instead
+  - Micro-optimizations - architecture is about structure, not performance
+  - Bug fixes - fix the bug, don't redesign architecture
 ---
 
 # Architecture Patterns
