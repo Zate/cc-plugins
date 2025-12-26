@@ -77,115 +77,6 @@ The canonical plan location is:
 - [YYYY-MM-DD HH:MM]: [Event description]
 ```
 
-## Plan Archival
-
-When plans grow large (>200 lines) or have multiple completed phases, use `/devloop:archive` to compress the active plan while preserving historical context.
-
-### When to Archive
-
-**DO archive when:**
-- Plan file exceeds 200 lines
-- 2+ phases are 100% complete (all tasks `[x]`)
-- `/devloop:continue` feels slow due to plan size
-- Team wants active plan focused on "what's next"
-
-**DON'T archive when:**
-- Plan < 100 lines (too small, no benefit)
-- Active phases still in progress
-- All phases complete (use `/devloop:ship` instead)
-
-### Archive Format
-
-Archived phases are saved to `.devloop/archive/{plan-name}_phase_{N}_{timestamp}.md`:
-
-```markdown
-# Archived Plan: {Plan Name} - Phase {N}
-
-**Archived**: {YYYY-MM-DD}
-**Original Plan**: {Plan name}
-**Phase Status**: Complete
-**Tasks**: {X}/{X} complete
-
----
-
-{Complete phase section from plan}
-
----
-
-## Progress Log (Phase {N})
-
-{Progress log entries for this phase}
-
----
-
-**Note**: This phase was archived to compress the active plan.
-```
-
-### Compressed Plan Structure
-
-After archival, the active `.devloop/plan.md` is compressed to:
-
-1. **Keep**:
-   - Plan header with metadata
-   - Overview, Architecture, Requirements sections
-   - All non-archived phases (pending or in-progress)
-   - Last 10 Progress Log entries
-   - Notes and Success Criteria
-
-2. **Remove**:
-   - Archived phases (saved to archive files)
-   - Older Progress Log entries (rotated to worklog)
-
-3. **Update**:
-   - Progress Log with archival note:
-     ```markdown
-     - {YYYY-MM-DD}: Archived Phase 1, Phase 2 to .devloop/archive/
-     ```
-
-### Archive-Worklog Integration
-
-When archiving, Progress Log entries for completed phases are extracted and appended to `.devloop/worklog.md`:
-
-```markdown
-## {YYYY-MM-DD}
-
-### {Plan Name} - Phase {N} Complete
-
-**Tasks Completed**:
-- Task N.1: {Description}
-- Task N.2: {Description}
-
-**Commits**: {List commit hashes from Progress Log}
-
-**Archived Plan**: `.devloop/archive/{filename}.md`
-
----
-```
-
-### Archive Awareness
-
-**Commands that handle archives:**
-- `/devloop:continue` - Detects archived phases, displays "Archive Status" note
-- `/devloop:archive` - Creates and manages archives
-
-**Hooks that handle archives:**
-- Pre-commit hook - Skips task count validation for archived plans
-
-**Git tracking:**
-- Archive files ARE git-tracked (team visibility)
-- Compressed plan IS git-tracked
-- Both committed together
-
-### Restoration from Archive
-
-To restore an archived phase:
-1. Read archive file from `.devloop/archive/`
-2. Copy phase section back into plan.md
-3. Update Progress Log
-4. Update Current Phase metadata
-
-Archives are complete backups - no information is lost during archival.
-
 ## Task Status Markers
 
 | Marker | Meaning |
@@ -196,7 +87,7 @@ Archives are complete backups - no information is lost during archival.
 | `- [-]` | Skipped / Not applicable |
 | `- [!]` | Blocked |
 
-## Parallelism Markers
+## Parallelism Quick Reference
 
 Tasks can include optional markers to indicate parallelization potential:
 
@@ -207,109 +98,7 @@ Tasks can include optional markers to indicate parallelization potential:
 | `[background]` | Low priority, can run in background | |
 | `[sequential]` | Must run alone, not parallelizable | |
 
-### Phase-Level Parallelism
-
-Phases can indicate overall parallelization:
-
-```markdown
-### Phase 2: Core Implementation  [parallel:partial]
-**Parallelizable**: full | partial | none
-**Parallel Groups**:
-- Group A: Tasks 2.1, 2.2 (independent implementations)
-- Group B: Tasks 2.3, 2.4 (can run after Group A completes)
-
-- [ ] Task 2.1: Create user model  [parallel:A]
-  - Acceptance: ...
-- [ ] Task 2.2: Create auth service  [parallel:A]
-  - Acceptance: ...
-- [ ] Task 2.3: Wire up middleware  [depends:2.1,2.2] [parallel:B]
-  - Acceptance: ...
-- [ ] Task 2.4: Add logging  [parallel:B]
-  - Acceptance: ...
-```
-
-### Detecting Parallel Tasks
-
-When `/devloop:continue` reads a plan:
-1. Find all pending tasks with `[parallel:X]` markers sharing the same group
-2. Offer to spawn agents in parallel for those tasks
-3. Track progress of all parallel tasks together
-4. Only proceed to dependent tasks when group completes
-
----
-
-## Smart Parallelism Guidelines
-
-### When to Parallelize
-
-**DO parallelize:**
-- **Read-only operations**: Multiple explorers, reviewers, analyzers examining different areas
-- **Independent implementations**: Tasks in same phase that touch different files
-- **Test generation + implementation**: Tests can be written while implementing (when marked)
-- **Multiple audits**: Security auditors analyzing different domains
-- **Documentation tasks**: API docs, README updates can run parallel to code
-
-**Parallel-safe patterns:**
-```markdown
-# Good: Independent file creation
-- [ ] Task 2.1: Create user model  [parallel:A]
-- [ ] Task 2.2: Create product model  [parallel:A]
-
-# Good: Read-only exploration
-- [ ] Explore auth patterns  [parallel:A]
-- [ ] Explore API patterns  [parallel:A]
-```
-
-### When NOT to Parallelize
-
-**DO NOT parallelize:**
-- **Dependent tasks**: Task B needs output from Task A
-- **Same file modifications**: Risk of merge conflicts
-- **Complex context sharing**: When agents need to coordinate closely
-- **High token cost scenarios**: Multiple Opus agents running in parallel
-- **User interaction required**: Background agents can't ask questions
-
-**Sequential patterns:**
-```markdown
-# Bad: Dependent tasks marked parallel
-- [ ] Task 2.1: Create base class  [parallel:A]
-- [ ] Task 2.2: Extend base class  [parallel:A]  # WRONG - depends on 2.1!
-
-# Good: Express dependency
-- [ ] Task 2.1: Create base class
-- [ ] Task 2.2: Extend base class  [depends:2.1]
-```
-
-### Token Cost Awareness
-
-| Scenario | Parallel? | Rationale |
-|----------|-----------|-----------|
-| 3x haiku explorers | Yes | Low cost (~$0.01), high benefit |
-| 3x sonnet architects | Maybe | Medium cost, evaluate if all needed |
-| 3x opus reviewers | No | High cost (~$0.15+ each), diminishing returns |
-| 1 opus + 2 haiku | Yes | Balanced - heavy lifting + quick helpers |
-| 5+ agents of any type | No | Context coordination costs exceed benefits |
-
-**Rule of thumb**: Max 3-4 parallel agents. Beyond that, coordination overhead negates benefits.
-
-### Model Selection for Parallel Work
-
-| Agent Type | Model | Notes |
-|------------|-------|-------|
-| code-explorer | sonnet | Multiple explorers useful |
-| code-architect | sonnet | Usually only need 2-3 variants |
-| code-reviewer | sonnet | Run parallel, different focus areas |
-| test-generator | haiku | Can run parallel to implementation |
-| security auditors | sonnet | Designed for parallel execution |
-
-### Marking Tasks for Parallelism
-
-When creating plans, task-planner should:
-
-1. **Identify independent tasks**: Tasks that don't share files or dependencies
-2. **Group by execution order**: Tasks that can run at the same time get same group letter
-3. **Mark dependencies explicitly**: Use `[depends:X.Y]` for clear ordering
-4. **Consider token costs**: Don't mark expensive tasks for parallel without justification
+**See**: `references/parallelism-guide.md` for detailed guidelines
 
 ## Plan Update Rules
 
@@ -410,122 +199,6 @@ The plan path can be referenced via:
 DEVLOOP_PLAN_PATH=.devloop/plan.md
 ```
 
----
-
-## Enforcement Configuration
-
-Configure enforcement behavior in `.devloop/local.md`:
-
-```yaml
----
-enforcement: advisory    # advisory (default) | strict
-auto_commit: true        # Prompt for commits after tasks
-auto_version: true       # Suggest version bumps at phase completion
-changelog: true          # Maintain CHANGELOG.md
-auto_tag: false          # Create git tags (or prompt)
----
-```
-
-### Enforcement Modes
-
-#### Advisory Mode (default)
-
-When plan is not updated after task completion:
-```
-⚠️ Warning: Plan file not updated for completed task.
-
-The task appears complete but .devloop/plan.md
-was not updated. This may cause sync issues.
-
-Would you like to:
-- Update now (Update the plan file)
-- Continue anyway (Skip plan update)
-- Review task (Verify completion status)
-```
-
-When changes are uncommitted:
-```
-⚠️ Warning: Uncommitted changes detected.
-
-You have changes that may need to be committed.
-Consider creating an atomic commit before proceeding.
-
-Would you like to:
-- Commit now (Create atomic commit)
-- Continue (Keep changes uncommitted)
-- Review changes (Show diff)
-```
-
-#### Strict Mode
-
-When plan is not updated:
-```
-🛑 Blocked: Plan update required.
-
-Strict enforcement is enabled. Cannot proceed to next task
-until .devloop/plan.md is updated.
-
-Required actions:
-1. Mark Task X.Y as [x] complete
-2. Add Progress Log entry
-
-Run the plan update now.
-```
-
-When changes are uncommitted at phase boundary:
-```
-🛑 Blocked: Commit required before phase transition.
-
-Strict enforcement requires all work to be committed
-before completing a phase.
-
-Pending changes:
-- [list of modified files]
-
-Create a commit to proceed.
-```
-
-### Per-Project Settings
-
-The `.devloop/local.md` file:
-- Is project-specific (not committed to git)
-- Has YAML frontmatter for settings
-- Can include markdown notes/preferences
-- Is read at session start and during enforcement checks
-
-### Default Behavior
-
-If no `.devloop/local.md` exists:
-- `enforcement: advisory`
-- `auto_commit: true` (prompts, doesn't auto-commit)
-- `auto_version: true` (suggests, doesn't auto-bump)
-- `changelog: true` (offers to update if exists)
-- `auto_tag: false` (manual tagging)
-
-### Enforcement Hooks
-
-The devloop plugin includes hooks that implement enforcement:
-
-**Pre-Commit Hook** (`hooks/pre-commit.sh`):
-- Triggered before any `git commit` command
-- Checks if plan has completed tasks without Progress Log entries
-- In advisory mode: warns but allows commit
-- In strict mode: blocks commit until plan is updated
-- Checks `**Updated**:` timestamp (recent = approved)
-
-**Post-Commit Hook** (`hooks/post-commit.sh`):
-- Triggered after successful `git commit`
-- Extracts commit hash and message
-- Parses task references from commit message (e.g., "- Task 1.1")
-- Updates worklog with commit entry
-- Adds completed tasks to worklog's "Tasks Completed" section
-
-**Hook Configuration**:
-Hooks are configured in `plugins/devloop/hooks/hooks.json` and use the
-`condition` field to match git commit commands specifically.
-
----
-
 ## Error Handling
 
 | Scenario | Action |
@@ -541,6 +214,20 @@ If using Claude's built-in plan mode (`--permission-mode plan`):
 - Claude may create plans in `~/.claude/plans/`
 - After plan mode, **copy/merge** the plan to `.devloop/plan.md`
 - This ensures the project-local plan stays current
+
+## Additional Resources
+
+### Plan Archival
+For detailed guidance on archiving completed phases to compress large plans:
+- **`references/archive-format.md`** - Archive format, when to archive, restoration procedures
+
+### Parallelism Strategies
+For detailed guidance on marking and executing parallel tasks:
+- **`references/parallelism-guide.md`** - Smart parallelism, token cost awareness, model selection
+
+### Enforcement Configuration
+For detailed guidance on enforcement modes and hooks:
+- **`references/enforcement-modes.md`** - Advisory vs strict modes, hook behavior, configuration
 
 ## See Also
 
