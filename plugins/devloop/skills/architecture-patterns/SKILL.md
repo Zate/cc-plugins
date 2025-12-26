@@ -1,6 +1,6 @@
 ---
 name: architecture-patterns
-description: Guide architecture decisions with proven patterns for Go, TypeScript/React, Java, and general software design. Use when designing feature architecture, choosing design patterns, or making architectural decisions.
+description: This skill should be used when designing feature architecture, making architectural decisions, choosing design patterns, or when the user asks about 'architecture design', 'design patterns', 'layered architecture', 'hexagonal architecture', 'microservices', 'SOLID principles', 'service layer', 'repository pattern'.
 ---
 
 # Architecture Patterns

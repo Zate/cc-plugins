@@ -1,6 +1,6 @@
 ---
 name: react-patterns
-description: React and TypeScript best practices including hooks, component design, state management, performance optimization, and accessibility. Use when building React applications or making React-specific decisions.
+description: This skill should be used when working with React/TypeScript code, implementing React features, reviewing React patterns, or when the user asks about 'React hooks', 'React components', 'React state management', 'React performance', 'useEffect', 'useState', 'custom hooks', 'React context'.
 ---
 
 # React Patterns

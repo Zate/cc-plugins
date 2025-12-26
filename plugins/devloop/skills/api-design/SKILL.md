@@ -1,6 +1,6 @@
 ---
 name: api-design
-description: Best practices for designing RESTful and GraphQL APIs. Covers endpoint naming, versioning, error handling, pagination, and documentation. Use when designing new APIs or reviewing existing ones.
+description: This skill should be used when designing APIs, reviewing API patterns, planning API endpoints, or when the user asks about 'REST API', 'GraphQL', 'API versioning', 'API pagination', 'API authentication', 'API error handling', 'OpenAPI', 'Swagger', 'API rate limiting'.
 ---
 
 # API Design

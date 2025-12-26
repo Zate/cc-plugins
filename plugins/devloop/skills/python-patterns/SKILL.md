@@ -1,6 +1,6 @@
 ---
 name: python-patterns
-description: Python-specific best practices including type hints, async patterns, testing with pytest, error handling, and common idioms. Use when working on Python codebases or making Python-specific design decisions.
+description: This skill should be used when working with Python code, implementing Python features, reviewing Python patterns, or when the user asks about 'Python type hints', 'async/await', 'pytest', 'Python dataclasses', 'Pydantic', 'Python idioms', 'asyncio', 'Python error handling'.
 ---
 
 # Python Patterns

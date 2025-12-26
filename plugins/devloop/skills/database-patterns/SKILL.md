@@ -1,6 +1,6 @@
 ---
 name: database-patterns
-description: Database design patterns including schema design, indexing strategies, query optimization, and migration best practices. Use when designing data models or optimizing database performance.
+description: This skill should be used when designing database schemas, optimizing queries, planning indexes, or when the user asks about 'database schema', 'database indexes', 'query optimization', 'database migrations', 'normalization', 'SQL performance', 'database relationships', 'connection pooling'.
 ---
 
 # Database Patterns

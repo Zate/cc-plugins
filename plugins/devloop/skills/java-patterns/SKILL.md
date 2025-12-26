@@ -1,6 +1,6 @@
 ---
 name: java-patterns
-description: Java and Spring best practices including dependency injection, stream patterns, exception handling, testing, and common idioms. Use when working on Java codebases or making Java-specific design decisions.
+description: This skill should be used when working with Java/Spring code, implementing Java features, reviewing Java patterns, or when the user asks about 'Spring dependency injection', 'Java streams', 'Java Optional', 'Spring Boot', 'JUnit', 'Java records', 'Lombok', 'Java exception handling'.
 ---
 
 # Java Patterns
