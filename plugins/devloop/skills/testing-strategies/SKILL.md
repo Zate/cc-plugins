@@ -1,6 +1,18 @@
 ---
 name: testing-strategies
-description: Design comprehensive test strategies including unit tests, integration tests, E2E tests, and deployment validation tests. Use when planning test coverage, generating tests, or ensuring deployment readiness.
+description: This skill should be used when the user asks about "test coverage", "test pyramid", "unit tests", "integration tests", "E2E tests", or needs to design comprehensive test strategies for deployment readiness.
+whenToUse: |
+  - Planning test coverage for a feature
+  - Designing test strategies (unit, integration, E2E)
+  - Understanding the test pyramid
+  - Deciding what to test vs what to skip
+  - Ensuring deployment readiness through testing
+whenNotToUse: |
+  - Prototype/spike code - throwaway code doesn't need tests
+  - Config changes - environment variables don't need unit tests
+  - Pure refactoring - existing tests should cover it
+  - Third-party code - don't test dependencies
+  - Generated code - tested by the generator
 ---
 
 # Testing Strategies

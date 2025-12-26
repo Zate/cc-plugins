@@ -1,6 +1,17 @@
 ---
 name: tool-usage-policy
-description: Consolidated guidance on which tools to use for common operations. Prevents permission prompts, ensures consistent results, and enables efficient parallel execution.
+description: This skill should be used when planning "file operations", "tool selection", "search strategy", or when the user needs guidance on which built-in tools to use. Consolidated guidance that prevents permission prompts and ensures efficient parallel execution.
+whenToUse: |
+  - Starting file discovery or search operations
+  - Planning multi-step analysis workflows
+  - Before using Bash for file operations
+  - Choosing between Glob, Grep, Read, Edit tools
+  - Setting up parallel tool execution
+whenNotToUse: |
+  - Simple git commands (git status, git log)
+  - Project build/test commands (npm test, go build)
+  - When tool choice is obvious from context
+  - System administration commands
 ---
 
 # Tool Usage Policy

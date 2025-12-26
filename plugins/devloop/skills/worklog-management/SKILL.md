@@ -1,6 +1,17 @@
 ---
 name: worklog-management
-description: Reference for managing the devloop worklog - a history of completed work with commit references. Documents format, update rules, and integration with the plan/commit workflow.
+description: This skill should be used when the user asks about "worklog", "completed work history", "devloop-worklog.md", "session summary", or needs to update the worklog after commits.
+whenToUse: |
+  - After commits are made to update worklog
+  - When generating session summaries
+  - When onboarding to understand project history
+  - When creating release notes from completed work
+  - When reconstructing history for existing projects
+whenNotToUse: |
+  - During active task implementation - use plan instead
+  - For tracking in-progress work - that's the plan's job
+  - For uncommitted changes - wait for commit
+  - For issue tracking - use issue-tracking skill
 ---
 
 # Worklog Management

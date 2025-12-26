@@ -1,6 +1,19 @@
 ---
 name: api-design
-description: This skill should be used when designing APIs, reviewing API patterns, planning API endpoints, or when the user asks about 'REST API', 'GraphQL', 'API versioning', 'API pagination', 'API authentication', 'API error handling', 'OpenAPI', 'Swagger', 'API rate limiting'.
+description: This skill should be used when designing APIs, reviewing API patterns, planning API endpoints, or when the user asks about "REST API", "GraphQL", "API versioning", "API pagination", "API authentication", "API error handling", "OpenAPI", "Swagger", "API rate limiting".
+whenToUse: |
+  - Designing new REST or GraphQL API endpoints
+  - Reviewing API patterns and conventions
+  - Planning API versioning strategy
+  - Implementing pagination, filtering, or sorting
+  - Designing API authentication/authorization
+  - Creating OpenAPI/Swagger documentation
+whenNotToUse: |
+  - Internal functions - this is for HTTP/GraphQL APIs, not internal code
+  - CLI design - command-line interfaces have different conventions
+  - Existing API patterns - don't override established conventions
+  - Database schema - use database-patterns instead
+  - Quick prototypes - over-engineering early can slow iteration
 ---
 
 # API Design

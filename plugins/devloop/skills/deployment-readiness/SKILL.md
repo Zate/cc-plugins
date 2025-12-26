@@ -1,6 +1,18 @@
 ---
 name: deployment-readiness
-description: Comprehensive deployment validation checklist and test design for production readiness. Use when validating features are ready for deployment or designing deployment tests.
+description: This skill should be used when the user asks about "deployment checklist", "production readiness", "pre-deployment validation", "release checklist", or needs to validate features before shipping.
+whenToUse: |
+  - Validating features are ready for deployment
+  - Running pre-deployment checklist
+  - Ensuring production readiness requirements are met
+  - Designing deployment validation tests
+  - Reviewing release criteria
+whenNotToUse: |
+  - Local development - dev environments don't need full production checks
+  - Spike/POC work - prototypes aren't meant for deployment
+  - Draft PRs - work-in-progress doesn't need deployment validation
+  - Partial features behind flags - validate when flag is removed
+  - Already deployed - use monitoring/observability instead
 ---
 
 # Deployment Readiness

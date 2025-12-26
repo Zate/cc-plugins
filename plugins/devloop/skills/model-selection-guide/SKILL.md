@@ -1,6 +1,17 @@
 ---
 name: model-selection-guide
-description: Guidelines for choosing the optimal model (opus/sonnet/haiku) for different development tasks based on complexity, quality requirements, and token budget. Use when making model selection decisions or optimizing for token efficiency.
+description: This skill should be used when the user asks about "which model", "opus vs sonnet", "model selection", "token budget", or needs guidance on choosing between opus, sonnet, and haiku for development tasks.
+whenToUse: |
+  - Making model selection decisions for agents
+  - Optimizing token budget across phases
+  - Escalating from sonnet to opus for complex tasks
+  - Understanding when to enable thinking mode
+  - Balancing cost vs quality for batch operations
+whenNotToUse: |
+  - Simple tasks where haiku is obviously correct
+  - User explicitly specified a model to use
+  - Single-step operations - just use default
+  - Already in an agent with pre-assigned model
 ---
 
 # Model Selection Guide

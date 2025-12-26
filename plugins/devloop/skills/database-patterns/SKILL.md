@@ -1,6 +1,19 @@
 ---
 name: database-patterns
-description: This skill should be used when designing database schemas, optimizing queries, planning indexes, or when the user asks about 'database schema', 'database indexes', 'query optimization', 'database migrations', 'normalization', 'SQL performance', 'database relationships', 'connection pooling'.
+description: This skill should be used when designing database schemas, optimizing queries, planning indexes, or when the user asks about "database schema", "database indexes", "query optimization", "database migrations", "normalization", "SQL performance", "database relationships", "connection pooling".
+whenToUse: |
+  - Designing database schemas and relationships
+  - Optimizing SQL queries for performance
+  - Planning index strategies
+  - Implementing database migrations
+  - Choosing normalization level
+  - Setting up connection pooling
+whenNotToUse: |
+  - In-memory data structures - this is for persistent storage
+  - File-based storage - JSON/YAML configs don't need database patterns
+  - Existing locked schema - when just querying
+  - NoSQL key-value stores - different patterns apply
+  - ORM handles it - when framework abstracts the database layer
 ---
 
 # Database Patterns

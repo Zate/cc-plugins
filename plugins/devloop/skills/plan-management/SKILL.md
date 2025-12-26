@@ -1,6 +1,19 @@
 ---
 name: plan-management
 description: This skill should be used when the user asks about "plan format", "update plan", "plan location", ".devloop/plan.md", "plan markers", "task status", or needs guidance on plan file conventions and update procedures. Central reference for maintaining plan consistency across devloop agents and commands.
+whenToUse: |
+  - Creating or updating devloop plans
+  - Reading existing plans to resume work
+  - Plan synchronization between agents
+  - Understanding plan structure and task markers
+  - Pre-commit validation of plan updates
+  - Archive operations for completed phases
+whenNotToUse: |
+  - Quick tasks without formal plans - use /devloop:quick
+  - Starting fresh with no plan - let /devloop create it
+  - Read-only agents with permissionMode: plan
+  - Bug fixes - use issue-tracking instead
+  - Exploratory spikes - create reports, not plans
 ---
 
 # Plan Management

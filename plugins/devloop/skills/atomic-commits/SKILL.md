@@ -1,6 +1,17 @@
 ---
 name: atomic-commits
-description: Guidance for creating reviewable, atomic commits that capture logical units of work. Use when deciding whether to commit after completing a task, determining if multiple tasks should be grouped, or planning commit structure for a feature.
+description: This skill should be used when the user asks about "commit size", "when to commit", "commit scope", "atomic commits", or needs guidance on creating reviewable commits that capture logical units of work.
+whenToUse: |
+  - Deciding whether to commit after completing a task
+  - Determining if multiple tasks should be grouped
+  - Planning how to structure commits for a feature
+  - Reviewing commit size and scope before committing
+  - Understanding commit atomicity principles
+whenNotToUse: |
+  - Commit message formatting - use git-workflows
+  - Branch strategy decisions - use git-workflows
+  - Exploratory/spike work where commits are less important
+  - Trivial single-file changes
 ---
 
 # Atomic Commits Skill

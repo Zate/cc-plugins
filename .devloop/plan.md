@@ -173,7 +173,7 @@ Breaking optimizations into 5 phases by priority and dependencies:
   - **Acceptance**: Template documented in `docs/skills.md` with examples
   - **Files**: `plugins/devloop/skills/INDEX.md` or `docs/skills.md`
 
-- [ ] Task 3.2: Update skills 1-10 with standardized frontmatter [parallel:C]
+- [x] Task 3.2: Update skills 1-10 with standardized frontmatter [parallel:C]
   - Batch: plan-management, tool-usage-policy, atomic-commits, worklog-management, model-selection-guide, api-design, database-patterns, testing-strategies, git-workflows, deployment-readiness
   - Convert markdown "When to Use" sections to YAML `whenToUse` field
   - Convert markdown "When NOT to Use" sections to YAML `whenNotToUse` field
@@ -415,6 +415,7 @@ Breaking optimizations into 5 phases by priority and dependencies:
   - Updated: pre-commit.sh, archive.md, continue.md to use validate-plan.sh
 - 2025-12-26 17:30: Fresh start initiated - state saved to next-action.json
 - 2025-12-26: Task 3.1 complete - Added "Skill Frontmatter Standard" section to docs/skills.md with template, examples, format guidelines
+- 2025-12-26: Task 3.2 complete - Updated 10 skills with whenToUse/whenNotToUse YAML: plan-management, tool-usage-policy, atomic-commits, worklog-management, model-selection-guide, api-design, database-patterns, testing-strategies, git-workflows, deployment-readiness
 
 ## Success Criteria
 

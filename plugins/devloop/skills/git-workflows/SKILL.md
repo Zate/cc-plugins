@@ -1,6 +1,18 @@
 ---
 name: git-workflows
-description: Git workflow patterns including branching strategies, commit conventions, code review, and release management. Use when managing git operations or establishing team workflows.
+description: This skill should be used when the user asks about "git flow", "branching strategy", "conventional commits", "PR workflow", "release management", or needs guidance on git patterns for team collaboration.
+whenToUse: |
+  - Choosing a branching strategy (Git Flow, GitHub Flow, trunk-based)
+  - Formatting commit messages (conventional commits)
+  - Creating PR descriptions and titles
+  - Planning release management workflow
+  - Establishing team git conventions
+whenNotToUse: |
+  - Simple add/commit/push - doesn't need workflow guidance
+  - Solo projects - team workflows are overkill
+  - Established conventions - don't override existing team practices
+  - Non-git VCS - different patterns for SVN, Mercurial
+  - Trivial changes - typo fixes don't need feature branches
 ---
 
 # Git Workflows
