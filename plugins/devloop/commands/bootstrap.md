@@ -8,26 +8,16 @@ allowed-tools: ["Read", "Write", "Edit", "Grep", "Glob", "Bash", "Task", "AskUse
 
 Set up a new project for devloop by generating CLAUDE.md from documentation artifacts.
 
-## Purpose
-
-Prepare a greenfield project (no code yet) for development with devloop by:
-1. Reading provided documentation (PRD, specs, briefs, design docs)
-2. Extracting project context and requirements
-3. Generating a comprehensive CLAUDE.md
-4. Setting up the devloop directory structure
-5. Optionally creating an initial development plan
-
 ## When to Use
 
 - Starting a new project from scratch
 - Have PRD, specs, or design documents but no code
 - Want to set up devloop before writing any code
-- Converting business requirements into development-ready context
 
 ## When NOT to Use
 
-- **Existing codebase**: Use `/init` instead to generate CLAUDE.md from existing code
-- **No documentation**: Just start with `/devloop` and answer clarifying questions
+- **Existing codebase**: Use `/init` instead
+- **No documentation**: Just start with `/devloop`
 - **Quick prototypes**: Over-engineering for throwaway code
 
 ---
@@ -38,21 +28,8 @@ Prepare a greenfield project (no code yet) for development with devloop by:
 
 **Goal**: Understand the project from provided documentation
 
-**Actions**:
-
-1. Create todo list for bootstrap process:
-```
-TodoWrite: [
-  "Analyze provided documentation",
-  "Determine tech stack",
-  "Generate CLAUDE.md",
-  "Set up devloop structure",
-  "Offer next steps"
-]
-```
-
+1. Create todo list for bootstrap process
 2. Check what was provided: $ARGUMENTS
-
 3. If no documents provided, ask:
 ```
 Use AskUserQuestion:
@@ -65,38 +42,21 @@ Use AskUserQuestion:
   - Nothing yet: I just have an idea, no formal docs
 ```
 
-4. For each document path provided:
-   - Read the document
-   - Extract key information:
-     - Project name and purpose
-     - Target users
-     - Core features/requirements
-     - Technical decisions (if any)
-     - Constraints and non-functional requirements
+4. For each document, extract:
+   - Project name and purpose
+   - Target users
+   - Core features/requirements
+   - Technical decisions (if any)
+   - Constraints and non-functional requirements
 
-5. Invoke the bootstrap skill:
-```
-Skill: project-bootstrap
-```
+5. Invoke: `Skill: project-bootstrap`
 
 ### Phase 2: Tech Stack Determination
 
 **Goal**: Establish the technology choices
 
-**Actions**:
-
-1. If tech stack is specified in documents, confirm:
-```
-Use AskUserQuestion:
-- question: "The docs mention [tech]. Should I use this stack?"
-- header: "Stack"
-- options:
-  - Yes, use specified: [tech stack from docs]
-  - Let me choose: I want to pick something different
-  - Need suggestions: Help me decide
-```
-
-2. If tech stack is NOT specified, ask:
+1. If tech stack is specified in documents, confirm with user
+2. If NOT specified, ask about project type:
 ```
 Use AskUserQuestion:
 - question: "What type of project is this?"
@@ -108,132 +68,22 @@ Use AskUserQuestion:
   - CLI tool: Command-line application
 ```
 
-3. Based on project type, ask about language:
-```
-Use AskUserQuestion:
-- question: "What's your preferred language/framework?"
-- header: "Tech"
-- options:
-  - [Recommended for type]: [e.g., "TypeScript + React (Recommended)"]
-  - [Alternative 1]: [e.g., "TypeScript + Vue"]
-  - [Alternative 2]: [e.g., "JavaScript + React"]
-  - Other: I have a specific preference
-```
+3. Based on type, ask about language/framework preference
 
 ### Phase 3: Generate CLAUDE.md
 
 **Goal**: Create the project memory file
 
-**Actions**:
-
-1. Create the CLAUDE.md file with extracted information:
-
-```markdown
-# [Project Name]
-
-[Brief description from PRD/docs - 2-3 sentences max]
-
-## Tech Stack
-
-- **Language**: [chosen language]
-- **Framework**: [chosen framework]
-- **Database**: [if applicable]
-- **Testing**: [test framework for stack]
-
-## Project Structure
-
-```
-[project-name]/
-├── [appropriate directories for stack]
-└── ...
-```
-
-## Common Commands
-
-```bash
-# Development
-[relevant command]  # Start dev server / run locally
-
-# Testing
-[relevant command]  # Run tests
-
-# Building
-[relevant command]  # Build for production
-```
-
-## Coding Conventions
-
-- [Key convention 1 for the language]
-- [Key convention 2 for the framework]
-- [Any convention mentioned in docs]
-
-## Architecture Notes
-
-[Key architectural decisions from specs, or sensible defaults]
-
-## Development Workflow (Devloop)
-
-This project uses devloop for structured development.
-
-### Key Commands
-- `/devloop` - Start new feature (full workflow)
-- `/devloop:continue` - Resume from plan
-- `/devloop:quick` - Quick implementation for small tasks
-- `/devloop:ship` - Commit and/or PR
-
-### Task Completion Requirements
-Before marking a task complete:
-1. Implementation working
-2. Tests pass (if applicable)
-3. Plan updated (`.devloop/plan.md`)
-4. Changes committed (atomic, reviewable commits)
-
-### Commit Conventions
-Use conventional commits: `type(scope): description`
-- `feat:` new feature → MINOR version bump
-- `fix:` bug fix → PATCH version bump
-- `BREAKING CHANGE:` → MAJOR version bump
-
-Include task reference: `feat(auth): add login - Task 2.1`
-
-### Versioning
-- Semantic versioning: MAJOR.MINOR.PATCH
-- Version auto-detected from commits at phase/feature completion
-- CHANGELOG updated with each release (if present)
-
-### Plan Location
-Active plan: `.devloop/plan.md`
-
-## Branch Strategy
-
-- Feature branches off main
-- Tests required for new features
-- [Any process from docs]
-```
-
-2. Ask user to review:
-```
-Use AskUserQuestion:
-- question: "I've drafted CLAUDE.md. How does it look?"
-- header: "Review"
-- options:
-  - Looks good: Save it as-is
-  - Minor tweaks: I'll edit it after
-  - Major changes: Let's revise together
-```
-
-3. Write the CLAUDE.md file to project root
+1. Use template: `templates/bootstrap/claudemd-template.md`
+2. Fill placeholders with extracted information
+3. Ask user to review
+4. Write CLAUDE.md to project root
 
 ### Phase 4: Set Up Devloop Structure
 
 **Goal**: Prepare devloop directory and optional plan
 
-**Actions**:
-
-1. Create .claude directory:
-```bash
-mkdir -p .devloop
-```
+1. Create directory: `mkdir -p .devloop`
 
 2. Ask about initial plan:
 ```
@@ -246,53 +96,13 @@ Use AskUserQuestion:
   - No, I'll plan later: Just set up CLAUDE.md for now
 ```
 
-3. If plan requested, create `.devloop/plan.md`:
-
-```markdown
-# Devloop Plan: [Project Name] - Initial Setup
-
-**Created**: [Date]
-**Status**: Ready to Start
-**Current Phase**: Scaffolding
-
-## Overview
-[Project description from bootstrap]
-
-## Tasks
-
-### Phase 1: Project Scaffolding
-- [ ] Initialize project structure
-- [ ] Set up build tooling and dependencies
-- [ ] Configure test framework
-- [ ] Add linting and formatting
-- [ ] Create initial README
-
-### Phase 2: Core Feature - [First Feature]
-- [ ] [Task derived from requirements]
-- [ ] [Task derived from requirements]
-
-## Progress Log
-- [Date]: Project bootstrapped with devloop
-```
+3. If plan requested, use template: `templates/bootstrap/initial-plan-template.md`
 
 ### Phase 5: Next Steps
 
 **Goal**: Guide user to start development
 
-**Actions**:
-
-1. Summarize what was created:
-```
-## Bootstrap Complete
-
-Created:
-- CLAUDE.md - Project context and conventions
-- .claude/ - Devloop directory
-[- .devloop/plan.md - Initial plan (if created)]
-
-Your project is ready for devloop!
-```
-
+1. Summarize what was created
 2. Offer next steps:
 ```
 Use AskUserQuestion:
@@ -304,101 +114,23 @@ Use AskUserQuestion:
   - I'll take it from here: Just finish bootstrap
 ```
 
-3. If user chooses to continue:
-   - If plan exists: Suggest `/devloop:continue`
-   - If no plan: Suggest `/devloop [first feature from docs]`
-
 ---
 
-## Input Handling
+## Templates
 
-### Supported Document Types
+Load templates for generation:
 
-| Extension | Handling |
-|-----------|----------|
-| `.md` | Read as markdown, extract sections |
-| `.txt` | Read as plain text |
-| `.yaml/.yml` | Parse as structured data (API specs) |
-| `.json` | Parse as structured data |
-| `.pdf` | Read and extract text content |
+| Template | Purpose |
+|----------|---------|
+| `templates/bootstrap/claudemd-template.md` | CLAUDE.md structure and stack-specific defaults |
+| `templates/bootstrap/initial-plan-template.md` | Plan structure and scaffolding tasks by stack |
+| `templates/bootstrap/examples.md` | Input handling, examples, best practices |
 
-### Multiple Documents
-
-If multiple paths provided, read all and synthesize:
 ```
-/devloop:bootstrap ./docs/PRD.md ./specs/api.yaml ./brief.txt
+Read: plugins/devloop/templates/bootstrap/claudemd-template.md
+Read: plugins/devloop/templates/bootstrap/initial-plan-template.md
+Read: plugins/devloop/templates/bootstrap/examples.md
 ```
-
-### URL Support
-
-Can fetch remote documents:
-```
-/devloop:bootstrap https://docs.google.com/document/d/xxx/export?format=txt
-```
-
----
-
-## Examples
-
-### From PRD
-```
-/devloop:bootstrap ./PRD.md
-
-# Reads PRD, extracts:
-# - Product name and description
-# - Target users
-# - Feature list
-# - Any technical requirements mentioned
-```
-
-### From API Spec
-```
-/devloop:bootstrap ./openapi.yaml
-
-# Reads OpenAPI spec, extracts:
-# - API purpose
-# - Endpoints structure
-# - Data models
-# - Authentication method
-```
-
-### From Brief
-```
-/devloop:bootstrap
-
-# No args - asks interactively:
-# - What's the project about?
-# - Who are the users?
-# - What tech stack?
-```
-
----
-
-## Best Practices
-
-### DO
-- Start with whatever documentation you have
-- Be honest about tech decisions not yet made
-- Keep CLAUDE.md concise and expandable
-- Review generated content before proceeding
-
-### DON'T
-- Over-specify before writing code
-- Include secrets or credentials
-- Add every possible convention
-- Skip the review step
-
----
-
-## Model Usage
-
-| Phase | Model | Rationale |
-|-------|-------|-----------|
-| Document Analysis | sonnet | Need comprehension |
-| Tech Stack | haiku | Simple choices |
-| Generate CLAUDE.md | sonnet | Quality writing |
-| Setup Structure | haiku | Simple file ops |
-| Next Steps | haiku | Simple routing |
 
 ---
 
