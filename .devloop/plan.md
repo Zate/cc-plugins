@@ -1,7 +1,7 @@
 # Devloop Plan: Plugin Best Practices Audit Fixes
 
 **Created**: 2025-12-25
-**Updated**: 2025-12-26T11:00:00Z
+**Updated**: 2025-12-26T11:15:00Z
 **Status**: In Progress
 **Current Phase**: Phase 2
 **Estimate**: L (7-10 hours)
@@ -163,7 +163,7 @@ Breaking fixes into phases by priority:
   - Acceptance: All major skills have trigger phrases
   - Files: Multiple skill SKILL.md files
 
-- [ ] Task 2.6: Add "When NOT to Use" sections to skills missing them
+- [x] Task 2.6: Add "When NOT to Use" sections to skills missing them
   - Review skills from Task 2.1 list
   - Add sections to: model-selection-guide, atomic-commits, worklog-management, api-design
   - **How**: Add after description frontmatter, before main content:
@@ -172,8 +172,17 @@ Breaking fixes into phases by priority:
     - [Specific anti-pattern 1]
     - [Specific anti-pattern 2]
     ```
-  - Acceptance: All skills have clear boundaries
+  - Acceptance: All skills have clear boundaries ✅
   - Files: Multiple SKILL.md files
+  - **Result**: All skills already have "When NOT to Use" sections! Verified:
+    - model-selection-guide (lines 10-15)
+    - atomic-commits (lines 18-22)
+    - worklog-management (lines 18-22)
+    - api-design (lines 10-16)
+    - plan-management (added in Task 2.2)
+    - version-management (lines 19-24)
+    - tool-usage-policy (lines 14-17)
+    - language-patterns-base (lines 10-22)
 
 ### Phase 3: Progressive Disclosure Improvements [parallel:none]
 **Goal**: Apply progressive disclosure to large skills (move content to references/)
@@ -363,6 +372,7 @@ Breaking fixes into phases by priority:
 - 2025-12-26 10:30: Completed Task 2.4 - Fixed go-patterns skill description with third-person format and clear trigger phrases
 - 2025-12-26 10:45: Fresh start initiated - state saved to next-action.json
 - 2025-12-26 11:00: Completed Task 2.5 - Fixed 6 high-priority skill descriptions (react-patterns, python-patterns, java-patterns, architecture-patterns, api-design, database-patterns) with third-person format and trigger phrases
+- 2025-12-26 11:15: Completed Task 2.6 - Verified all skills have "When NOT to Use" sections (all 8 skills from audit already compliant)
 
 ## Success Criteria
 
