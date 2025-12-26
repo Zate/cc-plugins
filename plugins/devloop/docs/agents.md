@@ -954,12 +954,53 @@ assistant: "I'll launch the devloop:agent-name agent to [action]."
 </commentary>
 </example>
 
-tools: [List of available tools]
-model: sonnet|haiku|opus      # Choose based on task complexity
-color: [color-name]           # Visual identification
-skills: [skill-1, skill-2]    # Auto-loaded skills
+tools: [List of available tools]        # Claude Code standard
+model: sonnet|haiku|opus                 # Claude Code standard
+color: [color-name]                      # Claude Code standard
+skills: [skill-1, skill-2]               # DEVLOOP-SPECIFIC (see below)
+permissionMode: plan                     # Optional, Claude Code standard
 ---
 ```
+
+#### Skills Field (Devloop-Specific)
+
+**IMPORTANT**: The `skills:` field is a **devloop plugin convention**, not a Claude Code standard agent frontmatter field.
+
+**Purpose**: Auto-loads skill context when the agent is invoked, providing domain knowledge without manual skill invocation.
+
+**Format**: Comma-separated list of skill names (without `devloop:` prefix)
+
+**Example**:
+```yaml
+skills: architecture-patterns, go-patterns, react-patterns, tool-usage-policy
+```
+
+**How it works**:
+1. When devloop invokes an agent (e.g., `devloop:engineer`), it reads the `skills:` field from frontmatter
+2. Skills listed are automatically loaded into the agent's context before execution
+3. Agent can reference skill content without using `Skill` tool invocations
+4. Reduces token usage by frontloading relevant domain knowledge
+
+**Best practices**:
+- **Core skills first**: List universal skills (tool-usage-policy, plan-management) before language-specific ones
+- **Limit to essentials**: Only include skills the agent will actually use (3-12 skills typical)
+- **Group by category**: Core → Language → Domain → Workflow
+- **Mode-specific loading**: Super-agents may conditionally load skills based on detected mode
+
+**Example from `engineer.md`**:
+```yaml
+skills: architecture-patterns, go-patterns, react-patterns, java-patterns, python-patterns, git-workflows, refactoring-analysis, plan-management, tool-usage-policy, complexity-estimation, project-context, api-design, database-patterns, testing-strategies
+```
+
+**Standard Claude Code Frontmatter Fields**:
+- `name`: Agent identifier (required)
+- `description`: Invocation trigger description (required)
+- `tools`: Available tools list
+- `model`: Model to use (sonnet/haiku/opus)
+- `color`: Visual identification color
+- `permissionMode`: Access restrictions (e.g., `plan` for read-only)
+
+The `skills:` field is parsed and used by devloop's agent invocation system to enhance agent capabilities with pre-loaded domain knowledge.
 
 ### Description Best Practices
 

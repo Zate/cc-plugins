@@ -373,12 +373,17 @@ Breaking fixes into phases by priority:
   - Files: `plugins/devloop/skills/INDEX.md`
   - **Result**: Updated INDEX.md from 28 → 29 skills, added missing workflow-loop skill
 
-- [ ] Task 5.3: Document 'skills' field in agent frontmatter
+- [x] Task 5.3: Document 'skills' field in agent frontmatter
   - Check if this is standard or devloop-specific
   - If custom: document in agents.md
   - If standard: verify it works as expected
-  - Acceptance: Feature documented or verified
+  - Acceptance: Feature documented or verified ✅
   - Files: `plugins/devloop/docs/agents.md`
+  - **Result**: Documented as devloop-specific custom field (not Claude Code standard)
+    - Added dedicated "Skills Field (Devloop-Specific)" section to agents.md
+    - Explained purpose, format, how it works, best practices
+    - Clarified difference from standard Claude Code frontmatter fields
+    - Included example from engineer.md showing 14 auto-loaded skills
 
 - [ ] Task 5.4: Consider hook prompt extraction
   - Review hooks.json for very long inline prompts
@@ -422,6 +427,7 @@ Breaking fixes into phases by priority:
 - 2025-12-26T10:30:00Z: Completed Task 4.4 - Documented continue.md refactoring (CHANGELOG entry added, skill dependencies documented in continue-refactor-map.md)
 - 2025-12-26T10:45:00Z: Completed Task 5.1 - Shortened plugin.json description (348 → 181 chars, 47.9% reduction, user-focused)
 - 2025-12-26T11:00:00Z: Completed Task 5.2 - Verified and updated skills INDEX.md (28 → 29 skills, added missing workflow-loop)
+- 2025-12-26T11:20:00Z: Completed Task 5.3 - Documented 'skills' field as devloop-specific custom frontmatter field in agents.md (added dedicated section with purpose, format, how it works, and best practices)
 
 ## Success Criteria
 
