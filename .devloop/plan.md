@@ -1,7 +1,7 @@
 # Devloop Plan: Plugin Best Practices Audit Fixes
 
 **Created**: 2025-12-25
-**Updated**: 2025-12-26T10:30:00Z
+**Updated**: 2025-12-26T11:00:00Z
 **Status**: In Progress
 **Current Phase**: Phase 3
 **Estimate**: L (7-10 hours)
@@ -365,12 +365,13 @@ Breaking fixes into phases by priority:
   - Acceptance: Description <200 chars, user-focused ✅
   - Files: `plugins/devloop/.claude-plugin/plugin.json`
 
-- [ ] Task 5.2: Verify skills INDEX.md is current
+- [x] Task 5.2: Verify skills INDEX.md is current
   - Compare INDEX.md to actual skills/ directory
   - Add any missing skills
   - Remove any deleted skills
-  - Acceptance: INDEX.md matches reality
+  - Acceptance: INDEX.md matches reality ✅
   - Files: `plugins/devloop/skills/INDEX.md`
+  - **Result**: Updated INDEX.md from 28 → 29 skills, added missing workflow-loop skill
 
 - [ ] Task 5.3: Document 'skills' field in agent frontmatter
   - Check if this is standard or devloop-specific
@@ -420,6 +421,7 @@ Breaking fixes into phases by priority:
 - 2025-12-26T10:10:00Z: Completed Task 4.3 - Tested and deployed streamlined continue.md (all tests passed)
 - 2025-12-26T10:30:00Z: Completed Task 4.4 - Documented continue.md refactoring (CHANGELOG entry added, skill dependencies documented in continue-refactor-map.md)
 - 2025-12-26T10:45:00Z: Completed Task 5.1 - Shortened plugin.json description (348 → 181 chars, 47.9% reduction, user-focused)
+- 2025-12-26T11:00:00Z: Completed Task 5.2 - Verified and updated skills INDEX.md (28 → 29 skills, added missing workflow-loop)
 
 ## Success Criteria
 

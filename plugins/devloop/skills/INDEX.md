@@ -1,6 +1,6 @@
 # Devloop Skills Index
 
-Quick reference for all 28 devloop skills. Invoke with `Skill: <skill-name>`.
+Quick reference for all 29 devloop skills. Invoke with `Skill: <skill-name>`.
 
 ---
 
@@ -21,6 +21,7 @@ Quick reference for all 28 devloop skills. Invoke with `Skill: <skill-name>`.
 | Skill | Description |
 |-------|-------------|
 | `workflow-selection` | Guide users in selecting the optimal development workflow based on task type |
+| `workflow-loop` | Standard patterns for multi-task workflows with mandatory checkpoints, state management, and error recovery |
 | `plan-management` | Central reference for devloop plan file location, format, and update procedures |
 | `phase-templates` | Reusable phase definitions for devloop workflows (discovery, implementation, review, handoff) |
 | `task-checkpoint` | Complete checklist and verification for task completion in devloop workflows |
