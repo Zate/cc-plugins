@@ -385,12 +385,17 @@ Breaking fixes into phases by priority:
     - Clarified difference from standard Claude Code frontmatter fields
     - Included example from engineer.md showing 14 auto-loaded skills
 
-- [ ] Task 5.4: Consider hook prompt extraction
+- [x] Task 5.4: Consider hook prompt extraction
   - Review hooks.json for very long inline prompts
   - Extract Stop hook prompt (50+ lines) to separate file if beneficial
   - **Decision point**: If extraction makes sense, do it; else skip
-  - Acceptance: Decision documented, improvements made if applicable
-  - Files: `plugins/devloop/hooks/hooks.json` or new prompt files
+  - Acceptance: Decision documented, improvements made if applicable ✅
+  - Files: `plugins/devloop/hooks/hooks.json`, `plugins/devloop/hooks/prompts/stop-routing.md`
+  - **Result**: ✓ Extracted Stop hook (62 lines, 2,108 chars) to separate file (96.7% reduction in JSON)
+    - Created `prompts/stop-routing.md` for routing logic
+    - hooks.json now uses `promptFile` reference
+    - Other prompts (3-22 lines) kept inline (acceptable sizes)
+    - Decision documented in `.devloop/task-5.4-decision.md`
 
 ## Progress Log
 
@@ -428,6 +433,8 @@ Breaking fixes into phases by priority:
 - 2025-12-26T10:45:00Z: Completed Task 5.1 - Shortened plugin.json description (348 → 181 chars, 47.9% reduction, user-focused)
 - 2025-12-26T11:00:00Z: Completed Task 5.2 - Verified and updated skills INDEX.md (28 → 29 skills, added missing workflow-loop)
 - 2025-12-26T11:20:00Z: Completed Task 5.3 - Documented 'skills' field as devloop-specific custom frontmatter field in agents.md (added dedicated section with purpose, format, how it works, and best practices)
+- 2025-12-26 11:10: Fresh start initiated - state saved to next-action.json
+- 2025-12-26T11:45:00Z: Completed Task 5.4 - Extracted Stop hook prompt to separate file (62 lines, 96.7% reduction in JSON, routing logic now in prompts/stop-routing.md)
 
 ## Success Criteria
 
