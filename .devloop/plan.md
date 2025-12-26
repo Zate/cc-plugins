@@ -3,7 +3,7 @@
 **Created**: 2025-12-26
 **Updated**: 2025-12-26T16:00:00Z
 **Status**: In Progress
-**Current Phase**: Phase 3
+**Current Phase**: Phase 4
 **Estimate**: L (13-19 hours across 5 phases)
 
 ## Overview
@@ -194,7 +194,7 @@ Breaking optimizations into 5 phases by priority and dependencies:
   - **Acceptance**: All 29 skills have standardized YAML frontmatter
   - **Files**: 9 SKILL.md files in `plugins/devloop/skills/`
 
-- [ ] Task 3.5: Verify skill invocation with updated frontmatter
+- [x] Task 3.5: Verify skill invocation with updated frontmatter
   - Test 5 representative skills across different categories
   - Confirm skills trigger correctly with new frontmatter
   - Check that whenToUse/whenNotToUse doesn't break existing invocation
@@ -418,6 +418,8 @@ Breaking optimizations into 5 phases by priority and dependencies:
 - 2025-12-26: Task 3.2 complete - Updated 10 skills with whenToUse/whenNotToUse YAML: plan-management, tool-usage-policy, atomic-commits, worklog-management, model-selection-guide, api-design, database-patterns, testing-strategies, git-workflows, deployment-readiness
 - 2025-12-26: Task 3.3 complete - Updated 10 skills with whenToUse/whenNotToUse YAML: architecture-patterns, security-checklist, requirements-patterns, phase-templates, complexity-estimation, project-context, project-bootstrap, language-patterns-base, workflow-selection, issue-tracking
 - 2025-12-26: Task 3.4 complete - Updated 8 skills with whenToUse/whenNotToUse YAML: version-management, file-locations, react-patterns, python-patterns, java-patterns, go-patterns, task-checkpoint, refactoring-analysis. Verified workflow-loop already had YAML.
+- 2025-12-26: Task 3.5 complete - Verified 5 representative skills (plan-management, go-patterns, workflow-loop, api-design, task-checkpoint) have valid YAML frontmatter
+- 2025-12-26: **Phase 3 Complete** - All 29 skills standardized with whenToUse/whenNotToUse YAML frontmatter
 
 ## Success Criteria
 
