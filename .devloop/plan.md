@@ -3,7 +3,7 @@
 **Created**: 2025-12-26
 **Updated**: 2025-12-26T16:00:00Z
 **Status**: In Progress
-**Current Phase**: Phase 1
+**Current Phase**: Phase 3
 **Estimate**: L (13-19 hours across 5 phases)
 
 ## Overview
@@ -52,7 +52,7 @@ Breaking optimizations into 5 phases by priority and dependencies:
 **Complexity**: M-sized (2-3 hours)
 **Expected Impact**: 40-50% token reduction per skill (~840 lines total)
 
-- [ ] Task 1.1: Extract go-patterns to references/
+- [x] Task 1.1: Extract go-patterns to references/
   - Create `plugins/devloop/skills/go-patterns/references/`
   - Extract sections to reference files:
     - `concurrency.md` - Goroutines, channels, sync patterns (~100 lines)
@@ -63,7 +63,7 @@ Breaking optimizations into 5 phases by priority and dependencies:
   - **Acceptance**: SKILL.md <200 lines, 4 reference files created, all patterns accessible
   - **Files**: `plugins/devloop/skills/go-patterns/SKILL.md`, `references/*.md`
 
-- [ ] Task 1.2: Extract python-patterns to references/ [parallel:A]
+- [x] Task 1.2: Extract python-patterns to references/ [parallel:A]
   - Create `plugins/devloop/skills/python-patterns/references/`
   - Extract sections to reference files:
     - `type-hints.md` - Typing best practices, generics, protocols (~90 lines)
@@ -74,7 +74,7 @@ Breaking optimizations into 5 phases by priority and dependencies:
   - **Acceptance**: SKILL.md <200 lines, 4 reference files created, all patterns accessible
   - **Files**: `plugins/devloop/skills/python-patterns/SKILL.md`, `references/*.md`
 
-- [ ] Task 1.3: Extract java-patterns to references/ [parallel:A]
+- [x] Task 1.3: Extract java-patterns to references/ [parallel:A]
   - Create `plugins/devloop/skills/java-patterns/references/`
   - Extract sections to reference files:
     - `spring-patterns.md` - Dependency injection, Spring Boot patterns (~100 lines)
@@ -85,7 +85,7 @@ Breaking optimizations into 5 phases by priority and dependencies:
   - **Acceptance**: SKILL.md <200 lines, 4 reference files created, all patterns accessible
   - **Files**: `plugins/devloop/skills/java-patterns/SKILL.md`, `references/*.md`
 
-- [ ] Task 1.4: Extract react-patterns to references/ [parallel:A]
+- [x] Task 1.4: Extract react-patterns to references/ [parallel:A]
   - Create `plugins/devloop/skills/react-patterns/references/`
   - Extract sections to reference files:
     - `hooks.md` - useState, useEffect, custom hooks, rules (~100 lines)
@@ -96,7 +96,7 @@ Breaking optimizations into 5 phases by priority and dependencies:
   - **Acceptance**: SKILL.md <200 lines, 4 reference files created, all patterns accessible
   - **Files**: `plugins/devloop/skills/react-patterns/SKILL.md`, `references/*.md`
 
-- [ ] Task 1.5: Test language skills with real files
+- [x] Task 1.5: Test language skills with real files
   - Edit Python file (test python-patterns triggers, references load)
   - Edit Go file (test go-patterns triggers, references load)
   - Edit Java file (test java-patterns triggers, references load)
@@ -111,7 +111,7 @@ Breaking optimizations into 5 phases by priority and dependencies:
 **Complexity**: S-sized (2-3 hours)
 **Expected Impact**: DRY principle, consistency, single source of truth
 
-- [ ] Task 2.1: Create scripts/validate-plan.sh
+- [x] Task 2.1: Create scripts/validate-plan.sh
   - Extract plan validation logic from `hooks/pre-commit.sh`, plan-management skill
   - Support features:
     - Format validation (YAML frontmatter, section headers)
@@ -123,7 +123,7 @@ Breaking optimizations into 5 phases by priority and dependencies:
   - **Files**: `plugins/devloop/scripts/validate-plan.sh`
   - **Testing**: Run on valid plan (passes), invalid plan (fails with clear errors)
 
-- [ ] Task 2.2: Update consumers to use validate-plan.sh
+- [x] Task 2.2: Update consumers to use validate-plan.sh
   - Update `hooks/pre-commit.sh` to call `validate-plan.sh` instead of inline logic
   - Update `/devloop:archive` to validate before archiving phases
   - Update `/devloop:continue` to validate on resume (optional check)
@@ -131,7 +131,7 @@ Breaking optimizations into 5 phases by priority and dependencies:
   - **Acceptance**: All 3 consumers use centralized script, no inline duplication
   - **Files**: `hooks/pre-commit.sh`, `commands/archive.md`, `commands/continue.md`
 
-- [ ] Task 2.3: Create scripts/update-worklog.sh
+- [x] Task 2.3: Create scripts/update-worklog.sh
   - Extract worklog format specification from worklog-management skill
   - Support operations:
     - Append entry (with timestamp, commit hash, description)
@@ -143,7 +143,7 @@ Breaking optimizations into 5 phases by priority and dependencies:
   - **Files**: `plugins/devloop/scripts/update-worklog.sh`
   - **Testing**: Append 5 entries, verify format consistency
 
-- [ ] Task 2.4: Create scripts/format-commit.sh [parallel:B]
+- [x] Task 2.4: Create scripts/format-commit.sh [parallel:B]
   - Extract conventional commit rules from atomic-commits skill, git-workflows skill
   - Generate conventional commit messages from task context
   - Support features:
@@ -162,7 +162,7 @@ Breaking optimizations into 5 phases by priority and dependencies:
 **Complexity**: M-sized (3-4 hours - ~30min per skill batch)
 **Expected Impact**: Better skill invocation, clearer contracts, programmatic access
 
-- [ ] Task 3.1: Create standardized frontmatter template
+- [x] Task 3.1: Create standardized frontmatter template
   - Document required fields: name, description
   - Document optional fields: whenToUse, whenNotToUse, dependencies
   - Include examples from workflow-loop skill (already has whenToUse/whenNotToUse)
@@ -375,9 +375,46 @@ Breaking optimizations into 5 phases by priority and dependencies:
   - **Acceptance**: bootstrap.md <250 lines, script handles generation
   - **Files**: `commands/bootstrap.md`, `scripts/generate-claudemd.sh`
 
+- [ ] Task 5.10: Intelligent context clear suggestions
+  - **Goal**: Use context_window data to proactively suggest /clear + /devloop:continue
+  - Leverage statusline's context_window.current_usage data (already captured)
+  - Create `scripts/context-advisor.sh`:
+    - Read context percentage from statusline JSON input
+    - Store context % in session tracking (.devloop/.current-session.json)
+    - Estimate next task complexity (from plan.md task description)
+    - Calculate if context + next task would exceed threshold
+  - Integration points:
+    - After task completion in `/devloop:continue` - check context before proceeding
+    - In Stop hook - suggest clear if context >60% and next task is complex
+    - In `/devloop:fresh` - use context % to validate suggestion
+  - Suggestion logic:
+    - If context >80%: "⚠️ Context at {X}%. Recommend `/clear` then `/devloop:continue`"
+    - If context >60% AND next task is M/L sized: "💡 Context at {X}%. Consider `/clear` before next task"
+    - If context <60%: No suggestion, continue normally
+  - Task complexity estimation:
+    - Parse next pending task from plan.md
+    - Check for complexity indicators (file count, parallel markers, description length)
+    - Simple heuristic: tasks with 5+ files or "parallel" = complex
+  - **Acceptance**: Context suggestions appear at appropriate thresholds, reduce context-related slowdowns
+  - **Files**: `scripts/context-advisor.sh`, `commands/continue.md`, `hooks/prompts/stop-routing.md`
+  - **Testing**: Simulate 60%, 75%, 90% context scenarios, verify suggestions trigger correctly
+
 ## Progress Log
 
 - 2025-12-26 16:00: Plan created from spike findings "Plugin Optimization: Built-in Tools & Token Efficiency"
+- 2025-12-26: **Phase 1 Complete** - Language skills progressive disclosure
+  - go-patterns: 199 lines (references: 1,478 lines across 4 files)
+  - python-patterns: 196 lines (references: 1,491 lines across 4 files)
+  - java-patterns: 199 lines (references: 2,167 lines across 4 files)
+  - react-patterns: 197 lines (references: 1,634 lines across 4 files)
+  - Total: ~791 lines loaded initially, ~6,770 lines on-demand = **88% reduction**
+- 2025-12-26: **Phase 2 Complete** - Core utility scripts
+  - Created: validate-plan.sh (plan format validation with actionable errors)
+  - Created: update-worklog.sh (centralized worklog management)
+  - Created: format-commit.sh (conventional commit formatting)
+  - Updated: pre-commit.sh, archive.md, continue.md to use validate-plan.sh
+- 2025-12-26 17:30: Fresh start initiated - state saved to next-action.json
+- 2025-12-26: Task 3.1 complete - Added "Skill Frontmatter Standard" section to docs/skills.md with template, examples, format guidelines
 
 ## Success Criteria
 

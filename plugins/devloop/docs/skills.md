@@ -773,24 +773,174 @@ But prefer auto-loading via agent frontmatter.
 
 ---
 
+## Skill Frontmatter Standard
+
+All skills MUST use standardized YAML frontmatter for consistent invocation and programmatic access.
+
+### Required Fields
+
+| Field | Type | Description | Max Length |
+|-------|------|-------------|------------|
+| `description` | string | Third-person description with specific trigger phrases | 1024 chars |
+
+### Optional Fields
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `name` | string | Skill identifier (defaults to directory name) |
+| `whenToUse` | multiline | List of trigger scenarios (YAML pipe syntax) |
+| `whenNotToUse` | multiline | List of anti-patterns and boundaries (YAML pipe syntax) |
+| `dependencies` | list | Other skills this skill requires |
+
+### Format Guidelines
+
+**`description` field:**
+- Third-person voice ("This skill should be used when...")
+- Include specific trigger phrases in quotes
+- List keyword patterns the user might use
+- Max 1024 characters (Claude Code truncates longer)
+
+**`whenToUse` field (YAML multiline with `|`):**
+- Bullet list of trigger scenarios
+- Include user intents, file types, workflow phases
+- Be specific: "When designing API endpoints" not just "API work"
+
+**`whenNotToUse` field (YAML multiline with `|`):**
+- Bullet list of anti-patterns and boundaries
+- Prevents over-invocation
+- Direct to alternatives when appropriate
+
+### Complete Template
+
+```yaml
+---
+description: This skill should be used when the user asks to "[keyword1]", "[keyword2]", "[keyword3]", or needs [specific guidance area]. [Brief summary of what the skill provides].
+whenToUse: |
+  - [Scenario 1: specific trigger condition]
+  - [Scenario 2: specific trigger condition]
+  - [Scenario 3: specific trigger condition]
+  - [Scenario 4: specific trigger condition]
+whenNotToUse: |
+  - [Anti-pattern 1] - use [alternative] instead
+  - [Anti-pattern 2] - not applicable because [reason]
+  - [Anti-pattern 3] - out of scope
+---
+
+# Skill Name
+
+Brief overview paragraph explaining the skill's purpose.
+
+## When to Use This Skill
+
+(Markdown expansion of whenToUse - provides more detail for Claude when skill is invoked)
+
+- **Scenario 1**: Detailed explanation of when this applies
+- **Scenario 2**: Detailed explanation of when this applies
+
+## When NOT to Use This Skill
+
+(Markdown expansion of whenNotToUse - keeps backward compatibility)
+
+- **Anti-pattern 1**: Why this doesn't apply, what to use instead
+- **Anti-pattern 2**: Why this doesn't apply, what to use instead
+
+## [Main Content Sections]
+
+[Skill-specific guidance, patterns, examples]
+
+## Reference Files
+
+(Optional: for skills with progressive disclosure)
+
+- [reference1.md](references/reference1.md) - Detailed topic 1
+- [reference2.md](references/reference2.md) - Detailed topic 2
+```
+
+### Example: workflow-loop
+
+```yaml
+---
+description: This skill should be used when the user asks to 'implement checkpoints', 'workflow loop', 'task completion pattern', 'mandate checkpoints', or needs patterns for multi-task workflows with mandatory checkpoints, state management, and error recovery.
+whenToUse: |
+  - Implementing commands that control multi-phase workflows
+  - Designing checkpoint logic between tasks
+  - Planning context management strategy
+  - Handling task failures and recovery
+  - Managing state transitions in work loops
+whenNotToUse: |
+  - Simple single-task operations
+  - Non-interactive background jobs
+  - Exploratory work without checkpoints
+---
+```
+
+### Example: plan-management (with whenToUse)
+
+```yaml
+---
+description: This skill should be used when the user asks about "plan format", "update plan", "plan location", ".devloop/plan.md", "plan markers", "task status", or needs guidance on plan file conventions and update procedures.
+whenToUse: |
+  - Creating or updating devloop plans
+  - Reading existing plans to resume work
+  - Plan synchronization between agents
+  - Understanding plan structure and task markers
+  - Pre-commit validation of plan updates
+  - Archive operations for completed phases
+whenNotToUse: |
+  - Quick tasks without formal plans - use /devloop:quick
+  - Starting fresh with no plan - let /devloop create it
+  - Bug fixes - use issue-tracking instead
+  - Exploratory spikes - create reports, not plans
+---
+```
+
+### Migration Notes
+
+When updating existing skills:
+1. Keep existing markdown "When to Use" / "When NOT to Use" sections for backward compatibility
+2. Add YAML `whenToUse` and `whenNotToUse` fields that mirror the markdown
+3. Ensure description includes trigger phrases in quotes
+4. Test skill invocation after update
+
+---
+
 ## Creating New Skills
 
 Skills are stored in `plugins/devloop/skills/<skill-name>/SKILL.md`.
 
-**Minimum structure**:
+**Directory structure**:
+```
+skills/
+└── skill-name/
+    ├── SKILL.md           # Main skill file (required)
+    └── references/        # Optional: progressive disclosure
+        ├── topic1.md
+        └── topic2.md
+```
+
+**Minimum structure** (with standardized frontmatter):
 ```markdown
 ---
-name: skill-name
-description: What this skill provides
+description: This skill should be used when the user asks to "[trigger]", or needs [guidance area].
+whenToUse: |
+  - [Trigger scenario 1]
+  - [Trigger scenario 2]
+whenNotToUse: |
+  - [Anti-pattern 1]
+  - [Anti-pattern 2]
 ---
 
 # Skill Name
 
 Detailed guidance for the skill topic.
 
+## When to Use This Skill
+
+[Expanded trigger scenarios with context]
+
 ## When NOT to Use This Skill
 
-[Important: prevents over-use]
+[Important: prevents over-use, directs to alternatives]
 
 ## Key Topics
 
