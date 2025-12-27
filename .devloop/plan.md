@@ -1,7 +1,7 @@
 # Devloop Plan: Structured Plan Format & Script-First Workflow
 
 **Created**: 2025-12-27
-**Updated**: 2025-12-27 09:00
+**Updated**: 2025-12-27 16:08
 **Status**: Complete
 **Current Phase**: Phase 4
 
@@ -36,114 +36,8 @@ Migrate devloop to use a JSON state file as the machine-readable source of truth
 
 ## Tasks
 
-### Phase 2: Script Migration - High Value
-**Goal**: Convert highest-token operations to scripts
-
-- [x] Task 2.1: Create fresh-start.sh to replace fresh.md logic [parallel:B]
-  - Acceptance: Generates next-action.json without any LLM calls
-  - Files: `plugins/devloop/scripts/fresh-start.sh`
-  - Token savings: ~2,000 tokens per invocation
-
-- [x] Task 2.2: Update fresh.md to call fresh-start.sh [depends:2.1]
-  - Acceptance: Command is < 50 lines, only handles edge cases
-  - Files: `plugins/devloop/commands/fresh.md`
-
-- [x] Task 2.3: Create archive-interactive.sh [parallel:B]
-  - Acceptance: Detects complete phases, performs archival, needs no LLM
-  - Files: `plugins/devloop/scripts/archive-interactive.sh`
-  - Token savings: ~2,500 tokens per invocation
-
-- [x] Task 2.4: Update archive.md to call archive-interactive.sh [depends:2.3]
-  - Acceptance: Command only handles user confirmation and errors
-  - Files: `plugins/devloop/commands/archive.md`
-
-- [x] Task 2.5: Update format-plan-status.sh to read from plan-state.json [depends:1.2]
-  - Acceptance: No markdown parsing, reads JSON directly
-  - Files: `plugins/devloop/scripts/format-plan-status.sh`
-
-- [x] Task 2.6: Update calculate-progress.sh to read from plan-state.json [depends:1.2]
-  - Acceptance: Falls back to parsing if JSON missing (backward compat)
-  - Files: `plugins/devloop/scripts/calculate-progress.sh`
-
-### Phase 3: Script Migration - Issue Tracking
-**Goal**: Make issue tracking mostly script-driven
-
-- [x] Task 3.1: Create create-issue.sh [parallel:C]
-  - Acceptance: Creates BUG-NNN.md or FEAT-NNN.md with correct structure
-  - Files: `plugins/devloop/scripts/create-issue.sh`
-  - Token savings: ~2,000 tokens per invocation
-
-- [x] Task 3.2: Create list-issues.sh [parallel:C]
-  - Acceptance: Lists issues with filtering (type, status), outputs markdown or JSON
-  - Files: `plugins/devloop/scripts/list-issues.sh`
-
-- [x] Task 3.3: Create update-issue.sh [parallel:C]
-  - Acceptance: Updates issue status, adds comments
-  - Files: `plugins/devloop/scripts/update-issue.sh`
-
-- [x] Task 3.4: Update issues.md to use issue scripts [depends:3.1,3.2,3.3]
-  - Acceptance: Command reduced to routing + user questions
-  - Files: `plugins/devloop/commands/issues.md`
-
-- [x] Task 3.5: Update new.md to use create-issue.sh [depends:3.1]
-  - Acceptance: Only uses LLM for type detection when ambiguous
-  - Files: `plugins/devloop/commands/new.md`
-
-- [x] Task 3.6: Update bugs.md to use list-issues.sh [depends:3.2]
-  - Acceptance: Pure script invocation + display
-  - Files: `plugins/devloop/commands/bugs.md`
-
-### Phase 4: Command Simplification
-**Goal**: Reduce continue.md and other commands to thin wrappers
-
-- [x] Task 4.1: Extract task routing logic to select-next-task.sh
-  - Acceptance: Determines next task, respects dependencies/parallelism
-  - Files: `plugins/devloop/scripts/select-next-task.sh`
-
-- [x] Task 4.2: Extract plan display to show-plan-status.sh
-  - Acceptance: Renders plan progress without LLM
-  - Files: `plugins/devloop/scripts/show-plan-status.sh`
-
-- [x] Task 4.3: Simplify continue.md Step 1 (Find Plan) [depends:4.2]
-  - Acceptance: Uses detect-plan.sh and show-plan-status.sh
-  - Files: `plugins/devloop/commands/continue.md`
-
-- [x] Task 4.4: Simplify continue.md Step 2 (Parse Status) [depends:4.1]
-  - Acceptance: Uses select-next-task.sh for task selection
-  - Files: `plugins/devloop/commands/continue.md`
-
-- [x] Task 4.5: Update statusline to use plan-state.json [depends:1.2]
-  - Acceptance: Faster statusline rendering (no markdown parsing)
-  - Files: `plugins/devloop/statusline/devloop-statusline.sh`
-
-### Phase 5: Documentation & Validation
-**Goal**: Document the new system and validate token savings
-
-- [x] Task 5.1: Update plan-management skill with JSON state info
-  - Acceptance: Explains dual-file model, sync triggers
-  - Files: `plugins/devloop/skills/plan-management/SKILL.md`
-
-- [x] Task 5.2: Create migration guide for existing plans
-  - Acceptance: Step-by-step instructions for users
-  - Files: `plugins/devloop/docs/migration-to-json-state.md`
-
-- [x] Task 5.3: Add unit tests for sync-plan-state.sh
-  - Acceptance: Tests for all task markers, edge cases
-  - Files: `plugins/devloop/tests/sync-plan-state.bats`
-
-- [x] Task 5.4: Measure token usage before/after
-  - Acceptance: Document actual savings vs projected
-  - Files: `.devloop/spikes/structured-plan-format.md` (update with results)
-
-- [x] Task 5.5: Update CHANGELOG.md with new features
-  - Acceptance: Entry for structured state support
-  - Files: `plugins/devloop/CHANGELOG.md`
-
-- [x] Task 5.6: Bump version to reflect improvements
-  - Acceptance: Update plugin.json version
-  - Files: `plugins/devloop/.claude-plugin/plugin.json`
-
 ## Progress Log
+- 2025-12-27 16:08: Archived completed phases (2,3,4,5) to .devloop/archive/
 - 2025-12-27 10:00: Plan Complete - All 23 tasks finished
   - Phase 5 complete: Documentation & Validation
   - Version bumped to 2.4.0

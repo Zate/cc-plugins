@@ -189,3 +189,70 @@ Fixed small issues for completeness.
 **Archived**: `.devloop/archive/test_plan__archive_script_testing_phase_3_20251227_091902.md`
 
 ---
+
+## 2025-12-27 16:08
+
+### Phase 2 Complete: Script Migration - High Value
+
+**Tasks Completed**: 6
+
+- Task 2.1: Create fresh-start.sh to replace fresh.md logic [parallel:B]
+- Task 2.2: Update fresh.md to call fresh-start.sh [depends:2.1]
+- Task 2.3: Create archive-interactive.sh [parallel:B]
+- Task 2.4: Update archive.md to call archive-interactive.sh [depends:2.3]
+- Task 2.5: Update format-plan-status.sh to read from plan-state.json [depends:1.2]
+- Task 2.6: Update calculate-progress.sh to read from plan-state.json [depends:1.2]
+
+**Archived**: `.devloop/archive/devloop_plan__structured_plan_format___script_first_workflow_phase_2_20251227_160827.md`
+
+---
+
+## 2025-12-27 16:08
+
+### Phase 3 Complete: Script Migration - Issue Tracking
+
+**Tasks Completed**: 6
+
+- Task 3.1: Create create-issue.sh [parallel:C]
+- Task 3.2: Create list-issues.sh [parallel:C]
+- Task 3.3: Create update-issue.sh [parallel:C]
+- Task 3.4: Update issues.md to use issue scripts [depends:3.1,3.2,3.3]
+- Task 3.5: Update new.md to use create-issue.sh [depends:3.1]
+- Task 3.6: Update bugs.md to use list-issues.sh [depends:3.2]
+
+**Archived**: `.devloop/archive/devloop_plan__structured_plan_format___script_first_workflow_phase_3_20251227_160827.md`
+
+---
+
+## 2025-12-27 16:08
+
+### Phase 4 Complete: Command Simplification
+
+**Tasks Completed**: 5
+
+- Task 4.1: Extract task routing logic to select-next-task.sh
+- Task 4.2: Extract plan display to show-plan-status.sh
+- Task 4.3: Simplify continue.md Step 1 (Find Plan) [depends:4.2]
+- Task 4.4: Simplify continue.md Step 2 (Parse Status) [depends:4.1]
+- Task 4.5: Update statusline to use plan-state.json [depends:1.2]
+
+**Archived**: `.devloop/archive/devloop_plan__structured_plan_format___script_first_workflow_phase_4_20251227_160827.md`
+
+---
+
+## 2025-12-27 16:08
+
+### Phase 5 Complete: Documentation & Validation
+
+**Tasks Completed**: 6
+
+- Task 5.1: Update plan-management skill with JSON state info
+- Task 5.2: Create migration guide for existing plans
+- Task 5.3: Add unit tests for sync-plan-state.sh
+- Task 5.4: Measure token usage before/after
+- Task 5.5: Update CHANGELOG.md with new features
+- Task 5.6: Bump version to reflect improvements
+
+**Archived**: `.devloop/archive/devloop_plan__structured_plan_format___script_first_workflow_phase_5_20251227_160827.md`
+
+---
