@@ -44,9 +44,43 @@ if [ -f "$LOCAL_CONFIG" ]; then
 fi
 
 # ============================================
-# Plan Format Validation (optional, uses central script)
+# Plan State Sync (ensures plan-state.json is current)
 # ============================================
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+SYNC_PLAN_SCRIPT="$SCRIPT_DIR/../scripts/sync-plan-state.sh"
+VALIDATE_STATE_SCRIPT="$SCRIPT_DIR/../scripts/validate-plan-state.sh"
+
+if [ -n "$PLAN_FILE" ] && [ -f "$SYNC_PLAN_SCRIPT" ]; then
+    # Sync plan state from plan.md to plan-state.json
+    PLAN_STATE_FILE="$(dirname "$PLAN_FILE")/plan-state.json"
+    "$SYNC_PLAN_SCRIPT" "$PLAN_FILE" --output "$PLAN_STATE_FILE" >/dev/null 2>&1 || true
+
+    # Stage plan-state.json if it was updated (so it gets committed with plan.md)
+    if [ -f "$PLAN_STATE_FILE" ] && git diff --name-only --cached | grep -q "$(basename "$PLAN_FILE")"; then
+        git add "$PLAN_STATE_FILE" 2>/dev/null || true
+    fi
+
+    # Validate the generated plan-state.json
+    if [ -f "$VALIDATE_STATE_SCRIPT" ] && [ -f "$PLAN_STATE_FILE" ]; then
+        VALIDATE_OUTPUT=$("$VALIDATE_STATE_SCRIPT" "$PLAN_STATE_FILE" --quiet 2>&1) || true
+        if echo "$VALIDATE_OUTPUT" | grep -q "Validation failed"; then
+            if [ "$ENFORCEMENT" = "strict" ]; then
+                cat <<EOF
+{
+  "decision": "block",
+  "message": "Plan state validation failed. Run: validate-plan-state.sh $PLAN_STATE_FILE --fix"
+}
+EOF
+                exit 0
+            fi
+            # Advisory mode: continue with warning
+        fi
+    fi
+fi
+
+# ============================================
+# Plan Format Validation (optional, uses central script)
+# ============================================
 VALIDATE_SCRIPT="$SCRIPT_DIR/../scripts/validate-plan.sh"
 
 if [ -n "$PLAN_FILE" ] && [ -f "$VALIDATE_SCRIPT" ]; then
