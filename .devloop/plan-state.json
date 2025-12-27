@@ -1,7 +1,7 @@
 {
   "schema_version": "1.0.0",
   "plan_file": ".devloop/plan.md",
-  "last_sync": "2025-12-27T01:00:26Z",
+  "last_sync": "2025-12-27T01:07:24Z",
   "plan_name": "Devloop Plan: Structured Plan Format & Script-First Workflow",
   "status": "in_progress",
   "created": "2025-12-27",
@@ -9,13 +9,13 @@
   "current_phase": 1,
   "stats": {
     "total": 28,
-    "completed": 1,
-    "pending": 27,
+    "completed": 4,
+    "pending": 24,
     "in_progress": 0,
     "blocked": 0,
     "skipped": 0,
-    "done": 1,
-    "percentage": 3
+    "done": 4,
+    "percentage": 14
   },
   "phases": [
     {
@@ -32,8 +32,8 @@
       ],
       "stats": {
         "total": 5,
-        "completed": 1,
-        "pending": 4
+        "completed": 4,
+        "pending": 1
       }
     },
     {
@@ -126,7 +126,7 @@
     "1.2": {
       "id": "1.2",
       "description": "Create sync-plan-state.sh script",
-      "status": "pending",
+      "status": "complete",
       "phase": 1,
       "parallel_group": "A",
       "acceptance": "Parses plan.md, outputs valid JSON to plan-state.json",
@@ -138,7 +138,7 @@
     "1.3": {
       "id": "1.3",
       "description": "Create validate-plan-state.sh script",
-      "status": "pending",
+      "status": "complete",
       "phase": 1,
       "parallel_group": "A",
       "acceptance": "Validates JSON against schema, reports errors",
@@ -149,7 +149,7 @@
     "1.4": {
       "id": "1.4",
       "description": "Add sync trigger to session-start hook",
-      "status": "pending",
+      "status": "complete",
       "phase": 1,
       "acceptance": "plan-state.json created/updated on session start",
       "files": [
@@ -495,5 +495,5 @@
       "1.2"
     ]
   },
-  "next_task": "1.2"
+  "next_task": "1.5"
 }

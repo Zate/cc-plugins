@@ -34,6 +34,12 @@ else
     WORKLOG_ARCHIVE=""
 fi
 
+# Plan state sync (runs quietly if plan exists, creates/updates plan-state.json)
+SYNC_PLAN_SCRIPT="$SCRIPTS_DIR/sync-plan-state.sh"
+if [ -f "$SYNC_PLAN_SCRIPT" ] && [ -f ".devloop/plan.md" ]; then
+    "$SYNC_PLAN_SCRIPT" ".devloop/plan.md" --output ".devloop/plan-state.json" >/dev/null 2>&1 || true
+fi
+
 # ============================================================================
 # Project Detection Functions
 # ============================================================================
