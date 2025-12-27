@@ -52,7 +52,7 @@ Resume work from an existing devloop plan. Finds the current plan, identifies pr
 Call `scripts/detect-plan.sh` to discover plan and state:
 
 ```bash
-Bash: "cd /home/zate/.claude/plugins/cache/cc-plugins/devloop/*/scripts && ./detect-plan.sh --check-fresh-start --json"
+Bash: "${CLAUDE_PLUGIN_ROOT}/scripts/detect-plan.sh --check-fresh-start --json"
 ```
 
 **Script output** (JSON):
@@ -125,7 +125,7 @@ AskUserQuestion:
 Call `scripts/show-plan-status.sh` to render plan status:
 
 ```bash
-Bash: "cd /home/zate/.claude/plugins/cache/cc-plugins/devloop/*/scripts && ./show-plan-status.sh --full"
+Bash: "${CLAUDE_PLUGIN_ROOT}/scripts/show-plan-status.sh --full"
 ```
 
 **Script output**: Full formatted status (see Step 1 for details).
@@ -137,7 +137,7 @@ Bash: "cd /home/zate/.claude/plugins/cache/cc-plugins/devloop/*/scripts && ./sho
 Call `scripts/select-next-task.sh` to get next task(s):
 
 ```bash
-Bash: "cd /home/zate/.claude/plugins/cache/cc-plugins/devloop/*/scripts && ./select-next-task.sh --json"
+Bash: "${CLAUDE_PLUGIN_ROOT}/scripts/select-next-task.sh --json"
 ```
 
 **Script output** (JSON):
@@ -397,7 +397,7 @@ AskUserQuestion:
 Use `select-next-task.sh --all-parallel` to get all tasks in same group:
 
 ```bash
-Bash: "cd /home/zate/.claude/plugins/cache/cc-plugins/devloop/*/scripts && ./select-next-task.sh --json --all-parallel"
+Bash: "${CLAUDE_PLUGIN_ROOT}/scripts/select-next-task.sh --json --all-parallel"
 ```
 
 **Script output** (if parallel tasks exist):
