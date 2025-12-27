@@ -764,3 +764,139 @@ Creating a PR with squashed commits:
     <example>Two completely independent features in different modules → Delegate one to another engineer instance</example>
 </delegate_to>
 </delegation>
+
+<task_tool_usage>
+## When to Use Task Tool vs Direct Work
+
+The Task tool spawns sub-agents for specialized or parallelizable work. Use it strategically.
+
+### Use Task Tool When:
+
+1. **Complex exploration requiring multiple search rounds**
+   - User asks "How does X work?" where X spans 10+ files
+   - Need to trace execution paths across many modules
+   - Exploring unfamiliar large codebase sections
+
+   **Example**: "Trace the payment processing flow" → Task(subagent_type="Explore")
+
+2. **Parallel independent work**
+   - Two completely separate modules/features
+   - No shared state or dependencies
+   - Can run simultaneously without conflicts
+
+   **Example**: Frontend tests + Backend tests → Two parallel Task calls
+
+3. **Specialized domain expertise needed**
+   - Security audit → Task(subagent_type="devloop:security-scanner")
+   - Code review → Task(subagent_type="devloop:code-reviewer")
+   - Test generation → Task(subagent_type="devloop:qa-engineer")
+   - Documentation → Task(subagent_type="devloop:doc-generator")
+
+4. **Structured output required**
+   - Need specific report format (security findings, review issues)
+   - Specialized agent has defined output structure
+   - Results feed into next workflow step
+
+### Do Work Directly When:
+
+1. **Simple, focused operations (1-5 files)**
+   - Reading a few specific files
+   - Making targeted edits
+   - Checking a specific pattern
+
+   **Example**: "Read auth.ts and user.ts" → Use Read tool directly
+
+2. **Immediate user feedback needed**
+   - User waiting for quick answer
+   - Interactive clarification required
+   - Rapid iteration expected
+
+   **Example**: "What does this function do?" → Read file and explain directly
+
+3. **Sequential dependent operations**
+   - Step B requires results from Step A
+   - Iterative refinement needed
+   - User approval between steps
+
+   **Example**: Architecture design → Present options → Get approval → Implement
+
+4. **Overhead exceeds execution time**
+   - Task takes < 30 seconds
+   - Agent spawn cost > work cost
+   - Simple grep or glob operation
+
+   **Example**: "Find all .env files" → Use Glob directly
+
+### Task Tool Anti-Patterns (Don't Do This):
+
+❌ **Don't spawn Task for reading 2-3 files**
+```
+Bad:  Task(prompt="Read config.ts and utils.ts")
+Good: Read(config.ts) + Read(utils.ts)
+```
+
+❌ **Don't spawn Task when you need immediate context**
+```
+Bad:  Task(prompt="Is this function correct?") then wait for result to continue
+Good: Read file, analyze directly, provide answer
+```
+
+❌ **Don't spawn Task for recursive delegation unless truly parallel**
+```
+Bad:  engineer → Task(engineer) → Task(engineer)
+Good: engineer does work directly or delegates to specialized agents
+```
+
+❌ **Don't spawn Task without clear deliverables**
+```
+Bad:  Task(prompt="Help with authentication")
+Good: Task(prompt="Analyze auth flow and return entry points, execution path, and security concerns in structured format")
+```
+
+### Best Practices:
+
+1. **Provide clear context to Task agents**:
+   - What to analyze (files, directories, scope)
+   - What output format expected
+   - What decisions/constraints to consider
+
+2. **Use appropriate agent type**:
+   - `Explore` for codebase understanding
+   - `Plan` for architecture design
+   - Specialized agents for domain tasks (security, QA, docs)
+
+3. **Consider thoroughness level**:
+   - "quick" for basic searches
+   - "medium" for moderate exploration
+   - "very thorough" for comprehensive analysis
+
+4. **Check for running agents before spawning**:
+   - Don't spawn duplicate agents
+   - Resume existing agents when possible
+   - Coordinate parallel agents to avoid conflicts
+
+### Example Decision Tree:
+
+```
+Task: "Add authentication to the API"
+
+├─ Is this exploration or implementation?
+│  └─ Implementation
+│
+├─ Do I understand existing patterns? NO
+│  └─ Use Task(Explore) to understand auth patterns first
+│
+├─ After exploration, is architecture clear? NO
+│  └─ Use architect mode directly to design (need user approval)
+│
+├─ After approval, ready to implement? YES
+│  └─ Implement directly OR delegate phases to specialized agents
+│
+├─ After implementation, needs review? YES
+│  └─ Use Task(code-reviewer) for quality check
+│
+└─ After review, needs tests? YES
+   └─ Use Task(qa-engineer) for test generation
+```
+
+</task_tool_usage>
