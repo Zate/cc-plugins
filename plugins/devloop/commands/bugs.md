@@ -1,32 +1,14 @@
 ---
 description: View and manage tracked bugs - list, filter, fix, or close bugs
 argument-hint: Optional filter (open, high, etc.) or bug ID
-allowed-tools: ["Read", "Write", "Edit", "Glob", "Grep", "Bash", "Task", "AskUserQuestion", "TodoWrite", "Skill"]
+allowed-tools: ["Read", "Bash", "AskUserQuestion", "Skill"]
 ---
 
 # Manage Bugs
 
 View, filter, and manage tracked bugs in the project.
 
-> **Note**: This command is an alias for `/devloop:issues bugs`.
-> For the full unified issue tracking system, use `/devloop:issues`.
-
-**IMPORTANT**: Invoke `Skill: issue-tracking` for issue format details.
-
-## Agent Routing
-
-When fixing bugs, this command routes to appropriate agents:
-
-| Action | Agent | Mode/Focus |
-|--------|-------|------------|
-| Investigate | `devloop:engineer` | Explore mode - trace bug source |
-| Quick fix | Direct implementation | No agent needed |
-| Complex fix | `/devloop` workflow | Full agent routing |
-
-## Storage Location
-
-- **New projects**: `.devloop/issues/` (unified system, check `bugs.md` view)
-- **Legacy projects**: `.devloop/issues/` (if not migrated)
+> **Note**: For full unified issue tracking, use `/devloop:issues`.
 
 ## Quick Usage
 
@@ -34,228 +16,88 @@ When fixing bugs, this command routes to appropriate agents:
 - `/devloop:bugs high` - Show high priority bugs
 - `/devloop:bugs BUG-003` - Show specific bug
 - `/devloop:bugs fix` - Start fixing bugs
+- `/devloop:bugs stats` - Show statistics
 
 ## Workflow
 
-### Step 1: Load Bug Index
+### 1. Parse Arguments
 
-Check for bugs in unified or legacy system:
-
-```bash
-# Check unified system first
-if [ -f ".devloop/issues/bugs.md" ]; then
-    cat .devloop/issues/bugs.md
-# Fall back to legacy system
-elif [ -f ".devloop/issues/index.md" ]; then
-    cat .devloop/issues/index.md
-else
-    echo "No bugs tracked yet. Use /devloop:bug or /devloop:new to report one."
-fi
-```
-
-### Step 2: Parse Arguments
-
-If `$ARGUMENTS` provided:
+Handle different argument patterns:
 
 | Argument | Action |
 |----------|--------|
-| `open` | Filter to open bugs only |
-| `high` | Filter to high priority |
-| `medium` | Filter to medium priority |
-| `low` | Filter to low priority |
-| `all` | Show all bugs including fixed |
-| `BUG-NNN` | Show specific bug details |
-| `fix` | Enter fix mode |
-| `stats` | Show statistics |
+| (none) | List open bugs: `--type bug --status open --format markdown` |
+| `high` | Filter high priority: `--priority high` |
+| `medium` | Filter medium priority: `--priority medium` |
+| `low` | Filter low priority: `--priority low` |
+| `open` | Show open only: `--status open` |
+| `all` | Show all statuses (no status filter) |
+| `BUG-NNN` | Read `.devloop/issues/BUG-NNN.md` directly |
+| `fix` | Enter fix mode (see step 3) |
+| `stats` | Show statistics (see step 4) |
 
-### Step 3: Display Bugs
+### 2. List Bugs
 
-If no filter or showing list:
+Use list-issues.sh script:
 
-```markdown
-## Bug Tracker
+```bash
+# Default: open bugs
+./plugins/devloop/scripts/list-issues.sh --type bug --status open --format markdown
 
-**Open**: {N} | **In Progress**: {N} | **Fixed**: {N}
+# With priority filter
+./plugins/devloop/scripts/list-issues.sh --type bug --priority high --format markdown
 
-### High Priority
-| ID | Title | Created | Tags |
-|----|-------|---------|------|
-| BUG-003 | Auth token refresh | 2024-12-11 | auth |
-
-### Medium Priority
-| ID | Title | Created | Tags |
-|----|-------|---------|------|
-| BUG-001 | Button truncation | 2024-12-10 | ui |
-
-### Low Priority
-| ID | Title | Created | Tags |
-|----|-------|---------|------|
-| BUG-005 | Typo in message | 2024-12-11 | formatting |
+# All bugs (no status filter)
+./plugins/devloop/scripts/list-issues.sh --type bug --format markdown
 ```
 
-Then ask:
-
-```
-Use AskUserQuestion:
-- question: "What would you like to do?"
-- header: "Action"
-- multiSelect: false
-- options:
-  - Fix a bug (Start working on one)
-  - View details (See full bug report)
-  - Report new (Add another bug)
-  - Close bug (Mark as won't fix)
-  - Done (Exit bug manager)
-```
-
-### Step 4: View Bug Details
-
-If specific bug requested or "View details" selected:
-
-1. Read `.devloop/issues/BUG-{NNN}.md`
-2. Display full bug report
-3. Offer actions:
-
-```
-Use AskUserQuestion:
-- question: "What would you like to do with BUG-{NNN}?"
-- header: "Bug Action"
-- multiSelect: false
-- options:
-  - Fix it (Start fixing this bug)
-  - Change priority (Adjust importance)
-  - Add context (Update with more info)
-  - Close (Mark as won't fix)
-  - Back (Return to list)
-```
-
-### Step 5: Fix Mode
+### 3. Fix Mode
 
 When user wants to fix a bug:
 
-1. If no specific bug, ask which to fix:
-   ```
-   Use AskUserQuestion:
-   - question: "Which bug would you like to fix?"
-   - header: "Select Bug"
-   - options:
-     - [BUG-003] High: Auth token refresh (Recommended)
-     - [BUG-001] Medium: Button truncation
-     - [BUG-005] Low: Typo in message
-     - Let me pick (Show me the list)
-   ```
+1. **Select bug** using AskUserQuestion (list from script output)
+2. **Mark in-progress**: `./plugins/devloop/scripts/update-issue.sh ISSUE_ID --status in-progress`
+3. **Read bug details**: `Read .devloop/issues/BUG-NNN.md`
+4. **Route to agent** based on approach:
 
-2. Mark bug as `in-progress` in both bug file and index
+| Approach | Action |
+|----------|--------|
+| Quick fix | Direct implementation - read related files and fix |
+| Investigate | Use `/devloop:engineer` in explore mode |
+| Full workflow | Redirect to `/devloop` with bug context |
 
-3. Read the bug file for full context
+5. **Mark resolved**: `./plugins/devloop/scripts/update-issue.sh ISSUE_ID --resolve "Fix description"`
 
-4. Present the bug details and ask:
-   ```
-   Use AskUserQuestion:
-   - question: "How would you like to approach this fix?"
-   - header: "Approach"
-   - options:
-     - Quick fix (I know what to do - just fix it)
-     - Investigate first (Explore the issue before fixing)
-     - Full devloop (Use complete workflow for complex fix)
-   ```
-
-5. Based on approach:
-   - **Quick fix**: Read related files, implement fix, run tests
-   - **Investigate**: Launch `devloop:engineer` agent in explore mode to investigate related files
-   - **Full devloop**: Redirect to `/devloop` with bug as input
-
-6. After fixing:
-   - Update bug status to `fixed`
-   - Add Resolution section to bug file
-   - Update index.md
-   - Ask about next bug
-
-### Step 6: Close Bug (Won't Fix)
-
-When closing without fixing:
-
-```
-Use AskUserQuestion:
-- question: "Why are you closing this bug?"
-- header: "Reason"
-- options:
-  - Not a bug (Behavior is correct)
-  - Won't fix (Not worth the effort)
-  - Duplicate (Already tracked elsewhere)
-  - Cannot reproduce (Unable to see the issue)
-```
-
-Then:
-1. Update bug status to `wont-fix`
-2. Add reason to bug file
-3. Move in index from Open to a "Closed" section
-4. Update counts
-
----
-
-## Statistics Mode
+### 4. Statistics Mode
 
 When `$ARGUMENTS` is `stats`:
 
-```markdown
-## Bug Statistics
-
-**Total Tracked**: {N}
-**Open**: {N} ({%})
-**Fixed**: {N} ({%})
-**Won't Fix**: {N} ({%})
-
-### By Priority
-- High: {N} open, {N} fixed
-- Medium: {N} open, {N} fixed
-- Low: {N} open, {N} fixed
-
-### By Tag
-- ui: {N}
-- api: {N}
-- formatting: {N}
-
-### Recent Activity
-- BUG-007 fixed (2024-12-11)
-- BUG-008 reported (2024-12-11)
-- BUG-006 fixed (2024-12-10)
-
-### Oldest Open Bugs
-1. BUG-001 (5 days old) - Button truncation
-2. BUG-002 (3 days old) - Form validation
+```bash
+# Get JSON output and parse for counts
+./plugins/devloop/scripts/list-issues.sh --type bug --format json
 ```
+
+Parse JSON to display:
+- Total bugs
+- Count by status (open, in-progress, done, blocked)
+- Count by priority (high, medium, low)
 
 ---
 
-## Batch Operations
+## Agent Routing
 
-For managing multiple bugs:
+When fixing bugs:
 
-```
-Use AskUserQuestion:
-- question: "Select a batch operation"
-- header: "Batch"
-- multiSelect: false
-- options:
-  - Fix all low (Close all low priority as won't fix)
-  - Reprioritize (Bulk change priorities)
-  - Clean up (Archive old fixed bugs)
-```
-
----
-
-## Integration with Devloop
-
-- Bugs can be addressed during `/devloop:continue` sessions
-- DoD validator checks for open bugs/issues
-- Summary generator notes bugs fixed
-- Plan can include bug-fix tasks
+| Action | Agent | Mode/Focus |
+|--------|-------|------------|
+| Investigate | `devloop:engineer` | Explore mode - trace bug source |
+| Quick fix | Direct implementation | No agent needed |
+| Complex fix | `/devloop` workflow | Full agent routing |
 
 ---
 
 ## See Also
 
-- `/devloop:new` - Smart issue creation (auto-detects type)
-- `/devloop:issues` - View and manage all issues
+- `/devloop:new` - Smart issue creation
+- `/devloop:issues` - View all issues
 - `/devloop:bug` - Report a new bug

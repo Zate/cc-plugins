@@ -1,12 +1,12 @@
 ---
 description: Smart issue creation - analyzes input, detects type, asks confirmation, creates issue
 argument-hint: Optional issue description
-allowed-tools: ["Read", "Write", "Edit", "Glob", "Bash", "AskUserQuestion", "TodoWrite", "Skill"]
+allowed-tools: ["Read", "Bash", "AskUserQuestion"]
 ---
 
 # New Issue
 
-Smart issue creation with automatic type detection. Analyzes your input to determine if it's a bug, feature, task, chore, or spike, then creates the appropriate issue.
+Smart issue creation with automatic type detection. Analyzes your input to determine if it's a bug, feature, task, chore, or spike, then creates the appropriate issue using the standardized creation script.
 
 **IMPORTANT**: Invoke `Skill: issue-tracking` for issue format and storage details.
 
@@ -121,7 +121,8 @@ Use AskUserQuestion:
 - header: "Estimate"
 - multiSelect: false
 - options:
-  - S (A few hours)
+  - XS (A few hours)
+  - S (A few hours to half day)
   - M (A day or two) (Recommended)
   - L (A week)
   - XL (Multiple weeks)
@@ -151,24 +152,11 @@ Use AskUserQuestion:
   - Half day (Deep dive)
 ```
 
-### Step 5: Add Context (All Types)
+### Step 5: Add Context (Optional)
 
 ```
 Use AskUserQuestion:
-- question: "Any related files or additional context?"
-- header: "Context"
-- multiSelect: true
-- options:
-  - Current file (I was working in a specific file)
-  - Add labels (I want to categorize this)
-  - Link to plan (Related to current plan task)
-  - No additional context (Skip)
-```
-
-If "Add labels" selected:
-```
-Use AskUserQuestion:
-- question: "Select relevant labels"
+- question: "Any labels or additional context?"
 - header: "Labels"
 - multiSelect: true
 - options:
@@ -178,42 +166,33 @@ Use AskUserQuestion:
   - perf (Performance)
   - docs (Documentation)
   - test (Testing)
+  - No labels (Skip)
 ```
 
-### Step 6: Create Issue
+### Step 6: Create Issue with Script
 
-1. Ensure `.devloop/issues/` directory exists:
-   ```bash
-   mkdir -p .devloop/issues
-   ```
+Call the creation script:
 
-2. Determine next ID for the type:
-   ```bash
-   prefix="FEAT"  # Based on type
-   max_num=$(ls .devloop/issues/${prefix}-*.md 2>/dev/null | \
-     sed "s/.*${prefix}-0*//" | sed 's/.md//' | \
-     sort -n | tail -1)
-   next_num=$((${max_num:-0} + 1))
-   id=$(printf "${prefix}-%03d" $next_num)
-   ```
-
-3. Create issue file with gathered information
-
-4. Regenerate view files (index.md, bugs.md, features.md, backlog.md)
-
-### Step 7: Confirmation
-
-Present the created issue:
-
-```markdown
-## Issue Created
-
-**ID**: {PREFIX}-{NNN}
-**Type**: {type}
-**Title**: {title}
-**Priority**: {priority}
-**Location**: .devloop/issues/{PREFIX}-{NNN}.md
+```bash
+./plugins/devloop/scripts/create-issue.sh \
+  --type "$TYPE" \
+  --title "$TITLE" \
+  --priority "$PRIORITY" \
+  ${LABELS:+--labels "$LABELS"} \
+  ${ESTIMATE:+--estimate "$ESTIMATE"} \
+  ${DESCRIPTION:+--description "$DESCRIPTION"} \
+  --output-format md
 ```
+
+**Note**: The script handles:
+- ID generation (BUG-001, FEAT-002, etc.)
+- File creation in `.devloop/issues/`
+- Proper YAML frontmatter
+- Issue template structure
+
+### Step 7: Next Actions
+
+Present options after creation:
 
 ```
 Use AskUserQuestion:
@@ -227,6 +206,10 @@ Use AskUserQuestion:
   - Work on this now (Start implementing/fixing)
 ```
 
+If "View all issues" → Run `/devloop:issues`
+If "Create another" → Restart this workflow
+If "Work on this now" → Suggest `/devloop:continue` or relevant workflow
+
 ---
 
 ## Quick Mode
@@ -236,21 +219,20 @@ If `$ARGUMENTS` provides a clear description:
 1. Parse the description as title
 2. Detect type from keywords
 3. Default to medium priority
-4. Auto-detect any file paths mentioned
-5. Show confirmation:
+4. Show confirmation:
 
 ```
 Use AskUserQuestion:
-- question: "Create {TYPE}-{NNN}: '{title}' (priority: medium)?"
+- question: "Create {TYPE}: '{title}' (priority: medium)?"
 - header: "Confirm"
 - multiSelect: false
 - options:
   - Create (Looks good) (Recommended)
-  - Edit (Let me adjust)
+  - Edit (Let me adjust details)
   - Cancel (Don't create)
 ```
 
-If "Create" → create issue immediately
+If "Create" → call script immediately with defaults
 If "Edit" → continue with full interactive flow
 
 ---
@@ -281,20 +263,19 @@ If creating multiple:
    3. TASK-001: Refactor utils
    ```
 4. Ask for confirmation
-5. Create all issues
-6. Regenerate views once at end
+5. Call script for each issue
 
 ---
 
-## Type Prefix Reference
+## Type Reference
 
-| Type | Prefix | Example |
-|------|--------|---------|
-| bug | BUG- | BUG-001 |
-| feature | FEAT- | FEAT-001 |
-| task | TASK- | TASK-001 |
-| chore | CHORE- | CHORE-001 |
-| spike | SPIKE- | SPIKE-001 |
+| Type | Prefix | Script Arg |
+|------|--------|------------|
+| Bug | BUG- | `--type bug` |
+| Feature | FEAT- | `--type feature` |
+| Task | TASK- | `--type task` |
+| Chore | CHORE- | `--type chore` |
+| Spike | SPIKE- | `--type spike` |
 
 ---
 
@@ -302,36 +283,32 @@ If creating multiple:
 
 Issues are stored in `.devloop/issues/{PREFIX}-{NNN}.md`
 
-Views:
-- `.devloop/issues/index.md` - All issues
-- `.devloop/issues/bugs.md` - Bugs only
-- `.devloop/issues/features.md` - Features only
-- `.devloop/issues/backlog.md` - Open features + tasks
+To view issues:
+- Use `/devloop:issues` to see all issues
+- Use `/devloop:issues bugs` to see only bugs
+- Use `/devloop:issues features` to see only features
+- Use `/devloop:issues backlog` to see the backlog
 
 ---
 
 ## Integration
 
 After creating an issue:
-- Use `/devloop:issues` to see all issues
-- Use `/devloop:issues bugs` to see only bugs
-- Use `/devloop:issues backlog` to see the backlog
-- Issues can be worked on during `/devloop:continue` sessions
+- Issues are tracked in `.devloop/issues/`
+- Can be worked on during `/devloop:continue` sessions
 - DoD validation checks for related open issues
+- Use `/devloop:issues` to manage all issues
 
 ---
 
-## Migration Note
+## Script Location
 
-If `.devloop/issues/` exists but `.devloop/issues/` doesn't, offer migration:
-
+The creation script is located at:
 ```
-Use AskUserQuestion:
-- question: "Found existing .devloop/issues/ directory. Would you like to migrate to the unified issue system?"
-- header: "Migrate"
-- multiSelect: false
-- options:
-  - Yes, migrate (Move bugs to issues)
-  - No, keep separate (Use both systems)
-  - Later (Skip for now)
+plugins/devloop/scripts/create-issue.sh
+```
+
+See script help for all options:
+```bash
+./plugins/devloop/scripts/create-issue.sh --help
 ```

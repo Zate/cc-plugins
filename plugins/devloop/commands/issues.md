@@ -1,7 +1,7 @@
 ---
 description: View all issues (replaces and extends /devloop:bugs) - filter by type, status, or ID
 argument-hint: Optional filter (bugs, features, backlog, BUG-001) or action (fix, close)
-allowed-tools: ["Read", "Write", "Edit", "Glob", "Grep", "Bash", "Task", "AskUserQuestion", "TodoWrite", "Skill"]
+allowed-tools: ["Bash", "Read", "AskUserQuestion", "TodoWrite", "Skill"]
 ---
 
 # Manage Issues
@@ -28,149 +28,67 @@ When working on issues, this command routes to appropriate agents:
 - `/devloop:issues backlog` - Show open features + tasks
 - `/devloop:issues high` - Show high priority issues
 - `/devloop:issues BUG-003` - Show specific issue
-- `/devloop:issues fix` - Enter fix mode
+- `/devloop:issues stats` - Show statistics
 
 ## Workflow
 
 ### Step 1: Check Issue Directory
 
-Check for `.devloop/issues/` directory:
+Check for issues using the list script:
 
 ```bash
-if [ -d ".devloop/issues" ]; then
-    ls .devloop/issues/
-else
-    echo "No issues tracked yet. Use /devloop:new to create one."
-fi
+./plugins/devloop/scripts/list-issues.sh --format table 2>/dev/null || echo "No issues found. Use /devloop:new to create one."
 ```
 
-If `.devloop/issues/` exists but not `.devloop/issues/`, offer migration (see Migration section).
-
-### Step 2: Parse Arguments
-
-If `$ARGUMENTS` provided:
-
-| Argument | Action |
-|----------|--------|
-| `bugs` | Filter to type:bug only |
-| `features` | Filter to type:feature only |
-| `tasks` | Filter to type:task only |
-| `backlog` | Show open features + tasks |
-| `open` | Filter to status:open |
-| `in-progress` | Filter to status:in-progress |
-| `done` | Filter to status:done |
-| `high` | Filter to priority:high |
-| `medium` | Filter to priority:medium |
-| `low` | Filter to priority:low |
-| `all` | Show all issues including done |
-| `{PREFIX}-NNN` | Show specific issue (e.g., BUG-001, FEAT-002) |
-| `fix` | Enter fix mode |
-| `stats` | Show statistics |
-
-### Step 3: Load and Display Issues
-
-Read issue files and display based on filter:
-
-#### Default View (Open Issues by Priority)
-
-```markdown
-## Issue Tracker
-
-**Open**: {N} | **In Progress**: {N} | **Done**: {N}
-
-[Bugs]({N}) | [Features]({N}) | [Tasks]({N}) | [Backlog]({N})
-
-### High Priority
-| ID | Type | Title | Created | Labels |
-|----|------|-------|---------|--------|
-| BUG-003 | bug | Auth token refresh | 2024-12-18 | auth, api |
-| FEAT-001 | feature | User auth flow | 2024-12-17 | auth, mvp |
-
-### Medium Priority
-| ID | Type | Title | Created | Labels |
-|----|------|-------|---------|--------|
-| BUG-001 | bug | Button truncation | 2024-12-16 | ui |
-| TASK-001 | task | Refactor helpers | 2024-12-18 | tech-debt |
-
-### Low Priority
-| ID | Type | Title | Created | Labels |
-|----|------|-------|---------|--------|
-| CHORE-001 | chore | Update deps | 2024-12-18 | maintenance |
-
-### In Progress
-| ID | Type | Title | Assignee |
-|----|------|-------|----------|
-| FEAT-002 | feature | Dark mode | current-session |
+If the script fails with "directory not found", display:
+```
+No issues tracked yet. Use /devloop:new to create one.
 ```
 
-#### Bugs View (`bugs` argument)
+### Step 2: Parse Arguments and Map to Script Flags
 
-```markdown
-## Bugs
+If `$ARGUMENTS` provided, map to script flags:
 
-**Open**: {N} | **In Progress**: {N} | **Fixed**: {N}
+| Argument | Script Flags |
+|----------|--------------|
+| `bugs` | `--type bug` |
+| `features` | `--type feature` |
+| `tasks` | `--type task` |
+| `backlog` | `--type feature --status open` (call twice for features + tasks) |
+| `open` | `--status open` |
+| `in-progress` | `--status in-progress` |
+| `done` | `--status done` |
+| `high` | `--priority high` |
+| `medium` | `--priority medium` |
+| `low` | `--priority low` |
+| `all` | No filters (show everything) |
+| `{PREFIX}-NNN` | Read specific file with Read tool |
+| `stats` | Use `--format json` and compute statistics |
 
-### Open Bugs
-| ID | Priority | Title | Created | Labels |
-|----|----------|-------|---------|--------|
-| BUG-003 | high | Auth token refresh | 2024-12-18 | auth |
-| BUG-001 | medium | Button truncation | 2024-12-16 | ui |
+### Step 3: Display Issues Using Script
 
-### In Progress
-| ID | Title | Assignee |
-|----|-------|----------|
-| BUG-002 | Form validation | current-session |
+Call the list script with appropriate flags:
 
-### Recently Fixed
-| ID | Title | Fixed |
-|----|-------|-------|
-| BUG-004 | Missing null check | 2024-12-18 |
+```bash
+# Default view (open issues)
+./plugins/devloop/scripts/list-issues.sh --format markdown --status open
+
+# Bugs view
+./plugins/devloop/scripts/list-issues.sh --format markdown --type bug
+
+# Features view
+./plugins/devloop/scripts/list-issues.sh --format markdown --type feature
+
+# Backlog view (features + tasks)
+echo "## Backlog (Open Features + Tasks)"
+./plugins/devloop/scripts/list-issues.sh --format markdown --type feature --status open
+./plugins/devloop/scripts/list-issues.sh --format markdown --type task --status open
+
+# High priority
+./plugins/devloop/scripts/list-issues.sh --format markdown --priority high
 ```
 
-#### Features View (`features` argument)
-
-```markdown
-## Features
-
-**Open**: {N} | **In Progress**: {N} | **Done**: {N}
-
-### Open Features
-| ID | Priority | Title | Estimate | Labels |
-|----|----------|-------|----------|--------|
-| FEAT-001 | high | User auth flow | L | auth, mvp |
-| FEAT-003 | medium | Export to CSV | M | export |
-
-### In Progress
-| ID | Title | Assignee |
-|----|-------|----------|
-| FEAT-002 | Dark mode | current-session |
-```
-
-#### Backlog View (`backlog` argument)
-
-```markdown
-## Backlog
-
-Open features and tasks, sorted by priority.
-
-**Total Items**: {N}
-
-### High Priority
-| ID | Type | Title | Estimate | Labels |
-|----|------|-------|----------|--------|
-| FEAT-001 | feature | User auth flow | L | mvp |
-
-### Medium Priority
-| ID | Type | Title | Estimate | Labels |
-|----|------|-------|----------|--------|
-| FEAT-003 | feature | Export to CSV | M | export |
-| TASK-001 | task | Add unit tests | M | testing |
-
-### Low Priority
-| ID | Type | Title | Estimate | Labels |
-|----|------|-------|----------|--------|
-| TASK-002 | task | Refactor helpers | S | tech-debt |
-```
+**Format**: The script outputs markdown with grouped sections by status.
 
 ### Step 4: Offer Actions
 
@@ -194,7 +112,7 @@ Use AskUserQuestion:
 
 If specific issue requested (e.g., `BUG-003`) or "View details" selected:
 
-1. Read `.devloop/issues/{PREFIX}-{NNN}.md`
+1. Read `.devloop/issues/{PREFIX}-{NNN}.md` using Read tool
 2. Display full issue report
 3. Offer actions:
 
@@ -206,7 +124,7 @@ Use AskUserQuestion:
 - options:
   - Work on it (Start implementing/fixing)
   - Change priority (Adjust importance)
-  - Add context (Update with more info)
+  - Add comment (Update with more info)
   - Close (Mark as done or won't do)
   - Back (Return to list)
 ```
@@ -215,21 +133,19 @@ Use AskUserQuestion:
 
 When user wants to work on an issue:
 
-1. If no specific issue selected, show picker:
+1. If no specific issue selected, show picker using list script:
+   ```bash
+   # Get high priority open issues
+   ./plugins/devloop/scripts/list-issues.sh --priority high --status open --format json
    ```
-   Use AskUserQuestion:
-   - question: "Which issue would you like to work on?"
-   - header: "Select Issue"
-   - options:
-     - [BUG-003] High: Auth token refresh (Recommended)
-     - [FEAT-001] High: User auth flow
-     - [BUG-001] Medium: Button truncation
-     - Let me pick (Show full list)
+   Parse JSON to create picker options
+
+2. Mark issue as `in-progress` using script:
+   ```bash
+   ./plugins/devloop/scripts/update-issue.sh {ISSUE_ID} --status in-progress
    ```
 
-2. Mark issue as `in-progress` in both issue file and views
-
-3. Read the issue file for full context
+3. Read the issue file for full context using Read tool
 
 4. Present details and ask approach:
    ```
@@ -244,14 +160,13 @@ When user wants to work on an issue:
 
 5. Based on approach:
    - **Quick fix**: Read related files, implement, run tests
-   - **Investigate**: Launch `devloop:engineer` agent in explore mode to investigate related files
+   - **Investigate**: Launch `devloop:engineer` agent in explore mode
    - **Full devloop**: Redirect to `/devloop` with issue as input
 
-6. After completing:
-   - Update issue status to `done`
-   - Add Resolution section to issue file
-   - Regenerate all views
-   - Ask about next issue
+6. After completing, update issue:
+   ```bash
+   ./plugins/devloop/scripts/update-issue.sh {ISSUE_ID} --resolve "Brief summary of what was done"
+   ```
 
 ### Step 7: Close Issue
 
@@ -277,23 +192,37 @@ If "Done":
    - Note: Free text for resolution
    ```
 
-2. Update issue:
-   - Set status to `done`
-   - Add Resolution section with summary
-   - Add commit/PR reference if available
+2. Update issue using script:
+   ```bash
+   ./plugins/devloop/scripts/update-issue.sh {ISSUE_ID} --resolve "{SUMMARY}"
+   ```
 
 If other reasons:
-1. Update issue:
-   - Set status to `wont-do`
-   - Add reason to issue file
-
-3. Regenerate all views
+1. Update status:
+   ```bash
+   ./plugins/devloop/scripts/update-issue.sh {ISSUE_ID} --status done --comment "Closed: {REASON}"
+   ```
 
 ---
 
 ## Statistics Mode
 
 When `$ARGUMENTS` is `stats`:
+
+Use `--format json` to get all issues and compute statistics:
+
+```bash
+# Get all issues in JSON format
+all_issues=$(./plugins/devloop/scripts/list-issues.sh --format json)
+
+# Parse and count:
+# - total, open, in-progress, done
+# - by type (bug, feature, task, chore, spike)
+# - by priority (high, medium, low)
+# - by label (extract from each issue)
+```
+
+Display summary:
 
 ```markdown
 ## Issue Statistics
@@ -304,96 +233,62 @@ When `$ARGUMENTS` is `stats`:
 ### By Type
 | Type | Open | In Progress | Done | Total |
 |------|------|-------------|------|-------|
-| Bug | 3 | 1 | 5 | 9 |
-| Feature | 2 | 1 | 3 | 6 |
-| Task | 2 | 0 | 1 | 3 |
-| Chore | 1 | 0 | 2 | 3 |
-| Spike | 0 | 0 | 2 | 2 |
+| Bug | {N} | {N} | {N} | {N} |
+| Feature | {N} | {N} | {N} | {N} |
+| Task | {N} | {N} | {N} | {N} |
+| Chore | {N} | {N} | {N} | {N} |
+| Spike | {N} | {N} | {N} | {N} |
 
 ### By Priority (Open Only)
 - High: {N}
 - Medium: {N}
 - Low: {N}
 
-### By Label
-| Label | Count |
-|-------|-------|
-| auth | 4 |
-| ui | 3 |
-| api | 2 |
-
 ### Recent Activity
-- BUG-007 fixed (2024-12-18)
-- FEAT-003 created (2024-12-18)
-- TASK-001 started (2024-12-17)
-
-### Oldest Open Issues
-1. BUG-001 (5 days) - Button truncation
-2. FEAT-001 (3 days) - User auth flow
+[Parse created/updated timestamps to show recent changes]
 ```
 
 ---
 
-## Batch Operations
+## Change Priority / Add Comment
 
-For managing multiple issues:
+When user selects "Change priority" or "Add comment":
 
+**Change Priority**:
 ```
 Use AskUserQuestion:
-- question: "Select a batch operation"
-- header: "Batch"
-- multiSelect: false
+- question: "New priority for {ISSUE_ID}?"
+- header: "Priority"
 - options:
-  - Close all low (Mark all low priority as won't do)
-  - Reprioritize (Bulk change priorities)
-  - Archive done (Move old done issues to archive)
-  - Label issues (Add labels to multiple issues)
+  - High
+  - Medium
+  - Low
 ```
 
----
+Update using script:
+```bash
+./plugins/devloop/scripts/update-issue.sh {ISSUE_ID} --priority {PRIORITY}
+```
 
-## View File Management
-
-After any modification (create, update, close):
-
-1. Regenerate `index.md` - Master index of all issues
-2. Regenerate `bugs.md` - Bug-only view
-3. Regenerate `features.md` - Feature-only view
-4. Regenerate `backlog.md` - Open features + tasks
-
-View files are derived from issue files. Issue files are the source of truth.
-
----
-
-## Migration from .devloop/issues/
-
-If `.devloop/issues/` exists but `.devloop/issues/` doesn't:
-
+**Add Comment**:
 ```
 Use AskUserQuestion:
-- question: "Found existing .devloop/issues/ directory. Migrate to unified issue system?"
-- header: "Migrate"
-- multiSelect: false
-- options:
-  - Yes, migrate (Recommended - keeps all data)
-  - No, use separately (Both systems will work)
-  - Later (Skip for now)
+- question: "Enter comment for {ISSUE_ID}"
+- header: "Comment"
 ```
 
-If migrating:
-1. Create `.devloop/issues/` directory
-2. Copy each `BUG-*.md` file, adding `type: bug` to frontmatter
-3. Rename `tags` to `labels` if present
-4. Generate all view files
-5. Optionally remove `.devloop/issues/` after verification
+Update using script:
+```bash
+./plugins/devloop/scripts/update-issue.sh {ISSUE_ID} --comment "{COMMENT}"
+```
 
 ---
 
-## Backwards Compatibility
+## Create New Issue
 
-These legacy commands still work:
-- `/devloop:bugs` → equivalent to `/devloop:issues bugs`
-- `/devloop:bug` → equivalent to `/devloop:new` with type=bug
+When user selects "Create new":
+
+Redirect to `/devloop:new` command which uses the create-issue script.
 
 ---
 
@@ -404,3 +299,11 @@ These legacy commands still work:
 - Summary generator notes issues resolved
 - Plan tasks can reference issues via `related-plan-task`
 - `/devloop:new` creates issues that appear here
+
+---
+
+## Backwards Compatibility
+
+These legacy commands still work:
+- `/devloop:bugs` → equivalent to `/devloop:issues bugs`
+- `/devloop:bug` → equivalent to `/devloop:new` with type=bug
