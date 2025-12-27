@@ -10,6 +10,25 @@
 
 set -euo pipefail
 
+# Find and change to project root (directory containing .devloop/ or .git/)
+find_project_root() {
+    local dir="$PWD"
+    while [ "$dir" != "/" ]; do
+        if [ -d "$dir/.devloop" ] || [ -d "$dir/.git" ]; then
+            echo "$dir"
+            return 0
+        fi
+        dir=$(dirname "$dir")
+    done
+    # Fallback to current directory
+    echo "$PWD"
+    return 1
+}
+
+# Change to project root
+PROJECT_ROOT=$(find_project_root)
+cd "$PROJECT_ROOT" || exit 1
+
 # Check for fresh start state from /devloop:fresh
 get_fresh_start_state() {
     local state_file=".devloop/next-action.json"
