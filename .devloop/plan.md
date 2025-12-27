@@ -1,9 +1,9 @@
 # Devloop Plan: Structured Plan Format & Script-First Workflow
 
 **Created**: 2025-12-27
-**Updated**: 2025-12-27 13:45
+**Updated**: 2025-12-27 07:45
 **Status**: In Progress
-**Current Phase**: Phase 2
+**Current Phase**: Phase 4
 
 ## Overview
 
@@ -44,7 +44,7 @@ Migrate devloop to use a JSON state file as the machine-readable source of truth
   - Files: `plugins/devloop/scripts/fresh-start.sh`
   - Token savings: ~2,000 tokens per invocation
 
-- [ ] Task 2.2: Update fresh.md to call fresh-start.sh [depends:2.1]
+- [x] Task 2.2: Update fresh.md to call fresh-start.sh [depends:2.1]
   - Acceptance: Command is < 50 lines, only handles edge cases
   - Files: `plugins/devloop/commands/fresh.md`
 
@@ -53,7 +53,7 @@ Migrate devloop to use a JSON state file as the machine-readable source of truth
   - Files: `plugins/devloop/scripts/archive-interactive.sh`
   - Token savings: ~2,500 tokens per invocation
 
-- [ ] Task 2.4: Update archive.md to call archive-interactive.sh [depends:2.3]
+- [x] Task 2.4: Update archive.md to call archive-interactive.sh [depends:2.3]
   - Acceptance: Command only handles user confirmation and errors
   - Files: `plugins/devloop/commands/archive.md`
 
@@ -68,39 +68,39 @@ Migrate devloop to use a JSON state file as the machine-readable source of truth
 ### Phase 3: Script Migration - Issue Tracking
 **Goal**: Make issue tracking mostly script-driven
 
-- [ ] Task 3.1: Create create-issue.sh [parallel:C]
+- [x] Task 3.1: Create create-issue.sh [parallel:C]
   - Acceptance: Creates BUG-NNN.md or FEAT-NNN.md with correct structure
   - Files: `plugins/devloop/scripts/create-issue.sh`
   - Token savings: ~2,000 tokens per invocation
 
-- [ ] Task 3.2: Create list-issues.sh [parallel:C]
+- [x] Task 3.2: Create list-issues.sh [parallel:C]
   - Acceptance: Lists issues with filtering (type, status), outputs markdown or JSON
   - Files: `plugins/devloop/scripts/list-issues.sh`
 
-- [ ] Task 3.3: Create update-issue.sh [parallel:C]
+- [x] Task 3.3: Create update-issue.sh [parallel:C]
   - Acceptance: Updates issue status, adds comments
   - Files: `plugins/devloop/scripts/update-issue.sh`
 
-- [ ] Task 3.4: Update issues.md to use issue scripts [depends:3.1,3.2,3.3]
+- [x] Task 3.4: Update issues.md to use issue scripts [depends:3.1,3.2,3.3]
   - Acceptance: Command reduced to routing + user questions
   - Files: `plugins/devloop/commands/issues.md`
 
-- [ ] Task 3.5: Update new.md to use create-issue.sh [depends:3.1]
+- [x] Task 3.5: Update new.md to use create-issue.sh [depends:3.1]
   - Acceptance: Only uses LLM for type detection when ambiguous
   - Files: `plugins/devloop/commands/new.md`
 
-- [ ] Task 3.6: Update bugs.md to use list-issues.sh [depends:3.2]
+- [x] Task 3.6: Update bugs.md to use list-issues.sh [depends:3.2]
   - Acceptance: Pure script invocation + display
   - Files: `plugins/devloop/commands/bugs.md`
 
 ### Phase 4: Command Simplification
 **Goal**: Reduce continue.md and other commands to thin wrappers
 
-- [ ] Task 4.1: Extract task routing logic to select-next-task.sh
+- [x] Task 4.1: Extract task routing logic to select-next-task.sh
   - Acceptance: Determines next task, respects dependencies/parallelism
   - Files: `plugins/devloop/scripts/select-next-task.sh`
 
-- [ ] Task 4.2: Extract plan display to show-plan-status.sh
+- [x] Task 4.2: Extract plan display to show-plan-status.sh
   - Acceptance: Renders plan progress without LLM
   - Files: `plugins/devloop/scripts/show-plan-status.sh`
 
@@ -144,6 +144,19 @@ Migrate devloop to use a JSON state file as the machine-readable source of truth
   - Files: `plugins/devloop/.claude-plugin/plugin.json`
 
 ## Progress Log
+- 2025-12-27 07:45: Completed Tasks 4.1, 4.2 (Phase 4 scripts created)
+  - select-next-task.sh: 283 lines, determines next task respecting dependencies/parallelism
+  - show-plan-status.sh: 325 lines, renders full/brief/phase/json plan status
+- 2025-12-27 07:15: Completed Tasks 3.4, 3.5, 3.6 (Phase 3 complete - command updates)
+  - issues.md: 310 lines (from 407), script delegation for all operations
+  - new.md: 315 lines (from 338), LLM only for type detection
+  - bugs.md: 103 lines (from 262), thin wrapper around list-issues.sh
+- 2025-12-27 06:55: Completed Tasks 3.1, 3.2, 3.3 (parallel issue tracking scripts)
+  - create-issue.sh: 525 lines, creates all 5 issue types with validation
+  - list-issues.sh: 503 lines, filtering by type/status/priority, table/json/markdown output
+  - update-issue.sh: 530 lines, status updates, comments, resolution, label management
+- 2025-12-27 14:05: Completed Task 2.4 - archive.md reduced to 43 lines (from 367), calls archive-interactive.sh
+- 2025-12-27 14:00: Completed Task 2.2 - fresh.md reduced to 45 lines (from 359), calls fresh-start.sh
 - 2025-12-27 13:45: Completed Tasks 2.1, 2.3, 2.5, 2.6 (parallel script migrations)
 - 2025-12-27 09:16: Archived completed phases (1) to .devloop/archive/
 - 2025-12-27 12:30: Completed Task 1.5 - Added sync trigger to pre-commit hook (syncs and validates plan-state.json)
