@@ -53,6 +53,123 @@ The canonical plan location is:
 
 **Always save new plans to**: `.devloop/plan.md`
 
+## Dual-File State Management
+
+**IMPORTANT**: Devloop uses a dual-file model for plan state:
+
+### The Two Files
+
+| File | Purpose | Format | Primary Use |
+|------|---------|--------|-------------|
+| `plan.md` | Human-readable plan | Markdown | **Primary authoring**, human reading, git history |
+| `plan-state.json` | Machine-readable state | JSON | **Script consumption**, fast parsing, deterministic operations |
+
+### Key Principles
+
+1. **plan.md is the source of truth** - Always edit plan.md, never edit plan-state.json directly
+2. **plan-state.json is auto-synced** - Scripts keep it synchronized with plan.md
+3. **Scripts prefer JSON** - All devloop scripts read plan-state.json first, fall back to markdown parsing
+4. **Backward compatible** - If plan-state.json is missing, scripts parse plan.md directly
+
+### When Sync Happens
+
+The sync process runs automatically in these situations:
+
+| Trigger | Script | When |
+|---------|--------|------|
+| **Session start** | `hooks/session-start.sh` | Every time you start a new Claude session |
+| **Pre-commit** | `hooks/pre-commit.sh` | Before each git commit (if plan.md changed) |
+| **Validation fix** | `scripts/validate-plan-state.sh --fix` | When validation detects stale/corrupt JSON |
+
+**Manual sync**: You can trigger sync manually with:
+```bash
+plugins/devloop/scripts/sync-plan-state.sh
+```
+
+### How Scripts Use plan-state.json
+
+Scripts consume the JSON for fast, deterministic operations:
+
+**Examples**:
+- **calculate-progress.sh**: Reads `stats.done` and `stats.total` directly from JSON
+- **format-plan-status.sh**: Uses JSON fields instead of parsing markdown
+- **select-next-task.sh**: Reads `tasks`, `dependencies`, `parallel_groups` from JSON
+- **show-plan-status.sh**: Displays `phases`, `next_task`, `percentage` from JSON
+- **devloop-statusline.sh**: Shows `stats.done/total` without markdown parsing
+
+**Benefit**: ~80% token reduction by avoiding LLM calls for deterministic operations
+
+### JSON Schema
+
+The plan-state.json follows a strict schema (v1.0.0):
+
+```json
+{
+  "schema_version": "1.0.0",
+  "plan_file": ".devloop/plan.md",
+  "last_sync": "2025-12-27T08:00:00Z",
+  "plan_name": "Feature: Authentication",
+  "status": "in_progress",
+  "created": "2025-12-27",
+  "updated": "2025-12-27 08:00",
+  "current_phase": 2,
+  "stats": {
+    "total": 10,
+    "completed": 3,
+    "pending": 5,
+    "in_progress": 1,
+    "blocked": 1,
+    "skipped": 0,
+    "done": 3,
+    "percentage": 30
+  },
+  "phases": [...],
+  "tasks": {...},
+  "parallel_groups": {...},
+  "dependencies": {...},
+  "next_task": "2.1"
+}
+```
+
+**See**: `plugins/devloop/schemas/plan-state.schema.json` for complete schema
+
+### Backward Compatibility
+
+**If plan-state.json is missing**:
+- Scripts fall back to parsing plan.md directly
+- First operation triggers automatic sync
+- No user intervention needed
+
+**If plan-state.json is stale**:
+- Validation script detects drift (compares timestamps)
+- Pre-commit hook re-syncs automatically
+- Session-start hook updates if needed
+
+**Migration from old plans**:
+- Existing plan.md files work without changes
+- Sync script creates plan-state.json on first run
+- No manual migration needed
+
+### Validation
+
+Validate plan-state.json integrity:
+
+```bash
+plugins/devloop/scripts/validate-plan-state.sh
+```
+
+**Checks**:
+- JSON syntax
+- Required fields present
+- Schema version compatibility
+- Stats consistency (total = sum of statuses)
+- Task status values are valid
+- Phase task references exist
+- Dependencies reference valid tasks
+- Sync freshness (plan.md vs JSON timestamps)
+
+**Auto-fix**: Add `--fix` flag to re-sync from plan.md if validation fails
+
 ## Plan File Format
 
 ```markdown

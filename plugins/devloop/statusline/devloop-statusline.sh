@@ -144,26 +144,62 @@ if { [ -n "$WORK_DIR" ] && [ -d "$WORK_DIR/.git" ]; } || git -C "$WORK_DIR" rev-
 fi
 
 # Check for devloop plan progress (prefer .devloop/, fallback to .claude/)
+# Optimized: Reads from plan-state.json (fast) instead of parsing markdown
+# Falls back to markdown parsing if JSON missing (backward compatibility)
 PLAN_STATUS=""
+PLAN_STATE_FILE=""
 PLAN_FILE=""
+
+# Try plan-state.json first (faster, no parsing)
+if [ -f "${PROJECT_DIR:-.}/.devloop/plan-state.json" ]; then
+    PLAN_STATE_FILE="${PROJECT_DIR:-.}/.devloop/plan-state.json"
+elif [ -f "${PROJECT_DIR:-.}/.claude/plan-state.json" ]; then
+    PLAN_STATE_FILE="${PROJECT_DIR:-.}/.claude/plan-state.json"
+fi
+
+# Fallback to plan.md for backward compatibility
 if [ -f "${PROJECT_DIR:-.}/.devloop/plan.md" ]; then
     PLAN_FILE="${PROJECT_DIR:-.}/.devloop/plan.md"
 elif [ -f "${PROJECT_DIR:-.}/.claude/devloop-plan.md" ]; then
     PLAN_FILE="${PROJECT_DIR:-.}/.claude/devloop-plan.md"
 fi
 
-if [ -n "$PLAN_FILE" ] && [ -f "$PLAN_FILE" ]; then
+TOTAL=0
+DONE=0
+
+# Read from JSON if available (fast path)
+if [ -n "$PLAN_STATE_FILE" ] && [ -f "$PLAN_STATE_FILE" ]; then
+    if command -v jq &> /dev/null; then
+        # Use jq for robust JSON parsing
+        DONE=$(jq -r '.stats.done // 0' "$PLAN_STATE_FILE" 2>/dev/null || echo "0")
+        TOTAL=$(jq -r '.stats.total // 0' "$PLAN_STATE_FILE" 2>/dev/null || echo "0")
+    else
+        # Fallback: basic grep/sed parsing (less robust but works)
+        DONE=$(grep -o '"done"[[:space:]]*:[[:space:]]*[0-9]*' "$PLAN_STATE_FILE" 2>/dev/null | grep -o '[0-9]*$' || echo "0")
+        TOTAL=$(grep -o '"total"[[:space:]]*:[[:space:]]*[0-9]*' "$PLAN_STATE_FILE" 2>/dev/null | grep -o '[0-9]*$' || echo "0")
+    fi
+elif [ -n "$PLAN_FILE" ] && [ -f "$PLAN_FILE" ]; then
+    # Fallback: parse markdown (backward compatibility)
     # grep -c returns 0 count but exits with 1 when no matches, so we capture output only
     TOTAL=$(grep -c "^\s*- \[" "$PLAN_FILE" 2>/dev/null) || true
-    DONE=$(grep -c "^\s*- \[x\]" "$PLAN_FILE" 2>/dev/null) || true
+    COMPLETED=$(grep -c "^\s*- \[x\]" "$PLAN_FILE" 2>/dev/null) || true
+    SKIPPED=$(grep -c "^\s*- \[-\]" "$PLAN_FILE" 2>/dev/null) || true
     # Trim whitespace and default to 0
     TOTAL="${TOTAL//[[:space:]]/}"
-    DONE="${DONE//[[:space:]]/}"
+    COMPLETED="${COMPLETED//[[:space:]]/}"
+    SKIPPED="${SKIPPED//[[:space:]]/}"
     TOTAL="${TOTAL:-0}"
-    DONE="${DONE:-0}"
-    if [ "$TOTAL" -gt 0 ] 2>/dev/null; then
-        PLAN_STATUS="${MAGENTA}${DONE}/${TOTAL}${RESET}"
-    fi
+    COMPLETED="${COMPLETED:-0}"
+    SKIPPED="${SKIPPED:-0}"
+    DONE=$((COMPLETED + SKIPPED))
+fi
+
+# Ensure numeric values
+TOTAL="${TOTAL:-0}"
+DONE="${DONE:-0}"
+
+if [ "$TOTAL" -gt 0 ] 2>/dev/null; then
+    PLAN_STATUS="${MAGENTA}${DONE}/${TOTAL}${RESET}"
 fi
 
 # Check for open bugs/issues (prefer .devloop/, fallback to .claude/)

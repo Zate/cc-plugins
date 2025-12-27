@@ -43,42 +43,62 @@ Resume work from an existing devloop plan. Finds the current plan, identifies pr
 
 ---
 
-## Step 1: Find and Read the Plan
+## Step 1: Detect Plan and State
 
-### 1a: Check for Fresh Start State
+**Purpose**: Find the active plan file and check for fresh start state using deterministic scripts.
 
-**CRITICAL**: Check for saved state BEFORE searching for plan file.
+### 1a: Run Plan Detection Script
 
-If `.devloop/next-action.json` exists:
-1. Read and parse state file (contains plan name, phase, summary, next task)
-2. Validate state (require `plan` and `summary` fields)
-3. Delete state file (single-use)
-4. Display fresh start context
-5. Set `FRESH_START_MODE=true` and `FRESH_START_NEXT_TASK` for Step 2
-6. Continue to Step 1b to read actual plan file
+Call `scripts/detect-plan.sh` to discover plan and state:
 
-**State file format and parsing details**: See `Skill: workflow-loop` section "State Persistence for Fresh Start"
+```bash
+Bash: "cd /home/zate/.claude/plugins/cache/cc-plugins/devloop/*/scripts && ./detect-plan.sh --check-fresh-start --json"
+```
 
-**If state file missing or invalid**: Skip to Step 1b.
+**Script output** (JSON):
+```json
+{
+  "active_plan": "name=Plan Name,done=5,total=10,file=.devloop/plan.md",
+  "fresh_start": "plan=Plan Name,phase=3,summary=...,next=Task 3.2",
+  "fresh_start_valid": "valid|stale:N|no_plan|invalid",
+  "migration_needed": "true|false",
+  "bug_count": "3"
+}
+```
+
+**Backward compatibility**: If scripts don't exist (older plugin version), fall back to manual plan search per `Skill: plan-management` section "Plan File Location".
 
 ---
 
-### 1b: Search for Plan File
+### 1b: Parse Detection Results
 
-**Optional Validation**: Run `scripts/validate-plan.sh` to verify plan format before processing. Helps catch malformed task markers or dependency issues early.
+Extract from script output:
 
-Search in order:
-1. **`.devloop/plan.md`** ← Primary (devloop standard)
-2. `docs/PLAN.md`, `docs/plan.md`
-3. `PLAN.md`, `plan.md`
+1. **Fresh start state**: If `fresh_start` is non-empty and `fresh_start_valid` is "valid":
+   - Parse state: plan name, phase, summary, next task
+   - Set `FRESH_START_MODE=true` and `FRESH_START_NEXT_TASK` for Step 2
+   - Display fresh start context: "Resuming from fresh start at [timestamp]"
+   - **Delete state file**: `.devloop/next-action.json` (single-use)
+   - **State file format details**: See `Skill: workflow-loop` section "State Persistence for Fresh Start"
 
-Also read `.devloop/worklog.md` if it exists to understand completed work.
+2. **Active plan**: If `active_plan` is non-empty:
+   - Parse: plan name, completion stats (done/total), file path
+   - Read plan file from extracted path
+   - Continue to Step 2
 
-**Archive Awareness**: Check for `.devloop/archive/` directory. If archives exist, note them for context (may explain missing phases).
+3. **No plan found**: If both `fresh_start` and `active_plan` are empty:
+   - Present user options (see below)
 
-**Plan file format, location priority, and discovery rules**: See `Skill: plan-management` section "Plan File Location"
+**Stale state handling**: If `fresh_start_valid` is "stale:N", warn user and ask to delete or use anyway.
 
-**If no plan found**:
+**Migration prompt**: If `migration_needed` is "true", suggest running `/devloop:onboard` to migrate legacy .claude/ files.
+
+---
+
+### 1c: Handle No Plan Scenario
+
+**If no plan found**, present options:
+
 ```yaml
 AskUserQuestion:
   question: "No plan found. What would you like to do?"
@@ -96,77 +116,79 @@ AskUserQuestion:
 
 ---
 
-## Step 2: Parse and Present Status
+## Step 2: Display Plan Status and Select Next Task
 
-Extract from plan file:
-- **Plan name**: From header
-- **Current phase**: Where we are
-- **Completed tasks**: Count of `[x]` items
-- **Pending tasks**: Count of `[ ]` items
-- **Next task(s)**: First pending item(s) OR from fresh start state
-- **Archived phases**: Check Progress Log for archival notes
+**Purpose**: Show plan progress and select next task(s) using scripts.
 
-**Task status markers**: See `Skill: plan-management` section "Task Status Markers" for complete definitions (`[x]` = Completed, `[ ]` = Pending, `[~]` = Partial, `[!]` = Blocked, `[-]` = Skipped, etc.)
+### 2a: Run Status Display Script
 
-**Parallel markers**: See `Skill: plan-management` section "Parallelism Markers" for `[parallel:X]` and `[depends:N.M]` usage.
+Call `scripts/show-plan-status.sh` to render plan status:
 
-**Fresh Start Integration**:
-- If `FRESH_START_MODE=true` from Step 1a, use `FRESH_START_NEXT_TASK` as the next task
-- Display "Resuming from fresh start" indicator
-- Skip normal "next task" detection since state provides it
-
-Present status:
-
-**If fresh start mode**:
-```markdown
-## Plan: [Name] (Fresh Start)
-
-**Progress**: [N]/[Total] tasks complete
-**Current Phase**: [Phase name]
-**Resuming from**: Fresh start at [timestamp]
-
-### Next Up (from saved state)
-- [ ] **Task [N]**: [Description from FRESH_START_NEXT_TASK]
-
-### Remaining
-- [ ] Task [N+1]: [Description]
-- [ ] Task [N+2]: [Description]
+```bash
+Bash: "cd /home/zate/.claude/plugins/cache/cc-plugins/devloop/*/scripts && ./show-plan-status.sh --full"
 ```
 
-**If normal mode**:
-```markdown
-## Plan: [Name]
-
-**Progress**: [N]/[Total] tasks complete
-**Current Phase**: [Phase name]
-
-### Next Up
-- [ ] **Task [N]**: [Description]
-
-### Remaining
-- [ ] Task [N+1]: [Description]
-- [ ] Task [N+2]: [Description]
-
-### Archive Status
-*Phases 1-2 archived to .devloop/archive/ (see worklog for details)*
-```
-
-Include archive status only if archives exist.
+**Script output**: Full formatted status (see Step 1 for details).
 
 ---
 
-## Step 3: Classify Next Task and Present Options
+### 2b: Select Next Task
 
-Analyze the next task description using classification keywords (see Agent Routing Table above) to determine task type.
+Call `scripts/select-next-task.sh` to get next task(s):
 
-Present targeted options:
+```bash
+Bash: "cd /home/zate/.claude/plugins/cache/cc-plugins/devloop/*/scripts && ./select-next-task.sh --json"
+```
+
+**Script output** (JSON):
+```json
+{
+  "next_task": "4.1",
+  "description": "Task description",
+  "phase": 4,
+  "parallel_group": "A",           // if applicable
+  "dependencies_met": true,
+  "acceptance": "Criteria text",   // if available
+  "files": "file1.go, file2.go"    // if available
+}
+```
+
+**Script handles**:
+- Dependency checking (tasks with `[depends:N.M]`)
+- Blocked task detection
+- Task status filtering (only pending tasks)
+- Fresh start override (if `FRESH_START_NEXT_TASK` set)
+
+**If no task found**: Script returns exit code 1 with reason:
+- `"all_complete"` - All tasks done → Skip to Step 5b (Loop Completion)
+- `"all_blocked"` - All pending tasks blocked → Present unblock options
+
+**Backward compatibility**: If script doesn't exist, fall back to grep for first `[ ]` task in plan.md.
+
+---
+
+### 2c: Apply Fresh Start Context
+
+**If `FRESH_START_MODE=true`** from Step 1:
+1. Override `select-next-task.sh` output with `FRESH_START_NEXT_TASK`
+2. Display fresh start banner in status output
+
+---
+
+## Step 3: Present Task Options
+
+**Purpose**: Present user options for the selected task using script output.
+
+Parse task from Step 2b JSON output and classify using keywords (see Agent Routing Table).
+
+Present options:
 
 ```yaml
 AskUserQuestion:
-  question: "Next task: [Task description]. How proceed?"
-  header: "Action"
+  question: "Next task: {description}. How proceed?"
+  header: "Task {next_task}"
   options:
-    - label: "[Primary action based on task type]"
+    - label: "[Primary action based on classification]"
       description: "(Recommended)"
     - label: "Different approach"
       description: "Alternate implementation strategy"
@@ -190,6 +212,8 @@ AskUserQuestion:
 - Estimation → "Estimate complexity" (devloop:complexity-estimator)
 - Spike → "Run spike workflow" (suggest /devloop:spike)
 - Validation → "Validate completion" (devloop:task-planner in DoD validator mode)
+
+**Use script output**: Pass `acceptance` and `files` to agent prompt in Step 4
 
 ---
 
@@ -366,15 +390,44 @@ AskUserQuestion:
 
 ## Step 6: Handle Parallel Tasks
 
-If next tasks have `[parallel:X]` markers, group tasks by marker letter and present option:
+**Purpose**: Execute multiple tasks in parallel if they share a parallel group.
+
+### 6a: Detect Parallel Tasks
+
+Use `select-next-task.sh --all-parallel` to get all tasks in same group:
+
+```bash
+Bash: "cd /home/zate/.claude/plugins/cache/cc-plugins/devloop/*/scripts && ./select-next-task.sh --json --all-parallel"
+```
+
+**Script output** (if parallel tasks exist):
+```json
+{
+  "next_task": "4.1",
+  "description": "...",
+  "parallel_group": "A",
+  "parallel_tasks": ["4.1", "4.2", "4.3"]  // all tasks in group A with deps met
+}
+```
+
+**Script handles**:
+- Filtering to only pending tasks
+- Checking dependencies for each parallel task
+- Grouping by `[parallel:X]` marker
+
+---
+
+### 6b: Present Parallel Options
+
+If `parallel_tasks` array has >1 task, present option:
 
 ```yaml
 AskUserQuestion:
-  question: "Tasks A, B, C can run in parallel. Run together?"
+  question: "Tasks {parallel_tasks} can run in parallel. Run together?"
   header: "Parallel"
   options:
     - label: "Run all in parallel"
-      description: "Execute all tasks together (Recommended)"
+      description: "Execute {count} tasks together (Recommended)"
     - label: "Run sequentially"
       description: "Execute tasks one by one"
     - label: "Pick specific tasks"
@@ -383,7 +436,7 @@ AskUserQuestion:
 
 If parallel, launch multiple Task tools simultaneously with `run_in_background: true`, then use TaskOutput to collect results.
 
-**Parallel task detection and execution patterns**: See `Skill: plan-management` section "Smart Parallelism Guidelines"
+**Parallel execution patterns**: See `Skill: plan-management` section "Smart Parallelism Guidelines"
 
 ---
 

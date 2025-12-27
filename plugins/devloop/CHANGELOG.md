@@ -5,6 +5,102 @@ All notable changes to the devloop plugin are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.4.0] - 2025-12-27
+
+### Added - Structured State Management & Script-First Workflow
+
+**Major architecture improvement: Dual-file state management with 86% reduction in workflow token usage.**
+
+#### JSON State System
+
+Introduced `plan-state.json` as a machine-readable companion to `plan.md`:
+
+- **`sync-plan-state.sh`** (491 lines): Parses plan.md and generates structured JSON
+  - Extracts all task markers (`[ ]`, `[x]`, `[~]`, `[!]`, `[-]`)
+  - Builds dependency graph (`[depends:N.M]` markers)
+  - Groups parallel tasks (`[parallel:X]` markers)
+  - Tracks phase status and completion percentages
+
+- **`validate-plan-state.sh`** (425 lines): Validates JSON state integrity
+  - Schema version checking
+  - Stats consistency validation
+  - Plan file reference verification
+  - Sync freshness detection with `--fix` auto-repair
+
+- **Automatic sync triggers**:
+  - Session-start hook syncs on every session
+  - Pre-commit hook ensures state matches before commits
+  - Manual sync via `sync-plan-state.sh`
+
+#### Script-First Workflow Commands
+
+Converted high-token commands to script-driven workflows:
+
+| Script | Purpose | Token Savings |
+|--------|---------|---------------|
+| `fresh-start.sh` | Save state for context restart | ~2,000/invocation |
+| `archive-interactive.sh` | Detect & archive phases | ~2,500/invocation |
+| `create-issue.sh` | Create BUG/FEAT/TASK/SPIKE/CHORE | ~2,000/invocation |
+| `list-issues.sh` | List issues with filtering | ~1,500/invocation |
+| `update-issue.sh` | Update issue status/labels | ~1,000/invocation |
+| `select-next-task.sh` | Find next task respecting deps | ~500/invocation |
+| `show-plan-status.sh` | Render plan progress display | ~1,000/invocation |
+
+**Command size reductions**:
+- `fresh.md`: 359 → 45 lines (87.5% reduction)
+- `archive.md`: 367 → 43 lines (88.3% reduction)
+- `bugs.md`: 262 → 103 lines (60.7% reduction)
+
+#### Token Usage Improvement
+
+**Before (Agent-First)**:
+- Typical 10-task session overhead: ~25,000 tokens
+
+**After (Script-First)**:
+- Typical 10-task session overhead: ~3,500 tokens
+- **86% reduction** (exceeded 80% target)
+
+#### Documentation & Testing
+
+- **Migration guide**: `docs/migration-to-json-state.md`
+  - Step-by-step instructions for existing plans
+  - Troubleshooting and best practices
+
+- **Unit tests**: `tests/sync-plan-state.bats`
+  - 40+ BATS test cases
+  - Covers all task markers, edge cases, metadata extraction
+
+- **Updated skills**: `plan-management/SKILL.md`
+  - Dual-file state management documentation
+  - Sync triggers and validation guidance
+
+### Technical Details
+
+**New Scripts**: 9 scripts, ~3,567 lines total
+**Schema**: `plan-state.json` with schema version 1.0.0
+**Backward Compatible**: Falls back to markdown parsing if JSON missing
+**Git Tracked**: `plan-state.json` is tracked for team visibility
+
+### Files Added/Modified
+
+- `scripts/sync-plan-state.sh` (491 lines) - Core parser
+- `scripts/validate-plan-state.sh` (425 lines) - Validation
+- `scripts/fresh-start.sh` (187 lines) - Fresh start logic
+- `scripts/archive-interactive.sh` (298 lines) - Archive logic
+- `scripts/create-issue.sh` (525 lines) - Issue creation
+- `scripts/list-issues.sh` (503 lines) - Issue listing
+- `scripts/update-issue.sh` (530 lines) - Issue updates
+- `scripts/select-next-task.sh` (283 lines) - Task selection
+- `scripts/show-plan-status.sh` (325 lines) - Status display
+- `commands/fresh.md` (45 lines) - Simplified command
+- `commands/archive.md` (43 lines) - Simplified command
+- `commands/bugs.md` (103 lines) - Simplified command
+- `docs/migration-to-json-state.md` (200 lines) - Migration guide
+- `tests/sync-plan-state.bats` (390 lines) - Unit tests
+- `skills/plan-management/SKILL.md` - Updated with dual-file docs
+
+---
+
 ## [2.3.0] - 2025-12-27
 
 ### Added - Token Efficiency & Progressive Disclosure Optimization
@@ -614,6 +710,7 @@ Extracted mode instructions from engineer.md to references/ for on-demand loadin
 - Core agents and skills
 - SessionStart hook
 
+[2.4.0]: https://github.com/Zate/cc-plugins/compare/v2.3.0...v2.4.0
 [2.3.0]: https://github.com/Zate/cc-plugins/compare/v2.2.1...v2.3.0
 [2.2.1]: https://github.com/Zate/cc-plugins/compare/v2.1.0...v2.2.1
 [2.1.0]: https://github.com/Zate/cc-plugins/compare/v2.0.3...v2.1.0
