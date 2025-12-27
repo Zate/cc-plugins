@@ -1,0 +1,248 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://github.com/zate/cc-plugins/plugins/devloop/schemas/plan-state.schema.json",
+  "title": "Devloop Plan State",
+  "description": "Machine-readable state for devloop plans. Auto-synced from plan.md by hooks.",
+  "type": "object",
+  "required": ["schema_version", "plan_file", "last_sync", "stats"],
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "type": "string",
+      "description": "Schema version for forward compatibility",
+      "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$",
+      "examples": ["1.0.0"]
+    },
+    "plan_file": {
+      "type": "string",
+      "description": "Relative path to the source plan.md file",
+      "examples": [".devloop/plan.md"]
+    },
+    "last_sync": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 timestamp of last sync from plan.md"
+    },
+    "plan_name": {
+      "type": "string",
+      "description": "Human-readable plan name from the # header",
+      "maxLength": 200
+    },
+    "status": {
+      "type": "string",
+      "description": "Overall plan status",
+      "enum": ["planning", "in_progress", "review", "complete", "archived"],
+      "default": "planning"
+    },
+    "created": {
+      "type": "string",
+      "format": "date",
+      "description": "Plan creation date (YYYY-MM-DD)"
+    },
+    "updated": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Last plan modification timestamp"
+    },
+    "current_phase": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "Current active phase number"
+    },
+    "stats": {
+      "type": "object",
+      "description": "Aggregate task statistics",
+      "required": ["total", "completed", "pending", "percentage"],
+      "additionalProperties": false,
+      "properties": {
+        "total": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Total number of tasks"
+        },
+        "completed": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Tasks with [x] marker"
+        },
+        "pending": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Tasks with [ ] marker"
+        },
+        "in_progress": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Tasks with [~] marker"
+        },
+        "blocked": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Tasks with [!] marker"
+        },
+        "skipped": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Tasks with [-] marker"
+        },
+        "done": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Completed + skipped (for progress calculation)"
+        },
+        "percentage": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 100,
+          "description": "Completion percentage (done/total * 100)"
+        }
+      }
+    },
+    "phases": {
+      "type": "array",
+      "description": "Ordered list of plan phases",
+      "items": {
+        "$ref": "#/$defs/Phase"
+      }
+    },
+    "tasks": {
+      "type": "object",
+      "description": "Map of task ID to task details for quick lookup",
+      "additionalProperties": {
+        "$ref": "#/$defs/Task"
+      }
+    },
+    "parallel_groups": {
+      "type": "object",
+      "description": "Map of parallel group letter to task IDs",
+      "additionalProperties": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        }
+      },
+      "examples": [{"A": ["1.2", "1.3"], "B": ["2.1", "2.3"]}]
+    },
+    "dependencies": {
+      "type": "object",
+      "description": "Map of task ID to list of task IDs it depends on",
+      "additionalProperties": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        }
+      },
+      "examples": [{"2.1": ["1.1", "1.2"], "3.1": ["2.1"]}]
+    },
+    "next_task": {
+      "type": ["string", "null"],
+      "description": "ID of the next pending task (first [ ] task respecting dependencies)"
+    }
+  },
+  "$defs": {
+    "Phase": {
+      "type": "object",
+      "required": ["number", "name"],
+      "additionalProperties": false,
+      "properties": {
+        "number": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Phase number (1-indexed)"
+        },
+        "name": {
+          "type": "string",
+          "description": "Phase name from ### Phase N: Name header"
+        },
+        "goal": {
+          "type": "string",
+          "description": "Phase goal from **Goal**: line"
+        },
+        "status": {
+          "type": "string",
+          "enum": ["pending", "in_progress", "complete", "archived"],
+          "default": "pending"
+        },
+        "task_ids": {
+          "type": "array",
+          "description": "Ordered list of task IDs in this phase",
+          "items": {
+            "type": "string"
+          }
+        },
+        "stats": {
+          "type": "object",
+          "description": "Phase-level task statistics",
+          "properties": {
+            "total": {"type": "integer", "minimum": 0},
+            "completed": {"type": "integer", "minimum": 0},
+            "pending": {"type": "integer", "minimum": 0}
+          }
+        }
+      }
+    },
+    "Task": {
+      "type": "object",
+      "required": ["id", "description", "status"],
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Task ID in format N.M (e.g., '1.1', '2.3')",
+          "pattern": "^[0-9]+\\.[0-9]+$"
+        },
+        "description": {
+          "type": "string",
+          "description": "Task description from plan.md",
+          "maxLength": 500
+        },
+        "status": {
+          "type": "string",
+          "description": "Task status from marker",
+          "enum": ["pending", "in_progress", "complete", "blocked", "skipped"]
+        },
+        "phase": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Parent phase number"
+        },
+        "acceptance": {
+          "type": "string",
+          "description": "Acceptance criteria from Acceptance: line"
+        },
+        "files": {
+          "type": "array",
+          "description": "Files affected by this task from Files: line",
+          "items": {
+            "type": "string"
+          }
+        },
+        "notes": {
+          "type": "string",
+          "description": "Additional notes from Notes: line"
+        },
+        "parallel_group": {
+          "type": "string",
+          "description": "Parallel execution group letter (A, B, C, etc.)",
+          "pattern": "^[A-Z]$"
+        },
+        "depends_on": {
+          "type": "array",
+          "description": "Task IDs this task depends on",
+          "items": {
+            "type": "string"
+          }
+        },
+        "token_savings": {
+          "type": "string",
+          "description": "Estimated token savings (if applicable)"
+        }
+      }
+    },
+    "TaskStatus": {
+      "type": "string",
+      "description": "Task status values derived from plan.md markers",
+      "enum": ["pending", "in_progress", "complete", "blocked", "skipped"]
+    }
+  }
+}

@@ -1,455 +1,192 @@
-# Devloop Plan: Plugin Optimization - Token Efficiency & Progressive Disclosure
+# Devloop Plan: Structured Plan Format & Script-First Workflow
 
-**Created**: 2025-12-26
-**Updated**: 2025-12-27T14:30:00Z
-**Status**: Complete
-**Current Phase**: Done
-**Estimate**: L (13-19 hours across 5 phases)
+**Created**: 2025-12-27
+**Updated**: 2025-12-27T12:00:00Z
+**Status**: In Progress
+**Current Phase**: Phase 1
 
 ## Overview
 
-Optimize devloop plugin for token efficiency and better progressive disclosure based on official Claude Code best practices. Builds on completed "Plugin Best Practices Audit Fixes" plan.
+Migrate devloop to use a JSON state file as the machine-readable source of truth, keeping plan.md for human readability. Convert high-token workflow operations to deterministic scripts, reducing workflow token usage by ~80%.
 
-**Focus Areas**:
-1. Progressive disclosure for language skills (go, python, java, react)
-2. Create core utility scripts (validate-plan, update-worklog, format-commit)
-3. Standardize skill frontmatter (whenToUse / whenNotToUse YAML)
-4. Extract engineer agent modes to references
-5. Additional optimizations (command templates, hook scripts)
+**Source**: Spike investigation "Structured Plan Format & Script-First Workflow"
+- Spike report: `.devloop/spikes/structured-plan-format.md`
 
-**Source**: Spike investigation "Plugin Optimization: Built-in Tools & Token Efficiency"
-- Spike report: `.devloop/spikes/plugin-optimization.md`
-- Official docs analyzed: Claude Code skills, Agent Skills overview, Best practices
+## Architecture
 
-## Architecture Choice
+**Core Concept**: Dual-file state management
+- `plan.md` - Human-readable markdown (primary authoring)
+- `plan-state.json` - Machine-readable JSON (script consumption)
+- Hooks trigger sync between the two
 
-**Phased Progressive Disclosure Strategy**
-
-Breaking optimizations into 5 phases by priority and dependencies:
-- Phase 1: Language skills (highest ROI, immediate benefit)
-- Phase 2: Core scripts (DRY principle, reusability)
-- Phase 3: Skill frontmatter (better invocation)
-- Phase 4: Engineer agent (second highest token impact)
-- Phase 5: Additional optimizations (completeness)
-
-**Why this approach:**
-- Addresses highest-frequency skills first (language patterns trigger often)
-- Builds on recent progressive disclosure success (workflow-loop, issue-tracking, plan-management)
-- Low-risk refactorings with measurable token savings
-- Each phase can be validated independently
-- Parallelism opportunities within phases
-
-**Expected Impact**:
-- ~2,000+ lines of frequently-loaded content moved to on-demand references
-- 40-50% token reduction in language skills (4 skills)
-- 50% token reduction in engineer agent (most-used agent)
-- Improved maintainability via utility scripts
-
-## Tasks
-
-### Phase 1: Language Skills Progressive Disclosure [parallel:none]
-**Goal**: Add references/ to 4 language pattern skills
-**Complexity**: M-sized (2-3 hours)
-**Expected Impact**: 40-50% token reduction per skill (~840 lines total)
-
-- [x] Task 1.1: Extract go-patterns to references/
-  - Create `plugins/devloop/skills/go-patterns/references/`
-  - Extract sections to reference files:
-    - `concurrency.md` - Goroutines, channels, sync patterns (~100 lines)
-    - `testing.md` - Table-driven tests, benchmarks, examples (~80 lines)
-    - `interfaces.md` - Interface design, composition patterns (~70 lines)
-    - `error-handling.md` - Error wrapping, sentinel errors, patterns (~60 lines)
-  - Update SKILL.md to ~180 lines with references section
-  - **Acceptance**: SKILL.md <200 lines, 4 reference files created, all patterns accessible
-  - **Files**: `plugins/devloop/skills/go-patterns/SKILL.md`, `references/*.md`
-
-- [x] Task 1.2: Extract python-patterns to references/ [parallel:A]
-  - Create `plugins/devloop/skills/python-patterns/references/`
-  - Extract sections to reference files:
-    - `type-hints.md` - Typing best practices, generics, protocols (~90 lines)
-    - `async-patterns.md` - Asyncio, coroutines, concurrency (~100 lines)
-    - `testing-pytest.md` - Fixtures, parametrize, mocking (~90 lines)
-    - `error-handling.md` - Exception patterns, context managers (~60 lines)
-  - Update SKILL.md to ~180 lines with references section
-  - **Acceptance**: SKILL.md <200 lines, 4 reference files created, all patterns accessible
-  - **Files**: `plugins/devloop/skills/python-patterns/SKILL.md`, `references/*.md`
-
-- [x] Task 1.3: Extract java-patterns to references/ [parallel:A]
-  - Create `plugins/devloop/skills/java-patterns/references/`
-  - Extract sections to reference files:
-    - `spring-patterns.md` - Dependency injection, Spring Boot patterns (~100 lines)
-    - `streams.md` - Stream API, collectors, functional patterns (~90 lines)
-    - `testing-junit.md` - JUnit 5, Mockito, integration tests (~80 lines)
-    - `dependency-injection.md` - DI patterns, lifecycle management (~60 lines)
-  - Update SKILL.md to ~180 lines with references section
-  - **Acceptance**: SKILL.md <200 lines, 4 reference files created, all patterns accessible
-  - **Files**: `plugins/devloop/skills/java-patterns/SKILL.md`, `references/*.md`
-
-- [x] Task 1.4: Extract react-patterns to references/ [parallel:A]
-  - Create `plugins/devloop/skills/react-patterns/references/`
-  - Extract sections to reference files:
-    - `hooks.md` - useState, useEffect, custom hooks, rules (~100 lines)
-    - `performance.md` - Memoization, lazy loading, code splitting (~90 lines)
-    - `testing.md` - React Testing Library, component tests (~80 lines)
-    - `state-management.md` - Context, Redux patterns, state design (~70 lines)
-  - Update SKILL.md to ~180 lines with references section
-  - **Acceptance**: SKILL.md <200 lines, 4 reference files created, all patterns accessible
-  - **Files**: `plugins/devloop/skills/react-patterns/SKILL.md`, `references/*.md`
-
-- [x] Task 1.5: Test language skills with real files
-  - Edit Python file (test python-patterns triggers, references load)
-  - Edit Go file (test go-patterns triggers, references load)
-  - Edit Java file (test java-patterns triggers, references load)
-  - Edit React/TypeScript file (test react-patterns triggers, references load)
-  - Verify skills trigger correctly, references loaded only when needed
-  - **Measure token reduction**: Compare SKILL.md sizes before/after
-  - **Acceptance**: All 4 skills work correctly, 40-50% size reduction verified
-  - **Metrics**: Document before/after line counts in Progress Log
-
-### Phase 2: Core Utility Scripts [parallel:none]
-**Goal**: Create 3 high-value scripts to replace repeated logic
-**Complexity**: S-sized (2-3 hours)
-**Expected Impact**: DRY principle, consistency, single source of truth
-
-- [x] Task 2.1: Create scripts/validate-plan.sh
-  - Extract plan validation logic from `hooks/pre-commit.sh`, plan-management skill
-  - Support features:
-    - Format validation (YAML frontmatter, section headers)
-    - Task marker validation (`[ ]`, `[x]`, `[~]`, `[!]`, `[-]`)
-    - Dependency checking (`[depends:X.Y]` references valid tasks)
-    - Parallelism marker validation (`[parallel:A]` consistency)
-  - Error messages: Specific, actionable (line numbers, issue description)
-  - **Acceptance**: Script validates all plan.md format rules, returns 0 on success
-  - **Files**: `plugins/devloop/scripts/validate-plan.sh`
-  - **Testing**: Run on valid plan (passes), invalid plan (fails with clear errors)
-
-- [x] Task 2.2: Update consumers to use validate-plan.sh
-  - Update `hooks/pre-commit.sh` to call `validate-plan.sh` instead of inline logic
-  - Update `/devloop:archive` to validate before archiving phases
-  - Update `/devloop:continue` to validate on resume (optional check)
-  - Remove duplicated validation logic from consumers
-  - **Acceptance**: All 3 consumers use centralized script, no inline duplication
-  - **Files**: `hooks/pre-commit.sh`, `commands/archive.md`, `commands/continue.md`
-
-- [x] Task 2.3: Create scripts/update-worklog.sh
-  - Extract worklog format specification from worklog-management skill
-  - Support operations:
-    - Append entry (with timestamp, commit hash, description)
-    - Rotate worklog (when exceeds size limit, use existing rotate-worklog.sh)
-    - Format dates consistently (ISO 8601)
-    - Validate entry format before appending
-  - Usage: `update-worklog.sh "commit-hash" "description"`
-  - **Acceptance**: Script maintains consistent worklog format, atomic updates
-  - **Files**: `plugins/devloop/scripts/update-worklog.sh`
-  - **Testing**: Append 5 entries, verify format consistency
-
-- [x] Task 2.4: Create scripts/format-commit.sh [parallel:B]
-  - Extract conventional commit rules from atomic-commits skill, git-workflows skill
-  - Generate conventional commit messages from task context
-  - Support features:
-    - Type detection (feat, fix, refactor, docs, test, chore)
-    - Scope extraction (from task description or file paths)
-    - Body formatting (multi-line description)
-    - Breaking change detection (BREAKING CHANGE: footer)
-  - Usage: `format-commit.sh "task-description" "file-list"`
-  - Output: Formatted commit message ready for `git commit -F -`
-  - **Acceptance**: Script generates valid conventional commits following atomic-commits pattern
-  - **Files**: `plugins/devloop/scripts/format-commit.sh`
-  - **Testing**: Generate 3 commits (feat, fix, refactor), verify format
-
-### Phase 3: Standardize Skill Frontmatter [parallel:none]
-**Goal**: Add whenToUse / whenNotToUse YAML to all 29 skills
-**Complexity**: M-sized (3-4 hours - ~30min per skill batch)
-**Expected Impact**: Better skill invocation, clearer contracts, programmatic access
-
-- [x] Task 3.1: Create standardized frontmatter template
-  - Document required fields: name, description
-  - Document optional fields: whenToUse, whenNotToUse, dependencies
-  - Include examples from workflow-loop skill (already has whenToUse/whenNotToUse)
-  - Format guidelines:
-    - `description`: Third-person, <1024 chars, includes specific triggers
-    - `whenToUse`: List of trigger scenarios (user asks, file type, workflow)
-    - `whenNotToUse`: List of anti-patterns and boundaries
-  - **Acceptance**: Template documented in `docs/skills.md` with examples
-  - **Files**: `plugins/devloop/skills/INDEX.md` or `docs/skills.md`
-
-- [x] Task 3.2: Update skills 1-10 with standardized frontmatter [parallel:C]
-  - Batch: plan-management, tool-usage-policy, atomic-commits, worklog-management, model-selection-guide, api-design, database-patterns, testing-strategies, git-workflows, deployment-readiness
-  - Convert markdown "When to Use" sections to YAML `whenToUse` field
-  - Convert markdown "When NOT to Use" sections to YAML `whenNotToUse` field
-  - Keep markdown sections for backward compatibility (Claude reads both)
-  - **Acceptance**: 10 skills have standardized YAML frontmatter
-  - **Files**: 10 SKILL.md files in `plugins/devloop/skills/`
-
-- [x] Task 3.3: Update skills 11-20 with standardized frontmatter [parallel:C]
-  - Batch: architecture-patterns, security-checklist, requirements-patterns, phase-templates, complexity-estimation, project-context, project-bootstrap, language-patterns-base, workflow-selection, issue-tracking
-  - Apply same pattern as Task 3.2
-  - **Acceptance**: 10 skills have standardized YAML frontmatter
-  - **Files**: 10 SKILL.md files in `plugins/devloop/skills/`
-
-- [x] Task 3.4: Update skills 21-29 with standardized frontmatter [parallel:C]
-  - Batch: version-management, file-locations, react-patterns, python-patterns, java-patterns, go-patterns, task-checkpoint, workflow-loop (verify existing), refactoring-analysis
-  - Apply same pattern as Task 3.2
-  - Note: workflow-loop already has whenToUse/whenNotToUse, verify format
-  - **Acceptance**: All 29 skills have standardized YAML frontmatter
-  - **Files**: 9 SKILL.md files in `plugins/devloop/skills/`
-
-- [x] Task 3.5: Verify skill invocation with updated frontmatter
-  - Test 5 representative skills across different categories
-  - Confirm skills trigger correctly with new frontmatter
-  - Check that whenToUse/whenNotToUse doesn't break existing invocation
-  - **Acceptance**: All skills invocable, no regressions
-  - **Testing**: Trigger plan-management, go-patterns, workflow-loop, api-design, task-checkpoint
-
-### Phase 4: Extract Engineer Agent Modes [parallel:none]
-**Goal**: Move mode instructions to references/, reduce agent size by ~50%
-**Complexity**: M-sized (2-3 hours)
-**Expected Impact**: ~530 tokens saved per engineer invocation
-
-- [x] Task 4.1: Analyze engineer.md structure
-  - Identify mode instruction sections (Explorer, Architect, Refactorer, Git)
-  - Measure current sizes: Total 1,033 lines, modes ~600 lines
-  - Plan extraction boundaries (what stays, what goes to references)
-  - Create extraction plan document
-  - **Acceptance**: Extraction boundaries documented, mode sizes measured
-  - **Files**: `.devloop/engineer-extraction-plan.md` (working doc)
-
-- [x] Task 4.2: Create engineer agent references directory
-  - Create `plugins/devloop/agents/engineer/references/`
-  - Create README.md explaining reference structure
-  - **Acceptance**: Directory structure ready for mode files
-  - **Files**: `plugins/devloop/agents/engineer/references/README.md`
-
-- [x] Task 4.3: Extract explorer mode to references
-  - Extract explorer-mode.md (~150 lines):
-    - Codebase exploration patterns
-    - Search strategies (Glob, Grep combinations)
-    - Discovery workflows
-    - Output format templates
-  - Update engineer.md to reference: "See `references/explorer-mode.md`"
-  - **Acceptance**: explorer-mode.md created, engineer.md updated
-  - **Files**: `agents/engineer/references/explorer-mode.md`, `agents/engineer.md`
-
-- [x] Task 4.4: Extract architect mode to references [parallel:D]
-  - Extract architect-mode.md (~150 lines):
-    - Architecture design patterns
-    - Trade-off analysis frameworks
-    - Approach comparison templates
-    - Decision documentation formats
-  - Update engineer.md to reference: "See `references/architect-mode.md`"
-  - **Acceptance**: architect-mode.md created, engineer.md updated
-  - **Files**: `agents/engineer/references/architect-mode.md`, `agents/engineer.md`
-
-- [x] Task 4.5: Extract refactorer mode to references [parallel:D]
-  - Extract refactorer-mode.md (~150 lines):
-    - Refactoring analysis patterns
-    - Code smell detection
-    - Impact assessment templates
-    - Refactoring prioritization
-  - Update engineer.md to reference: "See `references/refactorer-mode.md`"
-  - **Acceptance**: refactorer-mode.md created, engineer.md updated
-  - **Files**: `agents/engineer/references/refactorer-mode.md`, `agents/engineer.md`
-
-- [x] Task 4.6: Extract git mode to references [parallel:D]
-  - Extract git-mode.md (~150 lines):
-    - Git workflow patterns
-    - Commit message formatting (reference format-commit.sh)
-    - Branch management
-    - PR creation workflows
-  - Update engineer.md to reference: "See `references/git-mode.md`"
-  - **Acceptance**: git-mode.md created, engineer.md updated
-  - **Files**: `agents/engineer/references/git-mode.md`, `agents/engineer.md`
-
-- [x] Task 4.7: Update engineer.md orchestration logic
-  - Keep core sections (~400 lines):
-    - Frontmatter with description and skills field
-    - Mode selection logic ("Which mode to use?")
-    - Skill integration (14 auto-loaded skills)
-    - Tool usage patterns
-    - References section (links to 4 mode files)
-  - Remove duplicated mode instructions (now in references)
-  - Verify agent description still third-person with examples
-  - **Acceptance**: engineer.md ~500 lines, orchestration logic clear
-  - **Files**: `agents/engineer.md`
-  - **Result**: engineer.md 766 lines (26% reduction). Mode instructions extracted. Additional sections (workflow_awareness, skill_integration, delegation) remain as future optimization.
-
-- [x] Task 4.8: Test all 4 engineer modes
-  - Test Explorer mode: "Explore authentication implementation"
-  - Test Architect mode: "Design approach for user permissions"
-  - Test Refactorer mode: "Analyze opportunities to simplify auth code"
-  - Test Git mode: "Create commit for auth changes"
-  - Verify references are loaded correctly for each mode
-  - **Acceptance**: All modes functional, references loaded on-demand
-  - **Metrics**: Document engineer.md size reduction (1,033 → ~500 lines = 51%)
-  - **Result**: Verified structure of all 4 reference files. engineer.md reduced to 766 lines (26% reduction). Mode references total 698 lines (loaded on-demand).
-
-### Phase 5: Additional Optimizations [parallel:none]
-**Goal**: Extract command templates, split large hook scripts, optimize remaining skills
-**Complexity**: L-sized (4-6 hours)
-**Expected Impact**: Consistency, maintainability, completeness
-
-- [x] Task 5.1: Extract onboard.md templates
-  - Current: 492 lines (command for onboarding existing projects)
-  - Create `plugins/devloop/templates/onboard/`:
-    - `claudemd-template.md` - Default CLAUDE.md structure
-    - `gitignore-devloop` - Git ignore patterns for .devloop/
-    - `directory-structure.txt` - Standard .devloop/ layout
-  - Update command to reference templates (read & populate)
-  - **Acceptance**: onboard.md <300 lines, 3 template files created
-  - **Files**: `commands/onboard.md`, `templates/onboard/*.md`
-
-- [x] Task 5.2: Extract ship.md validation logic
-  - Current: 462 lines (validation and deployment prep)
-  - Create `scripts/ship-validation.sh`:
-    - DoD checklist validation (tests pass, docs updated, etc.)
-    - Deployment readiness checks
-    - Version bump suggestions
-  - Update command to call script for validation phases
-  - **Acceptance**: ship.md <300 lines, validation in script
-  - **Files**: `commands/ship.md`, `scripts/ship-validation.sh`
-
-- [x] Task 5.3: Split session-start.sh into smaller scripts [parallel:E]
-  - Current: 861 lines (largest hook script)
-  - Create subscripts:
-    - `scripts/detect-plan.sh` - Plan file discovery logic (~200 lines)
-    - `scripts/calculate-progress.sh` - Task counting, completion % (~150 lines)
-    - `scripts/format-plan-status.sh` - Status message formatting (~100 lines)
-  - Update `session-start.sh` to orchestrate subscripts (~400 lines)
-  - **Acceptance**: Main script <450 lines, 3 subscripts created
-  - **Files**: `hooks/session-start.sh`, `scripts/detect-plan.sh`, `scripts/calculate-progress.sh`, `scripts/format-plan-status.sh`
-
-- [x] Task 5.4: Create archive-phase.sh script [parallel:E]
-  - Extract phase archival logic from `/devloop:archive` command (361 lines)
-  - Create `scripts/archive-phase.sh`:
-    - Phase extraction logic
-    - Archive file generation
-    - Worklog integration
-  - Usage: `archive-phase.sh <phase-number> <plan-file> <archive-dir>`
-  - Update `/devloop:archive` to use script for phase operations
-  - **Acceptance**: Reusable script, command simplified
-  - **Files**: `scripts/archive-phase.sh`, `commands/archive.md`
-
-- [x] Task 5.5: Create suggest-skills.sh script [parallel:E]
-  - Centralized skill routing based on context
-  - Inputs: file type, task type, keywords
-  - Output: Recommended skills with rationale
-  - Usage: `suggest-skills.sh "python" "testing" "pytest"`
-  - Used by: PreToolUse hook, commands
-  - **Acceptance**: Script suggests relevant skills accurately
-  - **Files**: `scripts/suggest-skills.sh`
-
-- [x] Task 5.6: Add version-management references/ [parallel:F]
-  - Current: 420 lines
-  - Create `plugins/devloop/skills/version-management/references/`:
-    - `semver-guide.md` - Semantic versioning rules, examples (~100 lines)
-    - `changelog-format.md` - CHANGELOG.md structure, keep-a-changelog (~90 lines)
-    - `release-workflow.md` - Git tagging, version bumps, release notes (~80 lines)
-  - Update SKILL.md to ~150 lines with references section
-  - **Acceptance**: SKILL.md <200 lines, 3 reference files created
-  - **Files**: `skills/version-management/SKILL.md`, `references/*.md`
-
-- [x] Task 5.7: Add atomic-commits references/ [parallel:F]
-  - Current: 394 lines
-  - Create `plugins/devloop/skills/atomic-commits/references/`:
-    - `commit-sizing.md` - Size guidelines, grouping criteria, decision flow
-    - `examples.md` - Good vs bad commit examples, task references
-    - `parallel-tasks.md` - Parallel task handling, phase boundaries
-  - Update SKILL.md to 104 lines with references section
-  - **Result**: 406 → 104 lines (74% reduction), 3 reference files created
-
-- [x] Task 5.8: Add file-locations references/ [parallel:F]
-  - Current: 382 lines
-  - Create `plugins/devloop/skills/file-locations/references/`:
-    - `file-specs.md` - Detailed format for each file type, lifecycle, settings
-    - `migration.md` - Migration from .claude/ to .devloop/, new project setup
-    - `rationale.md` - Why files are tracked or not tracked
-  - Update SKILL.md to 115 lines with references section
-  - **Result**: 394 → 115 lines (71% reduction), 3 reference files created
-
-- [x] Task 5.9: Extract bootstrap.md generation logic [parallel:E]
-  - Current: 412 lines (bootstrap new projects from docs)
-  - Create `templates/bootstrap/`:
-    - `claudemd-template.md` - CLAUDE.md structure with stack-specific defaults
-    - `initial-plan-template.md` - Plan structure and scaffolding tasks by stack
-    - `examples.md` - Input handling, examples, best practices
-  - Update command to reference templates
-  - **Result**: 413 → 145 lines (65% reduction), 3 template files created
-
-- [x] Task 5.10: Intelligent context clear suggestions
-  - **Goal**: Detect when context is heavy and suggest fresh start
-  - Created `scripts/suggest-fresh.sh`:
-    - Analyzes plan.md metrics (tasks completed, plan size, blocked tasks)
-    - Configurable thresholds (low: 3 tasks, normal: 5, high: 10)
-    - JSON output support for programmatic use
-    - Returns recommendation with confidence level and reasons
-  - Integration with workflow-loop skill (context management section)
-  - **Result**: Script created with multi-threshold support
-  - **Files**: `scripts/suggest-fresh.sh`
-
-## Progress Log
-
-- 2025-12-26 16:00: Plan created from spike findings "Plugin Optimization: Built-in Tools & Token Efficiency"
-- 2025-12-26: **Phase 1 Complete** - Language skills progressive disclosure
-  - go-patterns: 199 lines (references: 1,478 lines across 4 files)
-  - python-patterns: 196 lines (references: 1,491 lines across 4 files)
-  - java-patterns: 199 lines (references: 2,167 lines across 4 files)
-  - react-patterns: 197 lines (references: 1,634 lines across 4 files)
-  - Total: ~791 lines loaded initially, ~6,770 lines on-demand = **88% reduction**
-- 2025-12-26: **Phase 2 Complete** - Core utility scripts
-  - Created: validate-plan.sh (plan format validation with actionable errors)
-  - Created: update-worklog.sh (centralized worklog management)
-  - Created: format-commit.sh (conventional commit formatting)
-  - Updated: pre-commit.sh, archive.md, continue.md to use validate-plan.sh
-- 2025-12-26 17:30: Fresh start initiated - state saved to next-action.json
-- 2025-12-26: Task 3.1 complete - Added "Skill Frontmatter Standard" section to docs/skills.md with template, examples, format guidelines
-- 2025-12-26: Task 3.2 complete - Updated 10 skills with whenToUse/whenNotToUse YAML: plan-management, tool-usage-policy, atomic-commits, worklog-management, model-selection-guide, api-design, database-patterns, testing-strategies, git-workflows, deployment-readiness
-- 2025-12-26: Task 3.3 complete - Updated 10 skills with whenToUse/whenNotToUse YAML: architecture-patterns, security-checklist, requirements-patterns, phase-templates, complexity-estimation, project-context, project-bootstrap, language-patterns-base, workflow-selection, issue-tracking
-- 2025-12-26: Task 3.4 complete - Updated 8 skills with whenToUse/whenNotToUse YAML: version-management, file-locations, react-patterns, python-patterns, java-patterns, go-patterns, task-checkpoint, refactoring-analysis. Verified workflow-loop already had YAML.
-- 2025-12-26: Task 3.5 complete - Verified 5 representative skills (plan-management, go-patterns, workflow-loop, api-design, task-checkpoint) have valid YAML frontmatter
-- 2025-12-26: **Phase 3 Complete** - All 29 skills standardized with whenToUse/whenNotToUse YAML frontmatter
-- 2025-12-26: **Phase 4 Complete** - Engineer agent mode extraction
-  - Created: references/explorer-mode.md (133 lines)
-  - Created: references/architect-mode.md (166 lines)
-  - Created: references/refactorer-mode.md (168 lines)
-  - Created: references/git-mode.md (231 lines)
-  - engineer.md: 1,034 → 766 lines (26% reduction)
-  - Per-invocation savings: ~350 lines now loaded on-demand
-- 2025-12-26: Phase 5 progress (Tasks 5.1-5.6 complete)
-  - onboard.md: 492 → 209 lines (57% reduction), 6 templates created
-  - ship.md: 463 → 188 lines (59% reduction), ship-validation.sh created
-  - session-start.sh: 871 → 384 lines (56% reduction), 3 subscripts created
-  - Created: archive-phase.sh, suggest-skills.sh utility scripts
-  - version-management skill: 431 → 139 lines (68% reduction), 3 references
-- 2025-12-27: **Phase 5 Complete** - All additional optimizations done
-  - atomic-commits skill: 406 → 104 lines (74% reduction), 3 references
-  - file-locations skill: 394 → 115 lines (71% reduction), 3 references
-  - bootstrap.md: 413 → 145 lines (65% reduction), 3 templates
-  - Created: suggest-fresh.sh for intelligent context clear suggestions
-- 2025-12-27: **PLAN COMPLETE** - All 5 phases finished
-  - Total new utility scripts: 10 (validate-plan, update-worklog, format-commit, ship-validation, detect-plan, calculate-progress, format-plan-status, archive-phase, suggest-skills, suggest-fresh)
-  - Total reference files created: 40+ across skills and agents
-  - Total template files created: 12+ for commands
-  - Token efficiency: ~60% average reduction in loaded content
+**Token Reduction Strategy**:
+- Scripts handle all deterministic operations (parsing, counting, file operations)
+- Agents only handle: routing decisions, user interaction, creative content generation
+- Commands become thin wrappers that call scripts + present choices
 
 ## Success Criteria
 
-1. ✅ Language skills (go, python, java, react) reduced by 40-50% (SKILL.md <200 lines each)
-2. ✅ Core utility scripts created (validate-plan.sh, update-worklog.sh, format-commit.sh)
-3. ✅ All 29 skills have standardized whenToUse / whenNotToUse YAML frontmatter
-4. ✅ Engineer agent reduced by 50% (1,033 → ~500 lines)
-5. ✅ At least 3 additional skills optimized (version-management, atomic-commits, file-locations)
-6. ✅ Command templates extracted (onboard.md, ship.md, bootstrap.md <300 lines each)
-7. ✅ Hook scripts split for maintainability (session-start.sh <450 lines)
-8. ✅ Token efficiency measurably improved (before/after metrics documented)
-9. ✅ At least 7 utility scripts created (validate-plan, update-worklog, format-commit, archive-phase, suggest-skills, ship-validation, generate-claudemd)
-10. ✅ All changes tested and validated (no regressions, skills trigger correctly)
+1. [ ] `plan-state.json` automatically stays in sync with `plan.md`
+2. [ ] `/devloop:fresh` uses 0 LLM tokens (pure script)
+3. [ ] `/devloop:archive` uses <500 tokens (routing only)
+4. [ ] Issue creation/listing uses <300 tokens per operation
+5. [ ] Session startup shows plan status without LLM (script-based)
+6. [ ] Backward compatible with existing plan.md files
+7. [ ] 80%+ token reduction measured for typical workflow session
+
+## Tasks
+
+### Phase 1: Core Infrastructure
+**Goal**: Create the sync mechanism and JSON state schema
+
+- [x] Task 1.1: Define JSON schema for plan-state.json
+  - Acceptance: Schema file with all fields documented
+  - Files: `plugins/devloop/schemas/plan-state.schema.json`
+
+- [x] Task 1.2: Create sync-plan-state.sh script [parallel:A]
+  - Acceptance: Parses plan.md, outputs valid JSON to plan-state.json
+  - Files: `plugins/devloop/scripts/sync-plan-state.sh`
+  - Notes: Must handle all task markers: `[ ]`, `[x]`, `[~]`, `[!]`, `[-]`
+
+- [x] Task 1.3: Create validate-plan-state.sh script [parallel:A]
+  - Acceptance: Validates JSON against schema, reports errors
+  - Files: `plugins/devloop/scripts/validate-plan-state.sh`
+
+- [ ] Task 1.4: Add sync trigger to session-start hook [depends:1.2]
+  - Acceptance: plan-state.json created/updated on session start
+  - Files: `plugins/devloop/hooks/session-start.sh`
+
+- [ ] Task 1.5: Add sync trigger to pre-commit hook [depends:1.2]
+  - Acceptance: plan-state.json validated before commits
+  - Files: `plugins/devloop/hooks/pre-commit.sh`
+
+### Phase 2: Script Migration - High Value
+**Goal**: Convert highest-token operations to scripts
+
+- [ ] Task 2.1: Create fresh-start.sh to replace fresh.md logic [parallel:B]
+  - Acceptance: Generates next-action.json without any LLM calls
+  - Files: `plugins/devloop/scripts/fresh-start.sh`
+  - Token savings: ~2,000 tokens per invocation
+
+- [ ] Task 2.2: Update fresh.md to call fresh-start.sh [depends:2.1]
+  - Acceptance: Command is < 50 lines, only handles edge cases
+  - Files: `plugins/devloop/commands/fresh.md`
+
+- [ ] Task 2.3: Create archive-interactive.sh [parallel:B]
+  - Acceptance: Detects complete phases, performs archival, needs no LLM
+  - Files: `plugins/devloop/scripts/archive-interactive.sh`
+  - Token savings: ~2,500 tokens per invocation
+
+- [ ] Task 2.4: Update archive.md to call archive-interactive.sh [depends:2.3]
+  - Acceptance: Command only handles user confirmation and errors
+  - Files: `plugins/devloop/commands/archive.md`
+
+- [ ] Task 2.5: Update format-plan-status.sh to read from plan-state.json [depends:1.2]
+  - Acceptance: No markdown parsing, reads JSON directly
+  - Files: `plugins/devloop/scripts/format-plan-status.sh`
+
+- [ ] Task 2.6: Update calculate-progress.sh to read from plan-state.json [depends:1.2]
+  - Acceptance: Falls back to parsing if JSON missing (backward compat)
+  - Files: `plugins/devloop/scripts/calculate-progress.sh`
+
+### Phase 3: Script Migration - Issue Tracking
+**Goal**: Make issue tracking mostly script-driven
+
+- [ ] Task 3.1: Create create-issue.sh [parallel:C]
+  - Acceptance: Creates BUG-NNN.md or FEAT-NNN.md with correct structure
+  - Files: `plugins/devloop/scripts/create-issue.sh`
+  - Token savings: ~2,000 tokens per invocation
+
+- [ ] Task 3.2: Create list-issues.sh [parallel:C]
+  - Acceptance: Lists issues with filtering (type, status), outputs markdown or JSON
+  - Files: `plugins/devloop/scripts/list-issues.sh`
+
+- [ ] Task 3.3: Create update-issue.sh [parallel:C]
+  - Acceptance: Updates issue status, adds comments
+  - Files: `plugins/devloop/scripts/update-issue.sh`
+
+- [ ] Task 3.4: Update issues.md to use issue scripts [depends:3.1,3.2,3.3]
+  - Acceptance: Command reduced to routing + user questions
+  - Files: `plugins/devloop/commands/issues.md`
+
+- [ ] Task 3.5: Update new.md to use create-issue.sh [depends:3.1]
+  - Acceptance: Only uses LLM for type detection when ambiguous
+  - Files: `plugins/devloop/commands/new.md`
+
+- [ ] Task 3.6: Update bugs.md to use list-issues.sh [depends:3.2]
+  - Acceptance: Pure script invocation + display
+  - Files: `plugins/devloop/commands/bugs.md`
+
+### Phase 4: Command Simplification
+**Goal**: Reduce continue.md and other commands to thin wrappers
+
+- [ ] Task 4.1: Extract task routing logic to select-next-task.sh
+  - Acceptance: Determines next task, respects dependencies/parallelism
+  - Files: `plugins/devloop/scripts/select-next-task.sh`
+
+- [ ] Task 4.2: Extract plan display to show-plan-status.sh
+  - Acceptance: Renders plan progress without LLM
+  - Files: `plugins/devloop/scripts/show-plan-status.sh`
+
+- [ ] Task 4.3: Simplify continue.md Step 1 (Find Plan) [depends:4.2]
+  - Acceptance: Uses detect-plan.sh and show-plan-status.sh
+  - Files: `plugins/devloop/commands/continue.md`
+
+- [ ] Task 4.4: Simplify continue.md Step 2 (Parse Status) [depends:4.1]
+  - Acceptance: Uses select-next-task.sh for task selection
+  - Files: `plugins/devloop/commands/continue.md`
+
+- [ ] Task 4.5: Update statusline to use plan-state.json [depends:1.2]
+  - Acceptance: Faster statusline rendering (no markdown parsing)
+  - Files: `plugins/devloop/statusline/devloop-statusline.sh`
+
+### Phase 5: Documentation & Validation
+**Goal**: Document the new system and validate token savings
+
+- [ ] Task 5.1: Update plan-management skill with JSON state info
+  - Acceptance: Explains dual-file model, sync triggers
+  - Files: `plugins/devloop/skills/plan-management/SKILL.md`
+
+- [ ] Task 5.2: Create migration guide for existing plans
+  - Acceptance: Step-by-step instructions for users
+  - Files: `plugins/devloop/docs/migration-to-json-state.md`
+
+- [ ] Task 5.3: Add unit tests for sync-plan-state.sh
+  - Acceptance: Tests for all task markers, edge cases
+  - Files: `plugins/devloop/tests/sync-plan-state.bats`
+
+- [ ] Task 5.4: Measure token usage before/after
+  - Acceptance: Document actual savings vs projected
+  - Files: `.devloop/spikes/structured-plan-format.md` (update with results)
+
+- [ ] Task 5.5: Update CHANGELOG.md with new features
+  - Acceptance: Entry for structured state support
+  - Files: `plugins/devloop/CHANGELOG.md`
+
+- [ ] Task 5.6: Bump version to reflect improvements
+  - Acceptance: Update plugin.json version
+  - Files: `plugins/devloop/.claude-plugin/plugin.json`
+
+## Progress Log
+
+- 2025-12-27 12:00: Plan created from spike findings
 
 ## Notes
 
-- **Testing is critical** after each phase - verify skills trigger, references load correctly
-- **Phase 1 has highest ROI** - language skills trigger frequently on file edits
-- **Phases can be done independently** - skip or reorder if needed
-- **Parallelism markers** indicate tasks that can run simultaneously within a phase
-- **Token impact measurements** should be documented in Progress Log after Phase 1, 4
-- Consider using `/devloop:continue` to work through phases systematically
-- Reference spike report for detailed rationale: `.devloop/spikes/plugin-optimization.md`
+**Backward Compatibility**:
+- plan-state.json is optional; scripts fall back to markdown parsing
+- No changes required to existing plan.md files
+- Sync script creates JSON on first run
+
+**Git Tracking**:
+- plan-state.json should be git-tracked (team visibility)
+- Add to .gitignore only if teams prefer per-developer state
+
+**Dependencies**:
+- `jq` for JSON manipulation (available on most systems)
+- Existing scripts (calculate-progress.sh, etc.) as reference
+
+**Parallelism Guide**:
+- [parallel:A] - Core infrastructure scripts (can develop together)
+- [parallel:B] - High-value script migrations (independent)
+- [parallel:C] - Issue tracking scripts (independent)
