@@ -267,14 +267,17 @@ parse_plan() {
             continue
         fi
 
-        # Detect task line: - [ ] Task N.M: Description
-        if [[ "$line" =~ ^[[:space:]]*-[[:space:]]*(\[[^]]*\])[[:space:]]*Task[[:space:]]+([0-9]+\.[0-9]+):?[[:space:]]*(.*) ]]; then
+        # Detect task line - supports two formats:
+        # Format 1: "- [ ] Task 2.8: Description"
+        # Format 2: "- [ ] **2.8** Description"
+        if [[ "$line" =~ ^[[:space:]]*-[[:space:]]*(\[[^]]*\])[[:space:]]*(Task[[:space:]]+)?(\*\*)?([0-9]+\.[0-9]+)(\*\*)?(:[[:space:]]*|[[:space:]]+)(.*) ]]; then
             # Flush previous task before starting new one
             flush_task
 
             local marker="${BASH_REMATCH[1]}"
-            current_task_id="${BASH_REMATCH[2]}"
-            local desc="${BASH_REMATCH[3]}"
+            # BASH_REMATCH[2] = "Task " or empty, [3] = first "**" or empty, [4] = task ID, [5] = second "**" or empty, [6] = ": " or " ", [7] = description
+            current_task_id="${BASH_REMATCH[4]}"
+            local desc="${BASH_REMATCH[7]}"
             current_task_status=$(marker_to_status "$marker")
 
             # Extract parallel group: [parallel:X]
