@@ -1,9 +1,9 @@
 # Devloop Plan: Structured Plan Format & Script-First Workflow
 
 **Created**: 2025-12-27
-**Updated**: 2025-12-27T12:30:00Z
+**Updated**: 2025-12-27 13:45
 **Status**: In Progress
-**Current Phase**: Phase 1
+**Current Phase**: Phase 2
 
 ## Overview
 
@@ -36,34 +36,10 @@ Migrate devloop to use a JSON state file as the machine-readable source of truth
 
 ## Tasks
 
-### Phase 1: Core Infrastructure
-**Goal**: Create the sync mechanism and JSON state schema
-
-- [x] Task 1.1: Define JSON schema for plan-state.json
-  - Acceptance: Schema file with all fields documented
-  - Files: `plugins/devloop/schemas/plan-state.schema.json`
-
-- [x] Task 1.2: Create sync-plan-state.sh script [parallel:A]
-  - Acceptance: Parses plan.md, outputs valid JSON to plan-state.json
-  - Files: `plugins/devloop/scripts/sync-plan-state.sh`
-  - Notes: Must handle all task markers: `[ ]`, `[x]`, `[~]`, `[!]`, `[-]`
-
-- [x] Task 1.3: Create validate-plan-state.sh script [parallel:A]
-  - Acceptance: Validates JSON against schema, reports errors
-  - Files: `plugins/devloop/scripts/validate-plan-state.sh`
-
-- [x] Task 1.4: Add sync trigger to session-start hook [depends:1.2]
-  - Acceptance: plan-state.json created/updated on session start
-  - Files: `plugins/devloop/hooks/session-start.sh`
-
-- [x] Task 1.5: Add sync trigger to pre-commit hook [depends:1.2]
-  - Acceptance: plan-state.json validated before commits
-  - Files: `plugins/devloop/hooks/pre-commit.sh`
-
 ### Phase 2: Script Migration - High Value
 **Goal**: Convert highest-token operations to scripts
 
-- [ ] Task 2.1: Create fresh-start.sh to replace fresh.md logic [parallel:B]
+- [x] Task 2.1: Create fresh-start.sh to replace fresh.md logic [parallel:B]
   - Acceptance: Generates next-action.json without any LLM calls
   - Files: `plugins/devloop/scripts/fresh-start.sh`
   - Token savings: ~2,000 tokens per invocation
@@ -72,7 +48,7 @@ Migrate devloop to use a JSON state file as the machine-readable source of truth
   - Acceptance: Command is < 50 lines, only handles edge cases
   - Files: `plugins/devloop/commands/fresh.md`
 
-- [ ] Task 2.3: Create archive-interactive.sh [parallel:B]
+- [x] Task 2.3: Create archive-interactive.sh [parallel:B]
   - Acceptance: Detects complete phases, performs archival, needs no LLM
   - Files: `plugins/devloop/scripts/archive-interactive.sh`
   - Token savings: ~2,500 tokens per invocation
@@ -81,11 +57,11 @@ Migrate devloop to use a JSON state file as the machine-readable source of truth
   - Acceptance: Command only handles user confirmation and errors
   - Files: `plugins/devloop/commands/archive.md`
 
-- [ ] Task 2.5: Update format-plan-status.sh to read from plan-state.json [depends:1.2]
+- [x] Task 2.5: Update format-plan-status.sh to read from plan-state.json [depends:1.2]
   - Acceptance: No markdown parsing, reads JSON directly
   - Files: `plugins/devloop/scripts/format-plan-status.sh`
 
-- [ ] Task 2.6: Update calculate-progress.sh to read from plan-state.json [depends:1.2]
+- [x] Task 2.6: Update calculate-progress.sh to read from plan-state.json [depends:1.2]
   - Acceptance: Falls back to parsing if JSON missing (backward compat)
   - Files: `plugins/devloop/scripts/calculate-progress.sh`
 
@@ -168,7 +144,8 @@ Migrate devloop to use a JSON state file as the machine-readable source of truth
   - Files: `plugins/devloop/.claude-plugin/plugin.json`
 
 ## Progress Log
-
+- 2025-12-27 13:45: Completed Tasks 2.1, 2.3, 2.5, 2.6 (parallel script migrations)
+- 2025-12-27 09:16: Archived completed phases (1) to .devloop/archive/
 - 2025-12-27 12:30: Completed Task 1.5 - Added sync trigger to pre-commit hook (syncs and validates plan-state.json)
 - 2025-12-27 12:15: Completed Task 1.4 - Added sync trigger to session-start hook
 - 2025-12-27 01:05: Fresh start initiated - state saved to next-action.json

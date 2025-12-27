@@ -122,29 +122,79 @@ main() {
         esac
     done
 
-    # Get progress using calculate-progress.sh
-    if [ -f "$SCRIPT_DIR/calculate-progress.sh" ]; then
-        local progress=$("$SCRIPT_DIR/calculate-progress.sh" --json "$plan_file" 2>/dev/null)
+    # Check for plan-state.json alongside plan.md
+    local plan_dir=$(dirname "$plan_file")
+    local state_file="$plan_dir/plan-state.json"
+
+    local plan_name current_phase done total percentage next_task
+
+    if [ -f "$state_file" ]; then
+        # Read from plan-state.json (faster, no parsing)
+        if command -v jq &>/dev/null; then
+            # Use jq for robust JSON parsing
+            plan_name=$(jq -r '.plan_name // "Unknown Plan"' "$state_file" 2>/dev/null)
+            current_phase=$(jq -r '.current_phase // 1' "$state_file" 2>/dev/null)
+            done=$(jq -r '.stats.done // 0' "$state_file" 2>/dev/null)
+            total=$(jq -r '.stats.total // 0' "$state_file" 2>/dev/null)
+            percentage=$(jq -r '.stats.percentage // 0' "$state_file" 2>/dev/null)
+            next_task=$(jq -r '.next_task // ""' "$state_file" 2>/dev/null)
+
+            # Convert phase number to "Phase N" format for compatibility
+            if [ -n "$current_phase" ] && [ "$current_phase" != "null" ]; then
+                local phase_name=$(jq -r ".phases[] | select(.number == $current_phase) | .name" "$state_file" 2>/dev/null)
+                if [ -n "$phase_name" ] && [ "$phase_name" != "null" ]; then
+                    current_phase="Phase $current_phase: $phase_name"
+                else
+                    current_phase="Phase $current_phase"
+                fi
+            else
+                current_phase=""
+            fi
+
+            # Convert null next_task to empty string
+            [ "$next_task" = "null" ] && next_task=""
+        else
+            # Fallback: basic grep/sed parsing (less robust)
+            plan_name=$(grep -o '"plan_name"[[:space:]]*:[[:space:]]*"[^"]*"' "$state_file" | sed 's/.*: *"\([^"]*\)".*/\1/' || echo "Unknown Plan")
+            current_phase=$(grep -o '"current_phase"[[:space:]]*:[[:space:]]*[0-9]*' "$state_file" | sed 's/.*: *//' || echo "1")
+            done=$(grep -o '"done"[[:space:]]*:[[:space:]]*[0-9]*' "$state_file" | sed 's/.*: *//' || echo "0")
+            total=$(grep -o '"total"[[:space:]]*:[[:space:]]*[0-9]*' "$state_file" | sed 's/.*: *//' || echo "0")
+            percentage=$(grep -o '"percentage"[[:space:]]*:[[:space:]]*[0-9]*' "$state_file" | sed 's/.*: *//' || echo "0")
+            next_task=$(grep -o '"next_task"[[:space:]]*:[[:space:]]*"[^"]*"' "$state_file" | sed 's/.*: *"\([^"]*\)".*/\1/' || echo "")
+
+            # Format current_phase as "Phase N"
+            [ -n "$current_phase" ] && current_phase="Phase $current_phase"
+        fi
     else
-        echo "Error: calculate-progress.sh not found" >&2
-        exit 1
+        # Fallback: use calculate-progress.sh (backward compatibility)
+        if [ -f "$SCRIPT_DIR/calculate-progress.sh" ]; then
+            local progress=$("$SCRIPT_DIR/calculate-progress.sh" --json "$plan_file" 2>/dev/null)
+        else
+            echo "Error: calculate-progress.sh not found" >&2
+            exit 1
+        fi
+
+        if echo "$progress" | grep -q '"error"'; then
+            case "$format" in
+                json) echo "$progress" ;;
+                *) echo "Error: Plan not found" >&2 ;;
+            esac
+            exit 1
+        fi
+
+        # Parse JSON response from calculate-progress.sh
+        plan_name=$(echo "$progress" | grep -o '"plan_name"[[:space:]]*:[[:space:]]*"[^"]*"' | sed 's/.*: *"\([^"]*\)".*/\1/' || echo "Unknown Plan")
+        current_phase=$(echo "$progress" | grep -o '"current_phase"[[:space:]]*:[[:space:]]*"[^"]*"' | sed 's/.*: *"\([^"]*\)".*/\1/' || echo "")
+        done=$(echo "$progress" | grep -o '"done"[[:space:]]*:[[:space:]]*[0-9]*' | sed 's/.*: *//' || echo "0")
+        total=$(echo "$progress" | grep -o '"total"[[:space:]]*:[[:space:]]*[0-9]*' | sed 's/.*: *//' || echo "0")
+        percentage=$(echo "$progress" | grep -o '"percentage"[[:space:]]*:[[:space:]]*[0-9]*' | sed 's/.*: *//' || echo "0")
+        next_task=$(echo "$progress" | grep -o '"next_task"[[:space:]]*:[[:space:]]*"[^"]*"' | sed 's/.*: *"\([^"]*\)".*/\1/' || echo "")
     fi
 
-    if echo "$progress" | grep -q '"error"'; then
-        case "$format" in
-            json) echo "$progress" ;;
-            *) echo "Error: Plan not found" >&2 ;;
-        esac
-        exit 1
-    fi
-
-    # Parse JSON response
-    local plan_name=$(echo "$progress" | grep -o '"plan_name"[[:space:]]*:[[:space:]]*"[^"]*"' | sed 's/.*: *"\([^"]*\)".*/\1/')
-    local current_phase=$(echo "$progress" | grep -o '"current_phase"[[:space:]]*:[[:space:]]*"[^"]*"' | sed 's/.*: *"\([^"]*\)".*/\1/')
-    local done=$(echo "$progress" | grep -o '"done"[[:space:]]*:[[:space:]]*[0-9]*' | sed 's/.*: *//')
-    local total=$(echo "$progress" | grep -o '"total"[[:space:]]*:[[:space:]]*[0-9]*' | sed 's/.*: *//')
-    local percentage=$(echo "$progress" | grep -o '"percentage"[[:space:]]*:[[:space:]]*[0-9]*' | sed 's/.*: *//')
-    local next_task=$(echo "$progress" | grep -o '"next_task"[[:space:]]*:[[:space:]]*"[^"]*"' | sed 's/.*: *"\([^"]*\)".*/\1/')
+    # Ensure numeric variables have valid values
+    done=${done:-0}
+    total=${total:-0}
+    percentage=${percentage:-0}
 
     case "$format" in
         brief) format_brief "$plan_name" "$done" "$total" "$percentage" ;;
