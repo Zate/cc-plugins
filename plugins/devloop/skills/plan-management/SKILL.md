@@ -217,6 +217,30 @@ plugins/devloop/scripts/validate-plan-state.sh
 | `- [-]` | Skipped / Not applicable |
 | `- [!]` | Blocked |
 
+### Task Format vs Success Criteria Format
+
+**Tasks** use **dash format** (picked up by scripts):
+```markdown
+- [ ] Task 1.1: Create user model
+- [x] Task 1.2: Add validation
+```
+
+**Success Criteria** use **numbered format** (NOT picked up by scripts):
+```markdown
+1. [ ] All tests pass with 80%+ coverage
+2. [ ] Documentation updated
+3. [ ] Performance benchmarks met
+```
+
+**Why the distinction?**
+- Tasks are implementation work tracked by `select-next-task.sh` and `fresh-start.sh`
+- Success Criteria are validation checkpoints verified when plan reaches "Review" status
+- Scripts intentionally ignore numbered lists to separate "doing" from "validating"
+
+**Script patterns**:
+- `^\s*-\s*\[` matches tasks (dash format)
+- `^\s*[0-9]*\.\s*\[` matches success criteria (numbered format - not matched by task scripts)
+
 ## Parallelism Quick Reference
 
 Tasks can include optional markers to indicate parallelization potential:

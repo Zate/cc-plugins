@@ -270,21 +270,77 @@ Task:
 
 **CRITICAL**: This step MUST run after every agent execution. Never skip.
 
-**Complete checkpoint workflow**: See `Skill: task-checkpoint` for:
-- Verification checklist (success/partial/failure indicators)
-- Plan marker updates (`[ ]` → `[x]`, `[~]`, or `[!]`)
-- Automatic commit logic (for successful completion only)
-- Checkpoint question presentation
-- Action handling (continue/fresh/stop/retry)
+#### 5a.1: Verify Agent Output
 
-**Integration for continue.md**:
-1. After agent completes, invoke checkpoint verification
-2. Based on verification, update plan markers
-3. If successful, auto-commit changes BEFORE checkpoint question
-4. Present checkpoint question with appropriate options
-5. Handle user selection and route to next step
+Determine completion state from agent result:
+- **Success** (✓): Agent explicitly states task complete, acceptance criteria met
+- **Partial** (~): Agent completed with limitations, some criteria pending
+- **Failure** (✗): Agent encountered blocking error, task not addressed
 
-**Key checkpoint patterns**: See `Skill: workflow-loop` section "Checkpoint Phase" for standard loop integration.
+#### 5a.2: Update Plan Markers
+
+Based on verification result, update `.devloop/plan.md`:
+
+```bash
+# Success: Mark complete
+- [ ] Task X.Y → - [x] Task X.Y
+
+# Partial: Mark in progress
+- [ ] Task X.Y → - [~] Task X.Y
+
+# Failure: Mark blocked
+- [ ] Task X.Y → - [!] Task X.Y
+```
+
+Add Progress Log entry:
+```markdown
+- YYYY-MM-DD HH:MM: Completed Task X.Y - [brief summary]
+```
+
+#### 5a.3: Sync Plan State (REQUIRED)
+
+After updating plan.md, sync to plan-state.json:
+
+```bash
+Bash: "${CLAUDE_PLUGIN_ROOT}/scripts/sync-plan-state.sh"
+```
+
+#### 5a.4: Present Checkpoint Question (MANDATORY)
+
+**ALWAYS present this question after EVERY task completion - never skip:**
+
+```yaml
+AskUserQuestion:
+  question: "Task {X.Y} complete. How should we proceed?"
+  header: "Checkpoint"
+  options:
+    - label: "Continue to next task"
+      description: "Move to next pending task (Recommended)"
+    - label: "Commit now"
+      description: "Create atomic commit for this work first"
+    - label: "Fresh start"
+      description: "Save state, clear context, resume in new session"
+    - label: "Stop here"
+      description: "Generate summary and end session"
+```
+
+#### 5a.5: Handle Checkpoint Response
+
+| User Choice | Action |
+|-------------|--------|
+| **Continue to next task** | Go to Step 5b (Loop Completion Detection) |
+| **Commit now** | Create commit with conventional message, then go to Step 5b |
+| **Fresh start** | Run `/devloop:fresh`, instruct user to `/clear`, END workflow |
+| **Stop here** | Generate session summary, END workflow |
+
+**Commit format** (if "Commit now"):
+```
+<type>(<scope>): <description> - Task X.Y
+
+<body explaining changes>
+```
+
+**Reference skills**: `Skill: task-checkpoint` for detailed verification checklist, `Skill: workflow-loop` for state transitions.
 
 ---
 
@@ -437,6 +493,26 @@ AskUserQuestion:
 If parallel, launch multiple Task tools simultaneously with `run_in_background: true`, then use TaskOutput to collect results.
 
 **Parallel execution patterns**: See `Skill: plan-management` section "Smart Parallelism Guidelines"
+
+---
+
+### 6c: Loop Back
+
+After Step 6 (whether running parallel or single task), return to the workflow loop:
+
+**If parallel tasks executed**: Run Step 5a checkpoint for EACH parallel task (can batch the checkpoint question)
+
+**If single task executed**: Already went through Step 5a
+
+**Continue the loop**: Return to **Step 2** (Display Plan Status and Select Next Task) to get the next pending task.
+
+```
+Loop: Step 2 → Step 3 → Step 4 → Step 5a → Step 5b → Step 6 → Step 2...
+```
+
+**Exit conditions**:
+- Step 5a: User chooses "Fresh start" or "Stop here"
+- Step 5b: All tasks complete (presents completion options)
 
 ---
 
