@@ -98,6 +98,18 @@ select_from_json() {
         return 1
     fi
 
+    # Validate JSON file is not empty and has tasks
+    if [ ! -s "$state_file" ]; then
+        # Empty file - fall back to markdown
+        return 1
+    fi
+
+    # Check if file has valid JSON with tasks
+    if ! jq -e '.tasks' "$state_file" >/dev/null 2>&1; then
+        # Invalid JSON or no tasks key - fall back to markdown
+        return 1
+    fi
+
     # Get completed task IDs for dependency checking
     local completed_ids
     completed_ids=$(jq -r '.tasks | to_entries[] | select(.value.status == "complete" or .value.status == "skipped") | .key' "$state_file" 2>/dev/null | tr '\n' ',' | sed 's/,$//')
@@ -287,9 +299,11 @@ select_from_markdown() {
         exit 2
     fi
 
-    # Find first pending task
+    # Find first pending task - supports two formats:
+    # Format 1: "- [ ] Task 2.8: Description"
+    # Format 2: "- [ ] **2.8** Description"
     local next_line
-    next_line=$(grep -m1 -E '^\s*-\s*\[\s\]\s*Task\s+[0-9]+\.[0-9]+' "$plan_file" 2>/dev/null || echo "")
+    next_line=$(grep -m1 -E '^\s*-\s*\[\s\]\s*(Task\s+[0-9]+\.[0-9]+|\*\*[0-9]+\.[0-9]+\*\*)' "$plan_file" 2>/dev/null || echo "")
 
     if [ -z "$next_line" ]; then
         if [ "$OUTPUT_JSON" = true ]; then
@@ -303,11 +317,12 @@ select_from_markdown() {
     # Parse the line
     local task_id desc parallel_group deps
 
-    # Extract task ID (e.g., "4.1")
-    task_id=$(echo "$next_line" | grep -oE 'Task\s+[0-9]+\.[0-9]+' | grep -oE '[0-9]+\.[0-9]+')
+    # Extract task ID (e.g., "4.1") - supports both "Task 2.8" and "**2.8**" formats
+    task_id=$(echo "$next_line" | grep -oE '(Task\s+[0-9]+\.[0-9]+|\*\*[0-9]+\.[0-9]+\*\*)' | grep -oE '[0-9]+\.[0-9]+')
 
-    # Extract description (everything after "Task N.M:" up to [parallel:] or [depends:])
-    desc=$(echo "$next_line" | sed -E 's/.*Task\s+[0-9]+\.[0-9]+:?\s*//' | sed -E 's/\[parallel:[A-Za-z]+\]//' | sed -E 's/\[depends:[0-9.,]+\]//' | sed 's/^[[:space:]]*//' | sed 's/[[:space:]]*$//')
+    # Extract description (everything after task ID up to [parallel:] or [depends:])
+    # Handles both "Task N.M:" and "**N.M**" formats
+    desc=$(echo "$next_line" | sed -E 's/.*Task\s+[0-9]+\.[0-9]+:?\s*//' | sed -E 's/.*\*\*[0-9]+\.[0-9]+\*\*\s*//' | sed -E 's/\[parallel:[A-Za-z]+\]//' | sed -E 's/\[depends:[0-9.,]+\]//' | sed 's/^[[:space:]]*//' | sed 's/[[:space:]]*$//')
 
     # Extract parallel group
     parallel_group=$(echo "$next_line" | grep -oE '\[parallel:([A-Za-z]+)\]' | grep -oE '[A-Za-z]+$' || echo "")
