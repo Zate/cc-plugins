@@ -1,412 +1,90 @@
 {
   "schema_version": "1.0.0",
-  "plan_file": "/home/zate/projects/cc-plugins/.devloop/plan.md",
-  "last_sync": "2025-12-27T08:03:23Z",
-  "plan_name": "Devloop Plan: Structured Plan Format & Script-First Workflow",
-  "status": "complete",
+  "plan_file": ".devloop/plan.md",
+  "last_sync": "2025-12-27T08:53:58Z",
+  "plan_name": "Devloop Plan: Agent Enforcement & Checkpoint Improvements",
+  "status": "planning",
   "created": "2025-12-27",
-  "updated": "00",
-  "current_phase": 4,
+  "updated": "",
+  "current_phase": 6,
   "stats": {
-    "total": 23,
-    "completed": 23,
-    "pending": 0,
+    "total": 5,
+    "completed": 0,
+    "pending": 5,
     "in_progress": 0,
     "blocked": 0,
     "skipped": 0,
-    "done": 23,
-    "percentage": 100
+    "done": 0,
+    "percentage": 0
   },
   "phases": [
     {
-      "number": 2,
-      "name": "Script Migration - High Value",
-      "goal": "Convert highest-token operations to scripts",
-      "status": "complete",
+      "number": 6,
+      "name": "Agent Enforcement & Checkpoint Improvements",
+      "status": "pending",
       "task_ids": [
-        "2.1",
-        "2.2",
-        "2.3",
-        "2.4",
-        "2.5",
-        "2.6"
-      ],
-      "stats": {
-        "total": 6,
-        "completed": 6,
-        "pending": 0
-      }
-    },
-    {
-      "number": 3,
-      "name": "Script Migration - Issue Tracking",
-      "goal": "Make issue tracking mostly script-driven",
-      "status": "complete",
-      "task_ids": [
-        "3.1",
-        "3.2",
-        "3.3",
-        "3.4",
-        "3.5",
-        "3.6"
-      ],
-      "stats": {
-        "total": 6,
-        "completed": 6,
-        "pending": 0
-      }
-    },
-    {
-      "number": 4,
-      "name": "Command Simplification",
-      "goal": "Reduce continue.md and other commands to thin wrappers",
-      "status": "complete",
-      "task_ids": [
-        "4.1",
-        "4.2",
-        "4.3",
-        "4.4",
-        "4.5"
+        "6.1",
+        "6.2",
+        "6.3",
+        "6.4",
+        "6.5"
       ],
       "stats": {
         "total": 5,
-        "completed": 5,
-        "pending": 0
-      }
-    },
-    {
-      "number": 5,
-      "name": "Documentation & Validation",
-      "goal": "Document the new system and validate token savings",
-      "status": "complete",
-      "task_ids": [
-        "5.1",
-        "5.2",
-        "5.3",
-        "5.4",
-        "5.5",
-        "5.6"
-      ],
-      "stats": {
-        "total": 6,
-        "completed": 6,
-        "pending": 0
+        "completed": 0,
+        "pending": 5
       }
     }
   ],
   "tasks": {
-    "2.1": {
-      "id": "2.1",
-      "description": "Create fresh-start.sh to replace fresh.md logic",
-      "status": "complete",
-      "phase": 2,
-      "parallel_group": "B",
-      "acceptance": "Generates next-action.json without any LLM calls",
-      "files": [
-        "plugins/devloop/scripts/fresh-start.sh"
-      ]
-    },
-    "2.2": {
-      "id": "2.2",
-      "description": "Update fresh.md to call fresh-start.sh",
-      "status": "complete",
-      "phase": 2,
-      "acceptance": "Command is < 50 lines, only handles edge cases",
-      "files": [
-        "plugins/devloop/commands/fresh.md"
-      ],
-      "depends_on": [
-        "2.1"
-      ]
-    },
-    "2.3": {
-      "id": "2.3",
-      "description": "Create archive-interactive.sh",
-      "status": "complete",
-      "phase": 2,
-      "parallel_group": "B",
-      "acceptance": "Detects complete phases, performs archival, needs no LLM",
-      "files": [
-        "plugins/devloop/scripts/archive-interactive.sh"
-      ]
-    },
-    "2.4": {
-      "id": "2.4",
-      "description": "Update archive.md to call archive-interactive.sh",
-      "status": "complete",
-      "phase": 2,
-      "acceptance": "Command only handles user confirmation and errors",
-      "files": [
-        "plugins/devloop/commands/archive.md"
-      ],
-      "depends_on": [
-        "2.3"
-      ]
-    },
-    "2.5": {
-      "id": "2.5",
-      "description": "Update format-plan-status.sh to read from plan-state.json",
-      "status": "complete",
-      "phase": 2,
-      "acceptance": "No markdown parsing, reads JSON directly",
-      "files": [
-        "plugins/devloop/scripts/format-plan-status.sh"
-      ],
-      "depends_on": [
-        "1.2"
-      ]
-    },
-    "2.6": {
-      "id": "2.6",
-      "description": "Update calculate-progress.sh to read from plan-state.json",
-      "status": "complete",
-      "phase": 2,
-      "acceptance": "Falls back to parsing if JSON missing (backward compat)",
-      "files": [
-        "plugins/devloop/scripts/calculate-progress.sh"
-      ],
-      "depends_on": [
-        "1.2"
-      ]
-    },
-    "3.1": {
-      "id": "3.1",
-      "description": "Create create-issue.sh",
-      "status": "complete",
-      "phase": 3,
-      "parallel_group": "C",
-      "acceptance": "Creates BUG-NNN.md or FEAT-NNN.md with correct structure",
-      "files": [
-        "plugins/devloop/scripts/create-issue.sh"
-      ]
-    },
-    "3.2": {
-      "id": "3.2",
-      "description": "Create list-issues.sh",
-      "status": "complete",
-      "phase": 3,
-      "parallel_group": "C",
-      "acceptance": "Lists issues with filtering (type, status), outputs markdown or JSON",
-      "files": [
-        "plugins/devloop/scripts/list-issues.sh"
-      ]
-    },
-    "3.3": {
-      "id": "3.3",
-      "description": "Create update-issue.sh",
-      "status": "complete",
-      "phase": 3,
-      "parallel_group": "C",
-      "acceptance": "Updates issue status, adds comments",
-      "files": [
-        "plugins/devloop/scripts/update-issue.sh"
-      ]
-    },
-    "3.4": {
-      "id": "3.4",
-      "description": "Update issues.md to use issue scripts",
-      "status": "complete",
-      "phase": 3,
-      "acceptance": "Command reduced to routing + user questions",
-      "files": [
-        "plugins/devloop/commands/issues.md"
-      ],
-      "depends_on": [
-        "3.1",
-        "3.2",
-        "3.3"
-      ]
-    },
-    "3.5": {
-      "id": "3.5",
-      "description": "Update new.md to use create-issue.sh",
-      "status": "complete",
-      "phase": 3,
-      "acceptance": "Only uses LLM for type detection when ambiguous",
-      "files": [
-        "plugins/devloop/commands/new.md"
-      ],
-      "depends_on": [
-        "3.1"
-      ]
-    },
-    "3.6": {
-      "id": "3.6",
-      "description": "Update bugs.md to use list-issues.sh",
-      "status": "complete",
-      "phase": 3,
-      "acceptance": "Pure script invocation + display",
-      "files": [
-        "plugins/devloop/commands/bugs.md"
-      ],
-      "depends_on": [
-        "3.2"
-      ]
-    },
-    "4.1": {
-      "id": "4.1",
-      "description": "Extract task routing logic to select-next-task.sh",
-      "status": "complete",
-      "phase": 4,
-      "acceptance": "Determines next task, respects dependencies/parallelism",
-      "files": [
-        "plugins/devloop/scripts/select-next-task.sh"
-      ]
-    },
-    "4.2": {
-      "id": "4.2",
-      "description": "Extract plan display to show-plan-status.sh",
-      "status": "complete",
-      "phase": 4,
-      "acceptance": "Renders plan progress without LLM",
-      "files": [
-        "plugins/devloop/scripts/show-plan-status.sh"
-      ]
-    },
-    "4.3": {
-      "id": "4.3",
-      "description": "Simplify continue.md Step 1 (Find Plan)",
-      "status": "complete",
-      "phase": 4,
-      "acceptance": "Uses detect-plan.sh and show-plan-status.sh",
+    "6.1": {
+      "id": "6.1",
+      "description": "Update continue.md Step 4 with mandatory agent routing enforcement",
+      "status": "pending",
+      "phase": 6,
       "files": [
         "plugins/devloop/commands/continue.md"
-      ],
-      "depends_on": [
-        "4.2"
       ]
     },
-    "4.4": {
-      "id": "4.4",
-      "description": "Simplify continue.md Step 2 (Parse Status)",
-      "status": "complete",
-      "phase": 4,
-      "acceptance": "Uses select-next-task.sh for task selection",
+    "6.2": {
+      "id": "6.2",
+      "description": "Update continue.md Step 5a.4 checkpoint to recommend Fresh Start based on context usage",
+      "status": "pending",
+      "phase": 6,
       "files": [
-        "plugins/devloop/commands/continue.md"
-      ],
-      "depends_on": [
-        "4.1"
+        "plugins/devloop/commands/continue.md",
+        "plugins/devloop/scripts/get-context-usage.sh (new)"
       ]
     },
-    "4.5": {
-      "id": "4.5",
-      "description": "Update statusline to use plan-state.json",
-      "status": "complete",
-      "phase": 4,
-      "acceptance": "Faster statusline rendering (no markdown parsing)",
+    "6.3": {
+      "id": "6.3",
+      "description": "Update ask-user-question-standards.md Format 6 (Checkpoint) to match",
+      "status": "pending",
+      "phase": 6,
       "files": [
-        "plugins/devloop/statusline/devloop-statusline.sh"
-      ],
-      "depends_on": [
-        "1.2"
+        "plugins/devloop/docs/ask-user-question-standards.md"
       ]
     },
-    "5.1": {
-      "id": "5.1",
-      "description": "Update plan-management skill with JSON state info",
-      "status": "complete",
-      "phase": 5,
-      "acceptance": "Explains dual-file model, sync triggers",
+    "6.4": {
+      "id": "6.4",
+      "description": "Update workflow-loop skill checkpoint-patterns.md reference",
+      "status": "pending",
+      "phase": 6,
       "files": [
-        "plugins/devloop/skills/plan-management/SKILL.md"
+        "plugins/devloop/skills/workflow-loop/references/checkpoint-patterns.md"
       ]
     },
-    "5.2": {
-      "id": "5.2",
-      "description": "Create migration guide for existing plans",
-      "status": "complete",
-      "phase": 5,
-      "acceptance": "Step-by-step instructions for users",
-      "files": [
-        "plugins/devloop/docs/migration-to-json-state.md"
-      ]
-    },
-    "5.3": {
-      "id": "5.3",
-      "description": "Add unit tests for sync-plan-state.sh",
-      "status": "complete",
-      "phase": 5,
-      "acceptance": "Tests for all task markers, edge cases",
-      "files": [
-        "plugins/devloop/tests/sync-plan-state.bats"
-      ]
-    },
-    "5.4": {
-      "id": "5.4",
-      "description": "Measure token usage before/after",
-      "status": "complete",
-      "phase": 5,
-      "acceptance": "Document actual savings vs projected",
-      "files": [
-        ".devloop/spikes/structured-plan-format.md (update with results)"
-      ]
-    },
-    "5.5": {
-      "id": "5.5",
-      "description": "Update CHANGELOG.md with new features",
-      "status": "complete",
-      "phase": 5,
-      "acceptance": "Entry for structured state support",
-      "files": [
-        "plugins/devloop/CHANGELOG.md"
-      ]
-    },
-    "5.6": {
-      "id": "5.6",
-      "description": "Bump version to reflect improvements",
-      "status": "complete",
-      "phase": 5,
-      "acceptance": "Update plugin.json version",
+    "6.5": {
+      "id": "6.5",
+      "description": "Bump version to 2.4.1",
+      "status": "pending",
+      "phase": 6,
       "files": [
         "plugins/devloop/.claude-plugin/plugin.json"
       ]
     }
   },
-  "parallel_groups": {
-    "B": [
-      "2.1",
-      "2.3"
-    ],
-    "C": [
-      "3.1",
-      "3.2",
-      "3.3"
-    ]
-  },
-  "dependencies": {
-    "2.2": [
-      "2.1"
-    ],
-    "2.4": [
-      "2.3"
-    ],
-    "2.5": [
-      "1.2"
-    ],
-    "2.6": [
-      "1.2"
-    ],
-    "3.4": [
-      "3.1",
-      "3.2",
-      "3.3"
-    ],
-    "3.5": [
-      "3.1"
-    ],
-    "3.6": [
-      "3.2"
-    ],
-    "4.3": [
-      "4.2"
-    ],
-    "4.4": [
-      "4.1"
-    ],
-    "4.5": [
-      "1.2"
-    ]
-  },
-  "next_task": null
+  "parallel_groups": {},
+  "dependencies": {},
+  "next_task": "6.1"
 }

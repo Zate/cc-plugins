@@ -483,8 +483,10 @@ EOF
         echo "$output_json" > "$OUTPUT_FILE"
     fi
 
-    echo "Synced plan state to: $OUTPUT_FILE"
-    [ "$VERBOSE" = true ] && echo "  Total tasks: $total, Complete: $completed, Pending: $pending"
+    echo "Synced plan state to: $OUTPUT_FILE" >&2
+    if [ "$VERBOSE" = true ]; then
+        echo "  Total tasks: $total, Complete: $completed, Pending: $pending" >&2
+    fi
 }
 
 main
