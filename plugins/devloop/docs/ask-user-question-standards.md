@@ -314,28 +314,69 @@ AskUserQuestion: "Include refresh tokens?"
 
 **Used after**: Every agent task completion
 
+**Context-Aware Pattern**: Check context usage before presenting checkpoint to provide appropriate recommendation.
+
+**Get context usage**:
+```bash
+claude --json | scripts/get-context-usage.sh
+```
+This returns a percentage (0-100). Use it to conditionally recommend options:
+- **Context < 50%**: Recommend "Continue to next task"
+- **Context >= 50%**: Recommend "Fresh start"
+
 **Template**:
 ```yaml
 AskUserQuestion:
-  question: "[BRIEF SUMMARY OF COMPLETED WORK]. What's next?"
+  question: "Task {X.Y} complete. How should we proceed?"
   header: "Checkpoint"
   options:
-    - label: "Continue"
-      description: "Proceed to next task in plan"
-    - label: "Commit first"
-      description: "Save this work, then continue"
+    # Conditional recommendation based on context usage
+    - label: "Continue to next task"
+      description: "Move to next pending task {context < 50% ? '(Recommended)' : ''}"
+    - label: "Commit now"
+      description: "Create atomic commit for this work first"
     - label: "Fresh start"
-      description: "Clear context, resume in new session"
+      description: "Save state, clear context, resume in new session {context >= 50% ? '(Recommended)' : ''}"
     - label: "Stop here"
-      description: "Generate summary, end session"
+      description: "Generate summary and end session"
 ```
 
-**Good Example**:
+**When to Use "(Recommended)" Qualifier**:
+| Context Usage | Recommend Option | Rationale |
+|---------------|------------------|-----------|
+| < 50% | "Continue to next task" | Plenty of context available, keep working |
+| >= 50% | "Fresh start" | Context getting heavy, avoid slowdown |
+
+**Good Example (Low Context)**:
 ```yaml
 AskUserQuestion:
   question: "Task 1.1 complete: Created User model with validation. What's next?"
   header: "Checkpoint"
-  options: [...]
+  options:
+    - label: "Continue to next task"
+      description: "Move to next pending task (Recommended)"  # Context at 35%
+    - label: "Commit now"
+      description: "Create atomic commit for this work first"
+    - label: "Fresh start"
+      description: "Save state, clear context, resume in new session"
+    - label: "Stop here"
+      description: "Generate summary and end session"
+```
+
+**Good Example (High Context)**:
+```yaml
+AskUserQuestion:
+  question: "Task 3.4 complete: Added integration tests. What's next?"
+  header: "Checkpoint"
+  options:
+    - label: "Continue to next task"
+      description: "Move to next pending task"
+    - label: "Commit now"
+      description: "Create atomic commit for this work first"
+    - label: "Fresh start"
+      description: "Save state, clear context, resume in new session (Recommended)"  # Context at 67%
+    - label: "Stop here"
+      description: "Generate summary and end session"
 ```
 
 **Bad Example**:
