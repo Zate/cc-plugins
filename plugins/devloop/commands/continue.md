@@ -420,17 +420,26 @@ Bash: "${CLAUDE_PLUGIN_ROOT}/scripts/sync-plan-state.sh"
 
 **ALWAYS present this question after EVERY task completion - never skip:**
 
+**Get context usage** to determine recommendation:
+```bash
+Bash: "claude --json | ${CLAUDE_PLUGIN_ROOT}/scripts/get-context-usage.sh"
+```
+
+This returns a percentage (0-100). Use it to recommend the appropriate option:
+
 ```yaml
 AskUserQuestion:
   question: "Task {X.Y} complete. How should we proceed?"
   header: "Checkpoint"
   options:
+    # If context < 50%: Recommend "Continue to next task"
+    # If context >= 50%: Recommend "Fresh start"
     - label: "Continue to next task"
-      description: "Move to next pending task (Recommended)"
+      description: "Move to next pending task {context < 50% ? '(Recommended)' : ''}"
     - label: "Commit now"
       description: "Create atomic commit for this work first"
     - label: "Fresh start"
-      description: "Save state, clear context, resume in new session"
+      description: "Save state, clear context, resume in new session {context >= 50% ? '(Recommended)' : ''}"
     - label: "Stop here"
       description: "Generate summary and end session"
 ```
