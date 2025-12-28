@@ -41,26 +41,43 @@ If `.devloop/plan.md` exists:
 **Updated**: [Current ISO timestamp]
 ```
 
-### Step 3: Commit Decision
+### Step 3: Context-Aware Checkpoint Decision
 
-Present mandatory decision:
+**ALWAYS present this question after EVERY task completion - never skip:**
+
+**Get context usage** to determine recommendation:
+```bash
+Bash: "claude --json | ${CLAUDE_PLUGIN_ROOT}/scripts/get-context-usage.sh"
+```
+
+This returns a percentage (0-100). Use it to recommend the appropriate option:
 
 ```yaml
 AskUserQuestion:
-  question: "Task [X.Y] complete. How should we proceed?"
+  question: "Task {X.Y} complete. How should we proceed?"
   header: "Checkpoint"
   options:
+    # If context < 50%: Recommend "Continue to next task"
+    # If context >= 50%: Recommend "Fresh start"
+    - label: "Continue to next task"
+      description: "Move to next pending task {context < 50% ? '(Recommended)' : ''}"
     - label: "Commit now"
-      description: "Create atomic commit for this work"
-    - label: "Continue working"
-      description: "Group with related tasks before committing"
+      description: "Create atomic commit for this work first"
     - label: "Fresh start"
-      description: "Save state, clear context, resume in new session"
+      description: "Save state, clear context, resume in new session {context >= 50% ? '(Recommended)' : ''}"
     - label: "Stop here"
       description: "Generate summary and end session"
 ```
 
 ### Step 4: Execute Selected Action
+
+**If "Continue to next task"**:
+```
+1. No commit yet - changes remain staged/unstaged
+2. Return to Step 5b (Loop Completion Detection) immediately
+3. If tasks remain, proceed to next task
+4. If all complete, present completion options
+```
 
 **If "Commit now"**:
 ```
@@ -72,14 +89,7 @@ AskUserQuestion:
 2. Run git commit (or invoke devloop:engineer in git mode)
 3. Verify commit succeeded
 4. Update worklog with commit hash
-5. Return to Step 5b (continuation decision)
-```
-
-**If "Continue working"**:
-```
-1. No commit yet - changes remain staged
-2. Return to Step 5b immediately
-3. Proceed to next task in same phase
+5. Return to Step 5b (Loop Completion Detection)
 ```
 
 **If "Fresh start"**:
@@ -98,6 +108,46 @@ AskUserQuestion:
 3. Show suggested next steps
 4. END workflow
 ```
+
+## Context-Aware Recommendations
+
+### Context Usage Calculation
+
+The `get-context-usage.sh` script:
+1. Reads `claude --json` output to get current context window usage
+2. Calculates percentage: `(tokens_used / max_tokens) * 100`
+3. Returns integer percentage (0-100)
+
+### Recommendation Logic
+
+| Context Usage | Recommended Action | Rationale |
+|---------------|-------------------|-----------|
+| **< 50%** | "Continue to next task" | Plenty of context remaining, efficient to continue |
+| **>= 50%** | "Fresh start" | Context building up, fresh session prevents degradation |
+
+### Dynamic Option Formatting
+
+The checkpoint question dynamically adds "(Recommended)" based on context:
+
+```typescript
+// Pseudocode for option description generation
+const contextUsage = getContextUsage(); // Returns 0-100
+
+const continueDescription =
+  `Move to next pending task${contextUsage < 50 ? ' (Recommended)' : ''}`;
+
+const freshDescription =
+  `Save state, clear context, resume in new session${contextUsage >= 50 ? ' (Recommended)' : ''}`;
+```
+
+### Why 50% Threshold?
+
+- **Below 50%**: Low risk of context degradation, continue efficiently
+- **At 50%+**: Noticeable context build-up, proactive refresh prevents:
+  - Slower response times
+  - Reduced model accuracy
+  - Potential context overflow
+  - Degraded task quality
 
 ## Checkpoint Requirements
 
