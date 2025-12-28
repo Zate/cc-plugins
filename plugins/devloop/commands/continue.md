@@ -219,7 +219,15 @@ AskUserQuestion:
 
 ## Step 4: Execute with Agent
 
-**CRITICAL**: Use the Task tool with explicit `subagent_type` from Agent Routing Table.
+**MANDATORY**: You MUST use the Task tool with explicit `subagent_type` from Agent Routing Table for ALL implementation tasks. Do NOT execute work directly in the main conversation.
+
+### 4a: Route to Agent (REQUIRED)
+
+**Critical enforcement rules**:
+1. **Always delegate**: ALL task execution MUST be delegated to specialized agents via the Task tool
+2. **Verify invocation**: After spawning agent, confirm the Task tool was actually invoked (check response)
+3. **No direct work**: Do NOT implement features, write code, or make file changes in this conversation
+4. **Agent is the implementer**: This command orchestrates; agents do the work
 
 **Single parameterized pattern**:
 
@@ -237,7 +245,9 @@ Task:
     [Mode-specific instructions based on task type]
 ```
 
-**Example - Implementation Task**:
+### 4b: Agent Invocation Examples
+
+**Example 1 - Implementation Task**:
 ```
 Task:
   subagent_type: devloop:engineer
@@ -252,7 +262,108 @@ Task:
     Follow the plan's architecture decisions. Update the plan when done.
 ```
 
-**For other agent types**: Adapt the prompt mode instruction:
+**Example 2 - Multiple Parallel Tasks**:
+```
+# Launch both tasks in parallel
+Task:
+  subagent_type: devloop:engineer
+  description: "Implement UserService"
+  run_in_background: true
+  prompt: |
+    Implement the following task from the devloop plan:
+
+    **Task**: Task 2.1 - Implement UserService
+    **Acceptance criteria**: CRUD operations, 90% test coverage
+    **Context**: services/, existing repository pattern
+
+    This task can run in parallel with Task 2.2. Update the plan when done.
+
+Task:
+  subagent_type: devloop:engineer
+  description: "Implement ProductService"
+  run_in_background: true
+  prompt: |
+    Implement the following task from the devloop plan:
+
+    **Task**: Task 2.2 - Implement ProductService
+    **Acceptance criteria**: CRUD operations, 90% test coverage
+    **Context**: services/, existing repository pattern
+
+    This task can run in parallel with Task 2.1. Update the plan when done.
+
+# Then collect results with TaskOutput
+```
+
+**Example 3 - Test Generation**:
+```
+Task:
+  subagent_type: devloop:qa-engineer
+  description: "Generate tests for UserService"
+  prompt: |
+    Generator mode: Create tests for the following:
+
+    **Task**: Task 4.1 - Add unit tests for UserService
+    **Acceptance criteria**: 90%+ coverage, edge cases covered
+    **Context**: services/user.go, existing test patterns in services/*_test.go
+
+    Follow existing test table-driven patterns. Update the plan when done.
+```
+
+**Example 4 - Code Review**:
+```
+Task:
+  subagent_type: devloop:code-reviewer
+  description: "Review authentication implementation"
+  prompt: |
+    Review recent changes for the following:
+
+    **Task**: Task 5.1 - Review authentication code
+    **Acceptance criteria**: Security best practices, no critical issues
+    **Context**: middleware/auth.go, handlers/login.go
+
+    Use confidence-based filtering. Report high-priority issues only. Update the plan when done.
+```
+
+**Example 5 - Architecture Design**:
+```
+Task:
+  subagent_type: devloop:engineer
+  description: "Design payment integration architecture"
+  prompt: |
+    Architect mode: Design implementation approach for:
+
+    **Task**: Task 1.2 - Design payment integration
+    **Acceptance criteria**: Support Stripe and PayPal, extensible for future providers
+    **Context**: Current architecture uses service layer pattern
+
+    Propose 2-3 approaches with trade-offs. Present for user approval before implementation.
+```
+
+### 4c: Verification After Agent Spawn (MANDATORY)
+
+After invoking the Task tool, verify the agent was actually spawned:
+
+1. **Check response**: Confirm you see a task ID or agent execution confirmation
+2. **If no agent spawned**: DO NOT proceed to implement work yourself - retry Task invocation
+3. **If agent fails to route**: Report the routing issue and ask user how to proceed
+
+**Anti-pattern (DO NOT DO THIS)**:
+```
+❌ Task tool failed, so I'll just implement it here...
+❌ Let me write the code directly instead of using the agent...
+❌ I'll handle this simple task without delegating...
+```
+
+**Correct pattern**:
+```
+✅ Task tool invoked successfully, waiting for agent result...
+✅ Agent execution confirmed, monitoring progress...
+✅ If Task fails: Report issue, retry, or ask user for guidance
+```
+
+### 4d: Mode-Specific Prompt Instructions
+
+**For other agent types**, adapt the prompt mode instruction:
 - Explore mode: "Explore mode: Investigate... Return key files and findings. Don't modify code."
 - Architect mode: "Architect mode: Design implementation approach... Propose 2-3 approaches with trade-offs."
 - Git mode: "Git mode: Handle version control for completed work... Stage, commit with conventional message."
