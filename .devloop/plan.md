@@ -1,9 +1,9 @@
 # Devloop Plan: Unified Workflow Conductor
 
 **Created**: 2025-12-29
-**Updated**: 2025-12-29 19:50
+**Updated**: 2025-12-29 21:15
 **Status**: In Progress
-**Current Phase**: Phase 7
+**Current Phase**: Phase 8
 
 **Previous Plan**: Agent Enforcement & Checkpoint Improvements (Complete)
 
@@ -45,7 +45,7 @@ Implement a unified workflow conductor system that:
   - Calculate health score
   - Files: `plugins/devloop/scripts/workflow-state.sh` (new)
 
-- [ ] Task 7.3: Create workflow-router skill
+- [x] Task 7.3: Create workflow-router skill
   - Interprets session hook output
   - Presents guided choices via AskUserQuestion
   - Routes to appropriate commands (continue, fresh, start new, etc.)
@@ -53,7 +53,7 @@ Implement a unified workflow conductor system that:
 
 ### Phase 8: Smart Entry Point
 
-- [ ] Task 8.1: Create /devloop:start command
+- [x] Task 8.1: Create /devloop:start command
   - Check workflow.json for active workflow
   - Check for existing plan.md state
   - Check for recent spikes
@@ -125,6 +125,8 @@ Implement a unified workflow conductor system that:
   - Files: `plugins/devloop/.claude-plugin/plugin.json`
 
 ## Progress Log
+- 2025-12-29 21:15: Task 8.1 complete - Created /devloop:start command (450 lines) with 10 situation handlers and fallback detection
+- 2025-12-29 20:15: Task 7.3 complete - Created workflow-router skill (822 lines) with 10 classified situations
 - 2025-12-29 19:50: Task 7.2 complete - Created workflow-state.sh script with all operations
 - 2025-12-29 17:00: Task 7.1 complete - Created workflow.json schema and documentation
 - 2025-12-29: Plan created from spikes (workflow-chaining-improvements.md, hook-driven-workflow-routing.md)
