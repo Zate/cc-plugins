@@ -1,7 +1,10 @@
 ---
 description: Archive completed phases from plan.md to compress active plan and rotate Progress Log to worklog
 argument-hint: Optional phase numbers to archive (e.g., "1 2" to archive Phase 1 and 2)
-allowed-tools: ["Bash", "AskUserQuestion"]
+allowed-tools: [
+  "Bash", "AskUserQuestion",
+  "Bash(${CLAUDE_PLUGIN_ROOT}/scripts/archive-interactive.sh:*)"
+]
 ---
 
 # Archive Plan

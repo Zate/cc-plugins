@@ -134,8 +134,12 @@ get_active_plan() {
         # Extract plan name from first heading
         local plan_name=$(grep -m1 "^# " "$plan_file" 2>/dev/null | sed 's/^# //' | head -c 50)
         # Count completed vs total tasks
-        local total=$(grep -c "^\s*- \[" "$plan_file" 2>/dev/null || echo "0")
-        local done=$(grep -c "^\s*- \[x\]" "$plan_file" 2>/dev/null || echo "0")
+        # Use { grep || true; } to prevent exit code 1 from triggering fallback
+        local total=$({ grep -cE '^\s*- \[' "$plan_file" 2>/dev/null || true; } | tr -d '\n')
+        local done=$({ grep -cE '^\s*- \[xX\]' "$plan_file" 2>/dev/null || true; } | tr -d '\n')
+        # Ensure numeric (empty becomes 0)
+        total=${total:-0}
+        done=${done:-0}
         if [ -n "$plan_name" ]; then
             echo "name=$plan_name,done=$done,total=$total,file=$plan_file"
             return

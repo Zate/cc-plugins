@@ -1,7 +1,11 @@
 ---
 name: stats
 description: View token usage statistics and API limit tracking across all projects
-allowed-tools: ["Bash", "Read"]
+allowed-tools: [
+  "Bash", "Read",
+  "Bash(${CLAUDE_PLUGIN_ROOT}/scripts/token-tracker.sh:*)",
+  "Bash(${CLAUDE_PLUGIN_ROOT}/scripts/fetch-api-usage.sh:*)"
+]
 ---
 
 # Token Usage Statistics

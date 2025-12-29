@@ -1,7 +1,10 @@
 ---
 description: Save current plan state and prepare for fresh context restart
 argument-hint: none
-allowed-tools: ["Bash", "AskUserQuestion"]
+allowed-tools: [
+  "Bash", "AskUserQuestion",
+  "Bash(${CLAUDE_PLUGIN_ROOT}/scripts/fresh-start.sh:*)"
+]
 ---
 
 # Fresh Start

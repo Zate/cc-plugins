@@ -1,7 +1,10 @@
 ---
 description: Complete validation and git integration for shipping a feature
 argument-hint: Optional commit message or PR title
-allowed-tools: ["Read", "Write", "Edit", "Grep", "Glob", "Bash", "Task", "AskUserQuestion", "TodoWrite", "Skill"]
+allowed-tools: [
+  "Read", "Write", "Edit", "Grep", "Glob", "Bash", "Task", "AskUserQuestion", "TodoWrite", "Skill",
+  "Bash(${CLAUDE_PLUGIN_ROOT}/scripts/ship-validation.sh:*)"
+]
 ---
 
 # Ship Feature

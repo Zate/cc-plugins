@@ -1,7 +1,14 @@
 ---
 description: Resume work from an existing plan - finds the current plan and implements the next step
 argument-hint: Optional specific step to work on
-allowed-tools: ["Read", "Write", "Edit", "Grep", "Glob", "Bash", "Task", "AskUserQuestion", "TodoWrite", "Skill", "WebSearch", "WebFetch", "EnterPlanMode"]
+allowed-tools: [
+  "Read", "Write", "Edit", "Grep", "Glob", "Bash", "Task", "AskUserQuestion", "TodoWrite", "Skill", "WebSearch", "WebFetch", "EnterPlanMode",
+  "Bash(${CLAUDE_PLUGIN_ROOT}/scripts/detect-plan.sh:*)",
+  "Bash(${CLAUDE_PLUGIN_ROOT}/scripts/show-plan-status.sh:*)",
+  "Bash(${CLAUDE_PLUGIN_ROOT}/scripts/select-next-task.sh:*)",
+  "Bash(${CLAUDE_PLUGIN_ROOT}/scripts/sync-plan-state.sh:*)",
+  "Bash(${CLAUDE_PLUGIN_ROOT}/scripts/get-context-usage.sh:*)"
+]
 ---
 
 # Continue from Plan
