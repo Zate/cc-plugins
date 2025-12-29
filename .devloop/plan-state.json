@@ -1,84 +1,223 @@
 {
   "schema_version": "1.0.0",
   "plan_file": ".devloop/plan.md",
-  "last_sync": "2025-12-28T10:52:52Z",
-  "plan_name": "Devloop Plan: Agent Enforcement & Checkpoint Improvements",
-  "status": "complete",
-  "created": "2025-12-27",
-  "updated": "00",
-  "current_phase": 6,
+  "last_sync": "2025-12-29T03:29:09Z",
+  "plan_name": "Devloop Plan: Unified Workflow Conductor",
+  "status": "in_progress",
+  "created": "2025-12-29",
+  "updated": "",
+  "current_phase": 7,
   "stats": {
-    "total": 5,
-    "completed": 5,
-    "pending": 0,
+    "total": 14,
+    "completed": 0,
+    "pending": 14,
     "in_progress": 0,
     "blocked": 0,
     "skipped": 0,
-    "done": 5,
-    "percentage": 100
+    "done": 0,
+    "percentage": 0
   },
   "phases": [
     {
-      "number": 6,
-      "name": "Agent Enforcement & Checkpoint Improvements",
-      "status": "complete",
+      "number": 7,
+      "name": "Foundation - Unified Workflow State",
+      "status": "pending",
       "task_ids": [
-        "6.1",
-        "6.2",
-        "6.3",
-        "6.4",
-        "6.5"
+        "7.1",
+        "7.2",
+        "7.3"
       ],
       "stats": {
-        "total": 5,
-        "completed": 5,
-        "pending": 0
+        "total": 3,
+        "completed": 0,
+        "pending": 3
+      }
+    },
+    {
+      "number": 8,
+      "name": "Smart Entry Point",
+      "status": "pending",
+      "task_ids": [
+        "8.1",
+        "8.2",
+        "8.3"
+      ],
+      "stats": {
+        "total": 3,
+        "completed": 0,
+        "pending": 3
+      }
+    },
+    {
+      "number": 9,
+      "name": "Integration with Existing Commands",
+      "status": "pending",
+      "task_ids": [
+        "9.1",
+        "9.2",
+        "9.3"
+      ],
+      "stats": {
+        "total": 3,
+        "completed": 0,
+        "pending": 3
+      }
+    },
+    {
+      "number": 10,
+      "name": "Metrics & Status Display",
+      "status": "pending",
+      "task_ids": [
+        "10.1",
+        "10.2"
+      ],
+      "stats": {
+        "total": 2,
+        "completed": 0,
+        "pending": 2
+      }
+    },
+    {
+      "number": 11,
+      "name": "Finalization",
+      "status": "pending",
+      "task_ids": [
+        "11.1",
+        "11.2",
+        "11.3"
+      ],
+      "stats": {
+        "total": 3,
+        "completed": 0,
+        "pending": 3
       }
     }
   ],
   "tasks": {
-    "6.1": {
-      "id": "6.1",
-      "description": "Update continue.md Step 4 with mandatory agent routing enforcement",
-      "status": "complete",
-      "phase": 6,
+    "7.1": {
+      "id": "7.1",
+      "description": "Create workflow.json schema",
+      "status": "pending",
+      "phase": 7,
+      "files": [
+        "plugins/devloop/schemas/workflow.schema.json (new)",
+        "plugins/devloop/docs/workflow-state.md (new)"
+      ]
+    },
+    "7.2": {
+      "id": "7.2",
+      "description": "Create workflow-state.sh script",
+      "status": "pending",
+      "phase": 7,
+      "files": [
+        "plugins/devloop/scripts/workflow-state.sh (new)"
+      ]
+    },
+    "7.3": {
+      "id": "7.3",
+      "description": "Create workflow-router skill",
+      "status": "pending",
+      "phase": 7,
+      "files": [
+        "plugins/devloop/skills/workflow-router/SKILL.md (new)"
+      ]
+    },
+    "8.1": {
+      "id": "8.1",
+      "description": "Create /devloop:start command",
+      "status": "pending",
+      "phase": 8,
+      "files": [
+        "plugins/devloop/commands/start.md (new)"
+      ]
+    },
+    "8.2": {
+      "id": "8.2",
+      "description": "Update session-start.sh to output structured workflow state",
+      "status": "pending",
+      "phase": 8,
+      "files": [
+        "plugins/devloop/hooks/session-start.sh"
+      ]
+    },
+    "8.3": {
+      "id": "8.3",
+      "description": "Create detect-workflow-state.sh script",
+      "status": "pending",
+      "phase": 8,
+      "files": [
+        "plugins/devloop/scripts/detect-workflow-state.sh (new)"
+      ]
+    },
+    "9.1": {
+      "id": "9.1",
+      "description": "Update /devloop:continue to update workflow.json on each checkpoint",
+      "status": "pending",
+      "phase": 9,
       "files": [
         "plugins/devloop/commands/continue.md"
       ]
     },
-    "6.2": {
-      "id": "6.2",
-      "description": "Update continue.md Step 5a.4 checkpoint to recommend Fresh Start based on context usage",
-      "status": "complete",
-      "phase": 6,
+    "9.2": {
+      "id": "9.2",
+      "description": "Update /devloop:fresh to update workflow state",
+      "status": "pending",
+      "phase": 9,
       "files": [
-        "plugins/devloop/commands/continue.md",
-        "plugins/devloop/scripts/get-context-usage.sh (new)"
+        "plugins/devloop/commands/fresh.md"
       ]
     },
-    "6.3": {
-      "id": "6.3",
-      "description": "Update ask-user-question-standards.md Format 1 (Checkpoint) to match",
-      "status": "complete",
-      "phase": 6,
+    "9.3": {
+      "id": "9.3",
+      "description": "Update /devloop and /devloop:spike to initialize workflow",
+      "status": "pending",
+      "phase": 9,
       "files": [
-        "plugins/devloop/docs/ask-user-question-standards.md"
+        "plugins/devloop/commands/devloop.md",
+        "plugins/devloop/commands/spike.md"
       ]
     },
-    "6.4": {
-      "id": "6.4",
-      "description": "Update workflow-loop skill checkpoint-patterns.md reference",
-      "status": "complete",
-      "phase": 6,
+    "10.1": {
+      "id": "10.1",
+      "description": "Enhance /devloop:status (or create new) with workflow metrics",
+      "status": "pending",
+      "phase": 10,
       "files": [
-        "plugins/devloop/skills/workflow-loop/references/checkpoint-patterns.md"
+        "plugins/devloop/commands/status.md (new or enhance existing)"
       ]
     },
-    "6.5": {
-      "id": "6.5",
-      "description": "Bump version to 2.4.7",
-      "status": "complete",
-      "phase": 6,
+    "10.2": {
+      "id": "10.2",
+      "description": "Update session-tracker.sh to integrate with workflow metrics",
+      "status": "pending",
+      "phase": 10,
+      "files": [
+        "plugins/devloop/scripts/session-tracker.sh"
+      ]
+    },
+    "11.1": {
+      "id": "11.1",
+      "description": "Test all scenarios",
+      "status": "pending",
+      "phase": 11,
+      "files": [
+        "Manual testing"
+      ]
+    },
+    "11.2": {
+      "id": "11.2",
+      "description": "Update CLAUDE.md with new workflow guidance",
+      "status": "pending",
+      "phase": 11,
+      "files": [
+        "CLAUDE.md"
+      ]
+    },
+    "11.3": {
+      "id": "11.3",
+      "description": "Bump version to 2.5.0",
+      "status": "pending",
+      "phase": 11,
       "files": [
         "plugins/devloop/.claude-plugin/plugin.json"
       ]
@@ -86,5 +225,5 @@
   },
   "parallel_groups": {},
   "dependencies": {},
-  "next_task": null
+  "next_task": "7.1"
 }

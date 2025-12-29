@@ -1,75 +1,144 @@
-# Devloop Plan: Agent Enforcement & Checkpoint Improvements
+# Devloop Plan: Unified Workflow Conductor
 
-**Created**: 2025-12-27
-**Updated**: 2025-12-28 10:00
-**Status**: Complete
-**Current Phase**: Phase 6
+**Created**: 2025-12-29
+**Updated**: 2025-12-29 17:00
+**Status**: In Progress
+**Current Phase**: Phase 7
 
-**Previous Plan**: Structured Plan Format & Script-First Workflow (Complete)
+**Previous Plan**: Agent Enforcement & Checkpoint Improvements (Complete)
 
 ## Overview
 
-Address two issues discovered during workflow observation:
-1. **Engineer agent not being mandated** - continue.md documents agent routing but doesn't enforce it
-2. **Fresh start not recommended** - checkpoints recommend "Continue" instead of "Fresh start"
+Implement a unified workflow conductor system that:
+1. **Tracks loop state holistically** - Not just plan state, but full workflow position
+2. **Auto-recommends next actions** - Smart routing based on context
+3. **Measures loop health** - Aggregated metrics across sessions
+4. **Reduces manual transitions** - Automatic handoffs where possible
 
-**Source**: Spike investigation "Engineer Agent Usage and Fresh Start Recommendation"
-- Spike report: `.devloop/spikes/engineer-agent-and-freshstart.md`
+**Source**: Two related spike investigations
+- `workflow-chaining-improvements.md` - Main design for unified conductor
+- `hook-driven-workflow-routing.md` - Hook-based routing approach
 
 ## Success Criteria
 
-1. [x] continue.md Step 4 has **MANDATORY** agent enforcement language
-2. [x] Checkpoint questions recommend "Fresh start" when context > 50% full
-3. [x] Script exists to query context usage percentage
-4. [x] ask-user-question-standards.md updated with new checkpoint pattern
-5. [x] workflow-loop skill references updated
-6. [x] Version bumped to 2.4.7
+1. [ ] `workflow.json` schema defined and documented
+2. [ ] `/devloop:start` command auto-detects context and routes appropriately
+3. [ ] `workflow-router` skill interprets session state and presents options
+4. [ ] Session start hook provides structured workflow state to agents
+5. [ ] Workflow state integrates with existing continue/fresh/ship commands
+6. [ ] Version bumped to 2.5.0
 
 ## Tasks
 
-### Phase 6: Agent Enforcement & Checkpoint Improvements
+### Phase 7: Foundation - Unified Workflow State
 
-- [x] Task 6.1: Update continue.md Step 4 with mandatory agent routing enforcement
-  - Add **MANDATORY** language: "You MUST use the Task tool with devloop:engineer for ALL implementation tasks"
-  - Add validation reminder: After spawning agent, verify agent was actually invoked
-  - Add multiple Task invocation examples (not just one)
+- [x] Task 7.1: Create workflow.json schema
+  - Define schema with: position, origin, plan, sessions, metrics, transitions, next_action
+  - Create JSON schema file for validation
+  - Document schema in skill or doc file
+  - Files: `plugins/devloop/schemas/workflow.schema.json` (new), `plugins/devloop/docs/workflow-state.md` (new)
+
+- [ ] Task 7.2: Create workflow-state.sh script
+  - Initialize workflow.json when starting new workflow
+  - Update workflow state (position, metrics, transitions)
+  - Read current state for routing decisions
+  - Calculate health score
+  - Files: `plugins/devloop/scripts/workflow-state.sh` (new)
+
+- [ ] Task 7.3: Create workflow-router skill
+  - Interprets session hook output
+  - Presents guided choices via AskUserQuestion
+  - Routes to appropriate commands (continue, fresh, start new, etc.)
+  - Files: `plugins/devloop/skills/workflow-router/SKILL.md` (new)
+
+### Phase 8: Smart Entry Point
+
+- [ ] Task 8.1: Create /devloop:start command
+  - Check workflow.json for active workflow
+  - Check for existing plan.md state
+  - Check for recent spikes
+  - Check for open issues
+  - Route to appropriate workflow based on detection
+  - Files: `plugins/devloop/commands/start.md` (new)
+
+- [ ] Task 8.2: Update session-start.sh to output structured workflow state
+  - Output workflow_state JSON with: has_active_plan, has_fresh_start, plan_progress, recommended_action, alternatives
+  - Integrate with workflow-state.sh for reading state
+  - Files: `plugins/devloop/hooks/session-start.sh`
+
+- [ ] Task 8.3: Create detect-workflow-state.sh script
+  - Detect active plan, fresh start state, open issues
+  - Calculate recommended action and alternatives
+  - Return structured JSON for routing
+  - Files: `plugins/devloop/scripts/detect-workflow-state.sh` (new)
+
+### Phase 9: Integration with Existing Commands
+
+- [ ] Task 9.1: Update /devloop:continue to update workflow.json on each checkpoint
+  - Write session metrics after task completion
+  - Update position (current_task, subphase)
+  - Track transitions
   - Files: `plugins/devloop/commands/continue.md`
 
-- [x] Task 6.2: Update continue.md Step 5a.4 checkpoint to recommend Fresh Start based on context usage
-  - Fresh start should be recommended when context is > 50% full
-  - Call a script to get context percentage (statusline already calculates this)
-  - Add "(Recommended)" to Fresh start option when context > 50%
-  - Keep "Continue to next task" as first option but only recommend when context < 50%
-  - Files: `plugins/devloop/commands/continue.md`, `plugins/devloop/scripts/get-context-usage.sh` (new)
+- [ ] Task 9.2: Update /devloop:fresh to update workflow state
+  - Record transition to "fresh" state
+  - Update session end metrics
+  - Set next_action for resume
+  - Files: `plugins/devloop/commands/fresh.md`
 
-- [x] Task 6.3: Update ask-user-question-standards.md Format 1 (Checkpoint) to match
-  - Updated Format 1 (Standard Checkpoint) with context-aware pattern
-  - Added context usage check instructions
-  - Documented when to use "(Recommended)" qualifier (< 50% vs >= 50%)
-  - Added two examples showing low context and high context scenarios
-  - Files: `plugins/devloop/docs/ask-user-question-standards.md`
+- [ ] Task 9.3: Update /devloop and /devloop:spike to initialize workflow
+  - Create workflow.json when starting new work
+  - Set origin (manual, spike, issue, quick)
+  - Initialize metrics
+  - Files: `plugins/devloop/commands/devloop.md`, `plugins/devloop/commands/spike.md`
 
-- [x] Task 6.4: Update workflow-loop skill checkpoint-patterns.md reference
-  - Align checkpoint pattern with new recommendations
-  - Files: `plugins/devloop/skills/workflow-loop/references/checkpoint-patterns.md`
+### Phase 10: Metrics & Status Display
 
-- [x] Task 6.5: Bump version to 2.4.7
+- [ ] Task 10.1: Enhance /devloop:status (or create new) with workflow metrics
+  - Show current workflow position
+  - Display velocity metrics (tasks/hour, trend)
+  - Show health score with factor breakdown
+  - Present recommended next action with alternatives
+  - Files: `plugins/devloop/commands/status.md` (new or enhance existing)
+
+- [ ] Task 10.2: Update session-tracker.sh to integrate with workflow metrics
+  - Record session data into workflow.json
+  - Calculate aggregate metrics across sessions
+  - Files: `plugins/devloop/scripts/session-tracker.sh`
+
+### Phase 11: Finalization
+
+- [ ] Task 11.1: Test all scenarios
+  - Clean session (no state)
+  - Active plan mid-execution
+  - Fresh start state
+  - Plan complete
+  - Stale state
+  - Files: Manual testing
+
+- [ ] Task 11.2: Update CLAUDE.md with new workflow guidance
+  - Document /devloop:start as primary entry point
+  - Update workflow diagram with new flow
+  - Files: `CLAUDE.md`
+
+- [ ] Task 11.3: Bump version to 2.5.0
   - Files: `plugins/devloop/.claude-plugin/plugin.json`
 
 ## Progress Log
-- 2025-12-28 10:00: Completed Task 6.5 - Bumped version to 2.4.7
-- 2025-12-28 09:30: Completed Task 6.4 - Updated workflow-loop skill checkpoint-patterns.md with context-aware recommendations
-- 2025-12-28 09:00: Completed Task 6.3 - Updated ask-user-question-standards.md Format 1 with context-aware checkpoint pattern
-- 2025-12-28 08:30: Completed Task 6.2 - Added context-based Fresh Start recommendation to continue.md Step 5a.4
-- 2025-12-28 08:15: Completed Task 6.1 - Updated continue.md Step 4 with mandatory agent routing enforcement
-- 2025-12-27: Plan created from spike findings (engineer-agent-and-freshstart.md)
-
-### Previous Plan Progress (Archived)
-See `.devloop/archive/` for completed phases from "Structured Plan Format & Script-First Workflow" plan.
+- 2025-12-29 17:00: Task 7.1 complete - Created workflow.json schema and documentation
+- 2025-12-29: Plan created from spikes (workflow-chaining-improvements.md, hook-driven-workflow-routing.md)
 
 ## Notes
 
-**Key Changes**:
-1. Agent enforcement: continue.md must mandate Task tool usage, not just document it
-2. Fresh start recommendation: Checkpoints should recommend fresh start after 5+ tasks per CLAUDE.md workflow guidance
-3. Consistency: All checkpoint-related docs must align with the new pattern
+**Key Design Decisions**:
+1. **workflow.json is the source of truth** for workflow position, not just plan.md
+2. **Backward compatible** - create workflow.json on first use, existing plans continue to work
+3. **User stays in control** - auto-suggest but never force transitions
+4. **Phased rollout** - each phase is independently useful
+
+**Risks**:
+- Migration complexity (mitigated by lazy initialization)
+- Over-automation concerns (mitigated by always offering alternatives)
+- State corruption with concurrent sessions (mitigated by session locking)
+
+**Estimated Size**: Large overall, but S-M per phase
