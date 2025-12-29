@@ -4,6 +4,7 @@
 # Sets environment variables for use by agents
 # Runs worklog rotation check on session start
 # Initializes session tracking for context usage monitoring
+# Outputs structured workflow state for intelligent routing decisions
 
 set -euo pipefail
 
@@ -330,6 +331,20 @@ CONTEXT_MSG="$CONTEXT_MSG
 
 $VALIDATION_WARNING"
 
+# Workflow routing recommendation - capture both JSON and situation string
+WORKFLOW_STATE_SCRIPT="$SCRIPTS_DIR/detect-workflow-state.sh"
+WORKFLOW_STATE_JSON='{}'
+WORKFLOW_SITUATION=""
+if [ -f "$WORKFLOW_STATE_SCRIPT" ]; then
+    # Get full JSON output for hookSpecificOutput
+    WORKFLOW_STATE_JSON=$("$WORKFLOW_STATE_SCRIPT" --json 2>/dev/null || echo '{}')
+
+    # Extract situation field for backward-compatible context message
+    if command -v jq &> /dev/null && [ "$WORKFLOW_STATE_JSON" != '{}' ]; then
+        WORKFLOW_SITUATION=$(echo "$WORKFLOW_STATE_JSON" | jq -r '.situation // ""' 2>/dev/null || echo "")
+    fi
+fi
+
 if [ "$FRESH_START_DETECTED" = true ]; then
     CONTEXT_MSG="$CONTEXT_MSG
 
@@ -349,6 +364,24 @@ The continue command will:
 4. Continue with the next pending task
 
 This is an automatic resume from a previous fresh start. Proceed immediately."
+elif [ -n "$WORKFLOW_SITUATION" ] && [ "$WORKFLOW_SITUATION" != "clean_slate" ]; then
+    # Non-fresh-start workflow state detected - suggest routing
+    CONTEXT_MSG="$CONTEXT_MSG
+
+---
+
+**Workflow State Detected**: \`$WORKFLOW_SITUATION\`
+
+If the user hasn't specified a task, consider invoking \`Skill: workflow-router\` to present options.
+The workflow-router skill will:
+1. Analyze the current state in detail
+2. Present appropriate options via AskUserQuestion
+3. Route to the correct command based on user choice
+
+Alternatively, the user can directly use:
+- \`/devloop:continue\` to resume active plan
+- \`/devloop:status\` to view detailed state
+- \`/devloop\` to start new work"
 fi
 
 # Build status message
@@ -369,19 +402,23 @@ if command -v jq &> /dev/null; then
   "systemMessage": ${ESCAPED_STATUS},
   "hookSpecificOutput": {
     "hookEventName": "SessionStart",
-    "additionalContext": ${ESCAPED_MSG}
+    "additionalContext": ${ESCAPED_MSG},
+    "workflow_state": ${WORKFLOW_STATE_JSON}
   }
 }
 EOF
 else
     ESCAPED_MSG=$(printf '%s' "$CONTEXT_MSG" | awk 'BEGIN{ORS="\\n"}{gsub(/\\/,"\\\\");gsub(/"/,"\\\"");gsub(/\t/,"\\t");print}' | sed '$ s/\\n$//')
     ESCAPED_STATUS=$(printf '%s' "$STATUS_MSG" | sed 's/"/\\"/g')
+    # For non-jq fallback, workflow_state should still be valid JSON
+    # WORKFLOW_STATE_JSON is already in JSON format from detect-workflow-state.sh
     cat <<EOF
 {
   "systemMessage": "$ESCAPED_STATUS",
   "hookSpecificOutput": {
     "hookEventName": "SessionStart",
-    "additionalContext": "$ESCAPED_MSG"
+    "additionalContext": "$ESCAPED_MSG",
+    "workflow_state": ${WORKFLOW_STATE_JSON}
   }
 }
 EOF
