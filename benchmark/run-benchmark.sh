@@ -13,6 +13,9 @@ TASK_FILE="$SCRIPT_DIR/task-fastify-api.md"
 TIMESTAMP=$(date +%Y%m%d-%H%M%S)
 PLUGIN_DIR="/home/zate/projects/cc-plugins/plugins/devloop"
 
+# System prompt addition to prevent questions
+NO_QUESTIONS_PROMPT="CRITICAL: Never use AskUserQuestion tool. Never ask for clarification. Make reasonable assumptions and proceed. Complete the entire task autonomously."
+
 mkdir -p "$RESULTS_DIR"
 
 echo "========================================"
@@ -44,15 +47,24 @@ run_single_benchmark() {
     local task_content
     task_content=$(cat "$TASK_FILE")
     
+    # Common flags to prevent interactive behavior
+    # --disallowedTools prevents AskUserQuestion from being available
+    # --append-system-prompt adds extra instruction to not ask questions
+    local COMMON_FLAGS=(
+        -p
+        --dangerously-skip-permissions
+        --output-format json
+        --max-budget-usd 50
+        --disallowedTools "AskUserQuestion"
+        --append-system-prompt "$NO_QUESTIONS_PROMPT"
+    )
+    
     # Run Claude based on variant
     case "$VARIANT" in
         native)
             echo "Running: native Claude (no plugins)"
-            claude -p \
+            claude "${COMMON_FLAGS[@]}" \
                 --settings '{"enabledPlugins":{}}' \
-                --dangerously-skip-permissions \
-                --output-format json \
-                --max-budget-usd 50 \
                 "$task_content" > "$result_file" 2>"$log_file" || true
             ;;
         baseline)
@@ -63,12 +75,9 @@ run_single_benchmark() {
             git checkout devloop-v2.4-baseline --quiet
             cd "$project_dir"
             
-            claude -p \
+            claude "${COMMON_FLAGS[@]}" \
                 --plugin-dir "$PLUGIN_DIR" \
                 --settings "{\"enabledPlugins\":{\"devloop@local\":true}}" \
-                --dangerously-skip-permissions \
-                --output-format json \
-                --max-budget-usd 50 \
                 "/devloop:onboard then $task_content" > "$result_file" 2>"$log_file" || true
             
             # Restore main branch
@@ -78,22 +87,16 @@ run_single_benchmark() {
             ;;
         optimized)
             echo "Running: devloop optimized (v3.x)"
-            claude -p \
+            claude "${COMMON_FLAGS[@]}" \
                 --plugin-dir "$PLUGIN_DIR" \
                 --settings "{\"enabledPlugins\":{\"devloop@local\":true}}" \
-                --dangerously-skip-permissions \
-                --output-format json \
-                --max-budget-usd 50 \
                 "/devloop $task_content" > "$result_file" 2>"$log_file" || true
             ;;
         lite)
             echo "Running: devloop lite mode"
-            claude -p \
+            claude "${COMMON_FLAGS[@]}" \
                 --plugin-dir "$PLUGIN_DIR" \
                 --settings "{\"enabledPlugins\":{\"devloop@local\":true}}" \
-                --dangerously-skip-permissions \
-                --output-format json \
-                --max-budget-usd 50 \
                 "/devloop --quick $task_content" > "$result_file" 2>"$log_file" || true
             ;;
         *)
@@ -109,12 +112,24 @@ run_single_benchmark() {
     local file_count=$(find "$project_dir" -type f \( -name "*.js" -o -name "*.json" -o -name "*.md" \) ! -path "*node_modules*" ! -path "*.git*" 2>/dev/null | wc -l)
     local loc=$(find "$project_dir" -type f -name "*.js" ! -path "*node_modules*" 2>/dev/null -exec cat {} \; 2>/dev/null | wc -l || echo "0")
     
+    # Check if tests pass
+    local tests_pass="unknown"
+    if [ -f "$project_dir/package.json" ]; then
+        cd "$project_dir"
+        if npm test > /dev/null 2>&1; then
+            tests_pass="true"
+        else
+            tests_pass="false"
+        fi
+    fi
+    
     # Extract metrics from result if possible
     echo ""
     echo "--- Results ---"
     echo "Duration: ${duration}s"
     echo "Files created: $file_count"
     echo "Lines of JS: $loc"
+    echo "Tests pass: $tests_pass"
     echo "Project: $project_dir"
     
     # Append summary to result file
@@ -128,6 +143,7 @@ run_single_benchmark() {
   "duration_seconds": $duration,
   "files_created": $file_count,
   "lines_of_code": $loc,
+  "tests_pass": "$tests_pass",
   "project_dir": "$project_dir"
 }
 EOF
