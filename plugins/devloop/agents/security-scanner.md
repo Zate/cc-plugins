@@ -26,7 +26,7 @@ assistant: "I'll launch the devloop:security-scanner agent to perform a security
 tools: Bash, Read, Grep, Glob, TodoWrite
 model: haiku
 color: red
-skills: plan-management, tool-usage-policy
+skills:
 permissionMode: plan
 ---
 

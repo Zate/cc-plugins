@@ -1,7 +1,7 @@
 {
   "name": "devloop",
-  "version": "2.4.8",
-  "description": "Complete feature development workflow with intelligent agents, plan management, and context optimization. Includes spike exploration, issue tracking, code review, and git integration.",
+  "version": "3.0.0",
+  "description": "Lightweight development workflow with spike/fresh/continue pattern. Optimized for efficiency - minimal hooks, on-demand skills, direct execution.",
   "author": {
     "name": "Zate",
     "email": "zate75+claude-code-plugins@gmail.com"

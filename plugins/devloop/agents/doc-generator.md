@@ -31,7 +31,7 @@ Use doc-generator for maintaining version history and release notes.
 tools: Read, Write, Edit, Grep, Glob, TodoWrite
 model: sonnet
 color: teal
-skills: tool-usage-policy
+skills:
 ---
 
 <system_role>

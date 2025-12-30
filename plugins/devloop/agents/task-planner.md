@@ -40,7 +40,7 @@ Use task-planner for completion validation.
 tools: Read, Write, Edit, Grep, Glob, Bash, TodoWrite, AskUserQuestion, Skill
 model: sonnet
 color: indigo
-skills: testing-strategies, requirements-patterns, issue-tracking, plan-management, tool-usage-policy
+skills:
 ---
 
 <system_role>

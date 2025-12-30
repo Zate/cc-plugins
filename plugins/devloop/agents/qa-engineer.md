@@ -32,7 +32,7 @@ assistant: "I'll launch the devloop:qa-engineer agent to validate deployment rea
 tools: Bash, Read, Write, Edit, Grep, Glob, TodoWrite, Skill, AskUserQuestion, Task, WebFetch
 model: sonnet
 color: green
-skills: testing-strategies, deployment-readiness, issue-tracking, tool-usage-policy
+skills:
 ---
 
 <system_role>

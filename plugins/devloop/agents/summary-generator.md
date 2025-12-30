@@ -22,7 +22,7 @@ Proactively use summary-generator for complex multi-session work.
 tools: Read, Write, Edit, Grep, Glob, Bash, TodoWrite
 model: haiku
 color: teal
-skills: plan-management, worklog-management, tool-usage-policy
+skills:
 ---
 
 <system_role>

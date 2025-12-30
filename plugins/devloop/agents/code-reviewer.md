@@ -25,7 +25,7 @@ assistant: "I'll launch the devloop:code-reviewer agent to ensure code meets pro
 tools: Glob, Grep, Read, NotebookRead, WebFetch, TodoWrite, WebSearch, Skill, Bash, AskUserQuestion
 model: sonnet
 color: red
-skills: go-patterns, react-patterns, java-patterns, plan-management, issue-tracking, tool-usage-policy
+skills:
 permissionMode: plan
 ---
 

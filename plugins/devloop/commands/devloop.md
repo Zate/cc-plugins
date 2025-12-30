@@ -1,262 +1,112 @@
 ---
-description: Guided feature development with codebase understanding and architecture focus
-argument-hint: Optional feature description
-allowed-tools: ["Read", "Write", "Edit", "Grep", "Glob", "Bash", "Task", "AskUserQuestion", "TodoWrite", "Skill", "WebSearch", "WebFetch"]
+description: Start development workflow - lightweight entry point
+argument-hint: Optional task description
+allowed-tools: ["Read", "Write", "Edit", "Grep", "Glob", "Bash", "Task", "AskUserQuestion", "TodoWrite", "Skill"]
 ---
 
-# Devloop - Complete Feature Development Workflow
+# Devloop v3.0 - Lightweight Development Workflow
 
-A comprehensive, token-conscious workflow for feature development from requirements through deployment.
+Start a development workflow with minimal overhead. **You do the work directly.**
 
-**Phase Details**: Invoke `Skill: phase-templates` for detailed phase guidance.
+## Quick Start
 
-## Core Principles
+1. **Check for existing work**:
+   - If `.devloop/plan.md` exists → Ask: continue or start new?
+   - If `.devloop/next-action.json` exists → Run `/devloop:continue`
 
-- **Ask clarifying questions**: Identify ambiguities and edge cases. Use AskUserQuestion. Wait for answers.
-- **Understand before acting**: Read existing code patterns first
-- **Read files agents identify**: Build detailed context from agent findings
-- **Simple and elegant**: Prioritize readable, maintainable code
-- **Use TodoWrite**: Track progress throughout every phase
-- **Token conscious**: Use appropriate models (haiku for simple, sonnet for balanced, opus for complex)
+2. **Understand the task**: $ARGUMENTS
+   - If clear → proceed to planning
+   - If unclear → ask ONE clarifying question
 
----
+3. **Create plan** (if task is non-trivial):
+   ```bash
+   mkdir -p .devloop
+   ```
+   Write plan to `.devloop/plan.md`:
+   ```markdown
+   # [Task Name]
+   
+   ## Tasks
+   - [ ] Task 1
+   - [ ] Task 2
+   - [ ] Task 3
+   ```
 
-## Workflow Overview
+4. **Implement directly** - no subagents for routine work
 
-| Phase | Goal | Model |
-|-------|------|-------|
-| 0. Triage | Classify task, determine workflow | haiku |
-| 1. Discovery | Understand what to build | haiku/sonnet |
-| 2. Complexity | Estimate effort, identify risks | haiku |
-| 3. Exploration | Deep code understanding | sonnet |
-| 4. Clarification | Resolve ambiguities | sonnet |
-| 5. Architecture | Design approach | sonnet/opus |
-| 6. Planning | Break into tasks | sonnet |
-| 7. Implementation | Build the feature | sonnet |
-| 8. Testing | Ensure correctness | haiku/sonnet |
-| 9. Review | Quality assurance | sonnet/opus |
-| 10. Validation | Definition of Done | haiku |
-| 11. Integration | Git commit/PR | haiku |
-| 12. Summary | Document completion | haiku |
+5. **Checkpoint** after significant progress:
+   - Summarize what was done
+   - Ask: "Continue or take a break?"
 
----
+## Key Principles
 
-## Phase 0: Triage
+1. **You (Claude) do the work** - Don't spawn subagents for tasks you can do yourself
+2. **Skills on demand** - Load with `Skill: skill-name` only when needed
+3. **Minimal questions** - One question at a time, not multi-part interrogations
+4. **Fast iteration** - Ship working code, then improve
 
-**Goal**: Classify task and route to optimal workflow
+## When to Use Subagents (Task tool)
 
-1. Analyze request: $ARGUMENTS
-2. Launch devloop:workflow-detector agent (haiku) if unclear
-3. Route:
+Only spawn subagents for:
+- **Genuinely parallel work** - Multiple independent tasks that can run simultaneously
+- **Specialized analysis** - Security scanning, complex code review
+- **Large codebases** - When exploration requires reading many files
 
-| Task Type | Command |
-|-----------|---------|
-| Simple/clear fix | `/devloop:quick` |
-| Unknown feasibility | `/devloop:spike` |
-| Code review | `/devloop:review` |
-| Ready to commit | `/devloop:ship` |
-| New feature | Continue below |
+Do NOT spawn subagents for:
+- Writing code (do it yourself)
+- Running tests (use Bash)
+- Git operations (use Bash)
+- Single-file changes
+- Documentation
 
----
+## Available Skills (Load on Demand)
 
-## Phase 1: Discovery
+```
+Skill: plan-management      # Working with .devloop/plan.md
+Skill: go-patterns          # Go idioms and patterns
+Skill: python-patterns      # Python best practices
+Skill: react-patterns       # React/TypeScript patterns
+Skill: java-patterns        # Java/Spring patterns
+Skill: testing-strategies   # Test design
+Skill: git-workflows        # Git operations
+Skill: atomic-commits       # Commit best practices
+```
 
-**Goal**: Understand what needs to be built
+Full index: `Read plugins/devloop/skills/INDEX.md`
 
-1. Create todo list with all workflow phases
-2. If vague/complex: Launch devloop:task-planner agent in requirements mode (sonnet)
-3. If clear: Confirm understanding with AskUserQuestion
+## Workflow Commands
 
-See `Skill: phase-templates` → Discovery Phase for details.
+| Command | Purpose |
+|---------|---------|
+| `/devloop` | Start new work (this command) |
+| `/devloop:continue` | Resume from plan or fresh start |
+| `/devloop:spike` | Time-boxed exploration |
+| `/devloop:fresh` | Save state and exit cleanly |
+| `/devloop:quick` | Small, well-defined fixes |
+| `/devloop:review` | Code review |
+| `/devloop:ship` | Commit and/or PR |
 
----
+## Example Flow
 
-## Phase 2: Complexity Assessment
+```
+User: Add user authentication to the API
 
-**Goal**: Estimate effort and identify risks
+Claude:
+1. Check: No existing plan
+2. Ask: "OAuth, JWT, or session-based auth?"
+3. User: "JWT"
+4. Create plan in .devloop/plan.md
+5. Implement JWT auth directly (no subagents)
+6. Run tests with Bash
+7. Checkpoint: "Auth complete. Continue to tests or break?"
+```
 
-1. Launch devloop:complexity-estimator agent (haiku, plan mode)
-2. If L/XL complexity or high uncertainty:
-   - Offer spike option: `/devloop:spike`
-   - Or reduce scope
+## Files
 
-Reference: `Skill: complexity-estimation`
-
----
-
-## Phase 3: Exploration
-
-**Goal**: Deep understanding of existing code
-
-1. Launch 2-3 devloop:engineer agents in explore mode in parallel (sonnet)
-2. Each returns 5-10 key files
-3. **Read all identified files**
-4. Present summary of findings
-
-See `Skill: phase-templates` → Exploration Phase for details.
-
----
-
-## Phase 4: Clarification
-
-**Goal**: Resolve all ambiguities before designing
-
-**CRITICAL**: Do not skip this phase
-
-1. Review findings and requirements
-2. Identify underspecified aspects
-3. **Use AskUserQuestion** for all clarifications (up to 4 per call)
-4. **Wait for all answers before proceeding**
-
----
-
-## Phase 5: Architecture
-
-**Goal**: Design implementation with trade-offs
-
-1. Invoke: `Skill: architecture-patterns`
-2. Invoke language skill: `Skill: go-patterns`, `Skill: react-patterns`, etc.
-3. Launch 2-3 devloop:engineer agents in architect mode:
-   - **Minimal**: Smallest change, max reuse
-   - **Clean**: Best architecture
-   - **Pragmatic**: Speed/quality balance
-4. Present comparison with AskUserQuestion
-
-See `Skill: phase-templates` → Architecture Phase for details.
+- `.devloop/plan.md` - Current task plan
+- `.devloop/next-action.json` - Fresh start state (auto-created by /devloop:fresh)
+- `.devloop/worklog.md` - Optional work history
 
 ---
 
-## Phase 6: Planning
-
-**Goal**: Break architecture into actionable tasks
-
-1. Launch devloop:task-planner agent (sonnet)
-2. Write tasks to TodoWrite
-3. **Save plan** to `.devloop/plan.md`
-4. **Initialize worklog** at `.devloop/worklog.md` if needed
-5. Present plan for approval
-
-References:
-- `Skill: phase-templates` → Planning Phase
-- `Skill: plan-management` for plan format
-- `Skill: worklog-management` for worklog format
-
----
-
-## Phase 7: Implementation
-
-**Goal**: Build the feature
-
-**DO NOT START WITHOUT USER APPROVAL**
-
-1. Check for parallel tasks (`[parallel:X]` markers)
-2. Read relevant files from exploration
-3. Implement following chosen architecture
-4. Update todos and plan markers as you progress
-
-Domain skills:
-- `Skill: frontend-design:frontend-design`
-- `Skill: api-design`
-- `Skill: database-patterns`
-
-See `Skill: phase-templates` → Implementation Phase for parallel execution details.
-
----
-
-## Phase 8: Testing
-
-**Goal**: Ensure code works correctly
-
-1. Launch devloop:qa-engineer agent in generator mode (haiku) if needed
-2. Launch devloop:qa-engineer agent in runner mode (haiku)
-3. Handle failures with AskUserQuestion
-
-Reference: `Skill: testing-strategies`
-
----
-
-## Phase 9: Review
-
-**Goal**: Quality assurance and code review
-
-1. Launch devloop:code-reviewer agents in parallel (correctness, quality, conventions)
-2. Launch devloop:security-scanner agent (haiku)
-3. Consolidate findings by severity
-4. Present results for action
-
----
-
-## Phase 10: Validation (DoD)
-
-**Goal**: Verify all completion criteria met
-
-1. Launch devloop:task-planner agent in DoD validator mode (haiku)
-2. Check `.devloop/local.md` for project-specific DoD
-3. Handle failures with AskUserQuestion
-
-See `Skill: phase-templates` → Validation Phase for checklist.
-
----
-
-## Phase 11: Integration (Git)
-
-**Goal**: Commit changes, create PR if needed
-
-1. Launch devloop:engineer agent in git mode (haiku)
-2. If PR requested: Generate description, create via `gh pr create`
-
-Reference: `Skill: git-workflows`
-
----
-
-## Phase 12: Summary
-
-**Goal**: Document completion and handoff
-
-1. Launch devloop:summary-generator agent (haiku)
-2. Mark all todos complete
-3. Present summary
-4. Suggest follow-up actions
-
----
-
-## Available Skills
-
-**Architecture & Design:**
-- `Skill: architecture-patterns`, `Skill: api-design`, `Skill: database-patterns`
-
-**Language-Specific:**
-- `Skill: go-patterns`, `Skill: react-patterns`, `Skill: java-patterns`, `Skill: python-patterns`
-
-**Quality & Testing:**
-- `Skill: testing-strategies`, `Skill: security-checklist`, `Skill: deployment-readiness`
-
-**Workflow:**
-- `Skill: phase-templates` - Detailed phase guidance
-- `Skill: workflow-selection`, `Skill: model-selection-guide`, `Skill: complexity-estimation`
-- `Skill: requirements-patterns`, `Skill: git-workflows`
-
-**UI/Frontend:**
-- `Skill: frontend-design:frontend-design`
-
----
-
-## Related Commands
-
-| Command | Use When |
-|---------|----------|
-| `/devloop:quick` | Small, well-defined tasks |
-| `/devloop:spike` | Need to explore feasibility first |
-| `/devloop:review` | Review existing code/PR |
-| `/devloop:ship` | Ready to commit/PR |
-| `/devloop:continue` | Resume from existing plan |
-| `/devloop:bug` | Report a bug |
-| `/devloop:issues` | Manage all issues |
-
----
-
-## Plan & Issue Management
-
-- Plans: `.devloop/plan.md` → `Skill: plan-management`
-- Worklog: `.devloop/worklog.md` → `Skill: worklog-management`
-- Issues: `.devloop/issues/` → `Skill: issue-tracking`
+**Start now**: What would you like to build?

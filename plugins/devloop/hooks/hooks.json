@@ -1,18 +1,6 @@
 {
-  "description": "Devloop workflow hooks for context loading, validation, progress tracking, and notifications",
+  "description": "Devloop workflow hooks - v3.0 minimal version for efficiency",
   "hooks": {
-    "UserPromptSubmit": [
-      {
-        "matcher": ".*",
-        "hooks": [
-          {
-            "type": "prompt",
-            "prompt": "Analyze the user's prompt and detect if they're requesting development work that could benefit from devloop workflow commands.\n\nKeyword → Command mapping:\n- \"bug\", \"fix\", \"broken\", \"error\", \"issue\" → /devloop:bugs (for bug tracking) or /devloop:quick (for small fixes)\n- \"feature\", \"implement\", \"add\", \"create\" → /devloop (for full workflow) or /devloop:quick (for small tasks)\n- \"refactor\", \"clean up\", \"restructure\", \"improve\" → /devloop:analyze\n- \"test\", \"coverage\", \"unit test\" → Suggest test-related workflow\n- \"review\", \"check\", \"audit\" → /devloop:review\n- \"continue\", \"resume\", \"finish\" → /devloop:continue\n- \"plan\", \"roadmap\", \"what's next\" → /devloop:plan (view current plan)\n\nRules:\n1. Only suggest if keywords are clearly present and intent is development work\n2. Don't suggest for simple questions or clarifications\n3. Don't suggest if the user already used a /devloop command\n4. Be helpful, not intrusive\n\nRespond with:\n{\"show\": true, \"suggestion\": \"/devloop:command\", \"reason\": \"Brief explanation\"}\n\nOr if no suggestion needed:\n{\"show\": false}",
-            "timeout": 10
-          }
-        ]
-      }
-    ],
     "SessionStart": [
       {
         "matcher": ".*",
@@ -27,36 +15,6 @@
     ],
     "PreToolUse": [
       {
-        "matcher": "Task",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "bash ${CLAUDE_PLUGIN_ROOT}/hooks/log-task-invocation.sh",
-            "timeout": 5
-          }
-        ]
-      },
-      {
-        "matcher": "Skill",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "bash ${CLAUDE_PLUGIN_ROOT}/hooks/track-skill-start.sh",
-            "timeout": 5
-          }
-        ]
-      },
-      {
-        "matcher": "Write|Edit",
-        "hooks": [
-          {
-            "type": "prompt",
-            "prompt": "Analyze the file being edited and suggest relevant language-specific skills if appropriate.\n\nDetect the file extension from the tool input:\n- .go files → Suggest: Skill: go-patterns (Go interfaces, error handling, goroutines, testing)\n- .py files → Suggest: Skill: python-patterns (Type hints, async patterns, pytest, error handling)\n- .java files → Suggest: Skill: java-patterns (Spring, streams, dependency injection, exception handling)\n- .tsx, .jsx, .ts files → Suggest: Skill: react-patterns (Hooks, component design, state management, performance)\n\nRules:\n1. Only suggest if the file extension matches one of the above\n2. This is informational only - do NOT block the operation\n3. If the skill is already being used (check context), don't suggest again\n4. Keep the suggestion brief and relevant\n\nRespond with:\n{\"suggestion\": \"Skill: skill-name\", \"reason\": \"Brief explanation of why this skill helps\"}\n\nOr if no suggestion needed:\n{\"suggestion\": \"none\"}",
-            "timeout": 10
-          }
-        ]
-      },
-      {
         "matcher": "Bash",
         "hooks": [
           {
@@ -64,26 +22,6 @@
             "command": "bash ${CLAUDE_PLUGIN_ROOT}/hooks/pre-commit.sh \"$TOOL_INPUT\"",
             "timeout": 10,
             "condition": "git commit"
-          }
-        ]
-      },
-      {
-        "matcher": "Write|Edit|MultiEdit",
-        "hooks": [
-          {
-            "type": "prompt",
-            "prompt": "You are validating a file write operation. Briefly check if this change follows good practices:\n\n1. Does it follow project conventions (if CLAUDE.md exists)?\n2. Does it avoid obvious security issues (no secrets, no SQL injection patterns)?\n3. Is the change reasonable for the current task?\n\nIf everything looks fine, respond with just: {\"decision\": \"approve\"}\n\nIf there's a concern, respond with: {\"decision\": \"warn\", \"message\": \"Brief explanation of concern\"}\n\nOnly use \"deny\" for serious security issues: {\"decision\": \"deny\", \"message\": \"Reason\"}",
-            "timeout": 15
-          }
-        ]
-      },
-      {
-        "matcher": "Bash",
-        "hooks": [
-          {
-            "type": "prompt",
-            "prompt": "You are validating a bash command. Check for safety:\n\n1. Is this a destructive command (rm -rf, drop database, etc.)?\n2. Does it contain obvious security risks?\n3. Is it appropriate for a development workflow?\n\nApprove safe commands: {\"decision\": \"approve\"}\nWarn on risky but possibly intentional: {\"decision\": \"warn\", \"message\": \"Brief concern\"}\nDeny dangerous commands: {\"decision\": \"deny\", \"message\": \"Reason\"}",
-            "timeout": 10
           }
         ]
       }
@@ -97,48 +35,6 @@
             "command": "bash ${CLAUDE_PLUGIN_ROOT}/hooks/post-commit.sh \"$TOOL_INPUT\" \"$TOOL_OUTPUT\"",
             "timeout": 10,
             "condition": "git commit"
-          },
-          {
-            "type": "prompt",
-            "prompt": "Analyze the bash command result:\n\n1. Did the command succeed or fail?\n2. If it failed, is this expected or unexpected?\n3. Are there warning signs in the output (deprecation warnings, permission issues, etc.)?\n\nProvide brief analysis in this format:\n{\"status\": \"success|warning|error\", \"summary\": \"One line summary\", \"action\": \"none|retry|investigate\"}",
-            "timeout": 10
-          }
-        ]
-      },
-      {
-        "matcher": "Task",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "bash ${CLAUDE_PLUGIN_ROOT}/hooks/track-agent-end.sh",
-            "timeout": 5
-          },
-          {
-            "type": "prompt",
-            "prompt": "An agent task has completed. Briefly assess:\n\n1. Did the agent accomplish its goal?\n2. Were there any issues or warnings?\n3. Are follow-up actions needed?\n\nRespond with: {\"completed\": true|false, \"summary\": \"Brief outcome\", \"followUp\": \"none|action needed\"}",
-            "timeout": 15
-          }
-        ]
-      },
-      {
-        "matcher": "Skill",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "bash ${CLAUDE_PLUGIN_ROOT}/hooks/track-skill-end.sh",
-            "timeout": 5
-          }
-        ]
-      }
-    ],
-    "Stop": [
-      {
-        "matcher": ".*",
-        "hooks": [
-          {
-            "type": "prompt",
-            "promptFile": "${CLAUDE_PLUGIN_ROOT}/hooks/prompts/stop-routing.md",
-            "timeout": 20
           }
         ]
       }
@@ -154,31 +50,11 @@
           }
         ]
       }
-    ],
-    "Notification": [
-      {
-        "matcher": ".*test.*fail.*|.*error.*|.*exception.*",
-        "hooks": [
-          {
-            "type": "prompt",
-            "prompt": "A potential issue was detected. Analyze the notification:\n\n1. Is this a test failure, error, or exception?\n2. What's the severity (critical, warning, info)?\n3. Should the user be alerted?\n\nRespond with: {\"severity\": \"critical|warning|info\", \"summary\": \"Brief description\", \"alert\": true|false}",
-            "timeout": 10
-          }
-        ]
-      },
-      {
-        "matcher": ".*build.*complete.*|.*deploy.*success.*",
-        "hooks": [
-          {
-            "type": "prompt",
-            "prompt": "A milestone notification was received. Summarize:\n\n{\"type\": \"milestone\", \"summary\": \"Brief description of what completed\"}",
-            "timeout": 5
-          }
-        ]
-      }
     ]
   },
   "notes": {
-    "SubagentStop": "REMOVED in v2.1.0 - Task 9.3. Rationale: Hook cannot detect agent modes (engineer:explore vs engineer:architect vs engineer:refactorer) which is required for 5/7 chaining rules. Only 2/7 rules worked reliably (qa-engineer transitions). Adds noise without benefit. User autonomy preferred for workflow decisions."
+    "v3.0_changes": "REMOVED all prompt-type hooks for efficiency. They were causing extra LLM calls on every tool use. Removed: UserPromptSubmit (command suggestions), PreToolUse prompts (skill suggestions, file validation, bash validation), PostToolUse prompts (bash analysis, task assessment), Stop prompt (routing), Notification prompts. Kept only command-type hooks for git commit validation and session lifecycle.",
+    "removed_hooks_count": "9 prompt hooks removed, saving ~9+ LLM calls per session",
+    "SubagentStop": "REMOVED in v2.1.0 - Hook cannot detect agent modes."
   }
 }

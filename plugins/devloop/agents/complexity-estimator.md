@@ -19,7 +19,7 @@ assistant: "I'll quickly run the devloop:complexity-estimator agent to confirm t
 tools: Glob, Grep, Read, AskUserQuestion
 model: haiku
 color: blue
-skills: complexity-estimation, plan-management, tool-usage-policy
+skills:
 permissionMode: plan
 ---
 

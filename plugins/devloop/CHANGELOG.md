@@ -5,6 +5,108 @@ All notable changes to the devloop plugin are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.0.0] - 2025-12-30
+
+### BREAKING - Radical Performance Optimization
+
+**Major restructuring to address 10x cost and 4x time overhead vs native Claude Code.**
+
+Based on controlled benchmarking (Fastify Users API task):
+- devloop v2.4: 35 min, $30.82, 17M cache tokens, 12 subagents
+- native Claude: 8 min, $3.02, 1.5M cache tokens, 4 subagents
+
+#### Removed - Prompt Hooks (Biggest Win)
+
+Eliminated all `type: "prompt"` hooks that were causing extra LLM calls:
+- `UserPromptSubmit` - Command suggestion on every user message
+- `PreToolUse` Write/Edit - File validation prompts (2 per write!)
+- `PreToolUse` Bash - Command validation prompt
+- `PostToolUse` Bash - Result analysis prompt
+- `PostToolUse` Task - Agent completion assessment
+- `Stop` - Routing prompt
+- `Notification` - Error/milestone analysis
+
+**Impact**: Saves 20-50+ LLM calls per session
+
+#### Removed - Auto-Loaded Skills
+
+Cleared `skills:` from all agent frontmatter. Skills now load on-demand only.
+
+Agents affected:
+- `engineer.md` (was loading 14 skills!)
+- `task-planner.md`, `qa-engineer.md`, `code-reviewer.md`
+- `security-scanner.md`, `doc-generator.md`, `summary-generator.md`
+- `workflow-detector.md`, `complexity-estimator.md`
+
+**Impact**: 60-80% reduction in cache tokens per agent spawn
+
+#### Removed - Redundant Skills (10 deleted)
+
+| Skill | Reason |
+|-------|--------|
+| `workflow-router` (22KB) | Complex routing logic, simplified |
+| `refactoring-analysis` (14KB) | Rarely used |
+| `phase-templates` (16KB) | Too heavyweight |
+| `workflow-selection` (12KB) | Redundant |
+| `requirements-patterns` | Rarely used |
+| `deployment-readiness` | Rarely used |
+| `model-selection-guide` | Can be inline |
+| `worklog-management` (12KB) | Simplified |
+| `tool-usage-policy` | Not needed |
+| `project-bootstrap` | Rarely used |
+
+**Remaining**: 19 skills (down from 29)
+
+#### Changed - session-start.sh
+
+Reduced from 428 lines to 108 lines:
+- Removed worklog rotation, plan sync, framework detection
+- Removed workflow state detection, migration checks
+- Fast language detection only
+- Minimal context output
+
+#### Changed - /devloop Command
+
+Reduced from 263 lines to 112 lines:
+- Removed 12-phase workflow documentation
+- Removed automatic subagent spawning instructions
+- Added "you do the work directly" principle
+- Simplified to: check → understand → plan → implement → checkpoint
+
+#### Changed - hooks.json
+
+Reduced from 185 lines to 60 lines:
+- Kept: SessionStart, SessionEnd (command hooks)
+- Kept: PreToolUse/PostToolUse for git commit (command hooks)
+- Removed: All prompt hooks, Notification, Stop, Skill tracking, Task tracking
+
+### Philosophy Change
+
+**Old**: Heavy orchestration with agents, skills, hooks, routing
+**New**: Lightweight entry, Claude does the work, skills on-demand
+
+Key principles:
+1. You (Claude) do the work directly - no subagents for routine tasks
+2. Skills on demand - load only when needed
+3. Minimal questions - one at a time
+4. Fast iteration - ship working code
+
+### Target Metrics (Post-Optimization)
+
+| Metric | v2.4 | Target v3.0 |
+|--------|------|-------------|
+| Duration ratio | 4.4x | ≤2.0x |
+| Cost ratio | 10.2x | ≤3.0x |
+| Cache ratio | 12.0x | ≤3.0x |
+| Subagent count | 12 | ≤6 |
+
+### Migration
+
+No action required. The simplified workflow is backward compatible.
+Existing `.devloop/plan.md` files work unchanged.
+
+---
+
 ## [2.4.0] - 2025-12-27
 
 ### Added - Structured State Management & Script-First Workflow

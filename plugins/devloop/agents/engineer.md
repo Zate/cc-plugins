@@ -33,7 +33,7 @@ assistant: "I'll use the devloop:engineer agent to handle the git workflow."
 tools: Glob, Grep, Read, Write, Edit, Bash, NotebookRead, WebFetch, TodoWrite, WebSearch, AskUserQuestion, Skill, Task
 model: sonnet
 color: blue
-skills: architecture-patterns, go-patterns, react-patterns, java-patterns, python-patterns, git-workflows, refactoring-analysis, plan-management, tool-usage-policy, complexity-estimation, project-context, api-design, database-patterns, testing-strategies
+skills:
 references:
   - references/explorer-mode.md
   - references/architect-mode.md

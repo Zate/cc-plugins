@@ -26,7 +26,7 @@ assistant: "I'll use the devloop:workflow-detector agent to determine if this sh
 tools: Read, Grep, Glob, AskUserQuestion
 model: haiku
 color: yellow
-skills: workflow-selection, plan-management, issue-tracking, tool-usage-policy
+skills:
 permissionMode: plan
 ---
 
