@@ -47,9 +47,10 @@ run_single_benchmark() {
     local task_content
     task_content=$(cat "$TASK_FILE")
     
-    # Common flags to prevent interactive behavior
+    # Common flags for clean, reproducible benchmarks
     # --disallowedTools prevents AskUserQuestion from being available
     # --append-system-prompt adds extra instruction to not ask questions
+    # --strict-mcp-config with no --mcp-config disables all MCP servers
     local COMMON_FLAGS=(
         -p
         --dangerously-skip-permissions
@@ -57,6 +58,7 @@ run_single_benchmark() {
         --max-budget-usd 50
         --disallowedTools "AskUserQuestion"
         --append-system-prompt "$NO_QUESTIONS_PROMPT"
+        --strict-mcp-config
     )
     
     # Run Claude based on variant
