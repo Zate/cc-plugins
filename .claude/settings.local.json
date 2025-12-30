@@ -17,7 +17,11 @@
       "Skill(devloop:devloop)",
       "Skill(devloop:issues)",
       "Skill(plugin-dev:agent-development)",
-      "Skill(plugin-dev:skill-development)"
+      "Skill(plugin-dev:skill-development)",
+      "WebFetch(domain:medium.com)",
+      "Bash(/home/zate/.claude/plugins/cache/cc-plugins/devloop/2.4.7/scripts/detect-plan.sh:*)",
+      "Bash(/home/zate/.claude/plugins/cache/cc-plugins/devloop/2.4.7/scripts/show-plan-status.sh:*)",
+      "Bash(/home/zate/.claude/plugins/cache/cc-plugins/devloop/2.4.7/scripts/select-next-task.sh:*)"
     ],
     "deny": [],
     "ask": []
