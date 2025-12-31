@@ -2,6 +2,12 @@
 
 Benchmark tools for comparing devloop plugin variants against native Claude Code.
 
+## ⚠️ Important: Run from a Regular Terminal
+
+**Do NOT run these benchmarks from within a Claude Code session.**
+
+Running `claude -p` from inside Claude causes conflicts with auth tokens and session management. Open a fresh terminal window and run the scripts there.
+
 ## Quick Start
 
 ```bash

@@ -61,11 +61,14 @@ run_single_benchmark() {
         --strict-mcp-config
     )
     
+    # Timeout in seconds (30 minutes should be plenty)
+    local TIMEOUT=1800
+    
     # Run Claude based on variant
     case "$VARIANT" in
         native)
             echo "Running: native Claude (no plugins)"
-            claude "${COMMON_FLAGS[@]}" \
+            timeout "$TIMEOUT" claude "${COMMON_FLAGS[@]}" \
                 --settings '{"enabledPlugins":{}}' \
                 "$task_content" > "$result_file" 2>"$log_file" || true
             ;;
