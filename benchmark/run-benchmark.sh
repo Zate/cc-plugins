@@ -10,6 +10,7 @@ ITERATIONS="${2:-1}"
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 RESULTS_DIR="$SCRIPT_DIR/results"
 TASK_FILE="$SCRIPT_DIR/task-fastify-api.md"
+PROGRESS_PARSER="$SCRIPT_DIR/parse-progress.sh"
 TIMESTAMP=$(date +%Y%m%d-%H%M%S)
 PLUGIN_DIR="/home/zate/projects/cc-plugins/plugins/devloop"
 
@@ -50,23 +51,29 @@ run_single_benchmark() {
     # Timeout in seconds (30 minutes should be plenty)
     local TIMEOUT=1800
     
+    # Clear result file
+    > "$result_file"
+    
     # Run Claude based on variant
     # NOTE: -p "prompt" must come first, then other flags after
+    # Using stream-json for live progress, piped through parser
     case "$VARIANT" in
         native)
             echo "Running: native Claude (no plugins)"
+            echo ""
             timeout "$TIMEOUT" claude -p "$task_content" \
                 --dangerously-skip-permissions \
-                --output-format json \
+                --output-format stream-json \
                 --max-budget-usd 50 \
                 --disallowedTools "AskUserQuestion" \
                 --append-system-prompt "$NO_QUESTIONS_PROMPT" \
                 --strict-mcp-config \
                 --settings '{"enabledPlugins":{}}' \
-                > "$result_file" 2>"$log_file" || true
+                2>"$log_file" | "$PROGRESS_PARSER" "$result_file" || true
             ;;
         baseline)
             echo "Running: devloop baseline (v2.4.x with full hooks)"
+            echo ""
             # Use baseline branch
             cd /home/zate/projects/cc-plugins
             git stash --quiet 2>/dev/null || true
@@ -75,14 +82,14 @@ run_single_benchmark() {
             
             timeout "$TIMEOUT" claude -p "/devloop:onboard then $task_content" \
                 --dangerously-skip-permissions \
-                --output-format json \
+                --output-format stream-json \
                 --max-budget-usd 50 \
                 --disallowedTools "AskUserQuestion" \
                 --append-system-prompt "$NO_QUESTIONS_PROMPT" \
                 --strict-mcp-config \
                 --plugin-dir "$PLUGIN_DIR" \
                 --settings "{\"enabledPlugins\":{\"devloop@local\":true}}" \
-                > "$result_file" 2>"$log_file" || true
+                2>"$log_file" | "$PROGRESS_PARSER" "$result_file" || true
             
             # Restore main branch
             cd /home/zate/projects/cc-plugins
@@ -91,29 +98,31 @@ run_single_benchmark() {
             ;;
         optimized)
             echo "Running: devloop optimized (v3.x)"
+            echo ""
             timeout "$TIMEOUT" claude -p "/devloop $task_content" \
                 --dangerously-skip-permissions \
-                --output-format json \
+                --output-format stream-json \
                 --max-budget-usd 50 \
                 --disallowedTools "AskUserQuestion" \
                 --append-system-prompt "$NO_QUESTIONS_PROMPT" \
                 --strict-mcp-config \
                 --plugin-dir "$PLUGIN_DIR" \
                 --settings "{\"enabledPlugins\":{\"devloop@local\":true}}" \
-                > "$result_file" 2>"$log_file" || true
+                2>"$log_file" | "$PROGRESS_PARSER" "$result_file" || true
             ;;
         lite)
             echo "Running: devloop lite mode"
+            echo ""
             timeout "$TIMEOUT" claude -p "/devloop:quick $task_content" \
                 --dangerously-skip-permissions \
-                --output-format json \
+                --output-format stream-json \
                 --max-budget-usd 50 \
                 --disallowedTools "AskUserQuestion" \
                 --append-system-prompt "$NO_QUESTIONS_PROMPT" \
                 --strict-mcp-config \
                 --plugin-dir "$PLUGIN_DIR" \
                 --settings "{\"enabledPlugins\":{\"devloop@local\":true}}" \
-                > "$result_file" 2>"$log_file" || true
+                2>"$log_file" | "$PROGRESS_PARSER" "$result_file" || true
             ;;
         *)
             echo "Unknown variant: $VARIANT"
