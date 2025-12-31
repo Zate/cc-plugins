@@ -47,30 +47,23 @@ run_single_benchmark() {
     local task_content
     task_content=$(cat "$TASK_FILE")
     
-    # Common flags for clean, reproducible benchmarks
-    # --disallowedTools prevents AskUserQuestion from being available
-    # --append-system-prompt adds extra instruction to not ask questions
-    # --strict-mcp-config with no --mcp-config disables all MCP servers
-    local COMMON_FLAGS=(
-        -p
-        --dangerously-skip-permissions
-        --output-format json
-        --max-budget-usd 50
-        --disallowedTools "AskUserQuestion"
-        --append-system-prompt "$NO_QUESTIONS_PROMPT"
-        --strict-mcp-config
-    )
-    
     # Timeout in seconds (30 minutes should be plenty)
     local TIMEOUT=1800
     
     # Run Claude based on variant
+    # NOTE: -p "prompt" must come first, then other flags after
     case "$VARIANT" in
         native)
             echo "Running: native Claude (no plugins)"
-            timeout "$TIMEOUT" claude "${COMMON_FLAGS[@]}" \
+            timeout "$TIMEOUT" claude -p "$task_content" \
+                --dangerously-skip-permissions \
+                --output-format json \
+                --max-budget-usd 50 \
+                --disallowedTools "AskUserQuestion" \
+                --append-system-prompt "$NO_QUESTIONS_PROMPT" \
+                --strict-mcp-config \
                 --settings '{"enabledPlugins":{}}' \
-                "$task_content" > "$result_file" 2>"$log_file" || true
+                > "$result_file" 2>"$log_file" || true
             ;;
         baseline)
             echo "Running: devloop baseline (v2.4.x with full hooks)"
@@ -80,10 +73,16 @@ run_single_benchmark() {
             git checkout devloop-v2.4-baseline --quiet
             cd "$project_dir"
             
-            claude "${COMMON_FLAGS[@]}" \
+            timeout "$TIMEOUT" claude -p "/devloop:onboard then $task_content" \
+                --dangerously-skip-permissions \
+                --output-format json \
+                --max-budget-usd 50 \
+                --disallowedTools "AskUserQuestion" \
+                --append-system-prompt "$NO_QUESTIONS_PROMPT" \
+                --strict-mcp-config \
                 --plugin-dir "$PLUGIN_DIR" \
                 --settings "{\"enabledPlugins\":{\"devloop@local\":true}}" \
-                "/devloop:onboard then $task_content" > "$result_file" 2>"$log_file" || true
+                > "$result_file" 2>"$log_file" || true
             
             # Restore main branch
             cd /home/zate/projects/cc-plugins
@@ -92,17 +91,29 @@ run_single_benchmark() {
             ;;
         optimized)
             echo "Running: devloop optimized (v3.x)"
-            claude "${COMMON_FLAGS[@]}" \
+            timeout "$TIMEOUT" claude -p "/devloop $task_content" \
+                --dangerously-skip-permissions \
+                --output-format json \
+                --max-budget-usd 50 \
+                --disallowedTools "AskUserQuestion" \
+                --append-system-prompt "$NO_QUESTIONS_PROMPT" \
+                --strict-mcp-config \
                 --plugin-dir "$PLUGIN_DIR" \
                 --settings "{\"enabledPlugins\":{\"devloop@local\":true}}" \
-                "/devloop $task_content" > "$result_file" 2>"$log_file" || true
+                > "$result_file" 2>"$log_file" || true
             ;;
         lite)
             echo "Running: devloop lite mode"
-            claude "${COMMON_FLAGS[@]}" \
+            timeout "$TIMEOUT" claude -p "/devloop:quick $task_content" \
+                --dangerously-skip-permissions \
+                --output-format json \
+                --max-budget-usd 50 \
+                --disallowedTools "AskUserQuestion" \
+                --append-system-prompt "$NO_QUESTIONS_PROMPT" \
+                --strict-mcp-config \
                 --plugin-dir "$PLUGIN_DIR" \
                 --settings "{\"enabledPlugins\":{\"devloop@local\":true}}" \
-                "/devloop --quick $task_content" > "$result_file" 2>"$log_file" || true
+                > "$result_file" 2>"$log_file" || true
             ;;
         *)
             echo "Unknown variant: $VARIANT"
