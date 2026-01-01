@@ -120,6 +120,25 @@ Resume anytime with `/devloop:continue`.
 
 ---
 
+## Troubleshooting
+
+### Plan file corrupted
+Delete `.devloop/plan.md` and run `/devloop` to start fresh.
+
+### Session ended unexpectedly
+Run `/devloop:continue` - it will pick up from the last checkpoint in your plan.
+
+### Want to abandon current plan
+Delete `.devloop/plan.md` or rename it, then run `/devloop`.
+
+### Context feels heavy/slow
+Run `/devloop:fresh`, then `/clear`, then `/devloop:continue`.
+
+### Skill not loading
+Check `skills/INDEX.md` for the exact skill name. Use `Skill: exact-name`.
+
+---
+
 ## Author
 
 **Zate** - [@Zate](https://github.com/Zate)

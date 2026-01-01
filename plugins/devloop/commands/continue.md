@@ -4,7 +4,11 @@ argument-hint: Optional specific task to work on
 allowed-tools: ["Read", "Write", "Edit", "Grep", "Glob", "Bash", "AskUserQuestion", "TodoWrite", "Skill"]
 ---
 
-# Continue - Resume Development Work
+# Continue - Resume Existing Work
+
+**Use this when**: A plan exists at `.devloop/plan.md`.
+
+**Use `/devloop` instead if**: No plan exists, or you want to start a new plan.
 
 Resume work from an existing plan or fresh start state. **You do the work directly.**
 
@@ -96,6 +100,43 @@ Skill: [language]-patterns  # Language-specific idioms
 ```
 
 Read `skills/INDEX.md` for full list.
+
+## When to Load Skills
+
+Load skills when you need domain-specific guidance:
+
+| Situation | Skill |
+|-----------|-------|
+| Unfamiliar language idioms | `Skill: go-patterns`, `python-patterns`, etc. |
+| Complex git operations | `Skill: git-workflows` |
+| Designing an API | `Skill: api-design` |
+| Writing tests | `Skill: testing-strategies` |
+| Security concerns | `Skill: security-checklist` |
+| Database schema work | `Skill: database-patterns` |
+
+Don't preload. Load when the task requires it.
+
+## Parallel Agent Example
+
+Only use agents when running truly independent tasks simultaneously:
+
+```
+Task:
+  subagent_type: devloop:engineer
+  description: "Implement UserService"
+  run_in_background: true
+  prompt: "Implement UserService with CRUD operations"
+
+Task:
+  subagent_type: devloop:engineer
+  description: "Implement ProductService"
+  run_in_background: true
+  prompt: "Implement ProductService with CRUD operations"
+
+# Wait for both with TaskOutput
+```
+
+For single tasks, just do the work directly.
 
 ---
 

@@ -4,7 +4,11 @@ argument-hint: Optional task description
 allowed-tools: ["Read", "Write", "Edit", "Grep", "Glob", "Bash", "Task", "AskUserQuestion", "TodoWrite", "Skill"]
 ---
 
-# Devloop v3.0 - Lightweight Development Workflow
+# Devloop - Start New Work
+
+**Use this when**: No plan exists, or you want to start fresh.
+
+**Use `/devloop:continue` instead if**: A plan already exists at `.devloop/plan.md`.
 
 Start a development workflow with minimal overhead. **You do the work directly.**
 
