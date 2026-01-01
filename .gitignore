@@ -46,3 +46,7 @@ benchmark/
 source_docs/
 spike/
 generate_reports.sh
+
+# Plugin development files (not needed by users)
+plugins/devloop/.devloop/
+plugins/devloop/tests/
