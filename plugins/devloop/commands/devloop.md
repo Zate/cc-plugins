@@ -53,8 +53,8 @@ Start a development workflow with minimal overhead. **You do the work directly.*
 
 Only spawn subagents for:
 - **Genuinely parallel work** - Multiple independent tasks that can run simultaneously
-- **Specialized analysis** - Security scanning, complex code review
-- **Large codebases** - When exploration requires reading many files
+- **Specialized analysis** - Security scanning (`devloop:security-scanner`), complex code review
+- **Large codebases** - Use Claude Code's native `Explore` agent for understanding 50+ files
 
 Do NOT spawn subagents for:
 - Writing code (do it yourself)
@@ -76,7 +76,7 @@ Skill: git-workflows        # Git operations
 Skill: atomic-commits       # Commit best practices
 ```
 
-Full index: `Read plugins/devloop/skills/INDEX.md`
+Full index: `skills/INDEX.md`
 
 ## Workflow Commands
 

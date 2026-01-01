@@ -47,7 +47,7 @@ Find the next pending task (marked with `- [ ]`).
 ### Only Use Agents For:
 - **Parallel work**: Multiple independent tasks that can run simultaneously
 - **Security scan**: Full codebase security audit (`devloop:security-scanner`)
-- **Large exploration**: Understanding 50+ files in unfamiliar codebase
+- **Large exploration**: Use Claude Code's native `Explore` agent (Task tool with `subagent_type: Explore`) for understanding large codebases
 
 ## Step 4: Update the Plan
 
