@@ -1,5 +1,5 @@
 {
-  "description": "Devloop workflow hooks - v3.0 minimal version for efficiency",
+  "description": "Devloop workflow hooks - v3.0 minimal",
   "hooks": {
     "SessionStart": [
       {
@@ -12,49 +12,6 @@
           }
         ]
       }
-    ],
-    "PreToolUse": [
-      {
-        "matcher": "Bash",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "bash ${CLAUDE_PLUGIN_ROOT}/hooks/pre-commit.sh \"$TOOL_INPUT\"",
-            "timeout": 10,
-            "condition": "git commit"
-          }
-        ]
-      }
-    ],
-    "PostToolUse": [
-      {
-        "matcher": "Bash",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "bash ${CLAUDE_PLUGIN_ROOT}/hooks/post-commit.sh \"$TOOL_INPUT\" \"$TOOL_OUTPUT\"",
-            "timeout": 10,
-            "condition": "git commit"
-          }
-        ]
-      }
-    ],
-    "SessionEnd": [
-      {
-        "matcher": ".*",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "bash ${CLAUDE_PLUGIN_ROOT}/hooks/session-end.sh",
-            "timeout": 15
-          }
-        ]
-      }
     ]
-  },
-  "notes": {
-    "v3.0_changes": "REMOVED all prompt-type hooks for efficiency. They were causing extra LLM calls on every tool use. Removed: UserPromptSubmit (command suggestions), PreToolUse prompts (skill suggestions, file validation, bash validation), PostToolUse prompts (bash analysis, task assessment), Stop prompt (routing), Notification prompts. Kept only command-type hooks for git commit validation and session lifecycle.",
-    "removed_hooks_count": "9 prompt hooks removed, saving ~9+ LLM calls per session",
-    "SubagentStop": "REMOVED in v2.1.0 - Hook cannot detect agent modes."
   }
 }

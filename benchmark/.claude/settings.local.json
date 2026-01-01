@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(timeout 15 claude:*)",
+      "Bash(# Test with minimal flags to isolate the issue cd /tmp/devloop-bench-3beqoyxw || cd /tmp timeout 10 claude -p \"\"echo hello\"\" --verbose --output-format stream-json --dangerously-skip-permissions 2>&1)",
+      "WebFetch(domain:raw.githubusercontent.com)",
+      "Bash(python3:*)"
+    ]
+  }
+}

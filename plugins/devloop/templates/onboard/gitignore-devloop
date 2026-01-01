@@ -1,5 +1,0 @@
-# Devloop local files (not tracked)
-.devloop/local.md
-.devloop/spikes/
-.devloop/next-action.json
-.devloop/.current-session.json

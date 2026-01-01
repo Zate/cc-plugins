@@ -1,48 +1,50 @@
 ---
 description: Save current plan state and prepare for fresh context restart
 argument-hint: none
-allowed-tools: [
-  "Bash", "AskUserQuestion",
-  "Bash(${CLAUDE_PLUGIN_ROOT}/scripts/fresh-start.sh:*)"
-]
+allowed-tools: ["Read", "Write", "Bash", "AskUserQuestion"]
 ---
 
 # Fresh Start
 
-Save the current devloop plan state for resuming after a context reset.
+Save the current devloop plan state for resuming after a context reset. **You do the work directly.**
 
-## Execution
-
-Run the fresh-start script:
+## Step 1: Read Current Plan
 
 ```bash
-${CLAUDE_PLUGIN_ROOT}/scripts/fresh-start.sh
+cat .devloop/plan.md
 ```
 
-**Exit codes:**
-- `0` - Success: state saved, display output to user
-- `1` - No plan found: show error, suggest `/devloop` or creating a plan
-- `2` - Invalid plan: show error, plan has no tasks
+If no plan exists, tell user to run `/devloop` first.
 
-## Edge Case: State File Already Exists
+## Step 2: Find Current Task
 
-If `.devloop/next-action.json` exists before running:
+Identify the next pending task (first `- [ ]` in the plan).
 
-```yaml
-AskUserQuestion:
-  question: "Fresh start state already exists from previous session. Overwrite?"
-  header: "Overwrite"
-  options:
-    - label: "Yes, update state"
-      description: "Save current progress (Recommended)"
-    - label: "No, keep existing"
-      description: "Exit without changing state"
+## Step 3: Save State
+
+Write to `.devloop/next-action.json`:
+
+```json
+{
+  "task": "Task X.Y: Description",
+  "phase": "Current Phase Name",
+  "notes": "Any context about work in progress",
+  "saved_at": "YYYY-MM-DD HH:MM"
+}
 ```
 
-If "No, keep existing" → exit without running script.
+## Step 4: Confirm
 
-## References
+Tell user:
 
-- `Skill: workflow-loop` - Context management patterns
-- `Skill: plan-management` - Plan state format
-- Script: `plugins/devloop/scripts/fresh-start.sh`
+```
+State saved to .devloop/next-action.json
+
+Next steps:
+1. Run /clear to reset context
+2. Run /devloop:continue to resume work
+```
+
+---
+
+**Note**: The next-action.json file is consumed (deleted) when `/devloop:continue` runs.

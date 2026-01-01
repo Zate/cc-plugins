@@ -1,393 +1,55 @@
 ---
 name: plan-management
-description: This skill should be used when the user asks about "plan format", "update plan", "plan location", ".devloop/plan.md", "plan markers", "task status", or needs guidance on plan file conventions and update procedures. Central reference for maintaining plan consistency across devloop agents and commands.
-whenToUse: |
-  - Creating or updating devloop plans
-  - Reading existing plans to resume work
-  - Plan synchronization between agents
-  - Understanding plan structure and task markers
-  - Pre-commit validation of plan updates
-  - Archive operations for completed phases
-whenNotToUse: |
-  - Quick tasks without formal plans - use /devloop:quick
-  - Starting fresh with no plan - let /devloop create it
-  - Read-only agents with permissionMode: plan
-  - Bug fixes - use issue-tracking instead
-  - Exploratory spikes - create reports, not plans
+description: This skill should be used when creating, reading, or updating devloop plans in .devloop/plan.md
+whenToUse: Creating or updating plans, reading plan state, understanding task status
+whenNotToUse: Quick tasks without formal plans, exploratory spikes
 ---
 
 # Plan Management
 
-**CRITICAL**: All devloop agents and commands MUST follow these conventions to ensure plan consistency.
+Conventions for `.devloop/plan.md` file format and updates.
 
-## When to Use This Skill
+## Plan Location
 
-- **Creating or updating plans**: When commands/agents need plan format reference
-- **Reading existing plans**: When `/devloop:continue` or other commands resume work
-- **Plan synchronization**: Ensuring plan updates follow conventions
-- **Understanding plan structure**: When agents need to parse task status, dependencies, or parallelism markers
-- **Enforcement checks**: Pre-commit hooks validating plan updates
-- **Archive operations**: When compressing or restoring archived phases
+Primary: `.devloop/plan.md`
 
-## When NOT to Use This Skill
-
-- **Quick tasks**: Simple fixes don't need formal plans - use `/devloop:quick`
-- **No existing plan**: If starting fresh, let `/devloop` create the plan
-- **Read-only agents**: Agents with `permissionMode: plan` can't update plans
-- **Bug fixes**: Use bug tracking, not the feature plan
-- **Exploratory work**: Spikes create reports, not plans
-
-## Plan File Location
-
-The canonical plan location is:
-
-```
-.devloop/plan.md
-```
-
-**Discovery order** (for finding existing plans):
-1. `.devloop/plan.md` ← Primary location
-2. `docs/PLAN.md`
-3. `PLAN.md`
-4. `~/.claude/plans/*.md` (fallback to most recent)
-
-**Always save new plans to**: `.devloop/plan.md`
-
-## Dual-File State Management
-
-**IMPORTANT**: Devloop uses a dual-file model for plan state:
-
-### The Two Files
-
-| File | Purpose | Format | Primary Use |
-|------|---------|--------|-------------|
-| `plan.md` | Human-readable plan | Markdown | **Primary authoring**, human reading, git history |
-| `plan-state.json` | Machine-readable state | JSON | **Script consumption**, fast parsing, deterministic operations |
-
-### Key Principles
-
-1. **plan.md is the source of truth** - Always edit plan.md, never edit plan-state.json directly
-2. **plan-state.json is auto-synced** - Scripts keep it synchronized with plan.md
-3. **Scripts prefer JSON** - All devloop scripts read plan-state.json first, fall back to markdown parsing
-4. **Backward compatible** - If plan-state.json is missing, scripts parse plan.md directly
-
-### When Sync Happens
-
-The sync process runs automatically in these situations:
-
-| Trigger | Script | When |
-|---------|--------|------|
-| **Session start** | `hooks/session-start.sh` | Every time you start a new Claude session |
-| **Pre-commit** | `hooks/pre-commit.sh` | Before each git commit (if plan.md changed) |
-| **Validation fix** | `scripts/validate-plan-state.sh --fix` | When validation detects stale/corrupt JSON |
-
-**Manual sync**: You can trigger sync manually with:
-```bash
-plugins/devloop/scripts/sync-plan-state.sh
-```
-
-### How Scripts Use plan-state.json
-
-Scripts consume the JSON for fast, deterministic operations:
-
-**Examples**:
-- **calculate-progress.sh**: Reads `stats.done` and `stats.total` directly from JSON
-- **format-plan-status.sh**: Uses JSON fields instead of parsing markdown
-- **select-next-task.sh**: Reads `tasks`, `dependencies`, `parallel_groups` from JSON
-- **show-plan-status.sh**: Displays `phases`, `next_task`, `percentage` from JSON
-- **devloop-statusline.sh**: Shows `stats.done/total` without markdown parsing
-
-**Benefit**: ~80% token reduction by avoiding LLM calls for deterministic operations
-
-### JSON Schema
-
-The plan-state.json follows a strict schema (v1.0.0):
-
-```json
-{
-  "schema_version": "1.0.0",
-  "plan_file": ".devloop/plan.md",
-  "last_sync": "2025-12-27T08:00:00Z",
-  "plan_name": "Feature: Authentication",
-  "status": "in_progress",
-  "created": "2025-12-27",
-  "updated": "2025-12-27 08:00",
-  "current_phase": 2,
-  "stats": {
-    "total": 10,
-    "completed": 3,
-    "pending": 5,
-    "in_progress": 1,
-    "blocked": 1,
-    "skipped": 0,
-    "done": 3,
-    "percentage": 30
-  },
-  "phases": [...],
-  "tasks": {...},
-  "parallel_groups": {...},
-  "dependencies": {...},
-  "next_task": "2.1"
-}
-```
-
-**See**: `plugins/devloop/schemas/plan-state.schema.json` for complete schema
-
-### Backward Compatibility
-
-**If plan-state.json is missing**:
-- Scripts fall back to parsing plan.md directly
-- First operation triggers automatic sync
-- No user intervention needed
-
-**If plan-state.json is stale**:
-- Validation script detects drift (compares timestamps)
-- Pre-commit hook re-syncs automatically
-- Session-start hook updates if needed
-
-**Migration from old plans**:
-- Existing plan.md files work without changes
-- Sync script creates plan-state.json on first run
-- No manual migration needed
-
-### Validation
-
-Validate plan-state.json integrity:
-
-```bash
-plugins/devloop/scripts/validate-plan-state.sh
-```
-
-**Checks**:
-- JSON syntax
-- Required fields present
-- Schema version compatibility
-- Stats consistency (total = sum of statuses)
-- Task status values are valid
-- Phase task references exist
-- Dependencies reference valid tasks
-- Sync freshness (plan.md vs JSON timestamps)
-
-**Auto-fix**: Add `--fix` flag to re-sync from plan.md if validation fails
-
-## Plan File Format
+## Plan Format
 
 ```markdown
 # Devloop Plan: [Feature Name]
 
-**Created**: [YYYY-MM-DD]
-**Updated**: [YYYY-MM-DD HH:MM]
-**Status**: [Planning | In Progress | Review | Complete]
-**Current Phase**: [Phase name]
-
-## Overview
-[2-3 sentence description of the feature]
-
-## Requirements
-[Key requirements or link to requirements doc]
-
-## Architecture
-[Chosen approach summary]
+**Created**: YYYY-MM-DD
+**Updated**: YYYY-MM-DD HH:MM
+**Status**: Planning | In Progress | Complete
 
 ## Tasks
 
 ### Phase 1: [Phase Name]
-- [ ] Task 1.1: [Description]
-  - Acceptance: [Criteria]
-  - Files: [Expected files to create/modify]
-- [ ] Task 1.2: [Description]
-  ...
-
-### Phase 2: [Phase Name]
-- [ ] Task 2.1: [Description]
-...
+- [ ] Task 1.1: Description
+  - Acceptance: Criteria
+  - Files: Expected files
 
 ## Progress Log
-- [YYYY-MM-DD HH:MM]: [Event description]
-- [YYYY-MM-DD HH:MM]: [Event description]
+- [timestamp]: Event
 ```
 
-## Task Status Markers
+## Task Markers
 
 | Marker | Meaning |
 |--------|---------|
-| `- [ ]` | Pending / Not started |
+| `- [ ]` | Pending |
 | `- [x]` | Completed |
 | `- [~]` | In progress |
-| `- [-]` | Skipped / Not applicable |
 | `- [!]` | Blocked |
 
-### Task Format vs Success Criteria Format
+## Parallelism Markers
 
-**Tasks** use **dash format** (picked up by scripts):
-```markdown
-- [ ] Task 1.1: Create user model
-- [x] Task 1.2: Add validation
-```
+- `[parallel:A]` - Can run with other Group A tasks
+- `[depends:N.M]` - Must wait for Task N.M
 
-**Success Criteria** use **numbered format** (NOT picked up by scripts):
-```markdown
-1. [ ] All tests pass with 80%+ coverage
-2. [ ] Documentation updated
-3. [ ] Performance benchmarks met
-```
+## Update Rules
 
-**Why the distinction?**
-- Tasks are implementation work tracked by `select-next-task.sh` and `fresh-start.sh`
-- Success Criteria are validation checkpoints verified when plan reaches "Review" status
-- Scripts intentionally ignore numbered lists to separate "doing" from "validating"
-
-**Script patterns**:
-- `^\s*-\s*\[` matches tasks (dash format)
-- `^\s*[0-9]*\.\s*\[` matches success criteria (numbered format - not matched by task scripts)
-
-## Parallelism Quick Reference
-
-Tasks can include optional markers to indicate parallelization potential:
-
-| Marker | Meaning | Example |
-|--------|---------|---------|
-| `[parallel:X]` | Can run with other tasks in group X | `[parallel:A]` |
-| `[depends:N.M,...]` | Must wait for listed tasks | `[depends:1.1,1.2]` |
-| `[background]` | Low priority, can run in background | |
-| `[sequential]` | Must run alone, not parallelizable | |
-
-**See**: `references/parallelism-guide.md` for detailed guidelines
-
-## Plan Update Rules
-
-### When to Update the Plan
-
-| Event | Action |
-|-------|--------|
-| Task started | Mark `- [~]`, add to Progress Log |
-| Task completed | Mark `- [x]`, add to Progress Log |
-| Task blocked | Mark `- [!]`, add blocker note |
-| Phase completed | Update Current Phase |
-| New task discovered | Add to appropriate phase |
-| Task skipped | Mark `- [-]`, add reason |
-| Plan approved | Update Status to "In Progress" |
-| All tasks done | Update Status to "Review" |
-| DoD passed | Update Status to "Complete" |
-
-### How to Update
-
-1. **Read the current plan** from `.devloop/plan.md`
-2. **Make changes** to task markers and Progress Log
-3. **Update timestamps**: Set `Updated` to current date/time
-4. **Write back** to the same location
-
-### Progress Log Format
-
-```markdown
-## Progress Log
-- 2024-12-11 14:30: Plan created
-- 2024-12-11 15:00: Started Phase 1
-- 2024-12-11 15:45: Completed Task 1.1 - Created user model
-- 2024-12-11 16:00: Task 1.2 blocked - waiting for API spec
-- 2024-12-11 17:00: Phase 1 complete, starting Phase 2
-```
-
-## Agent Responsibilities
-
-### Agents that CREATE plans
-- **task-planner**: Creates initial plan, saves to `.devloop/plan.md`
-
-### Agents that UPDATE plans
-- **task-planner**: Modifies plan structure
-- **summary-generator**: Marks tasks complete, adds to Progress Log
-- **dod-validator**: Updates Status when validation passes/fails
-
-### Agents that READ plans (but don't modify)
-- **complexity-estimator**: Reads to assess remaining work
-- **code-explorer**: Reads for context
-- **code-architect**: Reads for design context
-- **code-reviewer**: Reads to understand scope
-- **requirements-gatherer**: Reads existing requirements
-
-### Agents with `permissionMode: plan`
-These agents have read-only access and CANNOT update the plan directly.
-They should:
-1. Note any plan updates needed in their output
-2. Return recommendations for plan changes
-3. The parent agent/command is responsible for applying updates
-
-## Command Responsibilities
-
-| Command | Plan Action |
-|---------|-------------|
-| `/devloop` | Creates plan in Phase 6, updates throughout |
-| `/devloop:continue` | Reads plan, marks tasks in progress/complete |
-| `/devloop:quick` | May skip plan (simple tasks) |
-| `/devloop:spike` | Creates spike report, may recommend plan changes |
-| `/devloop:review` | Reads plan for context, doesn't modify |
-| `/devloop:ship` | Reads plan, updates Status to Complete if DoD passes |
-
-## Ensuring Sync
-
-### Before Starting Work
-```
-1. Check if .devloop/plan.md exists
-2. If yes, read and understand current state
-3. If no, either create one or confirm this is intentional
-```
-
-### After Completing Work
-```
-1. Update task status in plan
-2. Add Progress Log entry
-3. Update timestamps
-4. If phase complete, update Current Phase
-```
-
-### On Session Start
-The session-start hook automatically:
-- Detects if a plan exists
-- Shows plan progress (X/Y tasks)
-- Suggests `/devloop:continue` if plan is active
-
-## Environment Variable
-
-The plan path can be referenced via:
-```
-DEVLOOP_PLAN_PATH=.devloop/plan.md
-```
-
-## Error Handling
-
-| Scenario | Action |
-|----------|--------|
-| Plan file missing | Ask user: create new or continue without? |
-| Plan file corrupted | Attempt recovery, ask user if fails |
-| Task not in plan | Ask user: add to plan or proceed without? |
-| Multiple plans found | Use priority order, warn user |
-
-## Integration with Claude's Plan Mode
-
-If using Claude's built-in plan mode (`--permission-mode plan`):
-- Claude may create plans in `~/.claude/plans/`
-- After plan mode, **copy/merge** the plan to `.devloop/plan.md`
-- This ensures the project-local plan stays current
-
-## Additional Resources
-
-### Plan Archival
-For detailed guidance on archiving completed phases to compress large plans:
-- **`references/archive-format.md`** - Archive format, when to archive, restoration procedures
-
-### Parallelism Strategies
-For detailed guidance on marking and executing parallel tasks:
-- **`references/parallelism-guide.md`** - Smart parallelism, token cost awareness, model selection
-
-### Enforcement Configuration
-For detailed guidance on enforcement modes and hooks:
-- **`references/enforcement-modes.md`** - Advisory vs strict modes, hook behavior, configuration
-
-## See Also
-
-- `Skill: workflow-selection` - Choosing the right workflow
-- `Skill: worklog-management` - Worklog format and updates
-- `Skill: file-locations` - Where devloop files belong
-- `Skill: complexity-estimation` - Estimating task complexity
-- `/devloop:continue` - Resuming from a plan
-- `/devloop:archive` - Compressing large plans by archiving completed phases
+1. Mark tasks in progress: `- [~]`
+2. Mark tasks complete: `- [x]`
+3. Add Progress Log entry
+4. Update timestamps

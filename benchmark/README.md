@@ -95,6 +95,62 @@ optimized      1.09x            1.15x
 
 All benchmarks use `task-fastify-api.md`:
 - Fastify REST API with user CRUD
-- JSON file persistence  
+- JSON file persistence
 - Mocha tests with coverage
 - README documentation
+
+## Technical Details
+
+### How Claude Code is Run Programmatically
+
+The benchmark uses Claude Code's headless mode with these key flags:
+
+```bash
+claude -p "task..." \
+  --output-format stream-json \    # Newline-delimited JSON for real-time streaming
+  --dangerously-skip-permissions \ # No permission prompts (auto-approve tools)
+  --disallowedTools AskUserQuestion \  # Prevent blocking on questions
+  --max-budget-usd 50 \            # Safety limit on API cost
+  --append-system-prompt "..."     # Instructions for autonomous operation
+```
+
+### Avoiding Hanging Issues
+
+The script uses non-blocking I/O with `select()` to prevent pipe buffer deadlocks:
+
+1. **Both stdout and stderr are piped** - but only stdout is needed
+2. **select() polls both pipes** - prevents either buffer from filling and blocking
+3. **Non-blocking reads** - uses `fcntl(O_NONBLOCK)` so reads never hang
+4. **Activity timeout** - kills process if no output for 30 minutes
+
+This is necessary because:
+- Python's `for line in process.stdout` can buffer unexpectedly
+- If stderr fills its 64KB buffer while you're blocked on stdout, the process deadlocks
+- Claude's `stream-json` output may not flush line-by-line without careful handling
+
+### JSON Output Structure
+
+The `stream-json` format produces newline-delimited JSON:
+
+```json
+{"type": "assistant", "message": "..."}
+{"type": "tool_use", "name": "Write", "input": {...}}
+{"type": "tool_result", "is_error": false, "output": "..."}
+{"type": "result", "total_cost_usd": 2.45, "num_turns": 8, "usage": {...}}
+```
+
+The final `result` message contains usage statistics.
+
+### Troubleshooting
+
+**Benchmark hangs immediately:**
+- Run from a regular terminal, NOT inside Claude Code
+- Check that `claude` command is in PATH
+
+**No output captured (0-byte files):**
+- Usually indicates pipe deadlock - the new script fixes this
+- Check stderr output in results
+
+**Timeout after 30 minutes:**
+- Task may be too complex
+- Check raw JSON output for partial progress

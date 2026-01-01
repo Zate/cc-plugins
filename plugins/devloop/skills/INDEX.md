@@ -7,10 +7,6 @@ Load skills on demand with `Skill: skill-name`. Don't preload.
 | Skill | Purpose |
 |-------|---------|
 | `plan-management` | Working with .devloop/plan.md |
-| `task-checkpoint` | Fresh start pattern, save/resume state |
-| `workflow-loop` | Spike/fresh/continue workflow |
-| `file-locations` | Project file navigation |
-| `project-context` | Understanding project structure |
 
 ## Language Patterns
 
@@ -37,23 +33,14 @@ Load skills on demand with `Skill: skill-name`. Don't preload.
 | Skill | Purpose |
 |-------|---------|
 | `security-checklist` | Security review |
-| `complexity-estimation` | Effort estimation |
-
-## Tracking
-
-| Skill | Purpose |
-|-------|---------|
-| `issue-tracking` | Bug/issue management |
-| `version-management` | Versioning, changelogs |
 
 ---
 
-**Total**: 19 skills (reduced from 29)
+**Total**: 12 skills (reduced from 29)
 
 ## Quick Reference
 
 ```
-# Most common skills
 Skill: plan-management       # Plans
 Skill: go-patterns           # Go
 Skill: react-patterns        # React/TS

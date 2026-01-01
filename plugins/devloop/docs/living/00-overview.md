@@ -1,44 +1,42 @@
 # Devloop Overview
 
-**A complete, token-conscious feature development workflow for professional software engineering.**
+**A lightweight development workflow for AI-assisted software engineering.**
 
 ---
 
 ## What is Devloop?
 
-Devloop is a Claude Code plugin that brings structure, efficiency, and reliability to software development with AI assistants. It transforms the often chaotic process of AI-assisted coding into a methodical, repeatable workflow that mirrors how senior engineers approach complex features.
+Devloop is a Claude Code plugin that brings lightweight structure to AI-assisted development. It helps you work in focused loops—explore, plan, implement, checkpoint—without the overhead of complex orchestration.
 
 ### The Problem It Solves
 
 When working with AI coding assistants, developers often face:
 
 1. **Context Loss**: Long conversations become slow and confused
-2. **Workflow Chaos**: No clear structure for complex multi-file changes
+2. **No Structure**: Work happens ad-hoc without clear progress tracking
 3. **Incomplete Work**: Tasks left half-done, no clear handoff
-4. **Token Waste**: Using expensive models for simple tasks
-5. **State Management**: No way to pause and resume work
+4. **Wasted Effort**: Over-engineering simple tasks
 
 ### The Devloop Solution
 
 Devloop provides:
 
-- **Structured Workflow**: 12-phase process from requirements to shipping
+- **Simple Workflow**: Spike → Fresh → Continue pattern
 - **Context Management**: Fresh start mechanism to prevent slowdown
-- **Plan-Driven Development**: Persistent plans that survive session boundaries
-- **Intelligent Routing**: Right model (opus/sonnet/haiku) for each task
-- **Checkpoints**: Mandatory verification after every task
+- **Plan Files**: Persistent `.devloop/plan.md` that survives sessions
+- **Checkpoints**: Natural pause points to commit or take breaks
 
 ---
 
 ## Core Philosophy
 
-### 1. Commands Orchestrate, Agents Assist
+### 1. Claude Does the Work
 
-Devloop inverts the typical AI assistant pattern. Instead of giving an AI full control:
+Devloop v3.0 inverts the old pattern. Instead of spawning agents for everything:
 
-- **Commands** control the workflow and stay visible to the user
-- **Agents** are specialized helpers invoked for specific subtasks
-- **Users** always see what's happening and can intervene
+- **Claude implements directly** - Write code, run tests, make commits
+- **Skills load on-demand** - Only when specialized knowledge is needed
+- **Subagents are rare** - Only for genuinely parallel or specialized work
 
 ### 2. Work in Loops, Not Lines
 
@@ -49,25 +47,20 @@ Spike → Fresh → Continue → [Work] → Fresh → Continue → [Work] → Sh
 ```
 
 Each cycle:
-- **Spike**: Explore and plan
+- **Spike**: Explore and understand
 - **Fresh**: Save state, clear context
 - **Continue**: Resume with fresh focus
 - **Ship**: Validate and commit
 
-### 3. Token Consciousness
+### 3. Minimal Overhead
 
-Not all tasks need the same intelligence level:
+Not everything needs complex orchestration:
 
-| Task Type | Model | Token Cost |
-|-----------|-------|------------|
-| Classification, checklists | haiku | Low |
-| Implementation, exploration | sonnet | Medium |
-| Architecture, complex decisions | opus | High |
-
-Devloop automates this selection using a **20/60/20 strategy**:
-- 20% opus for high-stakes decisions
-- 60% sonnet for core development
-- 20% haiku for routine tasks
+| Task Size | Approach |
+|-----------|----------|
+| Small fix | `/devloop:quick` - Just do it |
+| Feature | `/devloop` - Plan then implement |
+| Exploration | `/devloop:spike` - Time-boxed discovery |
 
 ---
 
@@ -75,111 +68,102 @@ Devloop automates this selection using a **20/60/20 strategy**:
 
 ### Plans
 
-Plans are the heart of devloop. They're markdown files (`.devloop/plan.md`) that:
+Plans are markdown files (`.devloop/plan.md`) that:
 
 - Define what needs to be built
-- Break work into phases and tasks
 - Track progress with checkboxes
 - Survive session boundaries
 
 ```markdown
-# Devloop Plan: User Authentication
-
-**Status**: In Progress
-**Current Phase**: Implementation
+# User Authentication
 
 ## Tasks
-
-### Phase 1: Foundation
-- [x] Task 1.1: Create user model
-- [~] Task 1.2: Add validation (partial)
-- [ ] Task 1.3: Write unit tests
+- [x] Create user model
+- [x] Add validation
+- [ ] Write unit tests
+- [ ] Add JWT tokens
 ```
-
-### Checkpoints
-
-After every task completion, devloop asks:
-
-1. **Continue**: Move to next task
-2. **Commit**: Save work with atomic commit
-3. **Fresh start**: Clear context, resume later
-4. **Stop**: End session with summary
-
-This ensures nothing falls through the cracks.
 
 ### Fresh Starts
 
-When context becomes heavy (5-10 tasks), devloop suggests a fresh start:
+When context becomes heavy (5-10 tasks), take a fresh start:
 
-1. Current state is saved to `.devloop/next-action.json`
-2. User runs `/clear` to reset conversation
-3. Running `/devloop:continue` automatically resumes
+1. Run `/devloop:fresh` - saves state to `.devloop/next-action.json`
+2. Run `/clear` to reset conversation
+3. Run `/devloop:continue` - automatically resumes
 
 This keeps responses fast and reasoning sharp.
+
+### Checkpoints
+
+After significant progress, devloop asks:
+
+1. **Continue**: Keep working
+2. **Commit**: Save work with git commit
+3. **Break**: Fresh start, resume later
 
 ---
 
 ## The Workflow
 
-Devloop provides a 12-phase workflow for complex features:
+### Simple Flow
 
 ```
 ┌─────────────┐     ┌─────────────┐     ┌─────────────┐
-│  0. Triage  │────▶│ 1. Discovery│────▶│ 2. Estimate │
-└─────────────┘     └─────────────┘     └─────────────┘
-                                               │
-┌─────────────┐     ┌─────────────┐     ┌──────▼──────┐
-│ 5. Architect│◀────│4. Clarify   │◀────│ 3. Explore  │
-└──────┬──────┘     └─────────────┘     └─────────────┘
-       │
-┌──────▼──────┐     ┌─────────────┐     ┌─────────────┐
-│  6. Plan    │────▶│ 7. Implement│────▶│  8. Test    │
+│    Spike    │────▶│   Plan      │────▶│  Implement  │
 └─────────────┘     └─────────────┘     └──────┬──────┘
                                                │
-┌─────────────┐     ┌─────────────┐     ┌──────▼──────┐
-│ 11. Git     │◀────│10. Validate │◀────│  9. Review  │
-└──────┬──────┘     └─────────────┘     └─────────────┘
-       │
-       ▼
-┌─────────────┐
-│ 12. Summary │
-└─────────────┘
+                    ┌─────────────┐     ┌──────▼──────┐
+                    │    Ship     │◀────│  Checkpoint │
+                    └─────────────┘     └─────────────┘
 ```
 
-**You don't need all phases**. Use:
-- `/devloop:quick` for small tasks
-- `/devloop:spike` for exploration
-- `/devloop:review` for code review
+### Commands
+
+| Command | Purpose |
+|---------|---------|
+| `/devloop` | Start new work |
+| `/devloop:continue` | Resume from plan |
+| `/devloop:spike` | Time-boxed exploration |
+| `/devloop:fresh` | Save state, prepare for context clear |
+| `/devloop:quick` | Small, well-defined fixes |
+| `/devloop:review` | Code review |
+| `/devloop:ship` | Commit and/or PR |
 
 ---
 
 ## Quick Start
 
 ```bash
-# Install devloop
-/plugin install devloop
-
-# Best pattern: spike → fresh → continue
+# Start with exploration
 /devloop:spike How should we add user authentication?
+
+# Save state and clear context
 /devloop:fresh
 /clear
+
+# Resume work
 /devloop:continue
 ```
 
-That's it. Devloop guides you through the rest.
+That's it. No complex setup, no heavy orchestration.
+
+---
+
+## What's Different in v3.0
+
+| Aspect | v2.x | v3.0 |
+|--------|------|------|
+| Who does work | Agents | Claude directly |
+| Skills | Auto-loaded | On-demand |
+| Hooks | Many prompt hooks | Minimal, command-only |
+| Complexity | 12 phases | Simple loop |
+| Cost | ~10x native | ~2-3x native |
 
 ---
 
 ## Next Steps
 
-- [Architecture](01-architecture.md) - Understand how devloop is built
-- [The Development Loop](03-development-loop.md) - Master the spike → fresh → continue pattern
-- [Principles](02-principles.md) - Learn the design philosophies
-
----
-
-## Related Files
-
-- Plugin manifest: `.claude-plugin/plugin.json`
-- Main README: `../README.md`
-- Changelog: `../CHANGELOG.md`
+- [Principles](02-principles.md) - Design philosophy
+- [Development Loop](03-development-loop.md) - Master the workflow
+- [State Management](06-state-management.md) - How state persists
