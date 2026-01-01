@@ -44,3 +44,5 @@ temp/
 .analysis/
 benchmark/
 source_docs/
+spike/
+generate_reports.sh
