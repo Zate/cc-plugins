@@ -23,7 +23,7 @@ Mention Claude Code's native tools for exploration.
 
 ## Phase 4: Commit
 
-- [ ] Stage and commit: `git commit -m "fix(devloop): improve path refs and native tool awareness"`
+- [x] Stage and commit: `git commit -m "fix(devloop): improve path refs and native tool awareness"`
 
 ---
 

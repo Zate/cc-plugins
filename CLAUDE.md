@@ -234,7 +234,7 @@ This shows plugin loading, manifest validation, and component registration.
 - When context feels heavy
 - Suggested at checkpoints
 
-See `plugins/devloop/commands/fresh.md` and `plugins/devloop/skills/workflow-loop/SKILL.md` for details.
+See `plugins/devloop/commands/fresh.md` for details.
 
 ---
 
@@ -329,8 +329,8 @@ User: /plugin:audit
 ### Reference Implementation
 
 See these plugins for the pattern in action:
-- `plugins/devloop/commands/devloop.md` - Full 12-phase feature workflow
-- `plugins/security/commands/audit.md` - 5-phase security audit
+- `plugins/devloop/commands/devloop.md` - Lightweight workflow with checkpoints
+- `plugins/security/commands/audit.md` - 5-phase security audit (if available)
 
 ## .devloop/ Directory Structure
 
@@ -377,9 +377,9 @@ Add these patterns to exclude local-only files:
 .claude/settings.local.json
 ```
 
-See `plugins/devloop/templates/gitignore-devloop` for a complete template.
+Add these patterns to your project's `.gitignore`.
 
-For detailed file specifications, invoke `Skill: file-locations` from the devloop plugin.
+For detailed file specifications, see `plugins/devloop/skills/plan-management/SKILL.md`.
 
 ## Key Principles
 
