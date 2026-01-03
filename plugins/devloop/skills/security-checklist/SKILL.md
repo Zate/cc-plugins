@@ -1,8 +1,13 @@
 ---
 name: security-checklist
-description: This skill should be used for OWASP, security review, authentication, XSS, SQL injection prevention
-whenToUse: Security review, auth security, vulnerability prevention
-whenNotToUse: Non-security code review
+description: This skill should be used for OWASP, security review, authentication, XSS, SQL injection prevention, CSRF, input validation, secure coding, vulnerability scanning
+whenToUse: Security review, auth security, vulnerability prevention, input validation, secure coding, OWASP Top 10, penetration testing prep, security audit
+whenNotToUse: Non-security code review, general code quality
+seeAlso:
+  - skill: api-design
+    when: securing API endpoints
+  - skill: database-patterns
+    when: SQL injection prevention
 ---
 
 # Security Checklist

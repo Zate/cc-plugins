@@ -1,8 +1,8 @@
 ---
 name: plan-management
-description: This skill should be used when creating, reading, or updating devloop plans in .devloop/plan.md
-whenToUse: Creating or updating plans, reading plan state, understanding task status
-whenNotToUse: Quick tasks without formal plans, exploratory spikes
+description: This skill should be used when creating, reading, or updating devloop plans in .devloop/plan.md, task tracking, progress logs, phase management
+whenToUse: Creating or updating plans, reading plan state, understanding task status, marking tasks complete, adding progress entries, phase transitions
+whenNotToUse: Quick tasks without formal plans, exploratory spikes, simple TODOs
 ---
 
 # Plan Management

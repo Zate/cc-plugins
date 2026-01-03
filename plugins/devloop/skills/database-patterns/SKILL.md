@@ -1,8 +1,13 @@
 ---
 name: database-patterns
-description: This skill should be used for database schema design, indexes, query optimization, migrations
-whenToUse: Database schema, indexes, SQL performance
-whenNotToUse: Simple CRUD, established schemas
+description: This skill should be used for database schema design, indexes, query optimization, migrations, SQL, PostgreSQL, MySQL, ORM patterns, data modeling, database relationships
+whenToUse: Database schema, indexes, SQL performance, data modeling, PostgreSQL, MySQL, SQLite, ORM design, Prisma, TypeORM, SQLAlchemy, database relationships
+whenNotToUse: Simple CRUD, established schemas, NoSQL-only projects
+seeAlso:
+  - skill: api-design
+    when: designing data-backed APIs
+  - skill: architecture-patterns
+    when: data layer architecture
 ---
 
 # Database Patterns

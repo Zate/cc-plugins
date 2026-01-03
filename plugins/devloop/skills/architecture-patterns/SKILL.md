@@ -1,8 +1,15 @@
 ---
 name: architecture-patterns
-description: This skill should be used for system design, design patterns, architectural decisions
-whenToUse: Architecture design, design patterns, system structure
-whenNotToUse: Simple implementations, established patterns
+description: This skill should be used for system design, design patterns, architectural decisions, SOLID principles, clean code structure, code organization, refactoring strategy, software architecture
+whenToUse: Architecture design, design patterns, system structure, code organization, refactoring, clean code, SOLID, dependency injection, layered architecture
+whenNotToUse: Simple implementations, established patterns, trivial changes
+seeAlso:
+  - skill: api-design
+    when: designing service APIs
+  - skill: database-patterns
+    when: data layer architecture
+  - skill: testing-strategies
+    when: test architecture decisions
 ---
 
 # Architecture Patterns

@@ -1,8 +1,11 @@
 ---
 name: atomic-commits
-description: This skill should be used for guidance on commit size, scope, and creating reviewable commits
-whenToUse: Deciding when to commit, commit scope, atomic changes
+description: This skill should be used for guidance on commit size, scope, and creating reviewable commits, splitting large changes, commit hygiene
+whenToUse: Deciding when to commit, commit scope, atomic changes, splitting large PRs, commit hygiene, reviewable changes
 whenNotToUse: Simple single-file changes, trivial fixes
+seeAlso:
+  - skill: git-workflows
+    when: branching and PR strategy
 ---
 
 # Atomic Commits

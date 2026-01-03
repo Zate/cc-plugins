@@ -1,8 +1,17 @@
 ---
 name: testing-strategies
-description: This skill should be used for test coverage, test pyramid, unit/integration/E2E test design
-whenToUse: Designing tests, coverage strategy, test pyramid
-whenNotToUse: Simple test additions, established patterns
+description: This skill should be used for test coverage, test pyramid, unit/integration/E2E test design, TDD, BDD, mocking strategies, test doubles, test architecture
+whenToUse: Designing tests, coverage strategy, test pyramid, TDD, BDD, mocking, test doubles, test organization, E2E testing, integration testing strategy
+whenNotToUse: Simple test additions, established patterns, single test file edits
+seeAlso:
+  - skill: architecture-patterns
+    when: test architecture decisions
+  - skill: react-patterns
+    when: React component testing
+  - skill: python-patterns
+    when: pytest patterns
+  - skill: go-patterns
+    when: Go table-driven tests
 ---
 
 # Testing Strategies

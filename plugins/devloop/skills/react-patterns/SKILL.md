@@ -1,13 +1,22 @@
 ---
 name: react-patterns
-description: This skill should be used for React hooks, components, state management, performance
-whenToUse: React code, hooks, components, React performance
-whenNotToUse: Non-React code
+description: This skill should be used for React hooks, components, state management, performance, frontend TypeScript, Next.js, JSX/TSX, web UI components
+whenToUse: React code, hooks, components, React performance, frontend development with React, Next.js, TypeScript frontend, JSX, TSX files
+whenNotToUse: Non-React code, Vue, Angular, Svelte, pure HTML/CSS design
+seeAlso:
+  - skill: testing-strategies
+    when: writing React tests
+  - skill: architecture-patterns
+    when: structuring large React apps
+  - plugin: frontend-design
+    when: creating distinctive UI designs, production-grade interfaces, avoiding generic aesthetics
 ---
 
 # React Patterns
 
 Idiomatic React/TypeScript patterns.
+
+> **Tip**: For high-quality UI design beyond code patterns, consider the `frontend-design` plugin if installed (`/frontend-design`).
 
 ## Functional Components
 

@@ -1,4 +1,4 @@
-# Devloop Skills Index v3.0
+# Devloop Skills Index v3.1
 
 Load skills on demand with `Skill: skill-name`. Don't preload.
 
@@ -10,40 +10,52 @@ Load skills on demand with `Skill: skill-name`. Don't preload.
 
 ## Language Patterns
 
-| Skill | Purpose |
-|-------|---------|
-| `go-patterns` | Go idioms, error handling, testing |
-| `python-patterns` | Python best practices, pytest |
-| `react-patterns` | React/TypeScript, hooks, components |
-| `java-patterns` | Java/Spring patterns |
+| Skill | Purpose | Also Triggers On |
+|-------|---------|------------------|
+| `go-patterns` | Go idioms, error handling, testing | golang, .go files |
+| `python-patterns` | Python best practices, pytest | Django, Flask, FastAPI, pandas |
+| `react-patterns` | React/TypeScript, hooks, components | Next.js, frontend TS, JSX/TSX |
+| `java-patterns` | Java/Spring patterns | Kotlin, Spring Boot, Maven, Gradle |
 
 ## Development
 
-| Skill | Purpose |
-|-------|---------|
-| `git-workflows` | Git operations, branching |
-| `atomic-commits` | Commit best practices |
-| `testing-strategies` | Test design patterns |
-| `architecture-patterns` | System design patterns |
-| `api-design` | REST/GraphQL API design |
-| `database-patterns` | Database design |
+| Skill | Purpose | Also Triggers On |
+|-------|---------|------------------|
+| `git-workflows` | Git operations, branching | git flow, trunk-based, merge strategies |
+| `atomic-commits` | Commit best practices | splitting PRs, commit hygiene |
+| `testing-strategies` | Test design patterns | TDD, BDD, mocking, test doubles |
+| `architecture-patterns` | System design patterns | SOLID, clean code, refactoring |
+| `api-design` | REST/GraphQL API design | backend routes, HTTP endpoints |
+| `database-patterns` | Database design | SQL, PostgreSQL, MySQL, ORM |
 
 ## Quality
 
 | Skill | Purpose |
 |-------|---------|
-| `security-checklist` | Security review |
+| `security-checklist` | Security review, OWASP, vulnerability prevention |
 
 ---
 
-**Total**: 12 skills (reduced from 29)
+**Total**: 12 skills
+
+## Cross-References
+
+Skills now include `seeAlso` frontmatter pointing to related skills:
+- `react-patterns` → `testing-strategies`, `architecture-patterns`, **frontend-design plugin**
+- `api-design` → `security-checklist`, `architecture-patterns`, `database-patterns`
+- `testing-strategies` → language-specific patterns
+
+## External Plugin References
+
+Some skills reference external plugins when installed:
+- **`frontend-design`** (claude-plugins-official) - Referenced from `react-patterns` for UI design work
 
 ## Quick Reference
 
 ```
 Skill: plan-management       # Plans
 Skill: go-patterns           # Go
-Skill: react-patterns        # React/TS
+Skill: react-patterns        # React/TS (→ see frontend-design plugin)
 Skill: git-workflows         # Git
 Skill: atomic-commits        # Commits
 ```
