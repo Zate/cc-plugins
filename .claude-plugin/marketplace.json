@@ -7,16 +7,16 @@
   },
   "metadata": {
     "description": "A curated marketplace of Claude Code plugins and skills for enhanced development workflows",
-    "version": "0.2.0",
+    "version": "0.3.0",
     "pluginRoot": "./plugins"
   },
   "plugins": [
     {
       "name": "devloop",
       "source": "./plugins/devloop",
-      "description": "Token-conscious feature development workflow with enhanced engineer agent (6 new skills, mode-specific workflows, complexity-aware selection), mandatory checkpoint enforcement, loop completion detection, context management, fresh start mechanism, spike-to-plan application, worklog sync automation, consolidated super-agents (18→9), XML-structured prompts, unified language patterns, strategic model selection (opus/sonnet/haiku), and comprehensive documentation (agents.md, testing.md)",
+      "description": "Lightweight development workflow with spike/fresh/continue pattern, git workflow integration (branch-per-plan, PR creation, PR feedback), 14 on-demand skills, and 6 specialized agents. Optimized for efficiency with minimal hooks and direct execution.",
       "category": "development",
-      "tags": ["feature-development", "workflow", "agents", "checkpoints", "workflow-loop", "fresh-start", "context-management", "refactoring", "code-analysis", "go", "react", "java", "python", "model-selection", "documentation"]
+      "tags": ["feature-development", "workflow", "agents", "git", "pr-workflow", "fresh-start", "context-management", "go", "react", "java", "python"]
     },
     {
       "name": "security",
