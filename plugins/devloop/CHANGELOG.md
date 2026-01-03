@@ -5,6 +5,52 @@ All notable changes to the devloop plugin are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.3.0] - 2026-01-03
+
+### Added - Git Workflow Integration
+
+Comprehensive git workflow support with opt-in configuration via `.devloop/local.md`.
+
+#### New Command
+- `/devloop:pr-feedback` - Fetch and integrate PR review comments into the plan
+
+#### New Skills
+- `local-config` - Project settings via `.devloop/local.md` YAML frontmatter
+- `pr-feedback` - Parsing and integrating PR review feedback into tasks
+
+#### New Features
+- **Branch-per-plan workflow**: Optional auto-creation of feature branches when starting plans
+- **Smart commit strategy**: Choose between atomic commits (one per task) or squash
+- **PR creation**: Auto-generate PR description from plan summary and completed tasks
+- **PR status detection**: Session-start hook shows open PR and review status
+- **Config parsing**: `scripts/parse-local-config.sh` parses YAML frontmatter with defaults
+
+#### Enhanced Commands
+- `/devloop:ship` - Now branch-aware with 5 phases: Pre-flight, Validation, Commit, PR, Post-ship
+- `/devloop` - Offers feature branch creation when `git.auto-branch: true` in local.md
+
+#### Updated Skills
+- `git-workflows` - Added devloop integration section and trunk-based development guidance
+- `atomic-commits` - Added plan-to-commit mapping and devloop integration
+- `plan-management` - Added Branch and PR Feedback section formats
+
+#### Configuration (`.devloop/local.md`)
+```yaml
+---
+git:
+  auto-branch: true           # Create branch when plan starts
+  pr-on-complete: ask         # ask | always | never
+commits:
+  style: conventional         # conventional | simple
+review:
+  before-commit: ask          # ask | always | never
+---
+```
+
+All git features are opt-in. Without `local.md`, devloop works exactly as before.
+
+---
+
 ## [3.0.0] - 2025-12-30
 
 ### BREAKING - Radical Performance Optimization
