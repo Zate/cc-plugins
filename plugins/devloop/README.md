@@ -2,7 +2,7 @@
 
 **Claude does the work. You stay in control.**
 
-[![Version](https://img.shields.io/badge/version-3.1.0-blue)](./CHANGELOG.md) [![Commands](https://img.shields.io/badge/commands-7-orange)](#commands) [![Agents](https://img.shields.io/badge/agents-6-green)](#agents) [![Skills](https://img.shields.io/badge/skills-12-purple)](#skills)
+[![Version](https://img.shields.io/badge/version-3.2.0-blue)](./CHANGELOG.md) [![Commands](https://img.shields.io/badge/commands-8-orange)](#commands) [![Agents](https://img.shields.io/badge/agents-6-green)](#agents) [![Skills](https://img.shields.io/badge/skills-12-purple)](#skills)
 
 ---
 
@@ -53,6 +53,7 @@ For everything else, Claude reads files, writes code, runs tests, and commits - 
 | `/devloop:quick` | Fast implementation for small tasks |
 | `/devloop:review` | Code review for changes or PR |
 | `/devloop:ship` | Validation and git integration |
+| `/devloop:help` | Interactive guide to using devloop |
 
 ---
 
