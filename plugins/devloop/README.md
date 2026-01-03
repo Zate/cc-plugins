@@ -2,7 +2,7 @@
 
 **Claude does the work. You stay in control.**
 
-[![Version](https://img.shields.io/badge/version-3.2.0-blue)](./CHANGELOG.md) [![Commands](https://img.shields.io/badge/commands-8-orange)](#commands) [![Agents](https://img.shields.io/badge/agents-6-green)](#agents) [![Skills](https://img.shields.io/badge/skills-12-purple)](#skills)
+[![Version](https://img.shields.io/badge/version-3.3.0-blue)](./CHANGELOG.md) [![Commands](https://img.shields.io/badge/commands-9-orange)](#commands) [![Agents](https://img.shields.io/badge/agents-6-green)](#agents) [![Skills](https://img.shields.io/badge/skills-14-purple)](#skills)
 
 ---
 
@@ -52,7 +52,8 @@ For everything else, Claude reads files, writes code, runs tests, and commits - 
 | `/devloop:fresh` | Save state for context restart |
 | `/devloop:quick` | Fast implementation for small tasks |
 | `/devloop:review` | Code review for changes or PR |
-| `/devloop:ship` | Validation and git integration |
+| `/devloop:ship` | Validation, commit, and PR creation |
+| `/devloop:pr-feedback` | Integrate PR review comments into plan |
 | `/devloop:help` | Interactive guide to using devloop |
 
 ---
@@ -76,7 +77,7 @@ Six specialized agents for complex parallel work:
 
 Load domain knowledge on demand with `Skill: skill-name`:
 
-**Workflow**: plan-management, git-workflows, atomic-commits
+**Workflow**: plan-management, local-config, pr-feedback, git-workflows, atomic-commits
 
 **Patterns**: go-patterns, python-patterns, react-patterns, java-patterns
 
@@ -110,6 +111,7 @@ Plans live in `.devloop/plan.md`:
 # Devloop Plan: User Authentication
 
 **Status**: In Progress
+**Branch**: feat/add-authentication
 
 ## Phase 1: Core
 - [x] Task 1: Set up OAuth provider
@@ -118,6 +120,36 @@ Plans live in `.devloop/plan.md`:
 ```
 
 Resume anytime with `/devloop:continue`.
+
+---
+
+## Git Workflow (Optional)
+
+Enable branch-aware workflow with `.devloop/local.md`:
+
+```yaml
+---
+git:
+  auto-branch: true           # Create branch when plan starts
+  pr-on-complete: ask         # ask | always | never
+
+commits:
+  style: conventional         # conventional | simple
+
+review:
+  before-commit: ask          # ask | always | never
+---
+```
+
+**Full workflow:**
+
+1. `/devloop` - Creates plan + feature branch
+2. Work on tasks, commit with `/devloop:ship`
+3. Create PR when ready
+4. Get feedback, integrate with `/devloop:pr-feedback`
+5. Push fixes, merge
+
+All git features are opt-in. Without `local.md`, devloop works without git integration.
 
 ---
 

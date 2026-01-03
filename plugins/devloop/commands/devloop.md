@@ -22,23 +22,50 @@ Start a development workflow with minimal overhead. **You do the work directly.*
    - If clear → proceed to planning
    - If unclear → ask ONE clarifying question
 
-3. **Create plan** (if task is non-trivial):
+3. **Check git workflow config** (if `.devloop/local.md` exists):
+   - Read `git.auto-branch` setting
+   - If `true` and on main/master, offer to create feature branch
+
+4. **Create feature branch** (if configured):
+   ```yaml
+   AskUserQuestion:
+     question: "Create feature branch for this work?"
+     header: "Branch"
+     options:
+       - label: "Yes"
+         description: "Create feat/[task-slug] branch"
+       - label: "No"
+         description: "Stay on current branch"
+   ```
+   If yes:
+   ```bash
+   git checkout -b feat/[task-slug]
+   ```
+
+5. **Create plan** (if task is non-trivial):
    ```bash
    mkdir -p .devloop
    ```
    Write plan to `.devloop/plan.md`:
    ```markdown
    # [Task Name]
-   
+
+   **Created**: YYYY-MM-DD
+   **Status**: In Progress
+   **Branch**: feat/[task-slug] (if created)
+
    ## Tasks
    - [ ] Task 1
    - [ ] Task 2
    - [ ] Task 3
+
+   ## Progress Log
+   - YYYY-MM-DD: Plan created
    ```
 
-4. **Implement directly** - no subagents for routine work
+6. **Implement directly** - no subagents for routine work
 
-5. **Checkpoint** after significant progress:
+7. **Checkpoint** after significant progress:
    - Summarize what was done
    - Ask: "Continue or take a break?"
 
@@ -89,6 +116,7 @@ Full index: `skills/INDEX.md`
 | `/devloop:quick` | Small, well-defined fixes |
 | `/devloop:review` | Code review |
 | `/devloop:ship` | Commit and/or PR |
+| `/devloop:pr-feedback` | Integrate PR review comments |
 
 ## Example Flow
 
@@ -108,8 +136,10 @@ Claude:
 ## Files
 
 - `.devloop/plan.md` - Current task plan
+- `.devloop/local.md` - Project settings (git workflow, etc.)
 - `.devloop/next-action.json` - Fresh start state (auto-created by /devloop:fresh)
 - `.devloop/worklog.md` - Optional work history
+- `.devloop/spikes/` - Spike reports
 
 ---
 

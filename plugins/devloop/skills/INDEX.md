@@ -1,4 +1,4 @@
-# Devloop Skills Index v3.1
+# Devloop Skills Index v3.2
 
 Load skills on demand with `Skill: skill-name`. Don't preload.
 
@@ -7,6 +7,8 @@ Load skills on demand with `Skill: skill-name`. Don't preload.
 | Skill | Purpose |
 |-------|---------|
 | `plan-management` | Working with .devloop/plan.md |
+| `local-config` | Project settings via .devloop/local.md |
+| `pr-feedback` | Integrating PR review comments into plan |
 
 ## Language Patterns
 
@@ -36,7 +38,7 @@ Load skills on demand with `Skill: skill-name`. Don't preload.
 
 ---
 
-**Total**: 12 skills
+**Total**: 14 skills
 
 ## Cross-References
 
@@ -54,6 +56,8 @@ Some skills reference external plugins when installed:
 
 ```
 Skill: plan-management       # Plans
+Skill: local-config          # Project config
+Skill: pr-feedback           # PR review comments
 Skill: go-patterns           # Go
 Skill: react-patterns        # React/TS (→ see frontend-design plugin)
 Skill: git-workflows         # Git
