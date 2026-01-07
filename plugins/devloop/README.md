@@ -2,7 +2,7 @@
 
 **Claude does the work. You stay in control.**
 
-[![Version](https://img.shields.io/badge/version-3.3.0-blue)](./CHANGELOG.md) [![Commands](https://img.shields.io/badge/commands-9-orange)](#commands) [![Agents](https://img.shields.io/badge/agents-6-green)](#agents) [![Skills](https://img.shields.io/badge/skills-14-purple)](#skills)
+[![Version](https://img.shields.io/badge/version-3.4.0-blue)](./CHANGELOG.md) [![Commands](https://img.shields.io/badge/commands-10-orange)](#commands) [![Agents](https://img.shields.io/badge/agents-6-green)](#agents) [![Skills](https://img.shields.io/badge/skills-14-purple)](#skills)
 
 ---
 
@@ -54,6 +54,7 @@ For everything else, Claude reads files, writes code, runs tests, and commits - 
 | `/devloop:review` | Code review for changes or PR |
 | `/devloop:ship` | Validation, commit, and PR creation |
 | `/devloop:pr-feedback` | Integrate PR review comments into plan |
+| `/devloop:ralph` | Automated execution with ralph-loop |
 | `/devloop:help` | Interactive guide to using devloop |
 
 ---
@@ -150,6 +151,41 @@ review:
 5. Push fixes, merge
 
 All git features are opt-in. Without `local.md`, devloop works without git integration.
+
+---
+
+## Ralph Loop Integration (Automated Execution)
+
+Run plan tasks automatically until completion with the [ralph-loop plugin](https://github.com/anthropics/claude-plugins/tree/main/plugins/ralph-loop).
+
+```bash
+# Install ralph-loop if not already installed
+/plugin install ralph-loop
+
+# Start automated execution
+/devloop:ralph
+
+# With iteration limit
+/devloop:ralph --max-iterations 100
+```
+
+**How it works:**
+1. Creates ralph-loop state with completion promise "ALL PLAN TASKS COMPLETE"
+2. Works through plan tasks, marking each `[x]` when done
+3. When all tasks complete, outputs `<promise>ALL PLAN TASKS COMPLETE</promise>`
+4. Ralph's Stop hook detects the promise and terminates the loop
+
+**When to use:**
+- Well-defined plans from `/devloop:spike`
+- Overnight or background execution
+- Clear, implementable tasks
+
+**When NOT to use:**
+- Tasks requiring human decisions
+- Creative or design work
+- Evolving requirements (use manual spike/fresh/continue instead)
+
+See `/devloop:help` → "Automation" for detailed documentation.
 
 ---
 

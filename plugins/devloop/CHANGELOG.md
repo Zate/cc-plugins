@@ -5,6 +5,39 @@ All notable changes to the devloop plugin are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.4.0] - 2026-01-08
+
+### Added - Ralph Loop Integration
+
+Automated task execution with the ralph-loop plugin for hands-free plan completion.
+
+#### New Command
+- `/devloop:ralph` - Start automated task loop with ralph-loop integration
+
+#### New Script
+- `scripts/check-plan-complete.sh` - Check if all plan tasks are marked complete (returns JSON status)
+
+#### Enhanced Commands
+- `/devloop:continue` - Now outputs `<promise>ALL PLAN TASKS COMPLETE</promise>` when all tasks done and ralph-loop is active
+
+#### New Help Topic
+- "Automation" topic in `/devloop:help` - Explains ralph integration, flow diagram, and when to use
+
+#### Documentation
+- README updated with Ralph Loop Integration section
+- Full documentation of promise mechanism and workflow
+
+#### How It Works
+1. `/devloop:ralph` creates ralph-loop state with completion promise
+2. Claude works through plan tasks, marking each `[x]` when done
+3. After each task, checks if all tasks complete
+4. When complete, outputs `<promise>ALL PLAN TASKS COMPLETE</promise>`
+5. Ralph's Stop hook detects promise and terminates loop
+
+Requires ralph-loop plugin: `/plugin install ralph-loop`
+
+---
+
 ## [3.3.0] - 2026-01-03
 
 ### Added - Git Workflow Integration

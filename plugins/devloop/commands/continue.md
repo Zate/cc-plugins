@@ -1,7 +1,7 @@
 ---
 description: Resume work from plan or fresh start
 argument-hint: Optional specific task to work on
-allowed-tools: ["Read", "Write", "Edit", "Grep", "Glob", "Bash", "AskUserQuestion", "TodoWrite", "Skill"]
+allowed-tools: ["Read", "Write", "Edit", "Grep", "Glob", "Bash", "Bash(${CLAUDE_PLUGIN_ROOT}/scripts/check-plan-complete.sh:*)", "AskUserQuestion", "TodoWrite", "Skill"]
 ---
 
 # Continue - Resume Existing Work
@@ -61,6 +61,30 @@ For partial completion:
 ```markdown
 - [~] Partially done task description
 ```
+
+## Step 4b: Check for Ralph Loop Completion
+
+After marking a task complete, check if ALL tasks are now done:
+
+```bash
+"${CLAUDE_PLUGIN_ROOT}/scripts/check-plan-complete.sh" .devloop/plan.md
+```
+
+If the script returns `{"complete": true, ...}` AND a ralph-loop is active (`.claude/ralph-loop.local.md` exists):
+
+1. Read the completion promise from ralph state:
+   ```bash
+   grep '^completion_promise:' .claude/ralph-loop.local.md | sed 's/completion_promise: *//' | tr -d '"'
+   ```
+
+2. Output the promise tag to terminate the ralph loop:
+   ```
+   All plan tasks complete!
+
+   <promise>ALL PLAN TASKS COMPLETE</promise>
+   ```
+
+**Important**: Only output the `<promise>` tag when ALL tasks are genuinely marked `[x]`.
 
 ## Step 5: Checkpoint
 

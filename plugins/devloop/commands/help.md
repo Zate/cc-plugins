@@ -27,6 +27,8 @@ AskUserQuestion:
       description: "On-demand knowledge and parallel work"
     - label: "Troubleshooting"
       description: "Common issues and fixes"
+    - label: "Automation"
+      description: "Ralph loop integration for hands-free execution"
 ```
 
 ## Step 2: Show Topic Content
@@ -303,6 +305,114 @@ Nuclear option - start completely fresh:
 rm -rf .devloop/
 /devloop
 ```
+
+---
+
+# Topic: Automation
+
+## Ralph Loop Integration
+
+Run devloop tasks automatically until plan completion using the ralph-loop plugin.
+
+**Prerequisites:**
+- Install ralph-loop: `/plugin install ralph-loop`
+- Have a plan: `.devloop/plan.md`
+
+## Basic Usage
+
+```bash
+# Start automated execution (up to 50 iterations)
+/devloop:ralph
+
+# With custom iteration limit
+/devloop:ralph --max-iterations 100
+```
+
+## How It Works
+
+```
+┌─────────────────────────────────────────────────┐
+│  /devloop:ralph                                 │
+│  └─→ Creates ralph-loop state                   │
+│  └─→ Sets promise: "ALL PLAN TASKS COMPLETE"    │
+│  └─→ Starts working on tasks                    │
+└───────────────────────┬─────────────────────────┘
+                        ↓
+┌─────────────────────────────────────────────────┐
+│  Claude completes a task                        │
+│  └─→ Marks task [x] in plan                     │
+│  └─→ Checks: all tasks done?                    │
+└───────────────────────┬─────────────────────────┘
+                        │
+                ┌───────┴───────┐
+              No tasks           All tasks
+              remaining          complete
+                │                    │
+                ↓                    ↓
+         Stop hook              Output promise:
+         feeds prompt           <promise>ALL PLAN
+         back to Claude         TASKS COMPLETE</promise>
+                │                    │
+                ↓                    ↓
+         Another iteration       Loop terminates
+```
+
+## When to Use
+
+**Good for:**
+- Well-defined plans with clear tasks
+- Overnight or background execution
+- Automated implementation of spike-created plans
+
+**Not good for:**
+- Tasks requiring human decisions
+- Creative or design work
+- Unclear or evolving requirements
+
+## The Promise Mechanism
+
+Ralph's Stop hook looks for a `<promise>` tag in Claude's output. When all plan tasks are marked `[x]`, devloop outputs:
+
+```
+<promise>ALL PLAN TASKS COMPLETE</promise>
+```
+
+This signals Ralph to terminate the loop.
+
+## Stopping Early
+
+```bash
+# Cancel the active ralph loop
+/cancel-ralph
+```
+
+Or set `--max-iterations` for a safety limit.
+
+## Monitoring Progress
+
+```bash
+# Check ralph iteration count
+head -10 .claude/ralph-loop.local.md
+
+# Check plan progress
+./plugins/devloop/scripts/check-plan-complete.sh
+```
+
+## Comparison: Manual vs Automated
+
+| Aspect | Manual (spike/fresh/continue) | Automated (ralph) |
+|--------|-------------------------------|-------------------|
+| Context management | You run /fresh + /clear | Context accumulates |
+| Human checkpoints | Yes | No |
+| Works overnight | No | Yes |
+| Best for | Complex, evolving work | Clear, defined tasks |
+
+## Tips
+
+1. **Create good plans first** - Run `/devloop:spike` before `/devloop:ralph`
+2. **Use iteration limits** - Set `--max-iterations` as a safety net
+3. **Review results** - Check work after loop completes
+4. **Large plans** - Consider manual loop for 20+ tasks (context builds up)
 
 ---
 

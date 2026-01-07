@@ -1,7 +1,7 @@
 {
   "name": "devloop",
-  "version": "3.3.0",
-  "description": "Lightweight development workflow with spike/fresh/continue pattern, git workflow integration, and PR feedback. Optimized for efficiency - minimal hooks, on-demand skills, direct execution.",
+  "version": "3.4.0",
+  "description": "Lightweight development workflow with spike/fresh/continue pattern, git workflow integration, PR feedback, and ralph-loop automation. Optimized for efficiency - minimal hooks, on-demand skills, direct execution.",
   "author": {
     "name": "Zate",
     "email": "zate75+claude-code-plugins@gmail.com"
