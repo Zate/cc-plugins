@@ -75,6 +75,12 @@ if [ "${CONTEXT_SIZE:-0}" -gt 0 ] 2>/dev/null; then
     CURRENT_CONTEXT=$((${INPUT_TOKENS:-0} + ${CACHE_CREATE:-0} + ${CACHE_READ:-0}))
     CONTEXT_PCT=$((CURRENT_CONTEXT * 100 / CONTEXT_SIZE))
 
+    # Write context usage to file for hooks to read
+    mkdir -p .claude
+    cat > .claude/context-usage.json <<CONTEXT_EOF
+{"context_pct": $CONTEXT_PCT, "current_tokens": $CURRENT_CONTEXT, "max_tokens": $CONTEXT_SIZE, "updated_at": "$(date -u +%Y-%m-%dT%H:%M:%SZ)"}
+CONTEXT_EOF
+
     # Create mini progress bar (5 chars)
     BAR_FILLED=$((CONTEXT_PCT * 5 / 100))
     BAR_EMPTY=$((5 - BAR_FILLED))
