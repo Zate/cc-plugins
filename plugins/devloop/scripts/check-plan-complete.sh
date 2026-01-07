@@ -21,16 +21,26 @@ if [ ! -f "$PLAN_FILE" ]; then
     exit 2
 fi
 
-# Count task markers
+# Count task markers (excluding code blocks)
 # - [ ] = pending
 # - [x] = completed
 # - [~] = partial/in-progress
 # - [!] = blocked (also counts as pending)
 
-TOTAL=$(grep -c "^- \[" "$PLAN_FILE" 2>/dev/null) || TOTAL=0
-DONE=$(grep -c "^- \[x\]" "$PLAN_FILE" 2>/dev/null) || DONE=0
-PARTIAL=$(grep -c "^- \[\~\]" "$PLAN_FILE" 2>/dev/null) || PARTIAL=0
-BLOCKED=$(grep -c "^- \[!\]" "$PLAN_FILE" 2>/dev/null) || BLOCKED=0
+# Filter out code blocks first, then count tasks
+# Task pattern: starts with optional whitespace, then "- [" followed by space, x, ~, or !
+filter_code_blocks() {
+    awk '
+        /^```/ { in_code = !in_code; next }
+        !in_code { print }
+    ' "$1"
+}
+
+# Count only actual task markers: "- [ ]", "- [x]", "- [~]", "- [!]"
+TOTAL=$(filter_code_blocks "$PLAN_FILE" | grep -cE "^[[:space:]]*- \[[ x~!]\]" 2>/dev/null) || TOTAL=0
+DONE=$(filter_code_blocks "$PLAN_FILE" | grep -cE "^[[:space:]]*- \[x\]" 2>/dev/null) || DONE=0
+PARTIAL=$(filter_code_blocks "$PLAN_FILE" | grep -cE "^[[:space:]]*- \[~\]" 2>/dev/null) || PARTIAL=0
+BLOCKED=$(filter_code_blocks "$PLAN_FILE" | grep -cE "^[[:space:]]*- \[!\]" 2>/dev/null) || BLOCKED=0
 
 # Pending = Total - Done - Partial - Blocked, but we treat partial/blocked as pending
 PENDING=$((TOTAL - DONE))
