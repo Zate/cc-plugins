@@ -379,6 +379,23 @@ Ralph's Stop hook looks for a `<promise>` tag in Claude's output. When all plan 
 
 This signals Ralph to terminate the loop.
 
+## Context Guard (Auto-Exit)
+
+The loop automatically exits when context usage exceeds 70%, preventing degradation.
+
+**How it works:**
+1. Statusline writes context % to `.claude/context-usage.json`
+2. Stop hook checks context when Claude tries to stop
+3. If context >= threshold and ralph active, gracefully exits
+4. You'll see: "Run `/devloop:fresh` then `/devloop:continue` to resume"
+
+**Configure threshold** in `.devloop/local.md`:
+```yaml
+---
+context_threshold: 80  # Default is 70
+---
+```
+
 ## Stopping Early
 
 ```bash
@@ -387,6 +404,7 @@ This signals Ralph to terminate the loop.
 ```
 
 Or set `--max-iterations` for a safety limit.
+The context guard also stops the loop automatically at high context.
 
 ## Monitoring Progress
 

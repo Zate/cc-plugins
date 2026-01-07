@@ -5,6 +5,88 @@ All notable changes to the devloop plugin are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.5.0] - 2026-01-08
+
+### Added - Context Guard for Ralph Loop
+
+Automatic context monitoring to prevent degradation during long automated sessions.
+
+#### New Hook
+- `hooks/context-guard.sh` - Stop hook that monitors context usage and gracefully exits ralph loop when threshold exceeded
+
+#### How It Works
+1. Statusline writes context % to `.claude/context-usage.json` on every update
+2. Stop hook checks context usage when Claude tries to stop
+3. If context >= threshold (default 70%) and ralph loop is active, removes ralph state file
+4. Ralph-loop's hook then sees no state file and allows exit
+5. User sees message to run `/devloop:fresh` then `/devloop:continue` to resume
+
+#### Configuration
+Override threshold in `.devloop/local.md`:
+```yaml
+---
+context_threshold: 80  # Exit at 80% instead of default 70%
+---
+```
+
+#### Files Changed
+- `statusline/devloop-statusline.sh` - Now writes context usage JSON
+- `hooks/context-guard.sh` - New Stop hook
+- `hooks/hooks.json` - Added Stop hook configuration
+
+---
+
+## [3.4.2] - 2026-01-08
+
+### Fixed - Task Counting in check-plan-complete.sh
+
+Fixed script incorrectly counting markdown examples inside code blocks as tasks.
+
+#### Changes
+- Added `filter_code_blocks()` function using awk to skip content between ``` markers
+- Changed regex from `^- \[` to `^[[:space:]]*- \[[ x~!]\]` for precise task matching
+- Supports indented tasks with `[[:space:]]*` prefix
+
+**Before**: Counted `- [Finding]`, `- [Option A]` as tasks
+**After**: Only counts actual task markers: `- [ ]`, `- [x]`, `- [~]`, `- [!]`
+
+---
+
+## [3.4.1] - 2026-01-08
+
+### Enhanced - Spike Command Multi-Select
+
+Enhanced `/devloop:spike` with multi-select exploration aspects and time budget.
+
+#### New Features
+- **Multi-select exploration aspects**: Feasibility, Approach comparison, Performance, Integration
+- **Time budget question**: Quick (30 min), Standard (1-2 hr), Deep dive
+- **Aspect-specific research guidance** in Step 2
+- **Per-aspect evaluation** with verdicts and confidence levels in Step 4
+- **Enhanced report template** with "Findings by Aspect" sections and summary matrix
+
+#### Example
+```yaml
+AskUserQuestion:
+  questions:
+    - question: "What aspects should this spike explore?"
+      header: "Explore"
+      multiSelect: true
+      options:
+        - label: "Feasibility"
+        - label: "Approach comparison"
+        - label: "Performance"
+        - label: "Integration"
+    - question: "What's your time budget?"
+      header: "Depth"
+      options:
+        - label: "Quick (30 min)"
+        - label: "Standard (1-2 hr)"
+        - label: "Deep dive"
+```
+
+---
+
 ## [3.4.0] - 2026-01-08
 
 ### Added - Ralph Loop Integration
@@ -891,6 +973,12 @@ Extracted mode instructions from engineer.md to references/ for on-demand loadin
 - Core agents and skills
 - SessionStart hook
 
+[3.5.0]: https://github.com/Zate/cc-plugins/compare/v3.4.2...v3.5.0
+[3.4.2]: https://github.com/Zate/cc-plugins/compare/v3.4.1...v3.4.2
+[3.4.1]: https://github.com/Zate/cc-plugins/compare/v3.4.0...v3.4.1
+[3.4.0]: https://github.com/Zate/cc-plugins/compare/v3.3.0...v3.4.0
+[3.3.0]: https://github.com/Zate/cc-plugins/compare/v3.0.0...v3.3.0
+[3.0.0]: https://github.com/Zate/cc-plugins/compare/v2.4.0...v3.0.0
 [2.4.0]: https://github.com/Zate/cc-plugins/compare/v2.3.0...v2.4.0
 [2.3.0]: https://github.com/Zate/cc-plugins/compare/v2.2.1...v2.3.0
 [2.2.1]: https://github.com/Zate/cc-plugins/compare/v2.1.0...v2.2.1

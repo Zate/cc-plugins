@@ -2,7 +2,7 @@
 
 **Claude does the work. You stay in control.**
 
-[![Version](https://img.shields.io/badge/version-3.4.0-blue)](./CHANGELOG.md) [![Commands](https://img.shields.io/badge/commands-10-orange)](#commands) [![Agents](https://img.shields.io/badge/agents-6-green)](#agents) [![Skills](https://img.shields.io/badge/skills-14-purple)](#skills)
+[![Version](https://img.shields.io/badge/version-3.5.0-blue)](./CHANGELOG.md) [![Commands](https://img.shields.io/badge/commands-10-orange)](#commands) [![Agents](https://img.shields.io/badge/agents-6-green)](#agents) [![Skills](https://img.shields.io/badge/skills-14-purple)](#skills)
 
 ---
 
@@ -174,6 +174,15 @@ Run plan tasks automatically until completion with the [ralph-loop plugin](https
 2. Works through plan tasks, marking each `[x]` when done
 3. When all tasks complete, outputs `<promise>ALL PLAN TASKS COMPLETE</promise>`
 4. Ralph's Stop hook detects the promise and terminates the loop
+
+**Context Guard (v3.5.0):**
+The loop automatically exits when context usage exceeds 70%, preventing context degradation during long runs. Configure the threshold in `.devloop/local.md`:
+
+```yaml
+---
+context_threshold: 80  # Exit at 80% instead of default 70%
+---
+```
 
 **When to use:**
 - Well-defined plans from `/devloop:spike`
