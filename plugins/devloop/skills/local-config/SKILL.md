@@ -41,6 +41,12 @@ commits:
 review:
   before-commit: ask           # ask | always | never
   use-plugin: null             # Or: code-review, pr-review-toolkit
+
+# GitHub Issues Integration (optional)
+github:
+  link-issues: false           # Enable GH issue linking in plans
+  auto-close: ask              # ask | always | never - close issue on plan complete
+  comment-on-complete: true    # Post completion summary to linked issue
 ---
 
 # Project Notes
@@ -112,6 +118,41 @@ External plugin for code review.
 | `code-review` | claude-plugins-official code-review |
 | `pr-review-toolkit` | claude-plugins-official pr-review-toolkit |
 
+### github.link-issues
+
+Enable GitHub Issues integration for issue-driven development.
+
+| Value | Behavior |
+|-------|----------|
+| `false` | No GH integration (default) |
+| `true` | Enable issue linking in plans |
+
+When enabled:
+- `/devloop:from-issue 123` starts work from an issue
+- Plans include `**Issue**: #123` header
+- Completion can sync back to the issue
+
+### github.auto-close
+
+Automatically close linked issues when plan completes.
+
+| Value | Behavior |
+|-------|----------|
+| `ask` | Ask user (default) |
+| `always` | Auto-close issue |
+| `never` | Don't close issue |
+
+### github.comment-on-complete
+
+Post a completion summary to the linked issue.
+
+| Value | Behavior |
+|-------|----------|
+| `true` | Post summary comment (default when link-issues is true) |
+| `false` | Don't comment |
+
+Summary includes: tasks completed, time elapsed, archive location.
+
 ## Defaults
 
 If no `local.md` exists, all settings use safe defaults:
@@ -131,6 +172,11 @@ commits:
 review:
   before-commit: ask
   use-plugin: null
+
+github:
+  link-issues: false
+  auto-close: ask
+  comment-on-complete: true
 ```
 
 ## Example Configurations
@@ -175,6 +221,26 @@ review:
   before-commit: never
 ---
 ```
+
+### Issue-Driven Development
+
+```yaml
+---
+git:
+  auto-branch: true
+  pr-on-complete: always
+
+github:
+  link-issues: true
+  auto-close: always
+  comment-on-complete: true
+---
+```
+
+With this config:
+1. `/devloop:from-issue 123` fetches issue details
+2. Plan includes `**Issue**: #123` reference
+3. On completion: posts summary, closes issue
 
 ## Reading Config
 

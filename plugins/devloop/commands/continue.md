@@ -1,7 +1,7 @@
 ---
 description: Resume work from plan or fresh start
 argument-hint: Optional specific task to work on
-allowed-tools: ["Read", "Write", "Edit", "Grep", "Glob", "Bash", "Bash(${CLAUDE_PLUGIN_ROOT}/scripts/check-plan-complete.sh:*)", "AskUserQuestion", "TodoWrite", "Skill"]
+allowed-tools: ["Read", "Write", "Edit", "Grep", "Glob", "Bash", "Bash(${CLAUDE_PLUGIN_ROOT}/scripts/check-plan-complete.sh:*)", "Bash(${CLAUDE_PLUGIN_ROOT}/scripts/archive-plan.sh:*)", "AskUserQuestion", "TodoWrite", "Skill"]
 ---
 
 # Continue - Resume Existing Work
@@ -85,6 +85,37 @@ If the script returns `{"complete": true, ...}` AND a ralph-loop is active (`.cl
    ```
 
 **Important**: Only output the `<promise>` tag when ALL tasks are genuinely marked `[x]`.
+
+## Step 4c: Offer Archival on Completion
+
+If ALL tasks are complete (regardless of ralph loop status), offer to archive:
+
+```yaml
+AskUserQuestion:
+  question: "All tasks complete! Archive this plan?"
+  header: "Archive"
+  options:
+    - label: "Archive now"
+      description: "Move to .devloop/archive/, start fresh"
+    - label: "Keep active"
+      description: "Leave plan in place for review"
+    - label: "Ship first"
+      description: "Run /devloop:ship before archiving"
+```
+
+### If "Archive now":
+```bash
+"${CLAUDE_PLUGIN_ROOT}/scripts/archive-plan.sh" .devloop/plan.md
+```
+
+Display the archive result and suggest next steps:
+```
+Plan archived to: .devloop/archive/YYYY-MM-DD-{slug}.md
+
+Next:
+  - /devloop:spike "topic"  - Start new exploration
+  - /devloop               - Start new plan directly
+```
 
 ## Step 5: Checkpoint
 

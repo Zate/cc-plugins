@@ -110,6 +110,8 @@ Returning to work?
 | `/devloop:quick` | Fast implementation | Bug fixes, small changes |
 | `/devloop:review` | Code review | Before shipping, PR review |
 | `/devloop:ship` | Commit & PR | Ready to ship changes |
+| `/devloop:archive` | Archive completed plan | Plan is done, want fresh start |
+| `/devloop:from-issue` | Start from GH issue | Issue-driven development |
 | `/devloop:help` | This guide | Learning devloop |
 
 ## Examples
@@ -271,9 +273,16 @@ rm .devloop/plan.md
 
 ### Want to abandon current plan
 ```bash
-# Archive old plan, start new
-mv .devloop/plan.md .devloop/archive/
+# Archive old plan (if complete), start new
+/devloop:archive
 /devloop
+```
+
+### Issue-driven development
+```bash
+# Start work from GitHub issue
+/devloop:from-issue 123
+# On completion, plan syncs back to issue
 ```
 
 ### Context feels heavy/slow

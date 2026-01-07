@@ -1,7 +1,7 @@
 ---
 description: Technical spike/POC to explore feasibility before committing to implementation
 argument-hint: What to explore
-allowed-tools: ["Read", "Write", "Edit", "Grep", "Glob", "Bash", "AskUserQuestion", "TodoWrite", "WebSearch", "WebFetch"]
+allowed-tools: ["Read", "Write", "Edit", "Grep", "Glob", "Bash", "Bash(${CLAUDE_PLUGIN_ROOT}/scripts/check-plan-complete.sh:*)", "Bash(${CLAUDE_PLUGIN_ROOT}/scripts/archive-plan.sh:*)", "AskUserQuestion", "TodoWrite", "WebSearch", "WebFetch"]
 ---
 
 # Spike - Technical Exploration
@@ -169,6 +169,34 @@ Write spike report to `.devloop/spikes/{topic}.md`:
 ```
 
 ## Step 6: Next Steps
+
+First, check if there's an existing completed plan that should be archived:
+
+```bash
+"${CLAUDE_PLUGIN_ROOT}/scripts/check-plan-complete.sh" .devloop/plan.md
+```
+
+If an existing plan is complete (`complete: true`), offer to archive before proceeding:
+
+```yaml
+AskUserQuestion:
+  question: "Existing plan is complete. Archive it before starting new work?"
+  header: "Archive"
+  options:
+    - label: "Archive and continue"
+      description: "Move old plan to archive, then proceed"
+    - label: "Replace without archiving"
+      description: "Overwrite the old plan"
+    - label: "Cancel"
+      description: "Keep existing plan"
+```
+
+If "Archive and continue":
+```bash
+"${CLAUDE_PLUGIN_ROOT}/scripts/archive-plan.sh" .devloop/plan.md
+```
+
+Then ask about next steps:
 
 ```yaml
 AskUserQuestion:

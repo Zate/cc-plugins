@@ -1,7 +1,7 @@
 ---
 description: Complete validation and git integration for shipping a feature
 argument-hint: Optional commit message or PR title
-allowed-tools: ["Read", "Write", "Edit", "Grep", "Glob", "Bash", "AskUserQuestion", "TodoWrite"]
+allowed-tools: ["Read", "Write", "Edit", "Grep", "Glob", "Bash", "Bash(${CLAUDE_PLUGIN_ROOT}/scripts/check-plan-complete.sh:*)", "Bash(${CLAUDE_PLUGIN_ROOT}/scripts/archive-plan.sh:*)", "AskUserQuestion", "TodoWrite"]
 ---
 
 # Ship - Commit and PR
@@ -197,7 +197,40 @@ If `.devloop/plan.md` exists:
 
 3. If all tasks complete, update status to `Complete`
 
-**Suggest next action:**
+**Check if plan is complete and offer archival:**
+
+```bash
+"${CLAUDE_PLUGIN_ROOT}/scripts/check-plan-complete.sh" .devloop/plan.md
+```
+
+If `complete: true`, suggest next action with archive option:
+
+```yaml
+AskUserQuestion:
+  question: "Ship complete. All tasks done! What next?"
+  header: "Next"
+  options:
+    - label: "Archive plan"
+      description: "Move completed plan to archive, start fresh"
+    - label: "Wait for review"
+      description: "PR created, wait for feedback before archiving"
+    - label: "Done"
+      description: "Keep plan for reference"
+```
+
+### If "Archive plan":
+```bash
+"${CLAUDE_PLUGIN_ROOT}/scripts/archive-plan.sh" .devloop/plan.md
+```
+
+Display:
+```
+Plan archived to: .devloop/archive/YYYY-MM-DD-{slug}.md
+
+Great work! Ready for the next project.
+```
+
+If plan is NOT complete, offer:
 
 ```yaml
 AskUserQuestion:
@@ -208,8 +241,8 @@ AskUserQuestion:
       description: "Move to next phase"
     - label: "Wait for review"
       description: "PR created, wait for feedback"
-    - label: "Done"
-      description: "All work complete"
+    - label: "Done for now"
+      description: "Take a break"
 ```
 
 ---

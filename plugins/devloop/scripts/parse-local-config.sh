@@ -24,6 +24,11 @@ default_config() {
   "review": {
     "before_commit": "ask",
     "use_plugin": null
+  },
+  "github": {
+    "link_issues": false,
+    "auto_close": "ask",
+    "comment_on_complete": true
   }
 }
 EOF
@@ -90,12 +95,14 @@ merge_configs() {
             . * $user |
             .git = (.git // {}) |
             .commits = (.commits // {}) |
-            .review = (.review // {})
+            .review = (.review // {}) |
+            .github = (.github // {})
         ' | jq --argjson defaults "$defaults" '
             # Fill in missing nested values from defaults
             .git = ($defaults.git * .git) |
             .commits = ($defaults.commits * .commits) |
-            .review = ($defaults.review * .review)
+            .review = ($defaults.review * .review) |
+            .github = ($defaults.github * .github)
         '
     else
         # No jq, just return user config or defaults

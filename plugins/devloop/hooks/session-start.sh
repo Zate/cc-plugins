@@ -96,6 +96,46 @@ get_pr_status() {
     fi
 }
 
+get_linked_issue_status() {
+    # Check if plan references a GitHub issue
+    if [ ! -f ".devloop/plan.md" ]; then
+        echo ""
+        return
+    fi
+
+    # Look for **Issue**: #123 pattern
+    local issue_line
+    issue_line=$(grep -m1 '^\*\*Issue\*\*:' .devloop/plan.md 2>/dev/null || echo "")
+
+    if [ -z "$issue_line" ]; then
+        echo ""
+        return
+    fi
+
+    # Extract issue number
+    local issue_num
+    issue_num=$(echo "$issue_line" | grep -oE '#[0-9]+' | head -1 | tr -d '#')
+
+    if [ -z "$issue_num" ]; then
+        echo ""
+        return
+    fi
+
+    # Check issue status (quick, don't block on failure)
+    if command -v gh &> /dev/null; then
+        local issue_state
+        issue_state=$(gh issue view "$issue_num" --json state -q '.state' 2>/dev/null || echo "")
+
+        if [ -n "$issue_state" ]; then
+            echo "Issue #$issue_num ($issue_state)"
+        else
+            echo "Issue #$issue_num"
+        fi
+    else
+        echo "Issue #$issue_num"
+    fi
+}
+
 # ============================================================================
 # Main Execution
 # ============================================================================
@@ -107,6 +147,7 @@ FRESH=$(check_fresh_start)
 BRANCH=$(get_git_branch)
 GIT_WORKFLOW=$(get_git_workflow_config)
 PR_STATUS=$(get_pr_status)
+ISSUE_STATUS=$(get_linked_issue_status)
 
 # Build minimal context message
 CONTEXT="## devloop v3.0
@@ -124,6 +165,12 @@ fi
 if [ -n "$PR_STATUS" ]; then
     CONTEXT="$CONTEXT
 **PR**: $PR_STATUS"
+fi
+
+# Show linked issue status if plan references an issue
+if [ -n "$ISSUE_STATUS" ]; then
+    CONTEXT="$CONTEXT
+**Linked**: $ISSUE_STATUS"
 fi
 
 if [ "$FRESH" = "true" ]; then

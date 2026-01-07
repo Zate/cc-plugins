@@ -26,6 +26,7 @@ Primary: `.devloop/plan.md`
 **Created**: YYYY-MM-DD
 **Updated**: YYYY-MM-DD HH:MM
 **Status**: Planning | In Progress | Complete
+**Issue**: #123 (https://github.com/owner/repo/issues/123) (optional, if started from GH issue)
 **Branch**: feat/feature-name (optional)
 **PR**: https://github.com/.../pull/123 (after PR created)
 
@@ -81,3 +82,30 @@ Example: `[PR-123-1]` = First feedback item from PR #123
 4. Update timestamps
 5. Add PR link after PR creation
 6. Add PR Feedback section after review
+7. Add Issue link if started from GitHub Issue
+
+## GitHub Issues Integration
+
+When using issue-driven development (configured in `local.md`):
+
+### Starting from Issue
+
+Use `/devloop:from-issue 123` to fetch issue details and create a plan with:
+- `**Issue**: #123 (URL)` in the header
+- Issue title becomes plan title
+- Issue body provides context for planning
+
+### On Plan Completion
+
+When all tasks are `[x]` and Issue is linked:
+1. Generate completion summary (tasks done, time elapsed)
+2. Post summary as comment on the issue
+3. Optionally close the issue (based on `github.auto-close` setting)
+
+### Issue Reference Format
+
+```markdown
+**Issue**: #123 (https://github.com/owner/repo/issues/123)
+```
+
+The number after `#` is parsed by archive-plan.sh for GitHub integration.

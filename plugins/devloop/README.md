@@ -55,6 +55,8 @@ For everything else, Claude reads files, writes code, runs tests, and commits - 
 | `/devloop:ship` | Validation, commit, and PR creation |
 | `/devloop:pr-feedback` | Integrate PR review comments into plan |
 | `/devloop:ralph` | Automated execution with ralph-loop |
+| `/devloop:archive` | Archive completed plan to .devloop/archive/ |
+| `/devloop:from-issue` | Start work from a GitHub issue |
 | `/devloop:help` | Interactive guide to using devloop |
 
 ---
@@ -154,6 +156,58 @@ All git features are opt-in. Without `local.md`, devloop works without git integ
 
 ---
 
+## GitHub Issues Integration (Optional)
+
+Enable issue-driven development with `.devloop/local.md`:
+
+```yaml
+---
+github:
+  link-issues: true           # Enable issue linking
+  auto-close: ask             # ask | always | never
+  comment-on-complete: true   # Post summary to issue on completion
+---
+```
+
+**Issue-driven workflow:**
+
+1. `/devloop:from-issue 123` - Fetch issue, create plan with link
+2. Work on tasks, mark complete
+3. On plan completion, post summary to issue
+4. Optionally close the issue automatically
+
+**Plan format with issue:**
+```markdown
+# Devloop Plan: Add dark mode
+
+**Issue**: #123 (https://github.com/owner/repo/issues/123)
+**Status**: In Progress
+```
+
+Completed plans are archived to `.devloop/archive/` with issue metadata preserved.
+
+---
+
+## Completed Plan Management
+
+When all plan tasks are done, archive for team visibility:
+
+```bash
+# Manually archive completed plan
+/devloop:archive
+
+# Or it's offered automatically in /devloop:continue and /devloop:ship
+```
+
+**Archive location:** `.devloop/archive/YYYY-MM-DD-{slug}.md`
+
+Archives are git-tracked (shared with team) and include:
+- Original plan content
+- Completion metadata (date, task counts)
+- Issue reference (if linked)
+
+---
+
 ## Ralph Loop Integration (Automated Execution)
 
 Run plan tasks automatically until completion with the [ralph-loop plugin](https://github.com/anthropics/claude-plugins/tree/main/plugins/ralph-loop).
@@ -207,7 +261,8 @@ Delete `.devloop/plan.md` and run `/devloop` to start fresh.
 Run `/devloop:continue` - it will pick up from the last checkpoint in your plan.
 
 ### Want to abandon current plan
-Delete `.devloop/plan.md` or rename it, then run `/devloop`.
+Run `/devloop:archive` to archive a completed plan, then run `/devloop`.
+Or delete `.devloop/plan.md` and run `/devloop`.
 
 ### Context feels heavy/slow
 Run `/devloop:fresh`, then `/clear`, then `/devloop:continue`.

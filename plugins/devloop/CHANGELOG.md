@@ -5,6 +5,65 @@ All notable changes to the devloop plugin are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.6.0] - 2026-01-08
+
+### Added - Plan Archival with GitHub Issues Integration
+
+Complete system for handling completed plans with optional GitHub Issues workflow.
+
+#### New Commands
+- `/devloop:archive` - Manually archive completed plan to `.devloop/archive/`
+- `/devloop:from-issue 123` - Start work from a GitHub issue
+
+#### New Script
+- `scripts/archive-plan.sh` - Core archival logic with JSON output, issue metadata extraction
+
+#### GitHub Issues Integration (Opt-in)
+Enable in `.devloop/local.md`:
+```yaml
+---
+github:
+  link-issues: true           # Enable issue linking
+  auto-close: ask             # ask | always | never
+  comment-on-complete: true   # Post summary on completion
+---
+```
+
+**Workflow:**
+1. `/devloop:from-issue 123` fetches issue, creates plan with `**Issue**: #123` link
+2. Work through tasks as normal
+3. On completion, archive offers to post summary and close issue
+
+#### Command Updates
+- `continue.md` - Offers archival when plan completes (Step 4c)
+- `ship.md` - Archive option in post-ship actions (Phase 5)
+- `spike.md` - Archive old completed plan before starting new (Step 6)
+
+#### Enhanced Session-Start
+- Shows linked issue status (open/closed) if plan references a GitHub issue
+
+#### Documentation Updates
+- `local-config` skill - New `github.*` settings
+- `plan-management` skill - Issue reference format, GitHub integration section
+- `help.md` - Archive and from-issue commands
+- `README.md` - New sections for GitHub Issues and Plan Management
+
+#### Files Changed/Added
+| File | Action |
+|------|--------|
+| `scripts/archive-plan.sh` | Created |
+| `commands/archive.md` | Created |
+| `commands/from-issue.md` | Created |
+| `commands/continue.md` | Modified |
+| `commands/ship.md` | Modified |
+| `commands/spike.md` | Modified |
+| `hooks/session-start.sh` | Modified |
+| `scripts/parse-local-config.sh` | Modified |
+| `skills/local-config/SKILL.md` | Modified |
+| `skills/plan-management/SKILL.md` | Modified |
+
+---
+
 ## [3.5.0] - 2026-01-08
 
 ### Added - Context Guard for Ralph Loop

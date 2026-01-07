@@ -342,6 +342,8 @@ The devloop plugin uses a standalone `.devloop/` directory for all its artifacts
 ├── worklog.md            # Completed work history (git-tracked)
 ├── local.md              # Local settings (NOT git-tracked)
 ├── context.json          # Tech stack cache (git-tracked)
+├── archive/              # Completed plans archive (git-tracked)
+│   └── YYYY-MM-DD-{slug}.md
 ├── issues/               # Issue tracking (git-tracked)
 │   ├── index.md
 │   └── BUG-001.md, FEAT-001.md, etc.
@@ -356,6 +358,7 @@ Other plugins may use `.claude/` for their artifacts.
 | Category | Examples | Git Status |
 |----------|----------|------------|
 | **Shared State** | Plans, issues, context | Tracked |
+| **Archived Plans** | Completed plans in archive/ | Tracked |
 | **Local Config** | Settings, preferences | NOT tracked |
 | **Sensitive Data** | Security findings | NOT tracked |
 | **Working Notes** | Spike reports | NOT tracked |
