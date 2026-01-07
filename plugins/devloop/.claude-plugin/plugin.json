@@ -1,6 +1,6 @@
 {
   "name": "devloop",
-  "version": "3.5.0",
+  "version": "3.5.1",
   "description": "Lightweight development workflow with spike/fresh/continue pattern, git workflow integration, PR feedback, and ralph-loop automation. Optimized for efficiency - minimal hooks, on-demand skills, direct execution.",
   "author": {
     "name": "Zate",

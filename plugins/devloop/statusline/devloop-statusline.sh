@@ -163,18 +163,12 @@ TOTAL=0
 DONE=0
 
 if [ -n "$PLAN_FILE" ] && [ -f "$PLAN_FILE" ]; then
-    # Parse markdown task markers
-    # grep -c returns 0 count but exits with 1 when no matches, so we capture output only
-    TOTAL=$(grep -c "^\s*- \[" "$PLAN_FILE" 2>/dev/null) || true
-    COMPLETED=$(grep -c "^\s*- \[x\]" "$PLAN_FILE" 2>/dev/null) || true
-    SKIPPED=$(grep -c "^\s*- \[-\]" "$PLAN_FILE" 2>/dev/null) || true
-    # Trim whitespace and default to 0
-    TOTAL="${TOTAL//[[:space:]]/}"
-    COMPLETED="${COMPLETED//[[:space:]]/}"
-    SKIPPED="${SKIPPED//[[:space:]]/}"
-    TOTAL="${TOTAL:-0}"
-    COMPLETED="${COMPLETED:-0}"
-    SKIPPED="${SKIPPED:-0}"
+    # Filter out code blocks, then count only actual task markers
+    # Task pattern: "- [ ]", "- [x]", "- [~]", "- [!]", "- [-]"
+    FILTERED=$(awk '/^```/ { in_code = !in_code; next } !in_code { print }' "$PLAN_FILE")
+    TOTAL=$(echo "$FILTERED" | grep -cE "^[[:space:]]*- \[[ x~!-]\]" 2>/dev/null) || TOTAL=0
+    COMPLETED=$(echo "$FILTERED" | grep -cE "^[[:space:]]*- \[x\]" 2>/dev/null) || COMPLETED=0
+    SKIPPED=$(echo "$FILTERED" | grep -cE "^[[:space:]]*- \[-\]" 2>/dev/null) || SKIPPED=0
     DONE=$((COMPLETED + SKIPPED))
 fi
 
