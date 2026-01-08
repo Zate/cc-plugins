@@ -1,7 +1,11 @@
 ---
 description: Save current plan state and prepare for fresh context restart
 argument-hint: none
-allowed-tools: ["Read", "Write", "Bash", "AskUserQuestion"]
+allowed-tools:
+  - Read
+  - Write
+  - Bash
+  - AskUserQuestion
 ---
 
 # Fresh Start

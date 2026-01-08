@@ -1,7 +1,17 @@
 ---
 description: Start development workflow - lightweight entry point
 argument-hint: Optional task description
-allowed-tools: ["Read", "Write", "Edit", "Grep", "Glob", "Bash", "Task", "AskUserQuestion", "TodoWrite", "Skill"]
+allowed-tools:
+  - Read
+  - Write
+  - Edit
+  - Grep
+  - Glob
+  - Bash
+  - Task
+  - AskUserQuestion
+  - TodoWrite
+  - Skill
 ---
 
 # Devloop - Start New Work

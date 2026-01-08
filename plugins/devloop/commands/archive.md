@@ -1,7 +1,11 @@
 ---
 description: Archive a completed plan to .devloop/archive/
 argument-hint: "[--force]"
-allowed-tools: ["Read", "Bash", "Bash(${CLAUDE_PLUGIN_ROOT}/scripts/archive-plan.sh:*)", "Bash(${CLAUDE_PLUGIN_ROOT}/scripts/check-plan-complete.sh:*)", "AskUserQuestion"]
+allowed-tools:
+  - Read
+  - Bash
+  - Bash(${CLAUDE_PLUGIN_ROOT}/scripts/*.sh:*)
+  - AskUserQuestion
 ---
 
 # Archive - Move Completed Plan to Archive

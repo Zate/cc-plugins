@@ -1,7 +1,13 @@
 ---
 description: Comprehensive code review for existing changes or PR
 argument-hint: Optional file/PR to review
-allowed-tools: ["Read", "Grep", "Glob", "Bash", "AskUserQuestion", "TodoWrite"]
+allowed-tools:
+  - Read
+  - Grep
+  - Glob
+  - Bash
+  - AskUserQuestion
+  - TodoWrite
 ---
 
 # Review - Code Review

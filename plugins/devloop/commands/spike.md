@@ -1,7 +1,18 @@
 ---
 description: Technical spike/POC to explore feasibility before committing to implementation
 argument-hint: What to explore
-allowed-tools: ["Read", "Write", "Edit", "Grep", "Glob", "Bash", "Bash(${CLAUDE_PLUGIN_ROOT}/scripts/check-plan-complete.sh:*)", "Bash(${CLAUDE_PLUGIN_ROOT}/scripts/archive-plan.sh:*)", "AskUserQuestion", "TodoWrite", "WebSearch", "WebFetch"]
+allowed-tools:
+  - Read
+  - Write
+  - Edit
+  - Grep
+  - Glob
+  - Bash
+  - Bash(${CLAUDE_PLUGIN_ROOT}/scripts/*.sh:*)
+  - AskUserQuestion
+  - TodoWrite
+  - WebSearch
+  - WebFetch
 ---
 
 # Spike - Technical Exploration

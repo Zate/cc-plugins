@@ -1,7 +1,15 @@
 ---
 description: Quick implementation for small, well-defined tasks (skip exploration/architecture)
 argument-hint: Task description
-allowed-tools: ["Read", "Write", "Edit", "Grep", "Glob", "Bash", "AskUserQuestion", "TodoWrite"]
+allowed-tools:
+  - Read
+  - Write
+  - Edit
+  - Grep
+  - Glob
+  - Bash
+  - AskUserQuestion
+  - TodoWrite
 ---
 
 # Quick - Fast Implementation

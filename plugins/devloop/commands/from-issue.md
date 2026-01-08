@@ -1,7 +1,13 @@
 ---
 description: Start work from a GitHub issue
 argument-hint: <issue-number>
-allowed-tools: ["Read", "Write", "Bash", "Bash(${CLAUDE_PLUGIN_ROOT}/scripts/check-plan-complete.sh:*)", "Bash(${CLAUDE_PLUGIN_ROOT}/scripts/archive-plan.sh:*)", "Bash(${CLAUDE_PLUGIN_ROOT}/scripts/parse-local-config.sh:*)", "AskUserQuestion", "Skill"]
+allowed-tools:
+  - Read
+  - Write
+  - Bash
+  - Bash(${CLAUDE_PLUGIN_ROOT}/scripts/*.sh:*)
+  - AskUserQuestion
+  - Skill
 ---
 
 # From Issue - Start Work from GitHub Issue

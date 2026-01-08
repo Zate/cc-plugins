@@ -5,6 +5,49 @@ All notable changes to the devloop plugin are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.6.1] - 2026-01-08
+
+### Changed - Command Frontmatter Modernization
+
+Updated all command files to use Claude Code 2.1.0 YAML syntax.
+
+#### YAML-Style allowed-tools
+All commands now use YAML list format instead of JSON arrays:
+
+```yaml
+# Before (JSON array)
+allowed-tools: ["Read", "Write", "Edit"]
+
+# After (YAML list)
+allowed-tools:
+  - Read
+  - Write
+  - Edit
+```
+
+#### Wildcard Bash Permissions
+Commands with script access now use wildcards for simpler maintenance:
+
+```yaml
+# Before (individual scripts)
+allowed-tools:
+  - Bash(${CLAUDE_PLUGIN_ROOT}/scripts/check-plan-complete.sh:*)
+  - Bash(${CLAUDE_PLUGIN_ROOT}/scripts/archive-plan.sh:*)
+
+# After (wildcard)
+allowed-tools:
+  - Bash(${CLAUDE_PLUGIN_ROOT}/scripts/*.sh:*)
+```
+
+#### Files Updated
+All 12 command files in `commands/` directory.
+
+#### Investigation Notes
+- **Command-scoped hooks**: Not supported in command frontmatter (hooks require hooks.json or settings.json)
+- **context: fork**: Not supported in command frontmatter per current Claude Code docs
+
+---
+
 ## [3.6.0] - 2026-01-08
 
 ### Added - Plan Archival with GitHub Issues Integration

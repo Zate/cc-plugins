@@ -1,7 +1,17 @@
 ---
 description: Resume work from plan or fresh start
 argument-hint: Optional specific task to work on
-allowed-tools: ["Read", "Write", "Edit", "Grep", "Glob", "Bash", "Bash(${CLAUDE_PLUGIN_ROOT}/scripts/check-plan-complete.sh:*)", "Bash(${CLAUDE_PLUGIN_ROOT}/scripts/archive-plan.sh:*)", "AskUserQuestion", "TodoWrite", "Skill"]
+allowed-tools:
+  - Read
+  - Write
+  - Edit
+  - Grep
+  - Glob
+  - Bash
+  - Bash(${CLAUDE_PLUGIN_ROOT}/scripts/*.sh:*)
+  - AskUserQuestion
+  - TodoWrite
+  - Skill
 ---
 
 # Continue - Resume Existing Work

@@ -1,7 +1,17 @@
 ---
 description: Start automated task loop with ralph-loop integration
 argument-hint: "[--max-iterations N]"
-allowed-tools: ["Read", "Write", "Edit", "Grep", "Glob", "Bash", "Bash(${CLAUDE_PLUGIN_ROOT}/scripts/check-plan-complete.sh:*)", "AskUserQuestion", "TodoWrite", "Skill"]
+allowed-tools:
+  - Read
+  - Write
+  - Edit
+  - Grep
+  - Glob
+  - Bash
+  - Bash(${CLAUDE_PLUGIN_ROOT}/scripts/*.sh:*)
+  - AskUserQuestion
+  - TodoWrite
+  - Skill
 ---
 
 # Ralph Loop - Automated Devloop Execution

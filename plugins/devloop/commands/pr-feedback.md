@@ -1,7 +1,15 @@
 ---
 description: Fetch and integrate PR review feedback into devloop plan
 argument-hint: Optional PR number
-allowed-tools: ["Read", "Write", "Edit", "Grep", "Glob", "Bash", "AskUserQuestion", "TodoWrite"]
+allowed-tools:
+  - Read
+  - Write
+  - Edit
+  - Grep
+  - Glob
+  - Bash
+  - AskUserQuestion
+  - TodoWrite
 ---
 
 # PR Feedback - Integrate Review Comments
