@@ -35,13 +35,42 @@ plugins/rovodev/
     └── parse-local-config.sh
 ```
 
-## Usage with Rovodev
+## Installation
 
-These prompts are designed to be invoked via rovodev's prompt system:
+See [INSTALL.md](INSTALL.md) for detailed installation instructions.
+
+**Quick Install:**
+
+```bash
+cd ~/projects/acra-python
+
+# Copy files
+mkdir -p .rovodev/prompts/devloop .rovodev/subagents/devloop .rovodev/scripts .rovodev/skills
+cp ~/projects/claude-plugins/plugins/rovodev/prompts/*.md .rovodev/prompts/devloop/
+cp ~/projects/claude-plugins/plugins/rovodev/subagents/*.md .rovodev/subagents/devloop/
+cp ~/projects/claude-plugins/plugins/rovodev/scripts/*.sh .rovodev/scripts/
+cp ~/projects/claude-plugins/plugins/rovodev/skills/*.md .rovodev/skills/
+chmod +x .rovodev/scripts/*.sh
+```
+
+Then add to `.rovodev/prompts.yml`:
+
+```yaml
+prompts:
+  - name: devloop
+    description: "Start new development work"
+    content_file: prompts/devloop/rovodev.md
+  - name: spike
+    description: "Time-boxed investigation"
+    content_file: prompts/devloop/spike.md
+  # ... see INSTALL.md for full list
+```
+
+## Usage with Rovodev
 
 ```bash
 # Start new work
-rovodev run "@rovodev Add user authentication"
+rovodev run "@devloop Add user authentication"
 
 # Run a spike investigation
 rovodev run "@spike How does the MCP server work?"
