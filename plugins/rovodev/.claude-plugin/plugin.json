@@ -1,0 +1,9 @@
+{
+  "name": "rovodev",
+  "version": "1.0.0",
+  "description": "Development workflow for Rovo Dev CLI (acra-python) with spike/plan/execute pattern, prompt management, documentation automation, and CI/PR workflows.",
+  "author": {
+    "name": "Rovo Dev Team",
+    "email": "dev@rovodev.com"
+  }
+}
