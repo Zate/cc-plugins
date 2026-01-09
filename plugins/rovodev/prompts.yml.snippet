@@ -1,0 +1,32 @@
+# Add these entries to your .rovodev/prompts.yml file
+# After copying the prompt files to .rovodev/prompts/devloop/
+
+prompts:
+  # Devloop Workflow - Spike → Plan → Execute
+  - name: devloop
+    description: "Start new development work with structured planning"
+    content_file: prompts/devloop/rovodev.md
+  
+  - name: spike
+    description: "Time-boxed investigation and exploration (15-20 min)"
+    content_file: prompts/devloop/spike.md
+  
+  - name: continue
+    description: "Resume work from existing plan or saved state"
+    content_file: prompts/devloop/continue.md
+  
+  - name: fresh
+    description: "Save state for context reset"
+    content_file: prompts/devloop/fresh.md
+  
+  - name: quick
+    description: "Fast fixes without planning overhead"
+    content_file: prompts/devloop/quick.md
+  
+  - name: review
+    description: "Code review for changes or PRs"
+    content_file: prompts/devloop/review.md
+  
+  - name: ship
+    description: "Commit and create PR"
+    content_file: prompts/devloop/ship.md
