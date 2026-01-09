@@ -114,6 +114,7 @@ Returning to work?
 | `/devloop:ship` | Commit & PR | Ready to ship changes |
 | `/devloop:archive` | Archive completed plan | Plan is done, want fresh start |
 | `/devloop:from-issue` | Start from GH issue | Issue-driven development |
+| `/devloop:statusline` | Configure statusline | Set up devloop statusline |
 | `/devloop:help` | This guide | Learning devloop |
 
 ## Examples
@@ -300,6 +301,17 @@ Check `skills/INDEX.md` for exact name. Use `Skill: exact-name`.
 
 ### Plan progress not saving
 Make sure tasks are marked `[x]` not `[X]`. Case matters in some parsers.
+
+### Statusline not showing
+```bash
+# Configure the devloop statusline
+/devloop:statusline
+# Then restart Claude Code
+```
+
+If `jq` is missing, install it first:
+- macOS: `brew install jq`
+- Linux: `sudo apt install jq`
 
 ## Where to Get More Help
 

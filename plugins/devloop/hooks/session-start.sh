@@ -96,6 +96,24 @@ get_pr_status() {
     fi
 }
 
+check_statusline_configured() {
+    # Check if devloop statusline is configured in settings.json
+    local settings_file="$HOME/.claude/settings.json"
+    if [ -f "$settings_file" ] && command -v jq &> /dev/null; then
+        local statusline_cmd
+        statusline_cmd=$(jq -r '.statusLine.command // ""' "$settings_file" 2>/dev/null)
+        if [ -n "$statusline_cmd" ] && [[ "$statusline_cmd" == *"devloop"* ]]; then
+            echo "configured"
+        elif [ -n "$statusline_cmd" ]; then
+            echo "other"
+        else
+            echo "none"
+        fi
+    else
+        echo "unknown"
+    fi
+}
+
 get_linked_issue_status() {
     # Check if plan references a GitHub issue
     if [ ! -f ".devloop/plan.md" ]; then
@@ -148,6 +166,7 @@ BRANCH=$(get_git_branch)
 GIT_WORKFLOW=$(get_git_workflow_config)
 PR_STATUS=$(get_pr_status)
 ISSUE_STATUS=$(get_linked_issue_status)
+STATUSLINE_STATUS=$(check_statusline_configured)
 
 # Build minimal context message
 CONTEXT="## devloop v3.0
@@ -190,6 +209,13 @@ fi
 
 CONTEXT="$CONTEXT
 **Skills**: Load on demand with \`Skill: skill-name\` (see skills/INDEX.md)"
+
+# Add statusline hint if not configured
+if [ "$STATUSLINE_STATUS" = "none" ] || [ "$STATUSLINE_STATUS" = "unknown" ]; then
+    CONTEXT="$CONTEXT
+
+**Tip**: Run \`/devloop:statusline\` to enable the devloop statusline"
+fi
 
 # Build status line
 STATUS="devloop: $PROJECT"

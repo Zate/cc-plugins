@@ -5,6 +5,39 @@ All notable changes to the devloop plugin are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.6.2] - 2026-01-09
+
+### Added - Statusline Setup Command
+
+Restored statusline configuration capability with improved conflict handling.
+
+#### New Command
+- `/devloop:statusline` - Configure the devloop statusline in Claude Code settings
+
+#### New Agent
+- `statusline-setup` - Agent that safely configures statusline, detecting and handling existing configurations
+
+#### SessionStart Enhancement
+- Now checks if devloop statusline is configured
+- Shows tip to run `/devloop:statusline` if not configured
+
+#### What the Statusline Shows
+- Model name (Opus/Sonnet/Haiku)
+- Context window usage (progress bar + percentage)
+- Session tokens (formatted as K/M)
+- API limits (5h and 7d usage)
+- Current directory and git branch
+- Plan progress (X/Y tasks)
+- Open bug count
+
+#### Files Changed
+- `agents/statusline-setup.md` - New agent for safe statusline configuration
+- `commands/statusline.md` - New command to trigger setup
+- `commands/help.md` - Added statusline to command reference and troubleshooting
+- `hooks/session-start.sh` - Added statusline configuration check and hint
+
+---
+
 ## [3.6.1] - 2026-01-08
 
 ### Changed - Command Frontmatter Modernization
