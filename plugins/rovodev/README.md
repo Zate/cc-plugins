@@ -1,13 +1,16 @@
-# Rovodev Plugin
+# Rovodevloop
 
-Development workflow for Rovo Dev CLI (acra-python) with spike → plan → execute pattern.
+Development workflow for Rovo Dev CLI with spike → plan → execute pattern.
 
-This plugin provides prompts and subagents that enable rovodev to use the same structured workflow as the devloop plugin:
-- **Spike**: Time-boxed exploration and investigation
+This repository provides prompts, subagents, skills, and scripts that enable rovodev to use a structured development workflow:
+- **Spike**: Time-boxed exploration and investigation (15-20 min)
 - **Plan**: Create structured implementation plans
 - **Execute**: Implement with progress tracking
 - **Fresh**: Save state for context resets
 - **Continue**: Resume from saved state
+- **Quick**: Fast fixes without planning overhead
+- **Review**: Code review workflow
+- **Ship**: Commit and create PRs
 
 ## Structure
 
@@ -37,34 +40,52 @@ plugins/rovodev/
 
 ## Installation
 
-See [INSTALL.md](INSTALL.md) for detailed installation instructions.
-
-**Quick Install:**
+### Quick Install (Global with symlinks)
 
 ```bash
-cd ~/projects/acra-python
+# Clone the repository
+git clone https://github.com/yourusername/rovodevloop.git ~/projects/rovodevloop
 
-# Copy files
-mkdir -p .rovodev/prompts/devloop .rovodev/subagents/devloop .rovodev/scripts .rovodev/skills
-cp ~/projects/claude-plugins/plugins/rovodev/prompts/*.md .rovodev/prompts/devloop/
-cp ~/projects/claude-plugins/plugins/rovodev/subagents/*.md .rovodev/subagents/devloop/
-cp ~/projects/claude-plugins/plugins/rovodev/scripts/*.sh .rovodev/scripts/
-cp ~/projects/claude-plugins/plugins/rovodev/skills/*.md .rovodev/skills/
-chmod +x .rovodev/scripts/*.sh
+# Run the installer
+cd ~/projects/rovodevloop
+./install.sh
 ```
 
-Then add to `.rovodev/prompts.yml`:
+This will:
+1. Create symlinks in `~/.rovodev/` pointing to this repository
+2. Prompt you to create/update `~/.rovodev/prompts.yml`
+3. Make the prompts available to all your projects
 
-```yaml
-prompts:
-  - name: devloop
-    description: "Start new development work"
-    content_file: prompts/devloop/rovodev.md
-  - name: spike
-    description: "Time-boxed investigation"
-    content_file: prompts/devloop/spike.md
-  # ... see INSTALL.md for full list
+### Quick Install (Project-specific with symlinks)
+
+```bash
+# Clone the repository (if not already cloned)
+git clone https://github.com/yourusername/rovodevloop.git ~/projects/rovodevloop
+
+# Install to specific project
+cd ~/projects/rovodevloop
+./install.sh --local ~/projects/your-project
 ```
+
+### Other Installation Options
+
+```bash
+# Copy files instead of symlinking (global)
+./install.sh --no-link
+
+# Copy files to specific project
+./install.sh --local ~/projects/your-project --no-link
+
+# Update existing installation
+./install.sh -u
+./install.sh -u --local ~/projects/your-project
+
+# Uninstall
+./install.sh --uninstall
+./install.sh --uninstall --local ~/projects/your-project
+```
+
+See [INSTALL.md](INSTALL.md) for detailed installation instructions.
 
 ## Usage with Rovodev
 

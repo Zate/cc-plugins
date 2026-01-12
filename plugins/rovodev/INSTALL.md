@@ -1,41 +1,120 @@
 # Installation Guide
 
-How to install and configure the rovodev plugin for use with Rovo Dev CLI.
+How to install and configure rovodevloop for use with Rovo Dev CLI.
+
+## Prerequisites
+
+- Rovo Dev CLI installed and working
+- Git (for cloning the repository)
+- Bash shell
+
+## Quick Start
+
+```bash
+# Clone the repository
+git clone https://github.com/yourusername/rovodevloop.git ~/projects/rovodevloop
+
+# Run installer (global install with symlinks)
+cd ~/projects/rovodevloop
+./install.sh
+```
+
+That's it! The installer will guide you through the rest.
 
 ## Installation Methods
 
-### Method 1: Via prompts.yml (Recommended)
+### Method 1: Automated Install with Symlinks (Recommended)
 
-This method registers the prompts in your project's `.rovodev/prompts.yml` file so rovodev can find them.
+This method uses the provided `install.sh` script to create symlinks, so you always have the latest version.
 
-#### Step 1: Copy Files to .rovodev
+#### Global Install (Available to all projects)
 
 ```bash
-cd ~/projects/acra-python
+# Clone repository
+git clone https://github.com/yourusername/rovodevloop.git ~/projects/rovodevloop
 
-# Create directories
-mkdir -p .rovodev/prompts/devloop
-mkdir -p .rovodev/subagents/devloop
-mkdir -p .rovodev/scripts
-mkdir -p .rovodev/skills
-
-# Copy prompts
-cp ~/projects/claude-plugins/plugins/rovodev/prompts/*.md .rovodev/prompts/devloop/
-
-# Copy subagents
-cp ~/projects/claude-plugins/plugins/rovodev/subagents/*.md .rovodev/subagents/devloop/
-
-# Copy scripts
-cp ~/projects/claude-plugins/plugins/rovodev/scripts/*.sh .rovodev/scripts/
-chmod +x .rovodev/scripts/*.sh
-
-# Copy skills
-cp ~/projects/claude-plugins/plugins/rovodev/skills/*.md .rovodev/skills/
+# Run installer
+cd ~/projects/rovodevloop
+./install.sh
 ```
 
-#### Step 2: Register in prompts.yml
+**What this does:**
+- Creates symlinks in `~/.rovodev/prompts/devloop/`, `~/.rovodev/subagents/devloop/`, etc.
+- Prompts you to create `~/.rovodev/prompts.yml` if it doesn't exist
+- Makes prompts available to all your projects
+- Updates automatically when you `git pull` in rovodevloop repo
 
-Add these entries to `.rovodev/prompts.yml`:
+#### Local Install (Project-specific)
+
+```bash
+# Clone repository (if not already)
+git clone https://github.com/yourusername/rovodevloop.git ~/projects/rovodevloop
+
+# Install to specific project
+cd ~/projects/rovodevloop
+./install.sh --local ~/projects/acra-python
+```
+
+**What this does:**
+- Creates symlinks in `~/projects/acra-python/.rovodev/`
+- Prompts you to create/update `.rovodev/prompts.yml` in that project
+- Only available in that specific project
+
+### Method 2: Automated Install with Copies
+
+If you prefer copying files instead of symlinking (e.g., for CI/CD or offline use):
+
+#### Global Install (Copy)
+
+```bash
+cd ~/projects/rovodevloop
+./install.sh --no-link
+```
+
+#### Local Install (Copy)
+
+```bash
+cd ~/projects/rovodevloop
+./install.sh --local ~/projects/acra-python --no-link
+```
+
+**Note:** With copies, you need to run `./install.sh -u` or `./install.sh -u --local <path>` to update when rovodevloop changes.
+
+### Method 3: Manual Installation
+
+If you prefer manual control:
+
+#### Step 1: Clone Repository
+
+```bash
+git clone https://github.com/yourusername/rovodevloop.git ~/projects/rovodevloop
+```
+
+#### Step 2: Create Symlinks or Copy Files
+
+**For global install:**
+```bash
+mkdir -p ~/.rovodev/{prompts,subagents,skills,scripts}
+ln -sf ~/projects/rovodevloop/prompts ~/.rovodev/prompts/devloop
+ln -sf ~/projects/rovodevloop/subagents ~/.rovodev/subagents/devloop
+ln -sf ~/projects/rovodevloop/skills/*.md ~/.rovodev/skills/
+ln -sf ~/projects/rovodevloop/scripts/*.sh ~/.rovodev/scripts/
+chmod +x ~/.rovodev/scripts/*.sh
+```
+
+**For local install:**
+```bash
+mkdir -p ~/projects/acra-python/.rovodev/{prompts,subagents,skills,scripts}
+ln -sf ~/projects/rovodevloop/prompts ~/projects/acra-python/.rovodev/prompts/devloop
+ln -sf ~/projects/rovodevloop/subagents ~/projects/acra-python/.rovodev/subagents/devloop
+ln -sf ~/projects/rovodevloop/skills/*.md ~/projects/acra-python/.rovodev/skills/
+ln -sf ~/projects/rovodevloop/scripts/*.sh ~/projects/acra-python/.rovodev/scripts/
+chmod +x ~/projects/acra-python/.rovodev/scripts/*.sh
+```
+
+#### Step 3: Register in prompts.yml
+
+Add these entries to `~/.rovodev/prompts.yml` (global) or `<project>/.rovodev/prompts.yml` (local):
 
 ```yaml
 prompts:
@@ -71,32 +150,81 @@ prompts:
     content_file: prompts/devloop/ship.md
 ```
 
-#### Step 3: Use the Prompts
+## Updating Installation
+
+### Update Symlinked Installation
+
+If you used symlinks (default), just pull the latest changes:
 
 ```bash
-# Start new work
-rovodev run "@devloop Add user authentication"
-
-# Run a spike
-rovodev run "@spike How does MCP authentication work?"
-
-# Continue from plan
-rovodev run "@continue"
-
-# Save state
-rovodev run "@fresh"
-
-# Quick fix
-rovodev run "@quick Fix whitespace bug"
-
-# Review code
-rovodev run "@review"
-
-# Ship it
-rovodev run "@ship"
+cd ~/projects/rovodevloop
+git pull
 ```
 
-### Method 2: Global Installation (~/.rovodev)
+Your installation automatically uses the latest version!
+
+### Update Copied Installation
+
+If you used `--no-link`, run the update command:
+
+```bash
+# Update global
+cd ~/projects/rovodevloop
+./install.sh -u
+
+# Update local
+./install.sh -u --local ~/projects/acra-python
+```
+
+### Update with --no-link
+
+To update a copied installation:
+
+```bash
+./install.sh -u --no-link
+./install.sh -u --local ~/projects/acra-python --no-link
+```
+
+## Uninstalling
+
+### Uninstall Global
+
+```bash
+cd ~/projects/rovodevloop
+./install.sh --uninstall
+```
+
+### Uninstall Local
+
+```bash
+cd ~/projects/rovodevloop
+./install.sh --uninstall --local ~/projects/acra-python
+```
+
+**Note:** You may need to manually remove entries from `prompts.yml` after uninstalling.
+
+## Verification
+
+After installation, verify everything is set up correctly:
+
+```bash
+# Check files are in place (global)
+ls -la ~/.rovodev/prompts/devloop/
+ls -la ~/.rovodev/subagents/devloop/
+
+# Check files are in place (local)
+ls -la ~/projects/acra-python/.rovodev/prompts/devloop/
+
+# Check prompts.yml has entries
+cat ~/.rovodev/prompts.yml | grep devloop
+
+# Test a prompt
+rovodev run "@devloop Test if it works"
+```
+
+## Usage Examples
+
+### Complete Workflow
 
 Install globally so all your projects can use the prompts.
 
