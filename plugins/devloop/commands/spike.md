@@ -23,34 +23,98 @@ Time-boxed investigation to explore feasibility before committing to implementat
 
 Initial request: $ARGUMENTS
 
-Ask user what aspects to explore and their time budget:
+### Parse Depth Flag
+
+Check arguments for depth modifiers:
+- `--quick` → Quick depth (high-level feasibility check)
+- `--deep` → Deep depth (comprehensive exploration with prototypes)
+- (no flag) → Standard depth (default - solid analysis with recommendations)
+
+Strip the flag from the topic string for analysis.
+
+### Detect Spike Type
+
+Analyze the topic to determine the type of spike and suggest the most relevant aspects.
+
+**Available Aspects:**
+
+| Aspect | Description | When to suggest |
+|--------|-------------|-----------------|
+| **Feasibility** | Can we do this at all? | Most spikes |
+| **Scope** | How big is this? What's the blast radius? | Most spikes |
+| **Risk** | What could go wrong? Unknowns? | Most spikes |
+| **Dependencies** | What does this touch? What's needed first? | Changes touching multiple areas |
+| **Approach** | Compare different ways to do it | When multiple valid paths exist |
+| **Effort** | Is this a day or a month? | Planning/estimation needs |
+| **User impact** | How does this affect users? | User-facing changes |
+| **Performance** | Is it fast enough? Scalable? | Performance-sensitive features |
+| **Integration** | How does it fit with existing code? | Touching existing systems |
+
+**Spike Type Detection:**
+
+| Topic Pattern | Spike Type | Suggested Aspects (pick 2-3) |
+|---------------|------------|------------------------------|
+| "Should we use X", "Is X right for" | Technology decision | Feasibility, Risk, Integration |
+| "Add X", "Implement X", "Build X" | New feature | Scope, Risk, Effort |
+| "Is X possible", "Can we do X" | Feasibility check | Feasibility, Risk |
+| "X vs Y", "Compare X and Y" | Comparison | Approach, Risk, Effort |
+| "Redesign X", "Refactor X" | Architecture | Scope, Risk, Dependencies |
+| "Fix X", "Why is X broken" | Investigation | Feasibility, Scope, Risk |
+| "How to X", "Best way to X" | Implementation | Approach, Dependencies |
+| (general/unclear) | General | Scope, Risk, Feasibility |
+
+Display the detected type and depth:
+```
+Detected: [Spike Type] spike
+Depth: [Quick/Standard/Deep] (use --deep or --quick to change)
+```
+
+### Ask for Aspects
+
+Based on detected type, present a context-aware question with 3-4 relevant options.
+
+**Build the question dynamically** using the suggested aspects from type detection:
 
 ```yaml
 AskUserQuestion:
   questions:
-    - question: "What aspects should this spike explore? (Select all that apply)"
-      header: "Explore"
+    - question: "What aspects matter most for this spike?"
+      header: "Aspects"
       multiSelect: true
       options:
-        - label: "Feasibility"
-          description: "Can we do this at all?"
-        - label: "Approach comparison"
-          description: "Compare different implementation strategies"
-        - label: "Performance"
-          description: "Is it fast/efficient enough?"
-        - label: "Integration"
-          description: "Compatibility with existing code"
-    - question: "What's your time budget?"
-      header: "Depth"
-      multiSelect: false
-      options:
-        - label: "Quick (30 min)"
-          description: "High-level feasibility check"
-        - label: "Standard (1-2 hr)"
-          description: "Solid analysis with recommendations"
-        - label: "Deep dive"
-          description: "Comprehensive exploration with prototypes"
+        - label: "[Suggested aspect 1] (Recommended)"
+          description: "[From aspects table]"
+        - label: "[Suggested aspect 2] (Recommended)"
+          description: "[From aspects table]"
+        - label: "[Suggested aspect 3]"
+          description: "[From aspects table]"
 ```
+
+**Example for "Add dark mode" (New feature spike):**
+```yaml
+options:
+  - label: "Scope (Recommended)"
+    description: "How big is this? What's the blast radius?"
+  - label: "Risk (Recommended)"
+    description: "What could go wrong? Unknowns?"
+  - label: "Effort"
+    description: "Is this a day or a month?"
+  - label: "User impact"
+    description: "How does this affect users?"
+```
+
+**Example for "Should we use Redis" (Technology decision):**
+```yaml
+options:
+  - label: "Feasibility (Recommended)"
+    description: "Can we do this at all?"
+  - label: "Risk (Recommended)"
+    description: "What could go wrong? Unknowns?"
+  - label: "Integration"
+    description: "How does it fit with existing code?"
+```
+
+Only show aspects relevant to the spike type. Don't always show Performance or Integration unless the topic warrants it.
 
 Create a brief todo list for the investigation based on selected aspects.
 
@@ -58,37 +122,62 @@ Create a brief todo list for the investigation based on selected aspects.
 
 **Do this directly. No agents needed.**
 
-For each selected exploration aspect, investigate accordingly:
+For each selected aspect, investigate accordingly:
 
 ### If "Feasibility" selected:
 1. Search for similar implementations in codebase
 2. Identify technical blockers or requirements
-3. Check for dependencies or constraints
+3. Check for hard constraints (API limits, platform restrictions, etc.)
 
-### If "Approach comparison" selected:
+### If "Scope" selected:
+1. Identify all files/components that would be touched
+2. Map out the blast radius (what else changes if this changes?)
+3. List any secondary effects or follow-on work
+
+### If "Risk" selected:
+1. Identify unknowns and assumptions being made
+2. What could go wrong? What's the worst case?
+3. Are there reversibility concerns? Can we undo this?
+
+### If "Dependencies" selected:
+1. What needs to exist/happen before this can work?
+2. What other systems/teams are involved?
+3. Are there external dependencies (APIs, libraries, services)?
+
+### If "Approach" selected:
 1. Identify 2-3 viable approaches
 2. Research pros/cons of each
 3. Look for existing patterns in codebase
 
+### If "Effort" selected:
+1. Break down into rough task list
+2. Identify complexity drivers (what makes this hard?)
+3. Compare to similar past work if available
+
+### If "User impact" selected:
+1. Who is affected by this change?
+2. Is there a migration path? Breaking changes?
+3. What's the user-facing behavior change?
+
 ### If "Performance" selected:
-1. Identify performance-critical areas
+1. Identify performance-critical paths
 2. Research benchmarks or profiling approaches
-3. Look for bottlenecks or optimization opportunities
+3. Look for bottlenecks or scalability concerns
 
 ### If "Integration" selected:
 1. Find integration points in existing code
 2. Check API compatibility
-3. Identify potential conflicts
+3. Identify potential conflicts with existing behavior
 
 **General research steps:**
-1. **Search codebase**: Use Grep/Glob to find similar patterns
+1. **Search codebase**: Use Grep/Glob to find related code
 2. **Read relevant files**: Understand existing implementation
 3. **External research**: Use WebSearch/WebFetch for docs if needed
 
-Adjust depth based on time budget:
-- **Quick**: Focus on blockers, skip detailed analysis
+Adjust depth based on depth level:
+- **Quick**: Focus on blockers and showstoppers only
 - **Standard**: Balanced investigation of each aspect
-- **Deep dive**: Thorough research with code exploration
+- **Deep**: Thorough research with code exploration
 
 Document key findings as you go.
 
@@ -102,7 +191,7 @@ If needed, create throwaway POC code:
 
 ## Step 4: Evaluate
 
-After investigation, assess each selected exploration aspect:
+After investigation, assess each selected aspect:
 
 ### For each selected aspect, provide a verdict:
 
@@ -111,25 +200,48 @@ After investigation, assess each selected exploration aspect:
 - Confidence: High / Medium / Low
 - Key blockers (if any)
 
-**If "Approach comparison" was explored:**
+**If "Scope" was explored:**
+- Size: XS / S / M / L / XL
+- Files/components affected: [count]
+- Secondary effects: [list]
+
+**If "Risk" was explored:**
+- Risk level: Low / Medium / High
+- Top risks: [list 2-3]
+- Mitigation possible? Yes / Partial / No
+
+**If "Dependencies" was explored:**
+- Blocking dependencies: [list]
+- External dependencies: [list]
+- Can start now? Yes / After X / No
+
+**If "Approach" was explored:**
 - Best approach: [Name]
 - Runner-up: [Name]
 - Confidence: High / Medium / Low
 
+**If "Effort" was explored:**
+- Estimate: Hours / Days / Weeks
+- Complexity drivers: [list]
+- Confidence: High / Medium / Low
+
+**If "User impact" was explored:**
+- Users affected: [scope]
+- Breaking changes: Yes / No
+- Migration needed: Yes / No
+
 **If "Performance" was explored:**
 - Verdict: Acceptable / Needs work / Blocker
-- Confidence: High / Medium / Low
 - Key concerns (if any)
 
 **If "Integration" was explored:**
 - Verdict: Compatible / Needs adaptation / Incompatible
-- Confidence: High / Medium / Low
-- Integration points identified
+- Integration points: [list]
 
 ### Overall Assessment:
-- **Complexity**: XS / S / M / L / XL
-- **Risk**: Low / Medium / High
-- **Recommended approach**: What's the best path forward?
+- **Recommendation**: Proceed / Proceed with caution / Don't proceed / Need more info
+- **Confidence**: High / Medium / Low
+- **Next step**: What should happen next?
 
 ## Step 5: Report
 
@@ -139,44 +251,69 @@ Write spike report to `.devloop/spikes/{topic}.md`:
 ## Spike: [Topic]
 
 **Question**: [What we investigated]
-**Explored**: [Feasibility, Approach, Performance, Integration] (list selected)
-**Depth**: [Quick/Standard/Deep dive]
+**Type**: [Technology decision / New feature / Feasibility check / Comparison / Architecture / Investigation / Implementation / General]
+**Depth**: [Quick/Standard/Deep]
+**Explored**: [List only the aspects that were selected]
 
-### Findings by Aspect
+### Findings
 
-#### Feasibility (if selected)
-- [Key finding]
-- Verdict: [Yes/No/Partial]
+<!-- Include only sections for aspects that were explored -->
 
-#### Approach Comparison (if selected)
-| Approach | Pros | Cons |
-|----------|------|------|
-| Option A | ... | ... |
-| Option B | ... | ... |
+#### Feasibility
+- [Key findings]
+- **Verdict**: Yes / No / Partial
 
-- Best approach: [Name]
+#### Scope
+- **Size**: XS / S / M / L / XL
+- **Blast radius**: [What's affected]
+- **Secondary effects**: [Follow-on work needed]
 
-#### Performance (if selected)
-- [Key finding]
-- Verdict: [Acceptable/Needs work/Blocker]
+#### Risk
+- **Level**: Low / Medium / High
+- **Top risks**:
+  1. [Risk 1]
+  2. [Risk 2]
+- **Mitigation**: [Possible / Partial / Difficult]
 
-#### Integration (if selected)
-- [Key finding]
-- Verdict: [Compatible/Needs adaptation/Incompatible]
+#### Dependencies
+- **Blockers**: [What needs to happen first]
+- **External**: [APIs, services, teams]
 
-### Summary Matrix
+#### Approach
+| Option | Pros | Cons |
+|--------|------|------|
+| A | ... | ... |
+| B | ... | ... |
+- **Recommendation**: [Best option]
 
-| Aspect | Verdict | Confidence |
+#### Effort
+- **Estimate**: [Hours / Days / Weeks]
+- **Complexity drivers**: [What makes this hard]
+
+#### User Impact
+- **Affected users**: [Scope]
+- **Breaking changes**: Yes / No
+- **Migration**: [Required / Not needed]
+
+#### Performance
+- **Verdict**: Acceptable / Needs work / Blocker
+- **Concerns**: [If any]
+
+#### Integration
+- **Verdict**: Compatible / Needs adaptation / Incompatible
+- **Integration points**: [List]
+
+### Summary
+
+| Aspect | Finding | Confidence |
 |--------|---------|------------|
-| Feasibility | Yes/No/Partial | High/Med/Low |
-| Approach | [Best option] | High/Med/Low |
-| Performance | Acceptable/Needs work | High/Med/Low |
-| Integration | Compatible/Needs adapt | High/Med/Low |
+| [Only list explored aspects] | [Verdict] | High/Med/Low |
 
 ### Recommendation
-[Proceed/Don't proceed] with [approach]
 
-### Complexity: [Size] | Risk: [Level]
+**[Proceed / Proceed with caution / Don't proceed / Need more info]**
+
+[Brief explanation of recommendation and suggested next step]
 ```
 
 ## Step 6: Next Steps

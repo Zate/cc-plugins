@@ -32,8 +32,14 @@ get_plan_status() {
     if [ -f ".devloop/plan.md" ]; then
         local total
         local done
-        total=$(grep -c "^- \[" .devloop/plan.md 2>/dev/null) || total=0
-        done=$(grep -c "^- \[x\]" .devloop/plan.md 2>/dev/null) || done=0
+        local skipped
+        # Filter out code blocks before counting tasks (matches statusline logic)
+        local filtered
+        filtered=$(awk '/^```/ { in_code = !in_code; next } !in_code { print }' .devloop/plan.md)
+        total=$(echo "$filtered" | grep -cE "^[[:space:]]*- \[[ x~!-]\]" 2>/dev/null) || total=0
+        done=$(echo "$filtered" | grep -cE "^[[:space:]]*- \[x\]" 2>/dev/null) || done=0
+        skipped=$(echo "$filtered" | grep -cE "^[[:space:]]*- \[-\]" 2>/dev/null) || skipped=0
+        done=$((done + skipped))
         echo "$done/$total"
     else
         echo "none"
