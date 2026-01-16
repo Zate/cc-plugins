@@ -1,0 +1,1 @@
+I need to implement a new user authentication feature with OAuth support. This is a significant piece of work that will touch multiple files. Help me get started with planning this out.

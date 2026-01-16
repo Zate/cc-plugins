@@ -1,0 +1,1 @@
+I'm not sure how the caching layer works in this project. Before I make any changes, I need to understand the existing implementation and explore different approaches we could take. Can you help me investigate?
