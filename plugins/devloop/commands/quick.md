@@ -75,11 +75,13 @@ If during implementation you discover complexity:
 
 ```yaml
 AskUserQuestion:
-  question: "This is more complex than expected. Switch to full workflow?"
-  header: "Escalate"
-  options:
-    - label: "Yes, full workflow"
-      description: "Use /devloop for comprehensive approach"
-    - label: "Continue quick"
-      description: "Accept limitations, keep going"
+  questions:
+    - question: "This is more complex than expected. Switch to full workflow?"
+      header: "Escalate"
+      multiSelect: false
+      options:
+        - label: "Yes, full workflow"
+          description: "Use /devloop for comprehensive approach"
+        - label: "Continue quick"
+          description: "Accept limitations, keep going"
 ```

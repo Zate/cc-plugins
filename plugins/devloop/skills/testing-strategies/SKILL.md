@@ -12,6 +12,8 @@ seeAlso:
     when: pytest patterns
   - skill: go-patterns
     when: Go table-driven tests
+  - skill: superpowers:test-driven-development
+    when: writing tests first, rigorous TDD discipline
 ---
 
 # Testing Strategies

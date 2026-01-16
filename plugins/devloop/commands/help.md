@@ -16,21 +16,19 @@ If `$ARGUMENTS` specifies a topic, skip to that section. Otherwise, ask:
 
 ```yaml
 AskUserQuestion:
-  question: "What would you like to learn about?"
-  header: "Topic"
-  options:
-    - label: "Getting Started"
-      description: "New to devloop? Start here"
-    - label: "Commands"
-      description: "What each command does and when to use it"
-    - label: "The Loop"
-      description: "The spike -> fresh -> continue cycle"
-    - label: "Skills & Agents"
-      description: "On-demand knowledge and parallel work"
-    - label: "Troubleshooting"
-      description: "Common issues and fixes"
-    - label: "Automation"
-      description: "Ralph loop integration for hands-free execution"
+  questions:
+    - question: "What would you like to learn about?"
+      header: "Topic"
+      multiSelect: false
+      options:
+        - label: "Getting Started"
+          description: "New to devloop? Start here"
+        - label: "Commands"
+          description: "What each command does and when to use it"
+        - label: "The Loop"
+          description: "The spike -> fresh -> continue cycle"
+        - label: "Skills & Agents"
+          description: "On-demand knowledge and parallel work"
 ```
 
 ## Step 2: Show Topic Content
@@ -255,6 +253,15 @@ Agents are for **parallel, independent tasks** - not routine work.
 | `devloop:security-scanner` | OWASP, secrets, injection risks |
 | `devloop:doc-generator` | READMEs, API docs |
 
+## Optional: Superpowers Integration
+
+If you have the `superpowers` plugin installed, devloop skills link to complementary superpowers skills:
+- `testing-strategies` → `superpowers:test-driven-development`
+- `git-workflows` → `superpowers:using-git-worktrees`, `superpowers:finishing-a-development-branch`
+- `architecture-patterns` → `superpowers:systematic-debugging`
+
+Superpowers is NOT required - devloop works standalone.
+
 ---
 
 # Topic: Troubleshooting
@@ -463,13 +470,15 @@ After showing topic content, offer to explore more:
 
 ```yaml
 AskUserQuestion:
-  question: "Would you like to learn about another topic?"
-  header: "More"
-  options:
-    - label: "Yes, show topics"
-      description: "Return to topic menu"
-    - label: "No, I'm good"
-      description: "Exit help"
+  questions:
+    - question: "Would you like to learn about another topic?"
+      header: "More"
+      multiSelect: false
+      options:
+        - label: "Yes, show topics"
+          description: "Return to topic menu"
+        - label: "No, I'm good"
+          description: "Exit help"
 ```
 
 If "Yes", return to Step 1. If "No", end with:

@@ -39,13 +39,15 @@ Start a development workflow with minimal overhead. **You do the work directly.*
 4. **Create feature branch** (if configured):
    ```yaml
    AskUserQuestion:
-     question: "Create feature branch for this work?"
-     header: "Branch"
-     options:
-       - label: "Yes"
-         description: "Create feat/[task-slug] branch"
-       - label: "No"
-         description: "Stay on current branch"
+     questions:
+       - question: "Create feature branch for this work?"
+         header: "Branch"
+         multiSelect: false
+         options:
+           - label: "Yes"
+             description: "Create feat/[task-slug] branch"
+           - label: "No"
+             description: "Stay on current branch"
    ```
    If yes:
    ```bash

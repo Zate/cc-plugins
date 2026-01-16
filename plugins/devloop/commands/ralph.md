@@ -31,7 +31,23 @@ Start an automated ralph loop that works through plan tasks until completion.
 
 ## Step 1: Verify Prerequisites
 
-Check for existing plan:
+**FIRST: Check ralph-loop plugin is installed:**
+
+```bash
+"${CLAUDE_PLUGIN_ROOT}/scripts/check-plugin.sh" ralph-loop
+```
+
+If `installed: false`, STOP and tell user:
+```
+The ralph-loop plugin is required but not installed.
+
+Install it with:
+  /plugin install ralph-loop
+
+Then try again with /devloop:ralph
+```
+
+**THEN: Check for existing plan:**
 
 ```bash
 "${CLAUDE_PLUGIN_ROOT}/scripts/check-plan-complete.sh" .devloop/plan.md

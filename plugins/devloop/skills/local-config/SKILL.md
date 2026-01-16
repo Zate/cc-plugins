@@ -251,3 +251,26 @@ Internally, the plugin uses `${CLAUDE_PLUGIN_ROOT}/scripts/parse-local-config.sh
 ## Updating Config
 
 Edit `.devloop/local.md` directly. Changes take effect on next command.
+
+## Plugin Integration Settings
+
+### Disabling Superpowers Suggestions
+
+By default, devloop skills reference complementary superpowers skills when available. To disable these suggestions:
+
+```yaml
+---
+plugins:
+  superpowers-suggestions: false  # Disable seeAlso to superpowers skills
+---
+```
+
+### Context Threshold for Ralph Loop
+
+When using `/devloop:ralph` with context auto-exit:
+
+```yaml
+---
+context_threshold: 70  # Exit ralph loop when context usage exceeds this % (default: 70)
+---
+```

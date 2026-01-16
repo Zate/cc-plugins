@@ -10,6 +10,8 @@ seeAlso:
     when: data layer architecture
   - skill: testing-strategies
     when: test architecture decisions
+  - skill: superpowers:systematic-debugging
+    when: debugging complex architectural issues, tracing behavior
 ---
 
 # Architecture Patterns

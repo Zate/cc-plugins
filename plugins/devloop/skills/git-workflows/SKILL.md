@@ -10,6 +10,10 @@ seeAlso:
     when: configuring git workflow preferences
   - skill: pr-feedback
     when: handling PR review comments
+  - skill: superpowers:using-git-worktrees
+    when: parallel feature development, isolated workspaces
+  - skill: superpowers:finishing-a-development-branch
+    when: completing work, deciding merge/PR/cleanup options
 ---
 
 # Git Workflows

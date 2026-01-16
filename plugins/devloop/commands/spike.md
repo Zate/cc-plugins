@@ -328,15 +328,17 @@ If an existing plan is complete (`complete: true`), offer to archive before proc
 
 ```yaml
 AskUserQuestion:
-  question: "Existing plan is complete. Archive it before starting new work?"
-  header: "Archive"
-  options:
-    - label: "Archive and continue"
-      description: "Move old plan to archive, then proceed"
-    - label: "Replace without archiving"
-      description: "Overwrite the old plan"
-    - label: "Cancel"
-      description: "Keep existing plan"
+  questions:
+    - question: "Existing plan is complete. Archive it before starting new work?"
+      header: "Archive"
+      multiSelect: false
+      options:
+        - label: "Archive and continue"
+          description: "Move old plan to archive, then proceed"
+        - label: "Replace without archiving"
+          description: "Overwrite the old plan"
+        - label: "Cancel"
+          description: "Keep existing plan"
 ```
 
 If "Archive and continue":
@@ -348,15 +350,17 @@ Then ask about next steps:
 
 ```yaml
 AskUserQuestion:
-  question: "Spike complete. How would you like to proceed?"
-  header: "Next"
-  options:
-    - label: "Start work"
-      description: "Begin implementation with /devloop:continue"
-    - label: "Create plan"
-      description: "Design full implementation plan"
-    - label: "Defer"
-      description: "Save findings for later"
+  questions:
+    - question: "Spike complete. How would you like to proceed?"
+      header: "Next"
+      multiSelect: false
+      options:
+        - label: "Start work"
+          description: "Begin implementation with /devloop:continue"
+        - label: "Create plan"
+          description: "Design full implementation plan"
+        - label: "Defer"
+          description: "Save findings for later"
 ```
 
 ---

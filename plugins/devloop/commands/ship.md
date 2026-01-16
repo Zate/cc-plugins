@@ -45,17 +45,19 @@ If `.devloop/local.md` exists, read git workflow preferences:
 
 ```yaml
 AskUserQuestion:
-  question: "How would you like to ship?"
-  header: "Mode"
-  options:
-    - label: "Full validation"
-      description: "Run tests, review, then commit/PR"
-    - label: "Quick commit"
-      description: "Skip validation, just commit"
-    - label: "PR only"
-      description: "Changes already committed, create PR"
-    - label: "Atomic commits"
-      description: "One commit per completed plan task"
+  questions:
+    - question: "How would you like to ship?"
+      header: "Mode"
+      multiSelect: false
+      options:
+        - label: "Full validation"
+          description: "Run tests, review, then commit/PR"
+        - label: "Quick commit"
+          description: "Skip validation, just commit"
+        - label: "PR only"
+          description: "Changes already committed, create PR"
+        - label: "Atomic commits"
+          description: "One commit per completed plan task"
 ```
 
 ---
@@ -83,6 +85,8 @@ If `review.before-commit` is `always` or user chooses:
 - No debug code (console.log, print statements)
 - Verify correct branch
 
+**Tip**: If the `superpowers` plugin is installed, consider using `Skill: superpowers:verification-before-completion` for rigorous verification.
+
 ---
 
 ## Phase 3: Smart Commit Strategy
@@ -94,13 +98,15 @@ If `review.before-commit` is `always` or user chooses:
 
 ```yaml
 AskUserQuestion:
-  question: "Found N completed tasks. How to commit?"
-  header: "Strategy"
-  options:
-    - label: "Single commit"
-      description: "Squash all into one commit"
-    - label: "Atomic commits"
-      description: "One commit per task"
+  questions:
+    - question: "Found N completed tasks. How to commit?"
+      header: "Strategy"
+      multiSelect: false
+      options:
+        - label: "Single commit"
+          description: "Squash all into one commit"
+        - label: "Atomic commits"
+          description: "One commit per task"
 ```
 
 **Generate commit messages:**
@@ -216,15 +222,17 @@ If `complete: true`, suggest next action with archive option:
 
 ```yaml
 AskUserQuestion:
-  question: "Ship complete. All tasks done! What next?"
-  header: "Next"
-  options:
-    - label: "Archive plan"
-      description: "Move completed plan to archive, start fresh"
-    - label: "Wait for review"
-      description: "PR created, wait for feedback before archiving"
-    - label: "Done"
-      description: "Keep plan for reference"
+  questions:
+    - question: "Ship complete. All tasks done! What next?"
+      header: "Next"
+      multiSelect: false
+      options:
+        - label: "Archive plan"
+          description: "Move completed plan to archive, start fresh"
+        - label: "Wait for review"
+          description: "PR created, wait for feedback before archiving"
+        - label: "Done"
+          description: "Keep plan for reference"
 ```
 
 ### If "Archive plan":
@@ -243,15 +251,17 @@ If plan is NOT complete, offer:
 
 ```yaml
 AskUserQuestion:
-  question: "Ship complete. What next?"
-  header: "Next"
-  options:
-    - label: "Continue work"
-      description: "Move to next phase"
-    - label: "Wait for review"
-      description: "PR created, wait for feedback"
-    - label: "Done for now"
-      description: "Take a break"
+  questions:
+    - question: "Ship complete. What next?"
+      header: "Next"
+      multiSelect: false
+      options:
+        - label: "Continue work"
+          description: "Move to next phase"
+        - label: "Wait for review"
+          description: "PR created, wait for feedback"
+        - label: "Done for now"
+          description: "Take a break"
 ```
 
 ---

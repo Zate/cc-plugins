@@ -55,27 +55,31 @@ If a plan exists:
 **If plan is complete:**
 ```yaml
 AskUserQuestion:
-  question: "Existing plan is complete. Archive before starting from issue?"
-  header: "Archive"
-  options:
-    - label: "Archive and continue"
-      description: "Move completed plan to archive"
-    - label: "Replace"
-      description: "Overwrite without archiving"
-    - label: "Cancel"
-      description: "Keep existing plan"
+  questions:
+    - question: "Existing plan is complete. Archive before starting from issue?"
+      header: "Archive"
+      multiSelect: false
+      options:
+        - label: "Archive and continue"
+          description: "Move completed plan to archive"
+        - label: "Replace"
+          description: "Overwrite without archiving"
+        - label: "Cancel"
+          description: "Keep existing plan"
 ```
 
 **If plan is incomplete:**
 ```yaml
 AskUserQuestion:
-  question: "Existing plan has N pending tasks. What to do?"
-  header: "Conflict"
-  options:
-    - label: "Replace"
-      description: "Overwrite incomplete plan"
-    - label: "Cancel"
-      description: "Keep existing plan"
+  questions:
+    - question: "Existing plan has N pending tasks. What to do?"
+      header: "Conflict"
+      multiSelect: false
+      options:
+        - label: "Replace"
+          description: "Overwrite incomplete plan"
+        - label: "Cancel"
+          description: "Keep existing plan"
 ```
 
 ## Step 4: Fetch Issue Details
@@ -101,13 +105,15 @@ Make sure you're in a repository with this issue.
 **If issue is closed:**
 ```yaml
 AskUserQuestion:
-  question: "Issue #123 is already closed. Continue anyway?"
-  header: "Closed"
-  options:
-    - label: "Yes, start anyway"
-      description: "Create plan for closed issue"
-    - label: "Cancel"
-      description: "Don't create plan"
+  questions:
+    - question: "Issue #123 is already closed. Continue anyway?"
+      header: "Closed"
+      multiSelect: false
+      options:
+        - label: "Yes, start anyway"
+          description: "Create plan for closed issue"
+        - label: "Cancel"
+          description: "Don't create plan"
 ```
 
 ## Step 5: Create Plan from Issue
@@ -148,15 +154,17 @@ Write to `.devloop/plan.md`.
 
 ```yaml
 AskUserQuestion:
-  question: "Plan created from Issue #123. What next?"
-  header: "Next"
-  options:
-    - label: "Spike first"
-      description: "Explore before implementing (/devloop:spike)"
-    - label: "Start work"
-      description: "Begin implementation (/devloop:continue)"
-    - label: "Refine plan"
-      description: "Review and adjust tasks first"
+  questions:
+    - question: "Plan created from Issue #123. What next?"
+      header: "Next"
+      multiSelect: false
+      options:
+        - label: "Spike first"
+          description: "Explore before implementing (/devloop:spike)"
+        - label: "Start work"
+          description: "Begin implementation (/devloop:continue)"
+        - label: "Refine plan"
+          description: "Review and adjust tasks first"
 ```
 
 ### If "Spike first":

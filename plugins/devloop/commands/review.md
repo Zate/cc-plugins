@@ -18,17 +18,19 @@ Comprehensive code review for changes, PRs, or specific files. **You do the work
 
 ```yaml
 AskUserQuestion:
-  question: "What would you like to review?"
-  header: "Scope"
-  options:
-    - label: "Uncommitted changes"
-      description: "Review git diff"
-    - label: "Staged changes"
-      description: "Review git diff --cached"
-    - label: "Recent commits"
-      description: "Review last few commits"
-    - label: "Specific files"
-      description: "I'll specify paths"
+  questions:
+    - question: "What would you like to review?"
+      header: "Scope"
+      multiSelect: false
+      options:
+        - label: "Uncommitted changes"
+          description: "Review git diff"
+        - label: "Staged changes"
+          description: "Review git diff --cached"
+        - label: "Recent commits"
+          description: "Review last few commits"
+        - label: "Specific files"
+          description: "I'll specify paths"
 ```
 
 ## Step 2: Gather Code
@@ -80,15 +82,17 @@ Present findings by severity:
 
 ```yaml
 AskUserQuestion:
-  question: "Review complete. How proceed?"
-  header: "Action"
-  options:
-    - label: "Fix critical"
-      description: "Address blockers only"
-    - label: "Fix all"
-      description: "Apply all suggested fixes"
-    - label: "Accept as-is"
-      description: "Proceed without changes"
+  questions:
+    - question: "Review complete. How proceed?"
+      header: "Action"
+      multiSelect: false
+      options:
+        - label: "Fix critical"
+          description: "Address blockers only"
+        - label: "Fix all"
+          description: "Apply all suggested fixes"
+        - label: "Accept as-is"
+          description: "Proceed without changes"
 ```
 
 If fixing, make the changes directly using Edit tool.

@@ -31,15 +31,17 @@ Show status and ask:
 
 ```yaml
 AskUserQuestion:
-  question: "Plan has N pending tasks. Archive anyway?"
-  header: "Incomplete"
-  options:
-    - label: "Archive anyway"
-      description: "Force archive incomplete plan"
-    - label: "Continue work"
-      description: "Keep working on pending tasks"
-    - label: "Cancel"
-      description: "Don't archive"
+  questions:
+    - question: "Plan has N pending tasks. Archive anyway?"
+      header: "Incomplete"
+      multiSelect: false
+      options:
+        - label: "Archive anyway"
+          description: "Force archive incomplete plan"
+        - label: "Continue work"
+          description: "Keep working on pending tasks"
+        - label: "Cancel"
+          description: "Don't archive"
 ```
 
 ## Step 2: Show What Will Be Archived
@@ -64,13 +66,15 @@ Archive destination: .devloop/archive/YYYY-MM-DD-{slug}.md
 
 ```yaml
 AskUserQuestion:
-  question: "Archive this completed plan?"
-  header: "Confirm"
-  options:
-    - label: "Archive now"
-      description: "Move plan to archive, clear active plan"
-    - label: "Cancel"
-      description: "Keep plan active"
+  questions:
+    - question: "Archive this completed plan?"
+      header: "Confirm"
+      multiSelect: false
+      options:
+        - label: "Archive now"
+          description: "Move plan to archive, clear active plan"
+        - label: "Cancel"
+          description: "Keep plan active"
 ```
 
 ## Step 4: Execute Archive

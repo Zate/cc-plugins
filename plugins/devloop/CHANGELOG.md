@@ -5,6 +5,65 @@ All notable changes to the devloop plugin are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.7.0] - 2026-01-16
+
+### Fixed - Critical AskUserQuestion Format
+
+Fixed 23 instances of incorrect AskUserQuestion format across all commands and agents.
+
+#### What Was Wrong
+AskUserQuestion tool requires:
+- `questions:` array wrapper
+- `multiSelect:` field in each question
+
+All 11 files with AskUserQuestion now use the correct format.
+
+#### Files Fixed
+- `commands/archive.md` (2 instances)
+- `commands/continue.md` (2 instances)
+- `commands/devloop.md` (1 instance)
+- `commands/from-issue.md` (4 instances)
+- `commands/help.md` (2 instances)
+- `commands/pr-feedback.md` (2 instances)
+- `commands/quick.md` (1 instance)
+- `commands/review.md` (2 instances)
+- `commands/ship.md` (4 instances)
+- `commands/spike.md` (2 instances)
+- `agents/statusline-setup.md` (1 instance)
+
+### Added - Testing Infrastructure
+
+New test suite to prevent regressions.
+
+- `tests/test-helpers.sh` - Shared test utilities (assert_contains, assert_count, etc.)
+- `tests/test-askuserquestion-format.sh` - Validates AskUserQuestion format across all files
+- `tests/test-commands.sh` - Command structure smoke tests
+- `tests/run-tests.sh` - Test runner (`./run-tests.sh` runs all tests)
+
+### Added - Plugin Dependency Validation
+
+- `scripts/check-plugin.sh` - Generic plugin detection script
+- `/devloop:ralph` now validates ralph-loop plugin is installed before starting
+
+### Added - Superpowers Integration
+
+Lightweight cross-references to complementary superpowers skills (when installed):
+
+- `testing-strategies` → `superpowers:test-driven-development`
+- `git-workflows` → `superpowers:using-git-worktrees`, `superpowers:finishing-a-development-branch`
+- `architecture-patterns` → `superpowers:systematic-debugging`
+- `skills/INDEX.md` - New "Superpowers Integration" section
+- `commands/help.md` - Added optional superpowers info
+- `commands/ship.md` - Tip about verification skill
+- `skills/local-config/SKILL.md` - Settings to disable superpowers suggestions
+
+### Changed
+
+- Reduced help command topic options from 6 to 4 (AskUserQuestion limit)
+- INDEX.md version updated to reflect integrations
+
+---
+
 ## [3.6.2] - 2026-01-09
 
 ### Added - Statusline Setup Command

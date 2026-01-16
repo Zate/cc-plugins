@@ -89,18 +89,19 @@ For each comment/review body:
 
 ```yaml
 AskUserQuestion:
-  question: "Which feedback items should be added to the plan?"
-  header: "Select"
-  multiSelect: true
-  options:
-    - label: "All blockers"
-      description: "Add items 1-2"
-    - label: "Blockers + suggestions"
-      description: "Add items 1-3"
-    - label: "All items"
-      description: "Add everything"
-    - label: "Select individually"
-      description: "Choose specific items"
+  questions:
+    - question: "Which feedback items should be added to the plan?"
+      header: "Select"
+      multiSelect: true
+      options:
+        - label: "All blockers"
+          description: "Add items 1-2"
+        - label: "Blockers + suggestions"
+          description: "Add items 1-3"
+        - label: "All items"
+          description: "Add everything"
+        - label: "Select individually"
+          description: "Choose specific items"
 ```
 
 ## Step 5: Update Plan
@@ -134,15 +135,17 @@ PR #123 - @reviewer (CHANGES_REQUESTED)
 
 ```yaml
 AskUserQuestion:
-  question: "Feedback added to plan. What next?"
-  header: "Action"
-  options:
-    - label: "Start fixing"
-      description: "Work on first blocker"
-    - label: "Respond first"
-      description: "Reply to questions"
-    - label: "Review plan"
-      description: "See updated plan"
+  questions:
+    - question: "Feedback added to plan. What next?"
+      header: "Action"
+      multiSelect: false
+      options:
+        - label: "Start fixing"
+          description: "Work on first blocker"
+        - label: "Respond first"
+          description: "Reply to questions"
+        - label: "Review plan"
+          description: "See updated plan"
 ```
 
 ---

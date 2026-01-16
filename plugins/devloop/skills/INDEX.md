@@ -52,6 +52,19 @@ Skills now include `seeAlso` frontmatter pointing to related skills:
 Some skills reference external plugins when installed:
 - **`frontend-design`** (claude-plugins-official) - Referenced from `react-patterns` for UI design work
 
+## Superpowers Integration
+
+When the `superpowers` plugin is installed, devloop skills link to complementary superpowers skills:
+
+| Devloop Skill | Superpowers Skill | When to Use |
+|---------------|-------------------|-------------|
+| `testing-strategies` | `superpowers:test-driven-development` | Writing tests first, rigorous TDD |
+| `git-workflows` | `superpowers:using-git-worktrees` | Parallel feature development |
+| `git-workflows` | `superpowers:finishing-a-development-branch` | Completing work, merge decisions |
+| `architecture-patterns` | `superpowers:systematic-debugging` | Debugging complex issues |
+
+**Note**: Superpowers skills are NOT required. Devloop works standalone. These are optional enhancements.
+
 ## Quick Reference
 
 ```

@@ -102,15 +102,17 @@ If ALL tasks are complete (regardless of ralph loop status), offer to archive:
 
 ```yaml
 AskUserQuestion:
-  question: "All tasks complete! Archive this plan?"
-  header: "Archive"
-  options:
-    - label: "Archive now"
-      description: "Move to .devloop/archive/, start fresh"
-    - label: "Keep active"
-      description: "Leave plan in place for review"
-    - label: "Ship first"
-      description: "Run /devloop:ship before archiving"
+  questions:
+    - question: "All tasks complete! Archive this plan?"
+      header: "Archive"
+      multiSelect: false
+      options:
+        - label: "Archive now"
+          description: "Move to .devloop/archive/, start fresh"
+        - label: "Keep active"
+          description: "Leave plan in place for review"
+        - label: "Ship first"
+          description: "Run /devloop:ship before archiving"
 ```
 
 ### If "Archive now":
@@ -133,15 +135,17 @@ After significant progress, ask:
 
 ```yaml
 AskUserQuestion:
-  question: "Completed [task]. What next?"
-  header: "Checkpoint"
-  options:
-    - label: "Continue"
-      description: "Move to next task"
-    - label: "Commit"
-      description: "Git commit this work"
-    - label: "Break"
-      description: "Save state, take a break"
+  questions:
+    - question: "Completed [task]. What next?"
+      header: "Checkpoint"
+      multiSelect: false
+      options:
+        - label: "Continue"
+          description: "Move to next task"
+        - label: "Commit"
+          description: "Git commit this work"
+        - label: "Break"
+          description: "Save state, take a break"
 ```
 
 ### If "Commit":

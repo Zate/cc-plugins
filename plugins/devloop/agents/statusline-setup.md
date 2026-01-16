@@ -61,13 +61,15 @@ Check if path needs updating (version change). Update if necessary.
 Ask user:
 ```yaml
 AskUserQuestion:
-  question: "You have an existing statusline configured. What would you like to do?"
-  header: "Statusline"
-  options:
-    - label: "Replace with devloop"
-      description: "Use devloop statusline instead"
-    - label: "Keep existing"
-      description: "Don't change current statusline"
+  questions:
+    - question: "You have an existing statusline configured. What would you like to do?"
+      header: "Statusline"
+      multiSelect: false
+      options:
+        - label: "Replace with devloop"
+          description: "Use devloop statusline instead"
+        - label: "Keep existing"
+          description: "Don't change current statusline"
 ```
 
 ## Step 5: Apply Configuration
