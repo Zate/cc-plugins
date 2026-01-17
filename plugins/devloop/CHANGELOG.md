@@ -5,6 +5,53 @@ All notable changes to the devloop plugin are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.8.0] - 2026-01-17
+
+### Added - GitHub Issues Command
+
+New `/devloop:issues` command to list and browse GitHub issues directly from Claude Code.
+
+#### Features
+- **gh CLI Integration**: Uses `gh issue list` as the primary method
+- **GITHUB_TOKEN Fallback**: Falls back to curl + API when gh CLI unavailable
+- **Graceful Error Handling**: Clear instructions for installing/authenticating gh CLI
+- **Filtering Support**: `--state`, `--label`, `--assignee` options
+- **Readable Output**: Formatted table with issue number, labels, title, assignee, and age
+
+#### New Files
+- `scripts/check-gh-setup.sh` - Detects gh CLI installation, authentication, and repo
+- `scripts/list-issues.sh` - Fetches and formats issues with filtering
+- `commands/issues.md` - Slash command for `/devloop:issues`
+
+#### Usage Examples
+```bash
+# List open issues (default)
+/devloop:issues
+
+# List all issues
+/devloop:issues --state all
+
+# Filter by label
+/devloop:issues --label bug
+
+# Filter by assignee
+/devloop:issues --assignee @me
+```
+
+#### Output Format
+```
+# Open Issues (12)
+
+#42  [bug]        Login fails on Safari                          @alice   2d ago
+#38  [feature]    Add dark mode                                  @bob     5d ago
+```
+
+#### Integration
+- Works with `/devloop:from-issue` to provide issue picker
+- Useful for discovering what needs work before starting a plan
+
+---
+
 ## [3.7.0] - 2026-01-16
 
 ### Fixed - Critical AskUserQuestion Format
