@@ -316,6 +316,37 @@ Write spike report to `.devloop/spikes/{topic}.md`:
 [Brief explanation of recommendation and suggested next step]
 ```
 
+### Display Summary Before Proceeding
+
+**IMPORTANT**: After writing the report, you MUST display a summary to the user BEFORE asking next steps.
+
+Display this summary in the conversation:
+
+```
+## Spike Complete: [Topic]
+
+### Answer
+[Direct answer to the primary question being investigated]
+
+### Recommendation
+**[Proceed / Proceed with caution / Don't proceed / Need more info]**
+
+[1-2 sentence explanation]
+
+### Key Findings
+1. [Most important finding]
+2. [Second most important finding]
+3. [Third most important finding - if applicable]
+
+### Complexity & Risk
+- **Complexity**: [XS/S/M/L/XL] - [brief reason]
+- **Risk Level**: [Low/Medium/High] - [top risk if Medium/High]
+
+*Full report saved to: `.devloop/spikes/{topic}.md`*
+```
+
+This summary MUST be displayed before any `AskUserQuestion` call.
+
 ## Step 6: Next Steps
 
 First, check if there's an existing completed plan that should be archived:
