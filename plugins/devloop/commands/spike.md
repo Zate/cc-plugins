@@ -386,13 +386,109 @@ AskUserQuestion:
       header: "Next"
       multiSelect: false
       options:
-        - label: "Start work"
+        - label: "Create plan from findings (Recommended)"
+          description: "Generate plan.md using spike recommendations"
+        - label: "Start work directly"
           description: "Begin implementation with /devloop:continue"
-        - label: "Create plan"
-          description: "Design full implementation plan"
         - label: "Defer"
           description: "Save findings for later"
 ```
+
+### If "Create plan from findings":
+
+Generate a plan from the spike findings:
+
+1. **Parse spike data** from the summary displayed above:
+   - Topic becomes plan title
+   - Recommendation becomes overview
+   - Complexity estimate informs task breakdown
+   - Risks become considerations section
+
+2. **Generate tasks** based on complexity:
+   - **XS/S**: 2-4 tasks in single phase
+   - **M**: 4-6 tasks across 2 phases
+   - **L/XL**: 6-10 tasks across 3 phases
+
+3. **Create plan structure**:
+
+```markdown
+# Devloop Plan: [Spike Topic]
+
+**Created**: YYYY-MM-DD
+**Updated**: YYYY-MM-DD
+**Status**: Planning
+**Source**: Spike findings
+
+---
+
+## Overview
+
+[Spike recommendation and approach summary]
+
+### From Spike
+
+- **Recommendation**: [Proceed/Proceed with caution/etc]
+- **Complexity**: [XS/S/M/L/XL]
+- **Risk Level**: [Low/Medium/High]
+
+### Considerations
+
+[List key risks and mitigations from spike findings]
+
+---
+
+## Phase 1: [Phase Name]
+
+- [ ] Task 1.1: [Task derived from spike findings]
+- [ ] Task 1.2: [Task derived from spike findings]
+
+[Additional phases as needed based on complexity]
+
+---
+
+## Progress Log
+
+- YYYY-MM-DD: Plan created from spike findings
+```
+
+4. **Display the generated plan** to the user for review.
+
+5. **Ask for confirmation**:
+
+```yaml
+AskUserQuestion:
+  questions:
+    - question: "Review the generated plan. Ready to proceed?"
+      header: "Confirm"
+      multiSelect: false
+      options:
+        - label: "Looks good, save it"
+          description: "Write plan to .devloop/plan.md"
+        - label: "Edit first"
+          description: "I'll make changes before saving"
+        - label: "Cancel"
+          description: "Don't create plan"
+```
+
+**If "Looks good, save it":**
+- Write plan to `.devloop/plan.md`
+- Display: "Plan created at .devloop/plan.md"
+- Ask: "Start working on the plan now?"
+
+**If "Edit first":**
+- Display the plan content
+- Tell user: "Make your edits to the plan above, then run `/devloop:continue` when ready"
+
+**If "Cancel":**
+- Don't write anything
+- Return to next steps options
+
+### If "Start work directly":
+Run `/devloop:continue` to begin implementation immediately
+
+### If "Defer":
+- Ensure spike report is saved to `.devloop/spikes/{topic}.md`
+- Display: "Findings saved to `.devloop/spikes/{topic}.md` - revisit anytime"
 
 ---
 
