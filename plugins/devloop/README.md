@@ -1,8 +1,14 @@
 # devloop
 
-**Claude does the work. You stay in control.**
+> **A development workflow where Claude does the work and you stay in control.**
 
-[![Version](https://img.shields.io/badge/version-3.5.0-blue)](./CHANGELOG.md) [![Commands](https://img.shields.io/badge/commands-10-orange)](#commands) [![Agents](https://img.shields.io/badge/agents-6-green)](#agents) [![Skills](https://img.shields.io/badge/skills-14-purple)](#skills)
+[![Version](https://img.shields.io/badge/version-3.9.2-blue)](./CHANGELOG.md) [![Commands](https://img.shields.io/badge/commands-15-orange)](#commands) [![Agents](https://img.shields.io/badge/agents-7-green)](#agents) [![Skills](https://img.shields.io/badge/skills-14-purple)](#skills)
+
+**What devloop gives you:**
+- **Structured plans** that persist across sessions (`.devloop/plan.md`)
+- **Context management** so Claude stays sharp (spike → fresh → continue loop)
+- **GitHub integration** for issue-driven development
+- **Automation** with ralph-loop for hands-off execution
 
 ---
 
@@ -12,12 +18,12 @@ devloop v3 is simple: **Claude does the work directly.**
 
 No routine agent spawning. No model selection. No token optimization. Just you, Claude, and the code.
 
-Agents exist only for:
-- **Parallel work**: Multiple independent tasks running simultaneously
-- **Security scans**: Full codebase security audits
-- **Large exploration**: Understanding 50+ files in unfamiliar codebases
+**Why this matters:**
+- 10x less overhead than agent-heavy approaches
+- Fresh context = better reasoning
+- Plans survive sessions - pick up where you left off
 
-For everything else, Claude reads files, writes code, runs tests, and commits - directly.
+Agents exist only for parallel work, security scans, and large codebase exploration.
 
 ---
 
@@ -42,6 +48,45 @@ For everything else, Claude reads files, writes code, runs tests, and commits - 
 
 ---
 
+## Three Ways to Work
+
+Choose the workflow that fits your task:
+
+```
+┌─────────────────────────────────────────────────────────────────────────┐
+│  MANUAL LOOP (complex/evolving work)                                    │
+│                                                                         │
+│  /devloop:spike → /devloop:fresh → /clear → /devloop:continue          │
+│       ↑                                              │                  │
+│       └──────────── every 5-10 tasks ────────────────┘                  │
+└─────────────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────────────┐
+│  ISSUE-DRIVEN (GitHub-native teams)                                     │
+│                                                                         │
+│  /devloop:issues → /devloop:from-issue 42 → /devloop:continue          │
+│       ↓                                              │                  │
+│  List & pick issue        Creates plan from issue    Work on tasks      │
+└─────────────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────────────┐
+│  AUTOMATED (hands-off execution)                                        │
+│                                                                         │
+│  /devloop:spike → /devloop:ralph                                        │
+│       ↓                  ↓                                              │
+│  Create plan       Run until all tasks [x]                              │
+│                    (context guard auto-exits at 70%)                    │
+└─────────────────────────────────────────────────────────────────────────┘
+```
+
+| Workflow | Best For | Human Checkpoints |
+|----------|----------|-------------------|
+| Manual Loop | Complex features, evolving requirements | Yes (every 5-10 tasks) |
+| Issue-Driven | GitHub projects, team workflows | Yes |
+| Automated | Well-defined plans, overnight runs | No (runs until done) |
+
+---
+
 ## Commands
 
 | Command | Purpose |
@@ -57,13 +102,16 @@ For everything else, Claude reads files, writes code, runs tests, and commits - 
 | `/devloop:ralph` | Automated execution with ralph-loop |
 | `/devloop:archive` | Archive completed plan to .devloop/archive/ |
 | `/devloop:from-issue` | Start work from a GitHub issue |
+| `/devloop:issues` | List GitHub issues for the current repo |
+| `/devloop:statusline` | Configure the devloop statusline |
+| `/devloop:new` | Create a new issue (bug, feature, task) |
 | `/devloop:help` | Interactive guide to using devloop |
 
 ---
 
 ## Agents
 
-Six specialized agents for complex parallel work:
+Seven specialized agents for complex parallel work:
 
 | Agent | Purpose |
 |-------|---------|
@@ -73,6 +121,7 @@ Six specialized agents for complex parallel work:
 | `devloop:code-reviewer` | Quality review with confidence filtering |
 | `devloop:security-scanner` | OWASP Top 10, secrets, injection risks |
 | `devloop:doc-generator` | READMEs, API docs, changelogs |
+| `devloop:statusline-setup` | Configure statusline settings |
 
 ---
 
@@ -103,6 +152,31 @@ Spike → Fresh → /clear → Continue → [5-10 tasks] → Fresh → ...
 1. **Spike first** - Understand the problem, create a solid plan
 2. **Fresh regularly** - Clear context every 5-10 tasks
 3. **Continue seamlessly** - Pick up exactly where you left off
+
+---
+
+## Quick Reference
+
+```bash
+# Start new work
+/devloop:spike "add feature X"   # Explore and plan
+/devloop:from-issue 42           # Start from GitHub issue
+/devloop:quick "fix small bug"   # Skip planning for tiny tasks
+
+# Work on tasks
+/devloop:continue                # Resume from plan
+/devloop:fresh && /clear         # Clear context, then...
+/devloop:continue                # ...pick up where you left off
+
+# Finish work
+/devloop:review                  # Review changes
+/devloop:ship                    # Commit and create PR
+/devloop:archive                 # Archive completed plan
+
+# Automation
+/devloop:ralph                   # Run until all tasks done
+/devloop:issues                  # Browse GitHub issues
+```
 
 ---
 

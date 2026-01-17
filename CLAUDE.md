@@ -425,5 +425,33 @@ When working in this repository:
 ---
 
 **Remember**: Build plugins that solve real problems and that you would want to use yourself.
-- When we make changes, we should increment the minor, or major version numbers as required.  This will help with ensuring the plugin isnt cached.
-- When updating, only use the 3rd number in the version unless its a bigger update.  For smaller changes, go from 1.2.0 to 1.2.1 etc.
+
+## Versioning Guidelines (A.B.C)
+
+Follow strict semantic versioning to avoid version inflation:
+
+| Component | When to Increment | Examples |
+|-----------|-------------------|----------|
+| **A** (Major) | Breaking changes only | Removed commands, changed behavior that breaks existing workflows, incompatible plan format changes |
+| **B** (Minor) | New features | New commands, new agents, new skills, significant new functionality |
+| **C** (Patch) | Everything else | Bug fixes, documentation updates, refactoring, small improvements, config changes |
+
+**Rules:**
+1. **Default to patch (C)** - Most changes are patches. When in doubt, increment C.
+2. **Documentation = patch** - README updates, changelog entries, comment improvements → increment C only
+3. **Bug fixes = patch** - Even significant bug fixes are patches unless they change behavior
+4. **New command/agent/skill = minor** - Adding new user-facing functionality → increment B, reset C to 0
+5. **Breaking changes are rare** - Think twice before incrementing A. Most "breaking" changes can be made backwards-compatible.
+
+**Examples:**
+```
+3.9.1 → 3.9.2   Documentation update, bug fix, refactoring
+3.9.2 → 3.10.0  New /devloop:issues command added
+3.10.0 → 3.10.1 Fixed bug in issues command
+3.10.1 → 4.0.0  Changed plan.md format (breaks old plans)
+```
+
+**Anti-patterns to avoid:**
+- Incrementing minor version for docs-only changes
+- Incrementing major version for new features
+- Skipping versions (3.9 → 3.11)

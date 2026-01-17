@@ -5,6 +5,34 @@ All notable changes to the devloop plugin are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.9.2] - 2026-01-17
+
+### Changed - Documentation Overhaul
+
+Comprehensive README update to improve new user onboarding and reflect all v3.x features.
+
+#### New Sections
+- **"Three Ways to Work"**: Visual comparison of manual, issue-driven, and automated workflows
+- **"Quick Reference"**: Command cheatsheet for fast lookup
+- **Enhanced opening hook**: Immediately explains value proposition
+
+#### Updated Content
+- Version badge updated to current version
+- Commands badge: 10 → 15 (now includes issues, statusline, new)
+- Agents badge: 6 → 7 (added statusline-setup)
+- Command table: Added `/devloop:issues`, `/devloop:statusline`, `/devloop:new`
+- Agent table: Added `devloop:statusline-setup`
+- Philosophy section: Added "Why this matters" with concrete benefits
+
+#### Files Changed
+- `README.md` - Full documentation update
+- `CHANGELOG.md` - Added this entry
+- `.claude-plugin/plugin.json` - Version bump
+
+**Note**: This is a patch release (docs only) per new versioning guidelines in CLAUDE.md.
+
+---
+
 ## [3.8.0] - 2026-01-17
 
 ### Added - GitHub Issues Command
