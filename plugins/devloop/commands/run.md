@@ -11,7 +11,9 @@ allowed-tools:
   - Bash(${CLAUDE_PLUGIN_ROOT}/scripts/*.sh:*)
   - Task
   - AskUserQuestion
-  - TodoWrite
+  - TaskCreate
+  - TaskUpdate
+  - TaskList
   - Skill
 ---
 
@@ -139,6 +141,23 @@ Max iterations: [max_iterations]
 Starting work...
 ```
 
+## Step 4b: Sync Plan Tasks to Native Task System (Optional)
+
+For real-time progress tracking in Claude Code UI, sync pending tasks:
+
+```bash
+"${CLAUDE_PLUGIN_ROOT}/scripts/sync-plan-to-tasks.sh" .devloop/plan.md
+```
+
+For each pending task in the JSON output, use `TaskCreate`:
+- `subject`: Task subject from plan
+- `description`: Task description
+- `activeForm`: Present continuous form (e.g., "Implementing X")
+
+This creates native tasks that show progress in the UI. The plan.md remains the source of truth for persistence.
+
+**Note**: This step is optional. Native tasks provide UI feedback but plan.md is authoritative.
+
 ## Step 5: Execute Tasks
 
 Read the plan:
@@ -172,12 +191,16 @@ After completing a task:
    - [x] Completed task description
    ```
 
-2. Check completion status:
+2. **Update native task status** (if tasks were created in Step 4b):
+   - Use `TaskUpdate` with `status: "completed"` for the finished task
+   - Use `TaskUpdate` with `status: "in_progress"` for the next task
+
+3. Check completion status:
    ```bash
    "${CLAUDE_PLUGIN_ROOT}/scripts/check-plan-complete.sh" .devloop/plan.md
    ```
 
-3. **If all tasks complete** (`complete: true`):
+4. **If all tasks complete** (`complete: true`):
 
    Output the promise tag to terminate the loop:
    ```
@@ -186,7 +209,7 @@ After completing a task:
    <promise>ALL PLAN TASKS COMPLETE</promise>
    ```
 
-4. **If tasks remain** (`complete: false`):
+5. **If tasks remain** (`complete: false`):
 
    In autonomous mode: Continue to next task (no prompt)
 

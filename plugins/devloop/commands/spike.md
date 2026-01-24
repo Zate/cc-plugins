@@ -12,6 +12,7 @@ allowed-tools:
   - Bash(${CLAUDE_PLUGIN_ROOT}/scripts/*.sh:*)
   - AskUserQuestion
   - TodoWrite
+  - Task
   - WebSearch
   - WebFetch
 ---
@@ -177,6 +178,11 @@ For each selected aspect, investigate accordingly:
 1. **Search codebase**: Use Grep/Glob to find related code
 2. **Read relevant files**: Understand existing implementation
 3. **External research**: Use WebSearch/WebFetch for docs if needed
+
+**For large codebase exploration** (when many files are involved):
+- Use Task tool with `subagent_type: Explore` for efficient exploration
+- Specify thoroughness: "quick" for focused lookups, "medium" for balanced, "very thorough" for comprehensive
+- Example: Spawn Explore agent with "Find all authentication-related files and patterns"
 
 Adjust depth based on depth level:
 - **Quick**: Focus on blockers and showstoppers only

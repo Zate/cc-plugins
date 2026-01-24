@@ -11,6 +11,13 @@ tools: Glob, Grep, Read, TodoWrite, Bash, AskUserQuestion
 model: sonnet
 color: red
 permissionMode: plan
+hooks:
+  PostToolUse:
+    - matcher: "Read"
+      hooks:
+        - type: command
+          command: "echo \"$(date -u +%Y-%m-%dT%H:%M:%SZ) code-reviewer: read file\" >> .devloop/review.log 2>/dev/null || true"
+          once: true
 ---
 
 # Code Reviewer Agent

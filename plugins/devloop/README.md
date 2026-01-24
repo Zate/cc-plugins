@@ -33,6 +33,9 @@ Agents exist only for parallel work, security scans, and large codebase explorat
 # Install
 /plugin install devloop
 
+# Initialize devloop in a new project (optional, auto-detects tech stack)
+claude --init
+
 # Create a plan with autonomous exploration
 /devloop:plan "add user authentication"
 
@@ -42,6 +45,20 @@ Agents exist only for parallel work, security scans, and large codebase explorat
 # Or for detailed exploration without immediate action
 /devloop:spike "should we use OAuth or JWT?"
 ```
+
+### Project Initialization
+
+For new projects, run `claude --init` to set up devloop:
+
+```bash
+claude --init
+# Creates .devloop/ directory with:
+#   - context.json (detected tech stack)
+#   - local.md (local settings, not git-tracked)
+#   - archive/ and spikes/ directories
+```
+
+This is optional - devloop will work without initialization, but `--init` provides better project context detection.
 
 ---
 
@@ -198,6 +215,15 @@ Plans live in `.devloop/plan.md`:
 ```
 
 Resume anytime with `/devloop:run`.
+
+### Hybrid Task Tracking (Claude Code 2.1+)
+
+devloop uses a hybrid approach for task tracking:
+
+- **plan.md** - Persistent source of truth (survives sessions)
+- **Native TaskCreate/TaskUpdate** - Real-time progress in Claude Code UI (session-scoped)
+
+When `/devloop:run` starts, it can sync plan tasks to native tasks for live progress display. The plan.md remains authoritative - native tasks are for UI feedback only.
 
 ---
 

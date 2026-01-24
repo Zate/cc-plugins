@@ -4,6 +4,8 @@ description: Audit devloop against Claude Code updates to identify integration o
 whenToUse: After Claude Code updates, periodic maintenance, exploring new Claude Code features, checking if devloop is current
 whenNotToUse: Regular development work, quick tasks, when not working on devloop itself
 disable-model-invocation: true
+context: fork
+agent: Explore
 allowed-tools:
   - Read
   - Grep

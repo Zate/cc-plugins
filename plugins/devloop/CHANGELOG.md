@@ -5,6 +5,34 @@ All notable changes to the devloop plugin are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.13.0] - 2026-01-24
+
+### Added - Claude Code 2.1.x Integration
+
+Integration with Claude Code 2.1.x features for better native compatibility.
+
+#### Native Task System Support
+- Added `TaskCreate`, `TaskUpdate`, `TaskList` to `/devloop:run` allowed-tools
+- New `sync-plan-to-tasks.sh` script to parse plan.md into native task format
+- Hybrid approach: plan.md for persistence, native tasks for real-time UI progress
+
+#### Skill Enhancements
+- `devloop-audit` skill now uses `context: fork` and `agent: Explore` for isolated execution
+- `/devloop:spike` can now use native Explore agent for large codebase exploration
+
+#### Setup Hook System
+- New Setup hook triggered by `claude --init` for project initialization
+- `init-devloop.sh` script creates `.devloop/` structure with tech stack detection
+- Auto-detects language (go, typescript, javascript, python, java, rust) and framework
+
+#### Agent Improvements
+- `code-reviewer` agent now includes lifecycle hooks for file logging
+
+#### Documentation
+- Updated README with `claude --init` workflow
+- Added hybrid task tracking documentation
+- Documented Explore agent integration in spike.md
+
 ## [3.12.0] - 2026-01-24
 
 ### Added - Autonomous Plan Command

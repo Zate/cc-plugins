@@ -1,5 +1,5 @@
 {
-  "description": "Devloop workflow hooks - session init and context guard",
+  "description": "Devloop workflow hooks - session init, context guard, and project setup",
   "hooks": {
     "SessionStart": [
       {
@@ -19,6 +19,18 @@
           {
             "type": "command",
             "command": "${CLAUDE_PLUGIN_ROOT}/hooks/context-guard.sh"
+          }
+        ]
+      }
+    ],
+    "Setup": [
+      {
+        "matcher": "init",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash ${CLAUDE_PLUGIN_ROOT}/scripts/init-devloop.sh",
+            "timeout": 30
           }
         ]
       }
