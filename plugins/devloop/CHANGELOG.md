@@ -5,6 +5,94 @@ All notable changes to the devloop plugin are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.12.0] - 2026-01-24
+
+### Added - Autonomous Plan Command
+
+New `/devloop:plan` command that performs exploration and plan generation in a single autonomous workflow with minimal user interaction (≤ 2 prompts).
+
+#### Features
+- **Silent Context Detection**: Analyzes codebase without prompting (tech stack, patterns, conventions)
+- **Silent Exploration Phase**: Searches for relevant code, identifies files, understands dependencies
+- **Silent Plan Generation**: Creates actionable plan.md with phases and tasks
+- **Single Review Checkpoint**: One prompt to review/approve the generated plan
+- **GitHub Integration**: `--from-issue N` flag to start from an issue
+- **Depth Control**: `--thorough` flag for more comprehensive exploration
+
+#### Design Philosophy
+- **Autonomous by default**: Don't ask "should I explore X?" - just explore it
+- **Smart defaults**: Pick reasonable approaches without confirmation
+- **Only ask when necessary**: Ambiguous requirements, major architectural decisions
+- **Agent-ready output**: Plan format optimized for `/devloop:run` execution
+
+#### Migration Guide
+
+| Old Workflow | New Workflow |
+|--------------|--------------|
+| `/devloop:spike` → multiple prompts → create plan | `/devloop:plan` (1-2 prompts, plan included) |
+| `/devloop:from-issue N` → spike → create plan | `/devloop:plan --from-issue N` (single command) |
+
+#### When to Use Which
+
+| Command | Prompts | Best For |
+|---------|---------|----------|
+| `/devloop:plan` | 1-2 | Most work (quick to actionable) |
+| `/devloop:spike` | 4-5 | Deep exploration (detailed reports) |
+| `/devloop:plan --thorough` | 2-3 | Comprehensive exploration with plan |
+
+#### Files Changed
+- `commands/plan.md` - New autonomous plan command
+- `commands/spike.md` - Added reference to plan.md for faster workflow
+- `commands/devloop.md` - Updated routing to include plan command
+- `commands/from-issue.md` - Added alternative note about --from-issue flag
+- `README.md` - Updated workflow documentation
+- `CLAUDE.md` - Updated recommended workflow section
+- `CHANGELOG.md` - Added this entry
+- `.claude-plugin/plugin.json` - Version bump
+
+Closes #15
+
+---
+
+## [3.11.0] - 2026-01-24
+
+### Added - Devloop Audit Skill
+
+New `devloop-audit` skill for keeping devloop aligned with Claude Code's evolving capabilities.
+
+#### Features
+- **Documentation Gathering**: Fetches Claude Code release notes and documentation
+- **Gap Analysis**: Compares devloop features against native Claude Code capabilities
+- **Findings Report**: Generates structured report with integration opportunities
+- **Spike Integration**: Creates spike plans for follow-up work
+
+#### Audit Checklist Categories
+- Commands alignment
+- Skills format and discoverability
+- Agents and subagent patterns
+- Hooks API compliance
+- Task management (session vs persistent)
+- State management patterns
+
+#### Usage
+```bash
+# Invoke the audit skill
+Skill: devloop-audit
+
+# Or from the skill menu (user-invocable)
+/devloop-audit
+```
+
+#### Files Changed
+- `skills/devloop-audit/SKILL.md` - New audit skill
+- `skills/INDEX.md` - Added to skill index
+- `CHANGELOG.md` - Added this entry
+- `.claude-plugin/plugin.json` - Version bump
+
+Closes #19
+
+---
+
 ## [3.10.0] - 2026-01-24
 
 ### Added - Unified devloop:run Command

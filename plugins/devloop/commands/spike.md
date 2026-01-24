@@ -1,6 +1,7 @@
 ---
 description: Technical spike/POC to explore feasibility before committing to implementation
 argument-hint: What to explore
+note: For quick plan generation, use /devloop:plan instead. Use spike for deep exploration without immediate action.
 allowed-tools:
   - Read
   - Write
@@ -18,6 +19,9 @@ allowed-tools:
 # Spike - Technical Exploration
 
 Time-boxed investigation to explore feasibility before committing to implementation. **You do the work directly.**
+
+> **Tip**: For faster plan generation with less prompts, use `/devloop:plan` instead.
+> Use `/devloop:spike` when you need detailed exploration reports without immediate action.
 
 ## Step 1: Define Scope
 

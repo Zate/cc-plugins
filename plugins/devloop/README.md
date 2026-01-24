@@ -33,16 +33,14 @@ Agents exist only for parallel work, security scans, and large codebase explorat
 # Install
 /plugin install devloop
 
-# Start with a spike to understand and plan
-/devloop:spike How should we add user authentication?
+# Create a plan with autonomous exploration
+/devloop:plan "add user authentication"
 
 # Execute plan autonomously (runs until complete)
 /devloop:run
 
-# Or clear context and resume (for very large plans)
-/devloop:fresh
-/clear
-/devloop:run
+# Or for detailed exploration without immediate action
+/devloop:spike "should we use OAuth or JWT?"
 ```
 
 ---
@@ -55,26 +53,26 @@ Choose the workflow that fits your task:
 ┌─────────────────────────────────────────────────────────────────────────┐
 │  AUTONOMOUS (default - recommended)                                     │
 │                                                                         │
-│  /devloop:spike → /devloop:run                                          │
-│       ↓               ↓                                                 │
-│  Create plan    Execute until all tasks [x]                             │
-│                 (auto-commits at phase boundaries)                      │
+│  /devloop:plan "topic" → /devloop:run                                   │
+│       ↓                      ↓                                          │
+│  Explore & create plan   Execute until all tasks [x]                    │
+│  (1-2 prompts max)       (auto-commits at phase boundaries)             │
 └─────────────────────────────────────────────────────────────────────────┘
 
 ┌─────────────────────────────────────────────────────────────────────────┐
 │  ISSUE-DRIVEN (GitHub-native teams)                                     │
 │                                                                         │
-│  /devloop:issues → /devloop:from-issue 42 → /devloop:run               │
-│       ↓                                              │                  │
-│  List & pick issue        Creates plan from issue    Execute tasks      │
+│  /devloop:plan --from-issue 42 → /devloop:run                           │
+│       ↓                              │                                  │
+│  Fetch issue, explore, plan      Execute tasks autonomously             │
 └─────────────────────────────────────────────────────────────────────────┘
 ```
 
 | Workflow | Best For | Human Checkpoints |
 |----------|----------|-------------------|
-| Autonomous | Most development work | No (auto until done) |
-| Interactive | Complex decisions needed | Yes (`--interactive` flag) |
-| Issue-Driven | GitHub projects, team workflows | Optional |
+| /devloop:plan | Most work (quick to actionable) | 1-2 prompts |
+| /devloop:spike | Deep exploration (detailed reports) | 4-5 prompts |
+| /devloop:run --interactive | Complex decisions needed | Per task |
 
 ---
 
@@ -83,8 +81,9 @@ Choose the workflow that fits your task:
 | Command | Purpose |
 |---------|---------|
 | `/devloop` | Start development workflow |
-| `/devloop:run` | **Execute plan autonomously** (default workflow) |
-| `/devloop:spike` | Technical exploration/POC |
+| `/devloop:plan` | **Autonomous exploration → actionable plan** (recommended) |
+| `/devloop:run` | **Execute plan autonomously** |
+| `/devloop:spike` | Deep exploration (detailed reports) |
 | `/devloop:fresh` | Save state for context restart |
 | `/devloop:quick` | Fast implementation for small tasks |
 | `/devloop:review` | Code review for changes or PR |
@@ -142,10 +141,10 @@ See `skills/INDEX.md` for full documentation.
 devloop works best with a simple cycle:
 
 ```
-Spike → Run → [auto until done or context heavy] → Fresh → Run → ...
+Plan → Run → [auto until done or context heavy] → Fresh → Run → ...
 ```
 
-1. **Spike first** - Understand the problem, create a solid plan
+1. **Plan first** - Explore and create actionable plan (1-2 prompts)
 2. **Run autonomously** - Tasks execute without manual intervention
 3. **Fresh when needed** - Clear context if responses slow down
 
@@ -154,27 +153,30 @@ Spike → Run → [auto until done or context heavy] → Fresh → Run → ...
 ## Quick Reference
 
 ```bash
-# Start new work
-/devloop:spike "add feature X"   # Explore and plan
-/devloop:from-issue 42           # Start from GitHub issue
-/devloop:quick "fix small bug"   # Skip planning for tiny tasks
+# Start new work (recommended)
+/devloop:plan "add feature X"     # Autonomous explore → plan (1-2 prompts)
+/devloop:plan --from-issue 42     # From GitHub issue with exploration
+/devloop:quick "fix small bug"    # Skip planning for tiny tasks
+
+# Deep exploration (when needed)
+/devloop:spike "should we use X?" # Detailed exploration report
 
 # Execute plan
-/devloop:run                     # Autonomous execution (default)
-/devloop:run --interactive       # With checkpoint prompts
-/devloop:run --max-iterations 100  # Override iteration limit
+/devloop:run                      # Autonomous execution (default)
+/devloop:run --interactive        # With checkpoint prompts
+/devloop:run --max-iterations 100 # Override iteration limit
 
 # Manage context
-/devloop:fresh && /clear         # Clear context, then...
-/devloop:run                     # ...resume autonomously
+/devloop:fresh && /clear          # Clear context, then...
+/devloop:run                      # ...resume autonomously
 
 # Finish work
-/devloop:review                  # Review changes
-/devloop:ship                    # Commit and create PR
-/devloop:archive                 # Archive completed plan
+/devloop:review                   # Review changes
+/devloop:ship                     # Commit and create PR
+/devloop:archive                  # Archive completed plan
 
 # GitHub integration
-/devloop:issues                  # Browse GitHub issues
+/devloop:issues                   # Browse GitHub issues
 ```
 
 ---

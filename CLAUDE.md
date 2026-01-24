@@ -163,14 +163,15 @@ This shows plugin loading, manifest validation, and component registration.
 
 ## Recommended Workflow Pattern (devloop)
 
-**The devloop workflow uses autonomous execution by default with `/devloop:run`:**
+**The devloop workflow uses autonomous planning and execution:**
 
-### The Spike → Run Loop
+### The Plan → Run Loop
 
 ```
 ┌──────────────────────────────────────────────────┐
-│  1. /devloop:spike [exploration topic]          │
-│     └─→ Creates plan with findings               │
+│  1. /devloop:plan "topic or feature"            │
+│     └─→ Autonomous exploration (silent)          │
+│     └─→ Creates actionable plan (1-2 prompts)    │
 └─────────────────┬────────────────────────────────┘
                   ↓
 ┌──────────────────────────────────────────────────┐
@@ -189,16 +190,16 @@ This shows plugin loading, manifest validation, and component registration.
 
 ### Why This Pattern Works
 
-1. **Spike first** - Understand the problem, create a solid plan
+1. **Plan with minimal prompts** - Autonomous exploration, only 1-2 user prompts
 2. **Run autonomously** - Tasks execute without manual intervention
 3. **Fresh when needed** - Clear context every 5-10 tasks if responses slow down
-4. **Faster completion** - No checkpoint prompts in autonomous mode
+4. **Faster completion** - Quick from idea to implementation
 
 ### Example Session
 
 ```bash
-# Start with exploration
-/devloop:spike How should we implement user authentication?
+# Create plan with autonomous exploration (1-2 prompts)
+/devloop:plan "add user authentication"
 
 # Execute plan autonomously
 /devloop:run  # Completes tasks automatically until done
@@ -215,9 +216,11 @@ This shows plugin loading, manifest validation, and component registration.
 
 | Command | Behavior |
 |---------|----------|
+| `/devloop:plan "topic"` | Autonomous exploration → plan (1-2 prompts) |
+| `/devloop:plan --from-issue N` | Plan from GitHub issue |
+| `/devloop:spike "topic"` | Deep exploration (4-5 prompts, detailed report) |
 | `/devloop:run` | Autonomous execution (default) |
 | `/devloop:run --interactive` | Prompt at each task checkpoint |
-| `/devloop:run --max-iterations 100` | Override iteration limit |
 
 ### When to Use Fresh Start
 

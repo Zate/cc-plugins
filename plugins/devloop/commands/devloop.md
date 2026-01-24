@@ -221,10 +221,10 @@ AskUserQuestion:
       header: "Start"
       multiSelect: false
       options:
+        - label: "Create a plan (Recommended)"
+          description: "Autonomous exploration → actionable plan"
         - label: "Start a spike"
-          description: "Research or explore before implementing"
-        - label: "Create new issue"
-          description: "Log a bug, feature, or task"
+          description: "Deep exploration without immediate action"
         - label: "GitHub issues"
           description: "View and work from GitHub issues"
         - label: "Quick task"
@@ -232,8 +232,8 @@ AskUserQuestion:
 ```
 
 **Routing:**
+- "Create a plan" → `/devloop:plan`
 - "Start a spike" → `/devloop:spike`
-- "Create new issue" → `/devloop:new`
 - "GitHub issues" → `/devloop:issues`
 - "Quick task" → `/devloop:quick`
 
@@ -258,8 +258,9 @@ If `$ARGUMENTS` is provided and non-empty:
 | Command | Purpose |
 |---------|---------|
 | `/devloop` | Smart entry point (this command) |
-| `/devloop:continue` | Resume from plan or fresh start |
-| `/devloop:spike` | Time-boxed exploration |
+| `/devloop:plan` | Autonomous exploration → actionable plan |
+| `/devloop:run` | Execute plan autonomously |
+| `/devloop:spike` | Deep exploration (detailed reports) |
 | `/devloop:fresh` | Save state and exit cleanly |
 | `/devloop:quick` | Small, well-defined fixes |
 | `/devloop:new` | Create local issue |

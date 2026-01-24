@@ -14,6 +14,8 @@ allowed-tools:
 
 Fetch a GitHub issue and start a devloop plan based on its content. **You do the work directly.**
 
+> **Alternative**: Use `/devloop:plan --from-issue N` for autonomous exploration before plan generation.
+
 ## Step 1: Parse Issue Number
 
 Extract issue number from `$ARGUMENTS`.

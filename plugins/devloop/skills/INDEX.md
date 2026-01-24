@@ -1,4 +1,4 @@
-# Devloop Skills Index v3.2
+# Devloop Skills Index v3.3
 
 Load skills on demand with `Skill: skill-name`. Don't preload.
 
@@ -9,6 +9,12 @@ Load skills on demand with `Skill: skill-name`. Don't preload.
 | `plan-management` | Working with .devloop/plan.md |
 | `local-config` | Project settings via .devloop/local.md |
 | `pr-feedback` | Integrating PR review comments into plan |
+
+## Maintenance
+
+| Skill | Purpose |
+|-------|---------|
+| `devloop-audit` | Audit devloop against Claude Code updates |
 
 ## Language Patterns
 
@@ -38,7 +44,7 @@ Load skills on demand with `Skill: skill-name`. Don't preload.
 
 ---
 
-**Total**: 14 skills
+**Total**: 15 skills
 
 ## Cross-References
 
