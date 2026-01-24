@@ -1,6 +1,6 @@
 ---
-description: Resume work from plan or fresh start
-argument-hint: Optional specific task to work on
+description: Resume work from plan (deprecated - use /devloop:run)
+argument-hint: "[--interactive]"
 allowed-tools:
   - Read
   - Write
@@ -9,6 +9,7 @@ allowed-tools:
   - Glob
   - Bash
   - Bash(${CLAUDE_PLUGIN_ROOT}/scripts/*.sh:*)
+  - Task
   - AskUserQuestion
   - TodoWrite
   - Skill
@@ -16,11 +17,14 @@ allowed-tools:
 
 # Continue - Resume Existing Work
 
-**Use this when**: A plan exists at `.devloop/plan.md`.
+> **DEPRECATED**: This command is deprecated. Use `/devloop:run --interactive` instead.
+> `/devloop:continue` now aliases to `/devloop:run --interactive`.
 
-**Use `/devloop` instead if**: No plan exists, or you want to start a new plan.
+**Use this when**: A plan exists at `.devloop/plan.md` and you want interactive checkpoints.
 
-Resume work from an existing plan or fresh start state. **You do the work directly.**
+**Use `/devloop:run` instead for**: Autonomous execution (default behavior).
+
+Resume work from an existing plan or fresh start state with interactive checkpoints. **You do the work directly.**
 
 ## Step 1: Check for Fresh Start State
 
@@ -209,4 +213,16 @@ For single tasks, just do the work directly.
 
 ---
 
-**Now**: Read the plan and start working on the next task.
+## Migration to /devloop:run
+
+This command's behavior is now provided by `/devloop:run --interactive`.
+
+**Key differences:**
+- `/devloop:run` (no flags): Autonomous execution, no prompts between tasks
+- `/devloop:run --interactive`: Same as old `/devloop:continue` behavior
+
+**Recommendation**: Use `/devloop:run` for faster autonomous execution. The interactive mode is only needed when you want manual control at each task.
+
+---
+
+**Now**: This command operates in interactive mode. Read the plan and start working on the next task with checkpoint prompts.

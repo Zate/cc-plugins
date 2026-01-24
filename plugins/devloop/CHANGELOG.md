@@ -5,6 +5,45 @@ All notable changes to the devloop plugin are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.10.0] - 2026-01-24
+
+### Added - Unified devloop:run Command
+
+New `/devloop:run` command that merges `devloop:continue` and `devloop:ralph` into a single autonomous execution workflow.
+
+#### Features
+- **Autonomous by Default**: Executes plan tasks without prompts (ralph behavior)
+- **Interactive Mode**: `--interactive` flag for checkpoint prompts (old continue behavior)
+- **Iteration Control**: `--max-iterations N` to override default 50 iteration limit
+- **Auto-Commit at Phases**: Commits automatically when completing a phase (if `auto_commit: true`)
+- **Smart State Detection**: Handles no plan, complete plan, and pending tasks appropriately
+
+#### Migration Guide
+
+| Old Command | New Equivalent |
+|-------------|----------------|
+| `/devloop:ralph` | `/devloop:run` (autonomous is default) |
+| `/devloop:continue` | `/devloop:run --interactive` |
+| `/devloop:ralph --max-iterations 100` | `/devloop:run --max-iterations 100` |
+
+#### Deprecated Commands
+- `/devloop:continue` - Still works, but prefer `/devloop:run --interactive`
+- `/devloop:ralph` - Still works, but prefer `/devloop:run`
+
+Both deprecated commands include deprecation notices and migration guidance.
+
+#### Files Changed
+- `commands/run.md` - New unified command
+- `commands/continue.md` - Added deprecation notice and alias behavior
+- `commands/ralph.md` - Added deprecation notice and alias behavior
+- `README.md` - Updated workflow documentation
+- `CHANGELOG.md` - Added this entry
+- `.claude-plugin/plugin.json` - Version bump
+
+**Why this change?** Reduces cognitive load by having a single command for plan execution. Users no longer need to choose between `continue` and `ralph` - just use `run`.
+
+---
+
 ## [3.9.2] - 2026-01-17
 
 ### Changed - Documentation Overhaul

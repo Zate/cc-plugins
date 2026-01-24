@@ -163,9 +163,9 @@ This shows plugin loading, manifest validation, and component registration.
 
 ## Recommended Workflow Pattern (devloop)
 
-**The devloop workflow has evolved to use an iterative cycle that manages context effectively:**
+**The devloop workflow uses autonomous execution by default with `/devloop:run`:**
 
-### The Spike → Fresh → Continue Loop
+### The Spike → Run Loop
 
 ```
 ┌──────────────────────────────────────────────────┐
@@ -174,34 +174,25 @@ This shows plugin loading, manifest validation, and component registration.
 └─────────────────┬────────────────────────────────┘
                   ↓
 ┌──────────────────────────────────────────────────┐
-│  2. /devloop:fresh                               │
-│     └─→ Saves state to .devloop/next-action.json│
-└─────────────────┬────────────────────────────────┘
-                  ↓
-┌──────────────────────────────────────────────────┐
-│  3. /clear                                       │
-│     └─→ Reset conversation context               │
-└─────────────────┬────────────────────────────────┘
-                  ↓
-┌──────────────────────────────────────────────────┐
-│  4. /devloop:continue                            │
-│     └─→ Resumes work from saved state            │
-│     └─→ Executes tasks with checkpoints          │
+│  2. /devloop:run                                 │
+│     └─→ Executes tasks autonomously              │
+│     └─→ Auto-commits at phase boundaries         │
+│     └─→ Loops until complete or blocked          │
 └─────────────────┬────────────────────────────────┘
                   │
                   ↓
-            After 5-10 tasks?
+            Need fresh context?
                   │
-                  ├─→ Yes: Loop back to step 2
-                  └─→ No: Keep working
+                  ├─→ Yes: /devloop:fresh → /clear → /devloop:run
+                  └─→ No: Continues automatically
 ```
 
 ### Why This Pattern Works
 
 1. **Spike first** - Understand the problem, create a solid plan
-2. **Fresh regularly** - Clear context every 5-10 tasks to avoid slowness
-3. **Continue seamlessly** - Pick up exactly where you left off
-4. **Better results** - Fresh context = faster responses, better focus
+2. **Run autonomously** - Tasks execute without manual intervention
+3. **Fresh when needed** - Clear context every 5-10 tasks if responses slow down
+4. **Faster completion** - No checkpoint prompts in autonomous mode
 
 ### Example Session
 
@@ -209,22 +200,24 @@ This shows plugin loading, manifest validation, and component registration.
 # Start with exploration
 /devloop:spike How should we implement user authentication?
 
-# After spike creates plan, save and clear
+# Execute plan autonomously
+/devloop:run  # Completes tasks automatically until done
+
+# If context gets heavy after many tasks:
 /devloop:fresh
 /clear
+/devloop:run  # Resumes from checkpoint
 
-# Resume and work on tasks
-/devloop:continue  # Completes Task 1.1, 1.2, 1.3...
-
-# After several tasks, fresh start again
-/devloop:fresh
-/clear
-
-# Continue working
-/devloop:continue  # Completes Task 2.1, 2.2...
-
-# Repeat until done
+# When all tasks complete, /devloop:ship to commit and PR
 ```
+
+### Command Options
+
+| Command | Behavior |
+|---------|----------|
+| `/devloop:run` | Autonomous execution (default) |
+| `/devloop:run --interactive` | Prompt at each task checkpoint |
+| `/devloop:run --max-iterations 100` | Override iteration limit |
 
 ### When to Use Fresh Start
 
@@ -232,9 +225,13 @@ This shows plugin loading, manifest validation, and component registration.
 - When responses feel slow
 - After long agent invocations
 - When context feels heavy
-- Suggested at checkpoints
 
 See `plugins/devloop/commands/fresh.md` for details.
+
+### Deprecated Commands
+
+- `/devloop:continue` → Use `/devloop:run --interactive`
+- `/devloop:ralph` → Use `/devloop:run` (autonomous is default)
 
 ---
 

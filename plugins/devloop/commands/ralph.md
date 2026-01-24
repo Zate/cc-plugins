@@ -1,5 +1,5 @@
 ---
-description: Start automated task loop with ralph-loop integration
+description: Start automated task loop (deprecated - use /devloop:run)
 argument-hint: "[--max-iterations N]"
 allowed-tools:
   - Read
@@ -9,12 +9,16 @@ allowed-tools:
   - Glob
   - Bash
   - Bash(${CLAUDE_PLUGIN_ROOT}/scripts/*.sh:*)
+  - Task
   - AskUserQuestion
   - TodoWrite
   - Skill
 ---
 
 # Ralph Loop - Automated Devloop Execution
+
+> **DEPRECATED**: This command is deprecated. Use `/devloop:run` instead.
+> `/devloop:ralph` now aliases to `/devloop:run` (autonomous is the default).
 
 Start an automated ralph loop that works through plan tasks until completion.
 
@@ -161,4 +165,17 @@ head -10 .claude/ralph-loop.local.md
 
 ---
 
-**Now**: Verify prerequisites and start the automated loop.
+## Migration to /devloop:run
+
+This command's behavior is now the default in `/devloop:run`.
+
+**Key differences:**
+- `/devloop:run`: Autonomous execution (same as `/devloop:ralph`)
+- `/devloop:run --max-iterations N`: Override iteration limit
+- `/devloop:run --interactive`: Add checkpoint prompts (old `/devloop:continue` behavior)
+
+**Recommendation**: Use `/devloop:run` directly. It has the same autonomous behavior with simpler invocation.
+
+---
+
+**Now**: This command still works. Verify prerequisites and start the automated loop.

@@ -36,54 +36,45 @@ Agents exist only for parallel work, security scans, and large codebase explorat
 # Start with a spike to understand and plan
 /devloop:spike How should we add user authentication?
 
-# Save state and clear context
+# Execute plan autonomously (runs until complete)
+/devloop:run
+
+# Or clear context and resume (for very large plans)
 /devloop:fresh
 /clear
-
-# Resume and work
-/devloop:continue
-
-# Repeat fresh → continue every 5-10 tasks
+/devloop:run
 ```
 
 ---
 
-## Three Ways to Work
+## Two Ways to Work
 
 Choose the workflow that fits your task:
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────┐
-│  MANUAL LOOP (complex/evolving work)                                    │
+│  AUTONOMOUS (default - recommended)                                     │
 │                                                                         │
-│  /devloop:spike → /devloop:fresh → /clear → /devloop:continue          │
-│       ↑                                              │                  │
-│       └──────────── every 5-10 tasks ────────────────┘                  │
+│  /devloop:spike → /devloop:run                                          │
+│       ↓               ↓                                                 │
+│  Create plan    Execute until all tasks [x]                             │
+│                 (auto-commits at phase boundaries)                      │
 └─────────────────────────────────────────────────────────────────────────┘
 
 ┌─────────────────────────────────────────────────────────────────────────┐
 │  ISSUE-DRIVEN (GitHub-native teams)                                     │
 │                                                                         │
-│  /devloop:issues → /devloop:from-issue 42 → /devloop:continue          │
+│  /devloop:issues → /devloop:from-issue 42 → /devloop:run               │
 │       ↓                                              │                  │
-│  List & pick issue        Creates plan from issue    Work on tasks      │
-└─────────────────────────────────────────────────────────────────────────┘
-
-┌─────────────────────────────────────────────────────────────────────────┐
-│  AUTOMATED (hands-off execution)                                        │
-│                                                                         │
-│  /devloop:spike → /devloop:ralph                                        │
-│       ↓                  ↓                                              │
-│  Create plan       Run until all tasks [x]                              │
-│                    (context guard auto-exits at 70%)                    │
+│  List & pick issue        Creates plan from issue    Execute tasks      │
 └─────────────────────────────────────────────────────────────────────────┘
 ```
 
 | Workflow | Best For | Human Checkpoints |
 |----------|----------|-------------------|
-| Manual Loop | Complex features, evolving requirements | Yes (every 5-10 tasks) |
-| Issue-Driven | GitHub projects, team workflows | Yes |
-| Automated | Well-defined plans, overnight runs | No (runs until done) |
+| Autonomous | Most development work | No (auto until done) |
+| Interactive | Complex decisions needed | Yes (`--interactive` flag) |
+| Issue-Driven | GitHub projects, team workflows | Optional |
 
 ---
 
@@ -92,20 +83,25 @@ Choose the workflow that fits your task:
 | Command | Purpose |
 |---------|---------|
 | `/devloop` | Start development workflow |
-| `/devloop:continue` | Resume work from plan |
+| `/devloop:run` | **Execute plan autonomously** (default workflow) |
 | `/devloop:spike` | Technical exploration/POC |
 | `/devloop:fresh` | Save state for context restart |
 | `/devloop:quick` | Fast implementation for small tasks |
 | `/devloop:review` | Code review for changes or PR |
 | `/devloop:ship` | Validation, commit, and PR creation |
 | `/devloop:pr-feedback` | Integrate PR review comments into plan |
-| `/devloop:ralph` | Automated execution with ralph-loop |
 | `/devloop:archive` | Archive completed plan to .devloop/archive/ |
 | `/devloop:from-issue` | Start work from a GitHub issue |
 | `/devloop:issues` | List GitHub issues for the current repo |
 | `/devloop:statusline` | Configure the devloop statusline |
 | `/devloop:new` | Create a new issue (bug, feature, task) |
 | `/devloop:help` | Interactive guide to using devloop |
+
+**Deprecated commands** (still work, but prefer alternatives):
+| Command | Use Instead |
+|---------|-------------|
+| `/devloop:continue` | `/devloop:run --interactive` |
+| `/devloop:ralph` | `/devloop:run` (autonomous is default) |
 
 ---
 
@@ -143,15 +139,15 @@ See `skills/INDEX.md` for full documentation.
 
 ## The Loop
 
-devloop works best with an iterative cycle:
+devloop works best with a simple cycle:
 
 ```
-Spike → Fresh → /clear → Continue → [5-10 tasks] → Fresh → ...
+Spike → Run → [auto until done or context heavy] → Fresh → Run → ...
 ```
 
 1. **Spike first** - Understand the problem, create a solid plan
-2. **Fresh regularly** - Clear context every 5-10 tasks
-3. **Continue seamlessly** - Pick up exactly where you left off
+2. **Run autonomously** - Tasks execute without manual intervention
+3. **Fresh when needed** - Clear context if responses slow down
 
 ---
 
@@ -163,18 +159,21 @@ Spike → Fresh → /clear → Continue → [5-10 tasks] → Fresh → ...
 /devloop:from-issue 42           # Start from GitHub issue
 /devloop:quick "fix small bug"   # Skip planning for tiny tasks
 
-# Work on tasks
-/devloop:continue                # Resume from plan
+# Execute plan
+/devloop:run                     # Autonomous execution (default)
+/devloop:run --interactive       # With checkpoint prompts
+/devloop:run --max-iterations 100  # Override iteration limit
+
+# Manage context
 /devloop:fresh && /clear         # Clear context, then...
-/devloop:continue                # ...pick up where you left off
+/devloop:run                     # ...resume autonomously
 
 # Finish work
 /devloop:review                  # Review changes
 /devloop:ship                    # Commit and create PR
 /devloop:archive                 # Archive completed plan
 
-# Automation
-/devloop:ralph                   # Run until all tasks done
+# GitHub integration
 /devloop:issues                  # Browse GitHub issues
 ```
 
@@ -196,7 +195,7 @@ Plans live in `.devloop/plan.md`:
 - [ ] Task 3: Add session management
 ```
 
-Resume anytime with `/devloop:continue`.
+Resume anytime with `/devloop:run`.
 
 ---
 
@@ -282,45 +281,40 @@ Archives are git-tracked (shared with team) and include:
 
 ---
 
-## Ralph Loop Integration (Automated Execution)
+## Autonomous Execution
 
-Run plan tasks automatically until completion with the [ralph-loop plugin](https://github.com/anthropics/claude-plugins/tree/main/plugins/ralph-loop).
+Run plan tasks automatically until completion with `/devloop:run`. Requires the [ralph-loop plugin](https://github.com/anthropics/claude-plugins/tree/main/plugins/ralph-loop).
 
 ```bash
 # Install ralph-loop if not already installed
 /plugin install ralph-loop
 
-# Start automated execution
-/devloop:ralph
+# Execute plan autonomously (default behavior)
+/devloop:run
 
 # With iteration limit
-/devloop:ralph --max-iterations 100
+/devloop:run --max-iterations 100
+
+# With checkpoint prompts (old /devloop:continue behavior)
+/devloop:run --interactive
 ```
 
 **How it works:**
 1. Creates ralph-loop state with completion promise "ALL PLAN TASKS COMPLETE"
 2. Works through plan tasks, marking each `[x]` when done
-3. When all tasks complete, outputs `<promise>ALL PLAN TASKS COMPLETE</promise>`
-4. Ralph's Stop hook detects the promise and terminates the loop
+3. Auto-commits at phase boundaries (if `auto_commit: true` in local.md)
+4. When all tasks complete, outputs `<promise>ALL PLAN TASKS COMPLETE</promise>`
+5. Ralph's Stop hook detects the promise and terminates the loop
 
-**Context Guard (v3.5.0):**
-The loop automatically exits when context usage exceeds 70%, preventing context degradation during long runs. Configure the threshold in `.devloop/local.md`:
-
-```yaml
----
-context_threshold: 80  # Exit at 80% instead of default 70%
----
-```
-
-**When to use:**
+**When to use `/devloop:run`:**
+- Most development work (autonomous is the default)
 - Well-defined plans from `/devloop:spike`
 - Overnight or background execution
-- Clear, implementable tasks
 
-**When NOT to use:**
+**When to use `--interactive`:**
 - Tasks requiring human decisions
 - Creative or design work
-- Evolving requirements (use manual spike/fresh/continue instead)
+- Evolving requirements
 
 See `/devloop:help` → "Automation" for detailed documentation.
 
@@ -339,7 +333,7 @@ Run `/devloop:archive` to archive a completed plan, then run `/devloop`.
 Or delete `.devloop/plan.md` and run `/devloop`.
 
 ### Context feels heavy/slow
-Run `/devloop:fresh`, then `/clear`, then `/devloop:continue`.
+Run `/devloop:fresh`, then `/clear`, then `/devloop:run`.
 
 ### Skill not loading
 Check `skills/INDEX.md` for the exact skill name. Use `Skill: exact-name`.
