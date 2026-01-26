@@ -52,25 +52,11 @@ Continue anyway? (The issue will still be referenced in the plan)
 "${CLAUDE_PLUGIN_ROOT}/scripts/check-plan-complete.sh" .devloop/plan.md
 ```
 
-If a plan exists:
+**If plan is complete (`complete: true`):**
 
-**If plan is complete:**
-```yaml
-AskUserQuestion:
-  questions:
-    - question: "Existing plan is complete. Archive before starting from issue?"
-      header: "Archive"
-      multiSelect: false
-      options:
-        - label: "Archive and continue"
-          description: "Move completed plan to archive"
-        - label: "Replace"
-          description: "Overwrite without archiving"
-        - label: "Cancel"
-          description: "Keep existing plan"
-```
+Overwrite silently - no prompt needed for completed plans.
 
-**If plan is incomplete:**
+**If plan is incomplete (`complete: false` with pending tasks):**
 ```yaml
 AskUserQuestion:
   questions:
@@ -83,6 +69,8 @@ AskUserQuestion:
         - label: "Cancel"
           description: "Keep existing plan"
 ```
+
+**If no plan exists:** Proceed to next step.
 
 ## Step 4: Fetch Issue Details
 
@@ -185,7 +173,7 @@ Display the plan for user review
 | Step | Action |
 |------|--------|
 | 1 | Fetch issue from GitHub |
-| 2 | Archive existing plan (if complete) |
+| 2 | Check existing plan (prompt only if incomplete) |
 | 3 | Create plan with Issue reference |
 | 4 | Suggest next action |
 
