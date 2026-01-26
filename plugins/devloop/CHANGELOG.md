@@ -5,6 +5,26 @@ All notable changes to the devloop plugin are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.13.2] - 2026-01-27
+
+### Added - GitHub Issue Auto-Close Keywords in Commits
+
+Commits for issue-linked work now automatically include GitHub closing keywords (Closes #12).
+
+#### Features
+- `/devloop:ship` reads issue number from plan frontmatter
+- Adds `Closes #N` or `Fixes #N` to commit messages automatically
+- Respects `github.auto_close` config: `always`, `ask`, `never`
+- Default behavior: asks user for confirmation
+
+#### Config
+```yaml
+github:
+  auto_close: ask  # ask | always | never
+```
+
+This enables automatic issue closure when commits are pushed to GitHub.
+
 ## [3.13.1] - 2026-01-27
 
 ### Fixed - Auto-overwrite Completed Plans

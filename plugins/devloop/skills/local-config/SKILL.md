@@ -134,13 +134,15 @@ When enabled:
 
 ### github.auto-close
 
-Automatically close linked issues when plan completes.
+Automatically close linked issues when shipping commits.
 
 | Value | Behavior |
 |-------|----------|
 | `ask` | Ask user (default) |
-| `always` | Auto-close issue |
-| `never` | Don't close issue |
+| `always` | Auto-add `Closes #N` to commits |
+| `never` | Don't add closing keywords |
+
+When enabled, commits include GitHub closing keywords (`Closes #N` or `Fixes #N`) which automatically close the linked issue when pushed.
 
 ### github.comment-on-complete
 

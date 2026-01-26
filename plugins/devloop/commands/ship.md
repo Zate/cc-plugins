@@ -131,6 +131,35 @@ Type mapping from task names:
 
 Scope: Use plan name slugified, or detect from files changed.
 
+**Add GitHub issue closing keyword (if linked):**
+
+If `.devloop/plan.md` has an `issue:` field in frontmatter:
+
+1. Read the issue number from plan frontmatter
+2. Check `github.auto_close` config:
+   - `always`: Auto-add closing keyword
+   - `ask`: Prompt user
+   - `never`: Skip
+
+3. If adding closing keyword:
+   - For `fix` commits: Use `Fixes #N`
+   - For other commits: Use `Closes #N`
+   - Add on a blank line after the commit body
+
+```yaml
+# Only if github.auto_close is "ask"
+AskUserQuestion:
+  questions:
+    - question: "Close Issue #N with this commit?"
+      header: "Issue"
+      multiSelect: false
+      options:
+        - label: "Yes, close it"
+          description: "Add 'Closes #N' to commit"
+        - label: "No, keep open"
+          description: "Don't add closing keyword"
+```
+
 **Execute commits:**
 
 ```bash
@@ -141,9 +170,15 @@ feat(git-workflow): add local config system
 - Task 1.1: Created skills/local-config/SKILL.md
 - Task 1.2: Added scripts/parse-local-config.sh
 - Task 1.3: Updated session-start hook
+
+Closes #42
 EOF
 )"
 ```
+
+Note: The `Closes #42` line is only added when:
+- Plan has `issue:` in frontmatter
+- `github.auto_close` is `always`, or user confirms when `ask`
 
 ---
 
