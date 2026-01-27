@@ -77,6 +77,7 @@ When the `superpowers` plugin is installed, devloop skills link to complementary
 Skill: plan-management       # Plans
 Skill: local-config          # Project config
 Skill: pr-feedback           # PR review comments
+Skill: devloop-audit         # Audit against Claude Code updates
 Skill: go-patterns           # Go
 Skill: react-patterns        # React/TS (→ see frontend-design plugin)
 Skill: git-workflows         # Git

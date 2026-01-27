@@ -37,9 +37,9 @@ Audit devloop against Claude Code's evolving capabilities to identify integratio
 Fetch the latest documentation and release notes:
 
 1. **Check Release Notes**
-   - Search for recent Claude Code changelog/release information
-   - Use WebSearch: `Claude Code changelog release notes 2026`
-   - Focus on: new tools, hooks, skills, plugin features
+   - Fetch changelog: https://code.claude.com/docs/en/changelog.md
+   - Use WebFetch to get the latest entries
+   - Focus on: new tools, hooks, skills, plugin features, breaking changes
 
 2. **Review Key Documentation**
    - Skills: https://code.claude.com/docs/en/skills
@@ -79,6 +79,22 @@ For each devloop feature, check:
 | **Missing** | Are there new capabilities we should adopt? |
 
 ### Step 4: Generate Findings Report
+
+**Priority Ranking Logic:**
+
+| Priority | Criteria |
+|----------|----------|
+| **High** | Native feature fully replaces devloop feature, OR security/correctness issue, OR blocking user workflows |
+| **Medium** | Native feature partially overlaps, OR improves UX/performance, OR aligns with best practices |
+| **Low** | Minor improvement, OR "nice to have", OR requires significant refactoring for small benefit |
+
+**Effort Estimation:**
+
+| Effort | Description |
+|--------|-------------|
+| **Low** | < 1 day, localized change, no breaking changes |
+| **Medium** | 1-3 days, touches multiple files, may require migration |
+| **High** | 3+ days, architectural change, breaking changes likely |
 
 Create a findings report at `.devloop/spikes/claude-code-audit-YYYY-MM-DD.md`:
 
@@ -132,7 +148,37 @@ Features that are already aligned with Claude Code best practices.
 3. Document low-priority items for consideration
 ```
 
-### Step 5: Offer Next Steps
+### Step 5: Generate Spike Plan (if needed)
+
+If high-priority items are found, generate a spike plan:
+
+```markdown
+# Spike: Claude Code Integration Opportunities
+
+**Date**: YYYY-MM-DD
+**Source**: Audit findings from [date]
+**Focus**: High-priority integration opportunities
+
+## Questions to Answer
+
+1. [Question derived from top finding]
+2. [Question derived from second finding]
+
+## Investigation Tasks
+
+- [ ] Task 1: [Specific investigation from findings]
+- [ ] Task 2: [Specific investigation from findings]
+
+## Success Criteria
+
+- Clear recommendation for each integration opportunity
+- Migration path documented for any deprecations
+- Risk assessment for breaking changes
+```
+
+Save to `.devloop/spikes/claude-code-integration-YYYY-MM-DD.md`
+
+### Step 6: Offer Next Steps
 
 After generating the report, ask the user:
 
@@ -192,6 +238,10 @@ AskUserQuestion:
 
 ## Key Documentation Links
 
+**Start here for complete doc index:**
+- Full Index: https://code.claude.com/docs/llms.txt
+
+**Core documentation pages:**
 - Skills: https://code.claude.com/docs/en/skills
 - Plugins: https://code.claude.com/docs/en/plugins
 - Plugins Reference: https://code.claude.com/docs/en/plugins-reference
@@ -199,6 +249,58 @@ AskUserQuestion:
 - Sub-agents: https://code.claude.com/docs/en/sub-agents
 - Interactive Mode: https://code.claude.com/docs/en/interactive-mode
 - Memory: https://code.claude.com/docs/en/memory
+- Permissions/IAM: https://code.claude.com/docs/en/iam
+
+## Example Output
+
+```markdown
+# Claude Code Audit Findings
+
+**Date**: 2026-01-27
+**Claude Code Version**: 2.1.x
+**devloop Version**: 3.14.0
+
+## Summary
+
+Found 3 integration opportunities: 1 high, 1 medium, 1 low priority.
+No deprecated patterns detected.
+
+## Integration Opportunities
+
+### High Priority
+
+| Finding | Current State | Recommended Action | Effort |
+|---------|--------------|-------------------|--------|
+| TaskCreate/Update native integration | devloop uses plan.md only | Hybrid: plan.md for persistence + native Tasks for UI | Medium |
+
+### Medium Priority
+
+| Finding | Current State | Recommended Action | Effort |
+|---------|--------------|-------------------|--------|
+| Skill frontmatter alignment | Some skills missing new fields | Update frontmatter to include `context`, `agent` where applicable | Low |
+
+### Low Priority
+
+| Finding | Current State | Recommended Action | Effort |
+|---------|--------------|-------------------|--------|
+| Document /compact vs /fresh | Users confused about when to use which | Add guidance to CLAUDE.md | Low |
+
+## Deprecated Patterns
+
+None found.
+
+## New Features to Adopt
+
+| Feature | Use Case | Implementation Notes |
+|---------|----------|---------------------|
+| `context: fork` for skills | Run expensive operations in subagent | Consider for devloop-audit skill |
+
+## Next Steps
+
+1. Create Issue #20 for TaskCreate integration (high priority)
+2. Update skill frontmatter in next maintenance pass
+3. Add /compact vs /fresh guidance to docs
+```
 
 ## Output
 
