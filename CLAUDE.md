@@ -216,11 +216,15 @@ This shows plugin loading, manifest validation, and component registration.
 
 | Command | Behavior |
 |---------|----------|
+| `/devloop:new "title"` | Create GitHub issue (default), `--local` for offline |
+| `/devloop:issues` | List open GitHub issues |
+| `/devloop:from-issue N` | Create plan from GitHub issue #N |
 | `/devloop:plan "topic"` | Autonomous exploration → plan (1-2 prompts) |
 | `/devloop:plan --from-issue N` | Plan from GitHub issue |
 | `/devloop:spike "topic"` | Deep exploration (4-5 prompts, detailed report) |
 | `/devloop:run` | Autonomous execution (default) |
 | `/devloop:run --interactive` | Prompt at each task checkpoint |
+| `/devloop:run --next-issue` | Auto-select next issue, plan, and run |
 
 ### When to Use Fresh Start
 
@@ -338,18 +342,20 @@ The devloop plugin uses a standalone `.devloop/` directory for all its artifacts
 
 ```
 .devloop/
-├── plan.md               # Active plan (git-tracked)
+├── plan.md               # Active plan (NOT git-tracked - ephemeral)
 ├── worklog.md            # Completed work history (git-tracked)
 ├── local.md              # Local settings (NOT git-tracked)
 ├── context.json          # Tech stack cache (git-tracked)
-├── archive/              # Completed plans archive (git-tracked)
-│   └── YYYY-MM-DD-{slug}.md
-├── issues/               # Issue tracking (git-tracked)
-│   ├── index.md
-│   └── BUG-001.md, FEAT-001.md, etc.
+├── issues/               # Local issue tracking (NOT git-tracked - deprecated)
+│   ├── index.md          # Only used with /devloop:new --local
+│   └── BUG-001.md, etc.  # Local-only issues for offline work
 └── spikes/               # Spike reports (NOT git-tracked)
     └── {topic}.md
 ```
+
+**Issue Tracking**: Use GitHub issues via `/devloop:new` (default). Local issues (`.devloop/issues/`) are only for offline work with `--local` flag.
+
+**Plans**: Ephemeral session state, never committed. Use GitHub issues as permanent tracking.
 
 Other plugins may use `.claude/` for their artifacts.
 
@@ -357,24 +363,27 @@ Other plugins may use `.claude/` for their artifacts.
 
 | Category | Examples | Git Status |
 |----------|----------|------------|
-| **Shared State** | Plans, issues, context | Tracked |
-| **Archived Plans** | Completed plans in archive/ | Tracked |
+| **Shared State** | Worklog, context | Tracked |
+| **Ephemeral State** | Plans (session working memory) | NOT tracked |
 | **Local Config** | Settings, preferences | NOT tracked |
 | **Sensitive Data** | Security findings | NOT tracked |
-| **Working Notes** | Spike reports | NOT tracked |
+| **Working Notes** | Spike reports, local issues | NOT tracked |
 
-**Why track shared state?** Team visibility, context preservation across sessions.
+**Why NOT track plans?** Plans are working memory for a development session, not permanent artifacts. GitHub issues provide permanent tracking.
+**Why track worklog?** Team visibility, historical record of completed work.
 **Why NOT track local config?** Personal preferences vary, avoids merge conflicts.
 **Why NOT track security?** May contain sensitive vulnerability details.
 
 ### .gitignore for Plugins
 
-Add these patterns to exclude local-only files:
+Add these patterns to exclude ephemeral and local-only files:
 
 ```gitignore
-# Devloop local files
+# Devloop ephemeral files
+.devloop/plan.md
 .devloop/local.md
 .devloop/spikes/
+.devloop/issues/
 
 # Claude Code local settings
 .claude/settings.local.json
