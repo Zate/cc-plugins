@@ -86,8 +86,147 @@ Check for flags in `$ARGUMENTS`:
 
 - `--max-iterations N`: Override default 50 iteration limit
 - `--interactive`: Disable autonomous mode, prompt at each task
+- `--next-issue`: Fetch next GitHub issue, create plan, then run autonomously
+- `--next-issue=auto`: Same as above but skip issue selection confirmation
 
 Default behavior is **autonomous** (no `--interactive` flag).
+
+### If `--next-issue` flag detected:
+
+Jump to **Step 2b: Next Issue Workflow** instead of continuing to Step 3.
+
+## Step 2b: Next Issue Workflow
+
+When `--next-issue` is specified, orchestrate a complete issue-to-ship workflow:
+
+### 1. Check for existing incomplete plan
+
+```bash
+"${CLAUDE_PLUGIN_ROOT}/scripts/check-plan-complete.sh" .devloop/plan.md
+```
+
+If plan exists and is incomplete, prompt:
+```yaml
+AskUserQuestion:
+  questions:
+    - question: "Existing plan has N pending tasks. Replace with next issue?"
+      header: "Conflict"
+      multiSelect: false
+      options:
+        - label: "Replace"
+          description: "Overwrite and start from next issue"
+        - label: "Cancel"
+          description: "Keep existing plan, exit --next-issue mode"
+```
+
+### 2. Fetch open issues
+
+```bash
+gh issue list --state open --limit 20 --json number,title,labels,createdAt
+```
+
+**If no open issues:**
+```
+No open issues found.
+
+Create issues at: gh issue create
+Or start work with: /devloop:plan "your feature"
+```
+Then STOP.
+
+### 3. Prioritize issues
+
+Apply prioritization logic:
+
+| Priority | Criteria |
+|----------|----------|
+| 1 (highest) | Label contains "bug", "critical", "urgent" |
+| 2 | Label contains "security" |
+| 3 | Label contains "feat", "feature", "enhancement" |
+| 4 | Oldest issues (by createdAt) |
+| 5 (lowest) | Everything else |
+
+Select the highest priority issue.
+
+### 4. Confirm or auto-select
+
+**If `--next-issue` (no =auto):**
+```yaml
+AskUserQuestion:
+  questions:
+    - question: "Selected Issue #N: [title]. Work on this?"
+      header: "Issue"
+      multiSelect: false
+      options:
+        - label: "Yes, start work"
+          description: "Create plan and begin"
+        - label: "Pick different"
+          description: "Show all issues"
+        - label: "Cancel"
+          description: "Exit"
+```
+
+**If `--next-issue=auto`:**
+Display: "Auto-selected Issue #N: [title]"
+Proceed without confirmation.
+
+### 5. Create plan from issue
+
+Fetch issue details and create plan:
+```bash
+gh issue view $ISSUE_NUMBER --json number,title,body,labels,url
+```
+
+Generate plan at `.devloop/plan.md` with:
+- Issue reference in frontmatter (`issue: N`, `issue_url: ...`)
+- Tasks derived from issue description
+- Standard plan structure
+
+Display: "Plan created from Issue #N"
+
+### 6. Continue to normal execution
+
+After plan is created, continue to Step 3 (Fresh Start State check) and proceed with normal autonomous execution.
+
+### 7. Post-completion: Validate and ship
+
+When all tasks complete (before Step 7's AskUserQuestion):
+
+**Run validation:**
+```bash
+# Detect and run tests
+if [ -f "package.json" ]; then npm test; fi
+if [ -f "go.mod" ]; then go test ./...; fi
+if [ -f "pyproject.toml" ] || [ -f "requirements.txt" ]; then pytest; fi
+
+# Detect and run lint
+if [ -f "package.json" ] && grep -q '"lint"' package.json; then npm run lint; fi
+if [ -f "go.mod" ]; then golangci-lint run 2>/dev/null || go vet ./...; fi
+if [ -f "pyproject.toml" ]; then ruff check . 2>/dev/null || flake8 . 2>/dev/null; fi
+
+# Detect and run build
+if [ -f "package.json" ] && grep -q '"build"' package.json; then npm run build; fi
+if [ -f "go.mod" ]; then go build ./...; fi
+```
+
+**If validation fails:**
+```yaml
+AskUserQuestion:
+  questions:
+    - question: "Validation failed. How to proceed?"
+      header: "Validation"
+      multiSelect: false
+      options:
+        - label: "Fix issues"
+          description: "Attempt to fix failing tests"
+        - label: "Ship anyway"
+          description: "Commit despite failures"
+        - label: "Stop"
+          description: "Pause for manual intervention"
+```
+
+**If validation passes (or skipped):**
+Proceed to ship with auto-close keyword (respects `github.auto_close` config).
 
 ## Step 3: Check for Fresh Start State
 
@@ -306,6 +445,12 @@ Load skills when the task requires domain expertise, not preemptively.
 
 # Interactive mode (prompt at each task)
 /devloop:run --interactive
+
+# Auto-select next issue, plan, run, validate, and ship
+/devloop:run --next-issue
+
+# Fully autonomous: no confirmation prompts
+/devloop:run --next-issue=auto
 
 # Check progress mid-run
 head -10 .claude/ralph-loop.local.md

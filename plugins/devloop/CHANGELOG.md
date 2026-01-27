@@ -5,6 +5,36 @@ All notable changes to the devloop plugin are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.14.0] - 2026-01-27
+
+### Added - Autonomous Issue-to-Ship Workflow
+
+New `--next-issue` flag for `/devloop:run` enables fully autonomous issue-driven development.
+
+#### Features
+- `/devloop:run --next-issue` - Fetch issues, confirm selection, plan, run, validate, ship
+- `/devloop:run --next-issue=auto` - Fully autonomous with no confirmation prompts
+- Issue prioritization: bugs > security > features > age
+- Pre-ship validation: tests, lint, build detection
+- Automatic issue closure via commit keywords
+
+#### Workflow
+```bash
+/devloop:run --next-issue
+```
+1. Fetches open GitHub issues
+2. Prioritizes by label (bug/security/feature) and age
+3. Confirms selection (or auto-selects with `=auto`)
+4. Creates plan from issue
+5. Executes tasks autonomously
+6. Runs validation (tests/lint/build)
+7. Ships with auto-close keyword
+
+#### Validation Support
+- **Tests**: npm test, go test, pytest
+- **Lint**: npm lint, golangci-lint/go vet, ruff/flake8
+- **Build**: npm build, go build
+
 ## [3.13.2] - 2026-01-27
 
 ### Added - GitHub Issue Auto-Close Keywords in Commits

@@ -105,6 +105,8 @@ Returning to work?
 |---------|---------|-------------|
 | `/devloop` | Start new workflow | No plan exists, starting fresh |
 | `/devloop:spike` | Explore & plan | Unclear requirements, need research |
+| `/devloop:run` | Autonomous execution | Execute plan tasks without prompting |
+| `/devloop:run --next-issue` | Full auto workflow | Pick next issue, plan, run, validate, ship |
 | `/devloop:continue` | Resume work | Plan exists, returning to work |
 | `/devloop:fresh` | Save state | Before clearing context |
 | `/devloop:quick` | Fast implementation | Bug fixes, small changes |
