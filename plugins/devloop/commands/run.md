@@ -177,10 +177,23 @@ Fetch issue details and create plan:
 gh issue view $ISSUE_NUMBER --json number,title,body,labels,url
 ```
 
-Generate plan at `.devloop/plan.md` with:
-- Issue reference in frontmatter (`issue: N`, `issue_url: ...`)
+Generate plan at `.devloop/plan.md` with this **required frontmatter**:
+
+```yaml
+---
+title: [Issue title]
+issue: [ISSUE_NUMBER]           # REQUIRED - used for auto-close
+issue_url: [Full GitHub URL]    # For reference
+status: In Progress
+created: [ISO date]
+---
+```
+
+**CRITICAL**: The `issue:` field is MANDATORY when creating from `--next-issue`. Without it, the auto-close workflow in Step 2b.7 will fail.
+
+Then generate:
 - Tasks derived from issue description
-- Standard plan structure
+- Standard plan structure (phases, tasks, progress log)
 
 Display: "Plan created from Issue #N"
 
@@ -226,7 +239,31 @@ AskUserQuestion:
 ```
 
 **If validation passes (or skipped):**
-Proceed to ship with auto-close keyword (respects `github.auto_close` config).
+
+**IMPORTANT: In `--next-issue` mode, the commit MUST close the issue.**
+
+1. Read the issue number from `.devloop/plan.md` frontmatter (`issue: N`)
+2. Stage and commit with closing keyword:
+
+```bash
+git add -A
+git commit -m "$(cat <<'EOF'
+feat(scope): summary of changes
+
+Closes #${ISSUE_NUMBER}
+EOF
+)"
+```
+
+**The `Closes #N` line is MANDATORY in `--next-issue` mode** - do not ask, do not check config. The purpose of `--next-issue` is to work on an issue and close it. If the commit doesn't include the closing keyword, the issue won't close and the workflow fails.
+
+After successful commit, display:
+```
+Committed with: Closes #N
+Issue #N will be closed when pushed/merged.
+```
+
+Then offer next actions (push, create PR, etc.).
 
 ## Step 3: Check for Fresh Start State
 
