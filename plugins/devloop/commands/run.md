@@ -334,6 +334,19 @@ This creates native tasks that show progress in the UI. The plan.md remains the 
 
 **Note**: This step is optional. Native tasks provide UI feedback but plan.md is authoritative.
 
+**Large Plans (50+ tasks)**: For plans with many tasks, consider creating native tasks only for the current phase to avoid cluttering the `/tasks` view. Recreate tasks for the next phase when a phase completes.
+
+**Session Resume**: When resuming after `/clear` or a new session, run the sync script again to recreate native tasks from plan.md pending items. Already-completed tasks in plan.md are not recreated.
+
+**Task Marker Mapping**:
+
+| plan.md | Native Task Status |
+|---------|-------------------|
+| `- [ ]` | pending |
+| `- [~]` | in_progress |
+| `- [x]` | completed |
+| `- [!]` | blocked (use blockedBy) |
+
 ## Step 5: Execute Tasks
 
 Read the plan:
@@ -357,6 +370,16 @@ Find the next pending task (marked with `- [ ]`).
 - **Parallel work**: Multiple independent tasks running simultaneously
 - **Security scan**: Full codebase audit (`devloop:security-scanner`)
 - **Large exploration**: Use `Explore` agent for codebase understanding
+
+### Before Starting Each Task
+
+If native tasks were created in Step 4b, mark the current task as in-progress:
+
+```
+TaskUpdate: taskId=[task-id], status="in_progress"
+```
+
+This shows a progress spinner in the UI while you work on the task.
 
 ## Step 6: Update Plan After Each Task
 

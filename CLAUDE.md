@@ -226,6 +226,21 @@ This shows plugin loading, manifest validation, and component registration.
 | `/devloop:run --interactive` | Prompt at each task checkpoint |
 | `/devloop:run --next-issue` | Auto-select next issue, plan, and run |
 
+### Hybrid Task Tracking
+
+devloop uses a hybrid approach for task tracking:
+
+| System | Purpose | Persistence |
+|--------|---------|-------------|
+| `plan.md` | Source of truth | Cross-session |
+| Native Tasks | UI visibility (spinner, `/tasks`) | Session only |
+
+During `/devloop:run`:
+1. Pending tasks sync to native Tasks (optional)
+2. Progress shows in spinner (`activeForm`)
+3. Completions update BOTH systems
+4. After `/clear`, native tasks recreate from plan.md
+
 ### When to Use Fresh Start
 
 - After completing 5-10 tasks
