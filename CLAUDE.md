@@ -96,6 +96,44 @@ Use `${CLAUDE_PLUGIN_ROOT}` for absolute plugin directory paths in:
 6. **Focused Tools**: Single-purpose, composable functionality
 7. **Clear Scope**: Define when skills/agents should be invoked
 
+### Script & Hook Output Patterns
+
+All plugin scripts and hooks should follow consistent output patterns for a clean user experience.
+
+**Scripts** — Print a brief summary line before full JSON data:
+
+```bash
+# Summary line (visible in verbose mode, easy to scan)
+echo "devloop: state=active_plan priority=2"
+# Full structured data (for agent consumption)
+cat <<EOF
+{
+  "state": "active_plan",
+  "priority": 2,
+  "details": { ... }
+}
+EOF
+```
+
+**Hooks** — Use `suppressOutput` with `systemMessage` for user-facing feedback:
+
+```json
+{
+  "suppressOutput": true,
+  "systemMessage": "Brief status for user",
+  "hookSpecificOutput": {
+    "hookEventName": "SessionStart",
+    "additionalContext": "Detailed context for agent"
+  }
+}
+```
+
+**Key principles:**
+- Users see brief summaries; agents receive full structured data
+- Bash tool output is hidden by default (Ctrl+O toggles verbose mode)
+- Hook `systemMessage` becomes the user-visible feedback line
+- `suppressOutput: true` prevents raw JSON from cluttering verbose view
+
 ## Development Workflow
 
 ### Creating a New Plugin

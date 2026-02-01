@@ -83,6 +83,8 @@ Thank you for your interest in contributing to the Claude Code plugin marketplac
 - [ ] Security considerations documented
 - [ ] Examples for all major features
 - [ ] Clean, focused implementation
+- [ ] Scripts follow summary+detail output pattern (see CLAUDE.md)
+- [ ] Hooks use `suppressOutput` and `systemMessage` where appropriate
 
 ### Code Quality
 
@@ -91,6 +93,7 @@ Thank you for your interest in contributing to the Claude Code plugin marketplac
 - **Documentation**: Code should be clear and well-commented when needed
 - **Testing**: Verify functionality works as expected
 - **Compatibility**: Ensure it works with current Claude Code version
+- **Output**: Scripts print a brief summary line before full JSON; hooks use `suppressOutput: true` with `systemMessage` for user feedback (see "Script & Hook Output Patterns" in CLAUDE.md)
 
 ## Plugin Categories
 

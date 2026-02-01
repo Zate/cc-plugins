@@ -233,7 +233,11 @@ if echo "$ISSUES_JSON" | grep -q '"message":.*"Not Found"'; then
     exit 3
 fi
 
-# Output
+# Count issues for summary
+ISSUE_COUNT=$(echo "$ISSUES_JSON" | grep -o '"number":' | wc -l | tr -d ' ')
+
+# Output summary line then full data
+echo "issues: ${STATE} count=${ISSUE_COUNT}"
 if [ "$JSON_OUTPUT" = true ]; then
     echo "$ISSUES_JSON"
 else

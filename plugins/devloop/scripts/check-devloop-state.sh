@@ -134,7 +134,8 @@ if [ "$STATE" = "clean" ]; then
     SUGGESTIONS=$(json_array "Start new spike" "Create new issue" "View GitHub issues" "Quick task")
 fi
 
-# Output final JSON
+# Output summary line then full JSON
+echo "devloop: state=$STATE priority=$PRIORITY"
 cat <<EOF
 {
   "state": "$STATE",

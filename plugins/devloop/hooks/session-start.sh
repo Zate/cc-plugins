@@ -235,6 +235,7 @@ if command -v jq &> /dev/null; then
     ESCAPED_STATUS=$(printf '%s' "$STATUS" | jq -Rs '.')
     cat <<EOF
 {
+  "suppressOutput": true,
   "systemMessage": ${ESCAPED_STATUS},
   "hookSpecificOutput": {
     "hookEventName": "SessionStart",
@@ -247,6 +248,7 @@ else
     ESCAPED_CONTEXT=$(printf '%s' "$CONTEXT" | sed 's/"/\\"/g' | tr '\n' ' ')
     cat <<EOF
 {
+  "suppressOutput": true,
   "systemMessage": "$STATUS",
   "hookSpecificOutput": {
     "hookEventName": "SessionStart",
