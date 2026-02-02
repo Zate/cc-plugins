@@ -52,10 +52,10 @@ chmod +x "$TMPDIR/$BINARY_NAME"
 mv "$TMPDIR/$BINARY_NAME" "$INSTALL_DIR/$BINARY_NAME"
 
 # Verify
-if "$INSTALL_DIR/$BINARY_NAME" version &> /dev/null; then
+if "$INSTALL_DIR/$BINARY_NAME" status &> /dev/null; then
     echo "installed:$INSTALL_DIR/$BINARY_NAME"
 else
-    echo "warning:installed but version check failed" >&2
+    echo "warning:installed but verification failed" >&2
     echo "installed:$INSTALL_DIR/$BINARY_NAME"
 fi
 

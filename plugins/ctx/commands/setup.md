@@ -14,7 +14,7 @@ Install and verify the ctx persistent memory system.
 
 1. Check if `ctx` binary is in PATH:
    ```bash
-   command -v ctx && ctx version
+   command -v ctx && ctx status
    ```
 
 2. If not found, install from GitHub releases:
@@ -34,7 +34,7 @@ Install and verify the ctx persistent memory system.
 
 5. Show current status:
    ```bash
-   ctx show --stats 2>/dev/null || ctx show
+   ctx status
    ```
 
-6. Report results to user: binary version, database path, node count.
+6. Report results to user: binary location, database path, node count, tier breakdown.

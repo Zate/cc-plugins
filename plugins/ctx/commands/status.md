@@ -11,12 +11,7 @@ Show a summary of stored knowledge.
 
 Run:
 ```bash
-ctx show --stats 2>/dev/null || echo "No stats available"
+ctx status
 ```
 
-Also run:
-```bash
-ctx show --count 2>/dev/null || ctx show | head -20
-```
-
-Report to the user: total nodes, breakdown by type and tier if available, database size.
+Report to the user: total nodes, breakdown by type and tier, token counts, and database size.
