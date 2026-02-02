@@ -3,8 +3,8 @@
 set -euo pipefail
 
 if command -v ctx &> /dev/null; then
-    LOCATION=$(command -v ctx)
-    echo "found:${LOCATION}"
+    VERSION=$(ctx version 2>/dev/null || echo "unknown")
+    echo "found:${VERSION}"
     exit 0
 else
     echo "not-found"
