@@ -24,6 +24,13 @@
       "description": "Comprehensive security plugin providing OWASP ASVS 5.0-aligned audits via /security:audit command with 17 domain-specific auditor agents, plus live security guard hooks for real-time vulnerability detection during code changes",
       "category": "security",
       "tags": ["security", "audit", "owasp", "asvs", "vulnerability", "code-review", "live-guard", "hooks", "devsecops"]
+    },
+    {
+      "name": "ctx",
+      "source": "./plugins/ctx",
+      "description": "Persistent memory for Claude Code agents. Stores decisions, patterns, and knowledge in a structured graph database across sessions with auto-injection and enforcement.",
+      "category": "development",
+      "tags": ["memory", "context", "persistence", "knowledge-graph", "sessions"]
     }
   ]
 }

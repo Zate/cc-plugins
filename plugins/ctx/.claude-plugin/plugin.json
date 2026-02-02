@@ -1,0 +1,13 @@
+{
+  "name": "ctx",
+  "version": "1.0.0",
+  "description": "Persistent memory for Claude Code agents. Stores decisions, patterns, and knowledge in a structured graph database that persists across sessions.",
+  "author": {
+    "name": "Zate",
+    "email": "zate75+claude-code-plugins@gmail.com"
+  },
+  "homepage": "https://github.com/Zate/Memdown",
+  "repository": "https://github.com/Zate/Memdown",
+  "license": "MIT",
+  "keywords": ["memory", "context", "knowledge-graph", "persistence", "sessions"]
+}
