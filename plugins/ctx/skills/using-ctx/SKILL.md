@@ -72,6 +72,6 @@ Expand: `<ctx:expand node="ID1"/>`
 ## Rules
 
 - Commands in code blocks are ignored — only bare commands in your response text are processed
-- Commands are parsed at session end (Stop hook), not immediately
+- Commands are parsed on every user prompt (prompt-submit hook) and at session end (stop hook)
 - `recall` and `status` results are injected on the next user prompt
 - Use `project:X` tags for cross-project organization
