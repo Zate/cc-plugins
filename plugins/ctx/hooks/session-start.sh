@@ -1,9 +1,10 @@
 #!/bin/bash
 # ctx SessionStart hook
 # 1. Ensure ctx binary is installed
-# 2. Ensure database exists
-# 3. Compose and inject stored knowledge
-# 4. Inject using-ctx skill content
+# 2. Check for updates (at most once per day)
+# 3. Ensure database exists
+# 4. Compose and inject stored knowledge
+# 5. Inject using-ctx skill content
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -22,6 +23,33 @@ if ! command -v ctx &> /dev/null; then
             exit 0
         fi
     fi
+fi
+
+# Check for updates at most once per day
+UPDATE_HINT=""
+UPDATE_CHECK_FILE="$HOME/.ctx/.last-update-check"
+SHOULD_CHECK=false
+if [ ! -f "$UPDATE_CHECK_FILE" ]; then
+    SHOULD_CHECK=true
+else
+    LAST_CHECK=$(cat "$UPDATE_CHECK_FILE" 2>/dev/null || echo "0")
+    NOW=$(date +%s)
+    AGE=$(( NOW - LAST_CHECK ))
+    if [ "$AGE" -gt 86400 ]; then
+        SHOULD_CHECK=true
+    fi
+fi
+
+if [ "$SHOULD_CHECK" = "true" ]; then
+    date +%s > "$UPDATE_CHECK_FILE" 2>/dev/null || true
+    CHECK_RESULT=$(bash "$PLUGIN_ROOT/scripts/check-update.sh" 2>/dev/null || echo "check-failed:error")
+    case "$CHECK_RESULT" in
+        update-available:*)
+            CURRENT_V=$(echo "$CHECK_RESULT" | cut -d: -f2)
+            LATEST_V=$(echo "$CHECK_RESULT" | cut -d: -f3)
+            UPDATE_HINT="**ctx update available:** ${CURRENT_V} → ${LATEST_V}. Run \`/ctx:setup\` to upgrade."
+            ;;
+    esac
 fi
 
 # Ensure database exists
@@ -45,10 +73,19 @@ if [ -f "$PLUGIN_ROOT/skills/using-ctx/SKILL.md" ]; then
     SKILL_CONTENT=$(awk 'BEGIN{skip=0} /^---$/{skip++; next} skip>=2{print}' "$PLUGIN_ROOT/skills/using-ctx/SKILL.md")
 fi
 
-# Combine ctx knowledge + skill enforcement
+# Combine ctx knowledge + skill enforcement + update hint
 COMBINED=""
+if [ -n "$UPDATE_HINT" ]; then
+    COMBINED="$UPDATE_HINT"
+fi
 if [ -n "$CTX_CONTEXT" ]; then
-    COMBINED="$CTX_CONTEXT"
+    if [ -n "$COMBINED" ]; then
+        COMBINED="$COMBINED
+
+$CTX_CONTEXT"
+    else
+        COMBINED="$CTX_CONTEXT"
+    fi
 fi
 if [ -n "$SKILL_CONTENT" ]; then
     if [ -n "$COMBINED" ]; then

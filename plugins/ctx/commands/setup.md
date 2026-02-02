@@ -1,5 +1,5 @@
 ---
-description: Install and configure ctx persistent memory system
+description: Install, upgrade, or verify ctx persistent memory system
 argument-hint: None required
 allowed-tools:
   - Bash
@@ -8,33 +8,38 @@ allowed-tools:
 
 # ctx Setup
 
-Install and verify the ctx persistent memory system.
+Install, upgrade, or verify the ctx persistent memory system.
 
 ## Steps
 
-1. Check if `ctx` binary is in PATH:
+1. Check if `ctx` binary is in PATH and get current version:
    ```bash
-   command -v ctx && ctx status
+   command -v ctx && ctx version
    ```
 
-2. If not found, install from GitHub releases:
+2. Check for updates from GitHub releases:
+   ```bash
+   bash ${CLAUDE_PLUGIN_ROOT}/scripts/check-update.sh
+   ```
+
+3. If binary not found OR an update is available, install/upgrade from GitHub releases:
    ```bash
    bash ${CLAUDE_PLUGIN_ROOT}/scripts/install-binary.sh
    ```
 
-3. Verify database exists:
+4. Verify database exists:
    ```bash
    ls -la ~/.ctx/store.db
    ```
 
-4. If database missing, initialize:
+5. If database missing, initialize:
    ```bash
    ctx init
    ```
 
-5. Show current status:
+6. Show current status:
    ```bash
    ctx status
    ```
 
-6. Report results to user: binary location, database path, node count, tier breakdown.
+7. Report results to user: binary location, version, database path, node count, tier breakdown. If an upgrade was performed, mention the old and new versions.
