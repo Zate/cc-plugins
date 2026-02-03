@@ -57,8 +57,17 @@ if [ ! -f "$HOME/.ctx/store.db" ]; then
     ctx init >&2
 fi
 
+# Detect current project from git repo name
+PROJECT_NAME=""
+if command -v git &>/dev/null; then
+    REPO_ROOT=$(git rev-parse --show-toplevel 2>/dev/null)
+    if [ -n "$REPO_ROOT" ]; then
+        PROJECT_NAME=$(basename "$REPO_ROOT" | tr '[:upper:]' '[:lower:]')
+    fi
+fi
+
 # Get ctx hook output (already outputs proper JSON with additionalContext)
-CTX_OUTPUT=$(ctx hook session-start 2>/dev/null || echo '{}')
+CTX_OUTPUT=$(ctx hook session-start --project="$PROJECT_NAME" 2>/dev/null || echo '{}')
 
 # Extract the additionalContext from ctx output
 CTX_CONTEXT=""

@@ -98,9 +98,13 @@ NOT type:hypothesis
 
 ```
 hooks/
-  session-start.sh    # Compose + inject stored knowledge
-  prompt-submit.sh    # Parse commands, inject pending recalls
-  stop.sh             # Final command sweep
+  run-hook.js         # Cross-platform dispatcher (Node.js)
+  session-start.sh    # Compose + inject stored knowledge (Unix)
+  session-start.ps1   # Compose + inject stored knowledge (Windows)
+  prompt-submit.sh    # Parse commands, inject pending recalls (Unix)
+  prompt-submit.ps1   # Parse commands, inject pending recalls (Windows)
+  stop.sh             # Final command sweep (Unix)
+  stop.ps1            # Final command sweep (Windows)
 commands/
   status.md           # /ctx:status
   recall.md           # /ctx:recall
@@ -108,17 +112,22 @@ commands/
 skills/
   using-ctx/SKILL.md  # Enforces memory discipline
 scripts/
-  install-binary.sh   # Auto-downloads ctx binary
-  check-binary.sh     # Verifies installation
+  install-binary.sh   # Auto-downloads ctx binary (Unix)
+  install-binary.ps1  # Auto-downloads ctx binary (Windows)
+  check-binary.sh     # Verifies installation (Unix)
+  check-binary.ps1    # Verifies installation (Windows)
+  check-update.sh     # Version check (Unix)
+  check-update.ps1    # Version check (Windows)
 ```
 
-The `ctx` binary ([source](https://github.com/Zate/Memdown)) is a Go CLI that manages the SQLite database. The plugin hooks shell out to it.
+The `ctx` binary ([source](https://github.com/Zate/Memdown)) is a Go CLI that manages the SQLite database. All hooks go through `run-hook.js`, which detects the platform and spawns the appropriate `.sh` (Unix) or `.ps1` (Windows) script.
 
 ## Requirements
 
-- macOS or Linux (amd64 or arm64)
-- `curl` (for binary download)
-- `jq` (required for session-start knowledge injection)
+- **Windows**, **macOS**, or **Linux** (amd64 or arm64)
+- **Node.js** (required by Claude Code, used for cross-platform hook dispatch)
+- **Unix:** `curl`, `jq`
+- **Windows:** PowerShell 5.1+ (ships with Windows 10/11)
 
 ## FAQ
 

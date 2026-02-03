@@ -7,7 +7,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash ${CLAUDE_PLUGIN_ROOT}/hooks/session-start.sh",
+            "command": "node ${CLAUDE_PLUGIN_ROOT}/hooks/run-hook.js session-start",
             "timeout": 15
           }
         ]
@@ -19,7 +19,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash ${CLAUDE_PLUGIN_ROOT}/hooks/prompt-submit.sh",
+            "command": "node ${CLAUDE_PLUGIN_ROOT}/hooks/run-hook.js prompt-submit",
             "timeout": 5
           }
         ]
@@ -30,7 +30,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash ${CLAUDE_PLUGIN_ROOT}/hooks/stop.sh",
+            "command": "node ${CLAUDE_PLUGIN_ROOT}/hooks/run-hook.js stop",
             "timeout": 10
           }
         ]
