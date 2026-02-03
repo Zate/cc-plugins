@@ -33,7 +33,7 @@ $assetName = "${binaryName}_${assetVersion}_windows_${arch}.zip"
 $url = "https://github.com/$repo/releases/download/$version/$assetName"
 
 # Install directory
-$installDir = Join-Path $env:LOCALAPPDATA 'Microsoft\WindowsApps'
+$installDir = Join-Path $env:USERPROFILE '.local\bin'
 if (-not (Test-Path $installDir)) {
     New-Item -ItemType Directory -Path $installDir -Force | Out-Null
 }

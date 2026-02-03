@@ -10,7 +10,7 @@ $repo = 'Zate/Memdown'
 # Find ctx binary
 $ctxCmd = Get-Command ctx -ErrorAction SilentlyContinue
 if (-not $ctxCmd) {
-    $fallback = Join-Path $env:LOCALAPPDATA 'Microsoft\WindowsApps\ctx.exe'
+    $fallback = Join-Path $env:USERPROFILE '.local\bin\ctx.exe'
     if (Test-Path $fallback) {
         $ctxCmd = $fallback
     } else {
