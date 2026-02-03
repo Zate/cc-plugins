@@ -15,7 +15,7 @@ $ctxFound = Get-Command ctx -ErrorAction SilentlyContinue
 if ($ctxFound) {
     $ctxCmd = 'ctx'
 } else {
-    $fallback = Join-Path $env:USERPROFILE '.local\bin\ctx.exe'
+    $fallback = Join-Path $env:LOCALAPPDATA 'Microsoft\WindowsApps\ctx.exe'
     if (Test-Path $fallback) {
         $ctxCmd = $fallback
     } else {
