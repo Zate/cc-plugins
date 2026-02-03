@@ -98,7 +98,7 @@ NOT type:hypothesis
 
 ```
 hooks/
-  run-hook.js         # Cross-platform dispatcher (Node.js)
+  run-hook.cmd        # Polyglot dispatcher (CMD → .ps1, bash → .sh)
   session-start.sh    # Compose + inject stored knowledge (Unix)
   session-start.ps1   # Compose + inject stored knowledge (Windows)
   prompt-submit.sh    # Parse commands, inject pending recalls (Unix)
@@ -120,12 +120,11 @@ scripts/
   check-update.ps1    # Version check (Windows)
 ```
 
-The `ctx` binary ([source](https://github.com/Zate/Memdown)) is a Go CLI that manages the SQLite database. All hooks go through `run-hook.js`, which detects the platform and spawns the appropriate `.sh` (Unix) or `.ps1` (Windows) script.
+The `ctx` binary ([source](https://github.com/Zate/Memdown)) is a Go CLI that manages the SQLite database. All hooks go through `run-hook.cmd`, a polyglot script valid in both CMD.exe and bash. On Windows, CMD runs the `.ps1` scripts via PowerShell. On Unix, bash runs the `.sh` scripts directly.
 
 ## Requirements
 
 - **Windows**, **macOS**, or **Linux** (amd64 or arm64)
-- **Node.js** (required by Claude Code, used for cross-platform hook dispatch)
 - **Unix:** `curl`, `jq`
 - **Windows:** PowerShell 5.1+ (ships with Windows 10/11)
 
