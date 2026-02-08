@@ -44,7 +44,7 @@ To verify or manually install: `/ctx:setup`
 Claude stores knowledge using XML commands in its responses:
 
 ```xml
-<ctx:remember type="decision" tags="tier:reference,project:myproject">
+<ctx:remember type="decision" tags="tier:pinned,project:myproject">
 Chose gRPC over REST for internal service communication due to
 streaming requirements and type safety from protobuf.
 </ctx:remember>
@@ -63,13 +63,13 @@ streaming requirements and type safety from protobuf.
 
 ### Tiers
 
-Tiers control what gets loaded into context and when:
+Tiers control what gets loaded into context and when. **Key question:** Every session? → `pinned`. Someday? → `reference`. This task? → `working`.
 
 | Tier | Behavior |
 |------|----------|
-| `tier:pinned` | Always loaded — critical facts |
-| `tier:reference` | Loaded by default — most knowledge |
-| `tier:working` | Current task context — temporary |
+| `tier:pinned` | Always loaded — critical facts, foundational decisions, active conventions |
+| `tier:reference` | Not auto-loaded — durable knowledge, accessed via `<ctx:recall>` |
+| `tier:working` | Loaded for current task — temporary debugging, hypotheses |
 | `tier:off-context` | Archived — not loaded unless queried |
 
 ## Advanced Commands

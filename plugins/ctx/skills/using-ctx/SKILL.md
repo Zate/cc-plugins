@@ -23,21 +23,49 @@ BEFORE completing any response where you:
 
 ## How to Store
 
+Always include a `tier:` tag. **Key question:** Every session? → `pinned`. Someday? → `reference`. This task? → `working`.
+
 ```xml
+<!-- Pinned: critical, needed every session -->
+<ctx:remember type="fact" tags="tier:pinned,project:myproject">
+Always run tests before committing. User preference.
+</ctx:remember>
+
+<!-- Working: task-scoped, temporary -->
+<ctx:remember type="observation" tags="tier:working,project:myproject">
+Auth bug seems related to token refresh timing.
+</ctx:remember>
+
+<!-- Reference: durable but not needed every session -->
 <ctx:remember type="decision" tags="tier:reference,project:myproject">
-Chose SQLite over PostgreSQL for single-binary deployment requirement.
+Chose PostgreSQL for multi-tenant concurrent write access.
 </ctx:remember>
 ```
 
-Always include a `tier:` tag:
-- `tier:pinned` — Always loaded (critical facts)
-- `tier:reference` — Loaded by default (most knowledge)
-- `tier:working` — Current task context (temporary)
-- `tier:off-context` — Archived (not loaded)
+### Tiers
+
+| Tier | Auto-Loaded? | Use For | Examples |
+|------|-------------|---------|----------|
+| `tier:pinned` | Yes | Critical facts, foundational decisions, active conventions | "Always test code", "Uses Three.js + vanilla TS" |
+| `tier:reference` | No (use recall) | Durable knowledge, past decisions, resolved issues | "Chose PostgreSQL for multi-tenant" |
+| `tier:working` | Yes | Current task context, debugging, scratch | "Token refresh fails on expired tokens" |
+| `tier:off-context` | No | Archived, rarely needed | Completed task logs, old debugging |
+
+### Type → Tier Quick Guide
+
+| When you hear/think... | Type | Tier |
+|------------------------|------|------|
+| "Please remember: always test our code" | `fact` | `pinned` |
+| "We're using Three.js with vanilla TS" | `decision` | `pinned` |
+| "This codebase uses InstancedMesh for geometry" | `pattern` | `pinned` |
+| "We chose PostgreSQL for multi-tenant" | `decision` | `reference` |
+| "The 404 was caused by missing PBR textures" (resolved) | `observation` | `reference` |
+| "Debugging: token refresh fails on expired tokens" (in-progress) | `observation` | `working` |
+| "Maybe the race is in cache invalidation" | `hypothesis` | `working` |
 
 ## Other Commands
 
-Recall (results injected on next prompt):
+Recall (results injected on next prompt — use to access reference knowledge):
 ```xml
 <ctx:recall query="type:decision AND tag:project:X"/>
 ```
@@ -57,6 +85,15 @@ Link nodes: `<ctx:link from="ID1" to="ID2" type="DEPENDS_ON"/>`
 Summarize: `<ctx:summarize nodes="ID1,ID2">Summary here.</ctx:summarize>`
 Supersede: `<ctx:supersede old="ID1" new="ID2"/>`
 Expand: `<ctx:expand node="ID1"/>`
+
+## Starting a Task
+
+At the start of a task, recall relevant reference knowledge:
+```xml
+<ctx:recall query="type:decision AND tag:project:myproject"/>
+```
+
+This brings in past decisions without them cluttering every session.
 
 ## Red Flags
 
