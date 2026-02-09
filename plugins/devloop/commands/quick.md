@@ -9,7 +9,9 @@ allowed-tools:
   - Glob
   - Bash
   - AskUserQuestion
-  - TodoWrite
+  - TaskCreate
+  - TaskUpdate
+  - TaskList
 ---
 
 # Quick - Fast Implementation

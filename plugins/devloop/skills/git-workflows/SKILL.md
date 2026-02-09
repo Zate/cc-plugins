@@ -1,19 +1,6 @@
 ---
 name: git-workflows
 description: This skill should be used for branching strategies, conventional commits, PR workflows, and release management, git flow, trunk-based development, merge strategies
-whenToUse: Branching strategy, commit formatting, PR descriptions, releases, git flow, trunk-based development, merge vs rebase, release tagging
-whenNotToUse: Simple add/commit/push, established team conventions
-seeAlso:
-  - skill: atomic-commits
-    when: commit scope decisions
-  - skill: local-config
-    when: configuring git workflow preferences
-  - skill: pr-feedback
-    when: handling PR review comments
-  - skill: superpowers:using-git-worktrees
-    when: parallel feature development, isolated workspaces
-  - skill: superpowers:finishing-a-development-branch
-    when: completing work, deciding merge/PR/cleanup options
 ---
 
 # Git Workflows

@@ -12,7 +12,7 @@ user: "Run the tests"
 assistant: "I'll use devloop:qa-engineer to run tests and analyze results."
 </example>
 
-tools: Bash, Read, Write, Edit, Grep, Glob, TodoWrite, AskUserQuestion
+tools: Bash, Read, Write, Edit, Grep, Glob, TaskCreate, TaskUpdate, TaskList, AskUserQuestion
 model: sonnet
 color: green
 ---

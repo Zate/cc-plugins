@@ -7,7 +7,9 @@ allowed-tools:
   - Glob
   - Bash
   - AskUserQuestion
-  - TodoWrite
+  - TaskCreate
+  - TaskUpdate
+  - TaskList
 ---
 
 # Review - Code Review

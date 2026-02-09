@@ -299,7 +299,10 @@ rm .devloop/plan.md
 
 ### Context feels heavy/slow
 ```bash
-# The standard fix
+# Try partial summarization first (lighter than full reset)
+# Press Esc+Esc to compress context without losing state
+
+# If that's not enough, do a full reset
 /devloop:fresh
 /clear
 /devloop:continue

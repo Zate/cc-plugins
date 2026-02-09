@@ -12,7 +12,7 @@ user: "Is this feature ready to ship?"
 assistant: "I'll use devloop:task-planner to validate Definition of Done."
 </example>
 
-tools: Read, Write, Edit, Grep, Glob, Bash, TodoWrite, AskUserQuestion
+tools: Read, Write, Edit, Grep, Glob, Bash, TaskCreate, TaskUpdate, TaskList, AskUserQuestion
 model: sonnet
 color: indigo
 ---

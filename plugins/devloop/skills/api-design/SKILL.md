@@ -1,15 +1,6 @@
 ---
 name: api-design
 description: This skill should be used for REST API, GraphQL, versioning, pagination, authentication, backend routes, web services, HTTP endpoints, server API design
-whenToUse: API design, endpoints, REST patterns, backend development, web services, HTTP routes, server-side endpoints, Express routes, FastAPI endpoints
-whenNotToUse: Internal interfaces, non-HTTP APIs, frontend-only code
-seeAlso:
-  - skill: security-checklist
-    when: securing API endpoints
-  - skill: architecture-patterns
-    when: designing API layer architecture
-  - skill: database-patterns
-    when: API data modeling
 ---
 
 # API Design

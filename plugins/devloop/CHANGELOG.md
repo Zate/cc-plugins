@@ -5,6 +5,27 @@ All notable changes to the devloop plugin are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.16.0] - 2026-02-09
+
+### Changed - Claude Code Audit Integration
+
+Aligned devloop with Claude Code's latest capabilities from 2026-02-09 audit.
+
+#### Deprecated Pattern Fixes
+- Replaced `TodoWrite` with `TaskCreate`, `TaskUpdate`, `TaskList` across all commands and agents (14 files)
+- Removed non-standard skill frontmatter fields (`whenToUse`, `whenNotToUse`, `seeAlso`) from all 15 skills
+- Verified no deprecated `$ARGUMENTS.0` syntax in use
+
+#### Agent Memory
+- Added `memory: project` to code-reviewer and engineer agents
+- Added `memory: user` to security-scanner agent
+- Added memory consultation instructions to agent system prompts
+
+#### New Feature Adoption
+- Added `skills` preloading to code-reviewer agent (preloads `security-checklist`)
+- Added `context: fork` to security-checklist and architecture-patterns skills for isolated execution
+- Documented `Esc+Esc` partial summarization as lighter alternative to `/devloop:fresh`
+
 ## [3.14.0] - 2026-01-27
 
 ### Added - Autonomous Issue-to-Ship Workflow

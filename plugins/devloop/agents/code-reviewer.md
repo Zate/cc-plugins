@@ -7,9 +7,12 @@ user: "Review my changes before commit"
 assistant: "I'll launch devloop:code-reviewer to review your code."
 </example>
 
-tools: Glob, Grep, Read, TodoWrite, Bash, AskUserQuestion
+tools: Glob, Grep, Read, TaskCreate, TaskUpdate, TaskList, Bash, AskUserQuestion
 model: sonnet
+memory: project
 color: red
+skills:
+  - security-checklist
 permissionMode: plan
 hooks:
   PostToolUse:
@@ -21,6 +24,8 @@ hooks:
 ---
 
 # Code Reviewer Agent
+
+Consult your memory for past review patterns, recurring issues, and project conventions before starting review.
 
 Expert code review with confidence-based filtering. Only reports high-priority issues.
 

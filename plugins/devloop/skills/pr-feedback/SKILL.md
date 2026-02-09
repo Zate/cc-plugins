@@ -1,13 +1,6 @@
 ---
 name: pr-feedback
 description: This skill should be used for integrating PR review comments back into devloop plan, parsing review feedback, addressing reviewer concerns
-whenToUse: PR has review comments, feedback to address, review iterations, changes requested, responding to reviewers
-whenNotToUse: No open PR, PR already merged, creating new PR
-seeAlso:
-  - skill: git-workflows
-    when: git operations and PR strategy
-  - skill: plan-management
-    when: updating plan with new tasks
 ---
 
 # PR Feedback Integration

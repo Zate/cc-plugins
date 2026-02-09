@@ -7,13 +7,16 @@ user: "Check if this auth code is secure"
 assistant: "I'll launch devloop:security-scanner to analyze security."
 </example>
 
-tools: Bash, Read, Grep, Glob, TodoWrite
+tools: Bash, Read, Grep, Glob, TaskCreate, TaskUpdate, TaskList
 model: haiku
+memory: user
 color: red
 permissionMode: plan
 ---
 
 # Security Scanner Agent
+
+Consult your memory for past security findings, known vulnerability patterns, and remediation preferences before scanning.
 
 Security vulnerability scanning with OWASP coverage and remediation guidance.
 

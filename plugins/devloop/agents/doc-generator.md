@@ -7,7 +7,7 @@ user: "Update the API documentation"
 assistant: "I'll launch devloop:doc-generator to document the API changes."
 </example>
 
-tools: Read, Write, Edit, Grep, Glob, TodoWrite
+tools: Read, Write, Edit, Grep, Glob, TaskCreate, TaskUpdate, TaskList
 model: sonnet
 color: teal
 ---

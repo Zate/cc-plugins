@@ -1,15 +1,6 @@
 ---
 name: java-patterns
 description: This skill should be used for Java/Spring patterns, dependency injection, streams, Optional, Kotlin, Spring Boot, Maven, Gradle, JVM backend
-whenToUse: Java code, Spring Boot, JUnit, Kotlin, .java files, .kt files, Maven, Gradle, JVM backend, Spring framework, Jakarta EE
-whenNotToUse: Non-JVM code, Android-specific (use Android docs)
-seeAlso:
-  - skill: testing-strategies
-    when: JUnit test architecture
-  - skill: api-design
-    when: Spring REST APIs
-  - skill: architecture-patterns
-    when: Java application structure
 ---
 
 # Java Patterns

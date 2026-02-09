@@ -1,13 +1,6 @@
 ---
 name: local-config
 description: This skill should be used for configuring devloop project settings via .devloop/local.md, git workflow preferences, commit settings, review options
-whenToUse: Setting up project config, git workflow preferences, enabling auto-branching, configuring PR creation, commit style settings
-whenNotToUse: Reading plan.md, general git operations, one-time git commands
-seeAlso:
-  - skill: git-workflows
-    when: git branching strategy decisions
-  - skill: plan-management
-    when: working with plan.md format
 ---
 
 # Local Configuration

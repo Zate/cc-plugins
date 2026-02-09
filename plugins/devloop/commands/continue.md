@@ -11,7 +11,9 @@ allowed-tools:
   - Bash(${CLAUDE_PLUGIN_ROOT}/scripts/*.sh:*)
   - Task
   - AskUserQuestion
-  - TodoWrite
+  - TaskCreate
+  - TaskUpdate
+  - TaskList
   - Skill
 ---
 

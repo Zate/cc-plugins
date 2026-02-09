@@ -1,15 +1,6 @@
 ---
 name: python-patterns
 description: This skill should be used for Python idioms, type hints, async/await, pytest, Django, Flask, FastAPI, Python web frameworks, pandas, data processing
-whenToUse: Python code, type hints, async, pytest, .py files, Django, Flask, FastAPI, Python web, Python backend, pandas, data scripts
-whenNotToUse: Non-Python code, Jupyter-specific (use nbformat docs)
-seeAlso:
-  - skill: testing-strategies
-    when: pytest architecture
-  - skill: api-design
-    when: FastAPI/Flask endpoints
-  - skill: database-patterns
-    when: SQLAlchemy models
 ---
 
 # Python Patterns
