@@ -7,7 +7,7 @@
   },
   "metadata": {
     "description": "A curated marketplace of Claude Code plugins and skills for enhanced development workflows",
-    "version": "0.5.0",
+    "version": "0.4.1",
     "pluginRoot": "./plugins"
   },
   "plugins": [
