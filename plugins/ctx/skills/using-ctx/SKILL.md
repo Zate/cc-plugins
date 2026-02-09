@@ -115,10 +115,16 @@ This brings in past decisions without them cluttering every session.
 
 ## Coordination with MEMORY.md
 
-Claude Code has a built-in auto memory system (`MEMORY.md` in `~/.claude/projects/<project>/memory/`) that loads project-scoped notes into every conversation's system prompt. ctx is a separate structured knowledge graph.
+Claude Code has a built-in auto memory system (`MEMORY.md` in `~/.claude/projects/<project>/memory/`) that loads project-scoped notes into every conversation's system prompt. ctx is a separate structured knowledge graph. Both are loaded at session start, so duplicated content wastes context tokens.
 
 **Division of labor:**
-- **MEMORY.md**: Concise project-level notes -- release rules, gotchas, conventions, short reminders. File-based, project-scoped, always loaded.
+- **MEMORY.md**: Concise project-level notes -- release rules, gotchas, conventions, short reminders. File-based, project-scoped, always loaded (first 200 lines).
 - **ctx**: Detailed typed knowledge -- decisions, patterns, observations, hypotheses. Structured, cross-project, tiered, queryable.
 
-**Sync rule:** When updating one system, check if the other needs updating too. If they conflict, ctx is authoritative (it's structured and versioned). Keep MEMORY.md concise (under 200 lines) and use ctx for anything that needs detail, typing, or cross-project visibility.
+**When you write to MEMORY.md, you MUST also evaluate ctx:**
+1. Is this knowledge already in ctx? If so, do NOT duplicate it in MEMORY.md -- keep it in one place only.
+2. Does this belong in ctx instead? If it's a decision, pattern, observation, or cross-project knowledge, store it in ctx and keep only a brief reference (or nothing) in MEMORY.md.
+3. Does an existing ctx node need updating or removing? If the MEMORY.md change supersedes something in ctx, update or remove the ctx node.
+4. Take action -- don't just consider, actually emit the ctx commands (remember/supersede/summarize) in the same response.
+
+**When you store in ctx, check MEMORY.md too:** If the same fact exists in MEMORY.md, remove it from MEMORY.md to avoid duplication. ctx is authoritative (structured and versioned).
