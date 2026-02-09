@@ -107,6 +107,7 @@ Returning to work?
 | `/devloop:spike` | Explore & plan | Unclear requirements, need research |
 | `/devloop:run` | Autonomous execution | Execute plan tasks without prompting |
 | `/devloop:run --next-issue` | Full auto workflow | Pick next issue, plan, run, validate, ship |
+| `/devloop:run-swarm` | Swarm execution | Large plans (10+ tasks), fresh context per task |
 | `/devloop:continue` | Resume work | Plan exists, returning to work |
 | `/devloop:fresh` | Save state | Before clearing context |
 | `/devloop:quick` | Fast implementation | Bug fixes, small changes |

@@ -5,6 +5,29 @@ All notable changes to the devloop plugin are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.17.0] - 2026-02-09
+
+### Added - Swarm Execution Mode
+
+New `/devloop:run-swarm` command executes plan tasks via fresh-context subagents, eliminating the `/clear` + `/devloop:run` cycling for large plans.
+
+#### Features
+- `/devloop:run-swarm` — sequential task execution via `devloop:swarm-worker` agents
+- `--dry-run` flag to preview tasks without executing
+- `--max-tasks N` to limit execution batch size
+- Per-task context injection (relevant files, project conventions)
+- Phase boundary auto-commit support
+- Error handling with retry, skip, stop, and inline-fix options
+
+#### New Components
+- `agents/swarm-worker.md` — autonomous task executor with fresh context, memory:project
+- `scripts/gather-task-context.sh` — finds relevant files for worker context injection
+
+#### When to Use
+- Plans with 10+ tasks (avoids context degradation)
+- Well-defined implementation tasks
+- Use `/devloop:run` instead for small plans or exploration-heavy tasks
+
 ## [3.16.0] - 2026-02-09
 
 ### Changed - Claude Code Audit Integration
