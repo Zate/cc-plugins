@@ -35,6 +35,25 @@ if (-not $ctxCmd) {
     exit 0
 }
 
+# --- Minimum binary version required by this plugin ---
+$minBinaryVersion = '0.3.0'
+$binaryHint = ''
+try {
+    $rawVersion = & $ctxCmd version 2>$null
+    if ($rawVersion -match 'ctx\s+(\S+)') {
+        $currentVer = $Matches[1].TrimStart('v')
+        if ($currentVer -eq 'dev') {
+            $binaryHint = "**ctx binary is a dev build** - run ``/ctx:setup`` to install the release version (v${minBinaryVersion}+)."
+        } else {
+            $cur = [version]$currentVer
+            $min = [version]$minBinaryVersion
+            if ($cur -lt $min) {
+                $binaryHint = "**ctx binary outdated:** v${currentVer} installed, v${minBinaryVersion}+ required. Run ``/ctx:setup`` to upgrade."
+            }
+        }
+    }
+} catch {}
+
 # --- Check for updates (at most once per day) ---
 $updateHint = ''
 $ctxDir = Join-Path $env:USERPROFILE '.ctx'
@@ -125,6 +144,7 @@ if (Test-Path $skillPath) {
 
 # --- Combine context ---
 $parts = @()
+if ($binaryHint) { $parts += $binaryHint }
 if ($updateHint) { $parts += $updateHint }
 if ($ctxContext) { $parts += $ctxContext }
 if ($skillContent) { $parts += $skillContent }

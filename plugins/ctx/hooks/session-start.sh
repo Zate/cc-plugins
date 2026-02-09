@@ -10,6 +10,9 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PLUGIN_ROOT="$(dirname "$SCRIPT_DIR")"
 
+# Minimum binary version required by this plugin version
+MIN_BINARY_VERSION="0.3.0"
+
 # Check for ctx binary, install if missing
 if ! command -v ctx &> /dev/null; then
     # Check ~/.local/bin specifically (may not be in PATH yet)
@@ -22,6 +25,21 @@ if ! command -v ctx &> /dev/null; then
             echo '{"suppressOutput":true,"systemMessage":"ctx: binary installation failed. Run /ctx:setup to install manually."}'
             exit 0
         fi
+    fi
+fi
+
+# Check binary version against minimum requirement
+BINARY_HINT=""
+CURRENT_RAW=$(ctx version 2>/dev/null || echo "")
+CURRENT_VER=$(echo "$CURRENT_RAW" | grep -oP 'ctx \K[^\s]+' 2>/dev/null || echo "")
+if [ -z "$CURRENT_VER" ] || [ "$CURRENT_VER" = "dev" ]; then
+    BINARY_HINT="**ctx binary is a dev build** - run \`/ctx:setup\` to install the release version (v${MIN_BINARY_VERSION}+)."
+elif [ -n "$MIN_BINARY_VERSION" ]; then
+    # Strip leading v for comparison
+    CUR_CLEAN="${CURRENT_VER#v}"
+    NEWER=$(printf '%s\n%s\n' "$CUR_CLEAN" "$MIN_BINARY_VERSION" | sort -V | tail -1)
+    if [ "$NEWER" != "$CUR_CLEAN" ] && [ "$CUR_CLEAN" != "$MIN_BINARY_VERSION" ]; then
+        BINARY_HINT="**ctx binary outdated:** v${CUR_CLEAN} installed, v${MIN_BINARY_VERSION}+ required. Run \`/ctx:setup\` to upgrade."
     fi
 fi
 
@@ -82,10 +100,18 @@ if [ -f "$PLUGIN_ROOT/skills/using-ctx/SKILL.md" ]; then
     SKILL_CONTENT=$(awk 'BEGIN{skip=0} /^---$/{skip++; next} skip>=2{print}' "$PLUGIN_ROOT/skills/using-ctx/SKILL.md")
 fi
 
-# Combine ctx knowledge + skill enforcement + update hint
+# Combine ctx knowledge + skill enforcement + hints
 COMBINED=""
+if [ -n "$BINARY_HINT" ]; then
+    COMBINED="$BINARY_HINT"
+fi
 if [ -n "$UPDATE_HINT" ]; then
-    COMBINED="$UPDATE_HINT"
+    if [ -n "$COMBINED" ]; then
+        COMBINED="$COMBINED
+$UPDATE_HINT"
+    else
+        COMBINED="$UPDATE_HINT"
+    fi
 fi
 if [ -n "$CTX_CONTEXT" ]; then
     if [ -n "$COMBINED" ]; then
