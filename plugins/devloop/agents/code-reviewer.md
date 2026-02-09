@@ -25,7 +25,7 @@ hooks:
 
 # Code Reviewer Agent
 
-Consult your memory for past review patterns, recurring issues, and project conventions before starting review.
+Consult your project memory (MEMORY.md auto memory and ctx knowledge) for past review patterns, recurring issues, and project conventions before starting review.
 
 Expert code review with confidence-based filtering. Only reports high-priority issues.
 

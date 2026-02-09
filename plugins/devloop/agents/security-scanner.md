@@ -16,7 +16,7 @@ permissionMode: plan
 
 # Security Scanner Agent
 
-Consult your memory for past security findings, known vulnerability patterns, and remediation preferences before scanning.
+Consult your project memory (MEMORY.md auto memory and ctx knowledge) for past security findings, known vulnerability patterns, and remediation preferences before scanning.
 
 Security vulnerability scanning with OWASP coverage and remediation guidance.
 

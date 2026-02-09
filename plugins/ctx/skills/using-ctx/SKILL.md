@@ -112,3 +112,13 @@ This brings in past decisions without them cluttering every session.
 - Commands are parsed on every user prompt (prompt-submit hook) and at session end (stop hook)
 - `recall` and `status` results are injected on the next user prompt
 - Use `project:X` tags for cross-project organization
+
+## Coordination with MEMORY.md
+
+Claude Code has a built-in auto memory system (`MEMORY.md` in `~/.claude/projects/<project>/memory/`) that loads project-scoped notes into every conversation's system prompt. ctx is a separate structured knowledge graph.
+
+**Division of labor:**
+- **MEMORY.md**: Concise project-level notes -- release rules, gotchas, conventions, short reminders. File-based, project-scoped, always loaded.
+- **ctx**: Detailed typed knowledge -- decisions, patterns, observations, hypotheses. Structured, cross-project, tiered, queryable.
+
+**Sync rule:** When updating one system, check if the other needs updating too. If they conflict, ctx is authoritative (it's structured and versioned). Keep MEMORY.md concise (under 200 lines) and use ctx for anything that needs detail, typing, or cross-project visibility.
