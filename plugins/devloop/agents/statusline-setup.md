@@ -1,12 +1,12 @@
 ---
 name: statusline-setup
-description: Use this agent to configure the user's Claude Code status line setting.
+description: |
+  Use this agent to configure the user's Claude Code status line setting.
 
-<example>
-user: "Set up the devloop statusline"
-assistant: "I'll configure the devloop statusline for you."
-</example>
-
+  <example>
+  user: "Set up the devloop statusline"
+  assistant: "I'll configure the devloop statusline for you."
+  </example>
 tools: Read, Edit
 model: haiku
 color: cyan

@@ -1,12 +1,12 @@
 ---
 name: doc-generator
-description: Use this agent to generate or update READMEs, API docs, inline comments, and changelogs.
+description: |
+  Use this agent to generate or update READMEs, API docs, inline comments, and changelogs.
 
-<example>
-user: "Update the API documentation"
-assistant: "I'll launch devloop:doc-generator to document the API changes."
-</example>
-
+  <example>
+  user: "Update the API documentation"
+  assistant: "I'll launch devloop:doc-generator to document the API changes."
+  </example>
 tools: Read, Write, Edit, Grep, Glob, TaskCreate, TaskUpdate, TaskList
 model: sonnet
 color: teal

@@ -1,17 +1,17 @@
 ---
 name: task-planner
-description: Use this agent for planning implementations, gathering requirements, managing issues, and validating completion.
+description: |
+  Use this agent for planning implementations, gathering requirements, managing issues, and validating completion.
 
-<example>
-user: "Break this into tasks"
-assistant: "I'll launch devloop:task-planner to create an implementation plan."
-</example>
+  <example>
+  user: "Break this into tasks"
+  assistant: "I'll launch devloop:task-planner to create an implementation plan."
+  </example>
 
-<example>
-user: "Is this feature ready to ship?"
-assistant: "I'll use devloop:task-planner to validate Definition of Done."
-</example>
-
+  <example>
+  user: "Is this feature ready to ship?"
+  assistant: "I'll use devloop:task-planner to validate Definition of Done."
+  </example>
 tools: Read, Write, Edit, Grep, Glob, Bash, TaskCreate, TaskUpdate, TaskList, AskUserQuestion
 model: sonnet
 color: indigo

@@ -1,17 +1,17 @@
 ---
 name: engineer
-description: Use this agent for code exploration, architecture design, refactoring analysis, and git operations.
+description: |
+  Use this agent for code exploration, architecture design, refactoring analysis, and git operations.
 
-<example>
-user: "How does the payment processing work?"
-assistant: "I'll launch devloop:engineer to explore the payment system."
-</example>
+  <example>
+  user: "How does the payment processing work?"
+  assistant: "I'll launch devloop:engineer to explore the payment system."
+  </example>
 
-<example>
-user: "Create a PR for this feature"
-assistant: "I'll use devloop:engineer to handle the git workflow."
-</example>
-
+  <example>
+  user: "Create a PR for this feature"
+  assistant: "I'll use devloop:engineer to handle the git workflow."
+  </example>
 tools: Glob, Grep, Read, Write, Edit, Bash, TaskCreate, TaskUpdate, TaskList, WebSearch, AskUserQuestion
 model: sonnet
 memory: project

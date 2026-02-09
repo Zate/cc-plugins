@@ -1,12 +1,12 @@
 ---
 name: security-scanner
-description: Use this agent for security vulnerability scanning including OWASP Top 10, hardcoded secrets, and injection risks.
+description: |
+  Use this agent for security vulnerability scanning including OWASP Top 10, hardcoded secrets, and injection risks.
 
-<example>
-user: "Check if this auth code is secure"
-assistant: "I'll launch devloop:security-scanner to analyze security."
-</example>
-
+  <example>
+  user: "Check if this auth code is secure"
+  assistant: "I'll launch devloop:security-scanner to analyze security."
+  </example>
 tools: Bash, Read, Grep, Glob, TaskCreate, TaskUpdate, TaskList
 model: haiku
 memory: user

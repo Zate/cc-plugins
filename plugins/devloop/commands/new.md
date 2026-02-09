@@ -1,6 +1,6 @@
 ---
 description: Create a GitHub issue (or local issue with --local)
-argument-hint: [title or description] [--local]
+argument-hint: "[title or description] [--local]"
 allowed-tools:
   - Read
   - Write

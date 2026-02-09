@@ -1,12 +1,12 @@
 ---
 name: swarm-worker
-description: Autonomous task executor for devloop:run-swarm. Implements a single plan task with fresh context. Do not use for interactive work.
+description: |
+  Autonomous task executor for devloop:run-swarm. Implements a single plan task with fresh context. Do not use for interactive work.
 
-<example>
-Context: The orchestrator is running devloop:run-swarm and needs to execute a plan task
-assistant: "I'll spawn a swarm-worker to implement this task with fresh context."
-</example>
-
+  <example>
+  Context: The orchestrator is running devloop:run-swarm and needs to execute a plan task
+  assistant: "I'll spawn a swarm-worker to implement this task with fresh context."
+  </example>
 tools: Glob, Grep, Read, Write, Edit, Bash
 disallowedTools: AskUserQuestion
 model: sonnet

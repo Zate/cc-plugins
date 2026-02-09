@@ -1,12 +1,12 @@
 ---
 name: code-reviewer
-description: Use this agent for code review with bug detection, security analysis, and quality assessment. Uses confidence-based filtering.
+description: |
+  Use this agent for code review with bug detection, security analysis, and quality assessment. Uses confidence-based filtering.
 
-<example>
-user: "Review my changes before commit"
-assistant: "I'll launch devloop:code-reviewer to review your code."
-</example>
-
+  <example>
+  user: "Review my changes before commit"
+  assistant: "I'll launch devloop:code-reviewer to review your code."
+  </example>
 tools: Glob, Grep, Read, TaskCreate, TaskUpdate, TaskList, Bash, AskUserQuestion
 model: sonnet
 memory: project

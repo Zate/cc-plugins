@@ -1,17 +1,17 @@
 ---
 name: qa-engineer
-description: Use this agent for test generation, test execution, bug tracking, and deployment validation.
+description: |
+  Use this agent for test generation, test execution, bug tracking, and deployment validation.
 
-<example>
-user: "Write tests for the new UserService"
-assistant: "I'll launch devloop:qa-engineer to create tests."
-</example>
+  <example>
+  user: "Write tests for the new UserService"
+  assistant: "I'll launch devloop:qa-engineer to create tests."
+  </example>
 
-<example>
-user: "Run the tests"
-assistant: "I'll use devloop:qa-engineer to run tests and analyze results."
-</example>
-
+  <example>
+  user: "Run the tests"
+  assistant: "I'll use devloop:qa-engineer to run tests and analyze results."
+  </example>
 tools: Bash, Read, Write, Edit, Grep, Glob, TaskCreate, TaskUpdate, TaskList, AskUserQuestion
 model: sonnet
 color: green

@@ -5,6 +5,21 @@ All notable changes to the devloop plugin are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.17.1] - 2026-02-09
+
+### Fixed - Windows Compatibility & YAML Parse Errors
+
+#### YAML Frontmatter Fixes
+- Fix YAML parse errors in all 8 agent files — `<example>` tags now inside `description: |` multiline strings
+- Fix YAML parse error in `commands/new.md` — quoted `argument-hint` brackets
+
+#### Windows Hook Path Fix
+- Add polyglot `run-hook.cmd` dispatcher for cross-platform hook execution
+- Add PowerShell equivalents: `session-start.ps1`, `context-guard.ps1`, `init-devloop.ps1`
+- Add `scripts/run-script.cmd` dispatcher for Setup hook
+- Update `hooks.json` to use dispatcher pattern with quoted `${CLAUDE_PLUGIN_ROOT}` paths
+- Fixes `No such file or directory` error where Windows backslash paths were mangled by bash
+
 ## [3.17.0] - 2026-02-09
 
 ### Added - Swarm Execution Mode
