@@ -1,7 +1,7 @@
 ---
 name: using-ctx
 description: "MANDATORY persistent memory system. Use BEFORE responding when you've made decisions, discovered preferences, found patterns, or completed debugging. Use when the user references past discussions or asks about what you remember."
-whenToUse: "Any session where you make decisions, learn facts, debug issues, or establish conventions. This is automatic — ctx hooks manage the lifecycle."
+whenToUse: "Any session where you make decisions, learn facts, debug issues, or establish conventions. This is automatic -- ctx hooks manage the lifecycle."
 whenNotToUse: "Trivial single-turn Q&A with no decisions or learnings. When the user explicitly says not to store something."
 ---
 
@@ -12,18 +12,18 @@ You have persistent memory across conversations via `ctx`. Hooks automatically i
 ## The Rule
 
 BEFORE completing any response where you:
-- Made or learned a **decision** → store as `type="decision"`
-- Discovered a **preference** or convention → store as `type="fact"`
-- Found a recurring **pattern** → store as `type="pattern"`
-- Debugging revealed a **root cause** → store as `type="observation"`
-- Had an idea worth revisiting → store as `type="hypothesis"`
-- A question can't be answered now → store as `type="open-question"`
+- Made or learned a **decision** --> store as `type="decision"`
+- Discovered a **preference** or convention --> store as `type="fact"`
+- Found a recurring **pattern** --> store as `type="pattern"`
+- Debugging revealed a **root cause** --> store as `type="observation"`
+- Had an idea worth revisiting --> store as `type="hypothesis"`
+- A question can't be answered now --> store as `type="open-question"`
 
 **This is not optional. You are a stateless AI. If you don't store it, it's gone.**
 
 ## How to Store
 
-Always include a `tier:` tag. **Key question:** Every session? → `pinned`. Someday? → `reference`. This task? → `working`.
+Always include a `tier:` tag. **Key question:** Every session? --> `pinned`. Someday? --> `reference`. This task? --> `working`.
 
 ```xml
 <!-- Pinned: critical, needed every session -->
@@ -51,7 +51,7 @@ Chose PostgreSQL for multi-tenant concurrent write access.
 | `tier:working` | Yes | Current task context, debugging, scratch | "Token refresh fails on expired tokens" |
 | `tier:off-context` | No | Archived, rarely needed | Completed task logs, old debugging |
 
-### Type → Tier Quick Guide
+### Type --> Tier Quick Guide
 
 | When you hear/think... | Type | Tier |
 |------------------------|------|------|
@@ -65,7 +65,7 @@ Chose PostgreSQL for multi-tenant concurrent write access.
 
 ## Other Commands
 
-Recall (results injected on next prompt — use to access reference knowledge):
+Recall (results injected on next prompt - use to access reference knowledge):
 ```xml
 <ctx:recall query="type:decision AND tag:project:X"/>
 ```
@@ -108,7 +108,7 @@ This brings in past decisions without them cluttering every session.
 
 ## Rules
 
-- Commands in code blocks are ignored — only bare commands in your response text are processed
+- Commands in code blocks are ignored - only bare commands in your response text are processed
 - Commands are parsed on every user prompt (prompt-submit hook) and at session end (stop hook)
 - `recall` and `status` results are injected on the next user prompt
 - Use `project:X` tags for cross-project organization

@@ -47,7 +47,7 @@ if [ "$SHOULD_CHECK" = "true" ]; then
         update-available:*)
             CURRENT_V=$(echo "$CHECK_RESULT" | cut -d: -f2)
             LATEST_V=$(echo "$CHECK_RESULT" | cut -d: -f3)
-            UPDATE_HINT="**ctx update available:** ${CURRENT_V} → ${LATEST_V}. Run \`/ctx:setup\` to upgrade."
+            UPDATE_HINT="**ctx update available:** ${CURRENT_V} --> ${LATEST_V}. Run \`/ctx:setup\` to upgrade."
             ;;
     esac
 fi
