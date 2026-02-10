@@ -1,6 +1,8 @@
 ---
 name: architecture-patterns
 description: This skill should be used for system design, design patterns, architectural decisions, SOLID principles, clean code structure, code organization, refactoring strategy, software architecture
+whenToUse: System design, applying design patterns, refactoring strategy, SOLID principles
+whenNotToUse: Quick bug fixes, documentation updates, simple implementations
 context: fork
 ---
 

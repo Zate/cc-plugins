@@ -1,6 +1,8 @@
 ---
 name: pr-feedback
 description: This skill should be used for integrating PR review comments back into devloop plan, parsing review feedback, addressing reviewer concerns
+whenToUse: Integrating PR review comments, addressing reviewer concerns, iterating on PR
+whenNotToUse: Initial development before PR, writing new code
 ---
 
 # PR Feedback Integration

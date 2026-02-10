@@ -1,6 +1,8 @@
 ---
 name: git-workflows
 description: This skill should be used for branching strategies, conventional commits, PR workflows, and release management, git flow, trunk-based development, merge strategies
+whenToUse: Branching strategy, PR workflows, release management, merge decisions
+whenNotToUse: Writing code, running tests, initial implementation
 ---
 
 # Git Workflows

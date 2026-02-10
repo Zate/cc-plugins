@@ -5,6 +5,35 @@ All notable changes to the devloop plugin are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.17.6] - 2026-02-10
+
+### Added - Skill Auto-Triggers
+
+Added `whenToUse` and `whenNotToUse` YAML frontmatter to all 15 devloop skills, enabling Claude to autonomously invoke skills based on context:
+
+- atomic-commits: Preparing to commit, splitting large changes
+- api-design: REST/GraphQL API design, endpoints, versioning
+- architecture-patterns: System design, SOLID principles, refactoring strategy
+- database-patterns: Schema design, query optimization, migrations
+- devloop-audit: Auditing against Claude Code updates (manual invocation)
+- git-workflows: Branching strategy, PR workflows, release management
+- go-patterns: Writing Go code, Go idioms, goroutines
+- java-patterns: Java/Kotlin, Spring Boot, dependency injection
+- local-config: Configuring .devloop/local.md settings
+- plan-management: Creating/updating .devloop/plan.md
+- pr-feedback: Integrating PR review comments
+- python-patterns: Python, type hints, async/await, pytest
+- react-patterns: React hooks, components, state management
+- security-checklist: Security review, OWASP checks
+- testing-strategies: Test architecture, coverage strategy, TDD
+
+### Changed - Skill Compression
+
+Compressed oversized skills to improve context efficiency:
+
+- **devloop-audit**: 306 -> 131 lines (-57%) - Kept core audit steps, removed verbose examples
+- **local-config**: 272 -> 111 lines (-59%) - Consolidated settings reference into table format
+
 ## [3.17.5] - 2026-02-10
 
 ### Removed - Deprecated Commands

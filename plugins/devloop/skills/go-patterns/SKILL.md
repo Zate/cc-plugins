@@ -1,6 +1,8 @@
 ---
 name: go-patterns
 description: This skill should be used for Go idioms, error handling, goroutines, interfaces, and testing, golang, Go language, Go modules, Go concurrency
+whenToUse: Writing Go code, Go idioms, goroutines, Go testing
+whenNotToUse: Non-Go projects, JavaScript/Python/Java codebases
 ---
 
 # Go Patterns
