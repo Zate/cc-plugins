@@ -2,6 +2,21 @@
 
 This repository is a marketplace for Claude Code plugins. This document provides guidance for agents working in this codebase on how to build, structure, and contribute plugins.
 
+## Table of Contents
+
+- [Repository Structure](#repository-structure)
+- [Official Plugin Structure](#official-plugin-structure)
+- [Plugin Development Guidelines](#plugin-development-guidelines)
+- [Development Workflow](#development-workflow)
+- [Recommended Workflow Pattern (devloop)](#recommended-workflow-pattern-devloop)
+- [Command Orchestration Pattern](#command-orchestration-pattern)
+- [.devloop/ Directory Structure](#devloop-directory-structure)
+- [Key Principles](#key-principles)
+- [Marketplace Structure](#marketplace-structure)
+- [Versioning Guidelines](#versioning-guidelines-abc)
+
+---
+
 ## Repository Structure
 
 ```
@@ -256,10 +271,10 @@ This shows plugin loading, manifest validation, and component registration.
 |---------|----------|
 | `/devloop:new "title"` | Create GitHub issue (default), `--local` for offline |
 | `/devloop:issues` | List open GitHub issues |
-| `/devloop:from-issue N` | Create plan from GitHub issue #N |
-| `/devloop:plan "topic"` | Autonomous exploration → plan (1-2 prompts) |
-| `/devloop:plan --from-issue N` | Plan from GitHub issue |
-| `/devloop:spike "topic"` | Deep exploration (4-5 prompts, detailed report) |
+| `/devloop:plan "topic"` | Autonomous exploration -> plan (1-2 prompts) |
+| `/devloop:plan --deep` | Deep exploration with detailed report |
+| `/devloop:plan --quick` | Fast path for small tasks |
+| `/devloop:plan --from-issue N` | Plan from GitHub issue #N |
 | `/devloop:run` | Autonomous execution (default) |
 | `/devloop:run --interactive` | Prompt at each task checkpoint |
 | `/devloop:run --next-issue` | Auto-select next issue, plan, and run |
@@ -290,8 +305,15 @@ See `plugins/devloop/commands/fresh.md` for details.
 
 ### Deprecated Commands
 
-- `/devloop:continue` → Use `/devloop:run --interactive`
-- `/devloop:ralph` → Use `/devloop:run` (autonomous is default)
+| Old Command | New Command |
+|-------------|-------------|
+| `/devloop:spike` | `/devloop:plan --deep` |
+| `/devloop:quick` | `/devloop:plan --quick` |
+| `/devloop:from-issue N` | `/devloop:plan --from-issue N` |
+| `/devloop:continue` | `/devloop:run --interactive` |
+| `/devloop:ralph` | `/devloop:run` |
+
+The old commands still work as aliases but are deprecated.
 
 ---
 

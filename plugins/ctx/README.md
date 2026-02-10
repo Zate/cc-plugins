@@ -6,6 +6,42 @@ It's a Claude Code plugin that gives agents structured, persistent memory backed
 
 No more re-explaining your project conventions. No more re-discovering the same bugs. No more losing context when a session ends.
 
+## Quick Start
+
+```bash
+# Install the plugin
+/plugin install ctx
+
+# That's it. Memory is automatic.
+# Claude will store knowledge as it learns.
+# Everything persists to ~/.ctx/store.db
+```
+
+**First session:** ctx auto-downloads its binary and initializes the database.
+
+**Every session after:** Your stored knowledge is injected automatically.
+
+**Manual check:** `/ctx:status` shows what's stored.
+
+---
+
+## Coordination with MEMORY.md
+
+Claude Code has a built-in `MEMORY.md` in `~/.claude/projects/<project>/memory/`. Both ctx and MEMORY.md are loaded at session start.
+
+**Use both, but don't duplicate:**
+
+| Use MEMORY.md for... | Use ctx for... |
+|---------------------|----------------|
+| Short reminders | Detailed decisions with rationale |
+| Project-specific notes | Cross-project knowledge |
+| Quick conventions | Structured patterns, observations |
+| 1-2 line facts | Anything you'll want to query later |
+
+**Rule:** If it's a decision, pattern, or observation - put it in ctx. If it's a quick project note - MEMORY.md is fine.
+
+---
+
 ## How It Works
 
 ```
@@ -72,6 +108,32 @@ Tiers control what gets loaded into context and when. **Key question:** Every se
 | `tier:working` | Loaded for current task — temporary debugging, hypotheses |
 | `tier:off-context` | Archived — not loaded unless queried |
 
+## Best Practices
+
+### What to Store
+
+**Good candidates:**
+- Decisions with rationale ("Chose X because Y")
+- Patterns you want to remember ("Always use InstancedMesh for geometry")
+- User preferences ("Never auto-commit", "Use bun not npm")
+- Root causes from debugging ("The 404 was from missing CORS headers")
+
+### What NOT to Store
+
+**Avoid storing:**
+- Session-specific context (current task details, in-progress work)
+- Anything duplicated in MEMORY.md
+- Unverified conclusions from reading a single file
+- Temporary observations that won't matter next week
+
+### Tier Antipatterns
+
+**Too much pinned:** If you have 50+ pinned nodes, you're injecting too much context. Move older decisions to `tier:reference` and query them when needed.
+
+**Everything working:** Working tier is for current task context. Archive to reference when the task completes.
+
+**Never using recall:** Reference tier exists for durable but not-always-needed knowledge. Use `<ctx:recall>` to bring it back when relevant.
+
 ## Advanced Commands
 
 Claude can also use these in responses:
@@ -127,6 +189,23 @@ The `ctx` binary ([source](https://github.com/Zate/Memdown)) is a Go CLI that ma
 - **Windows**, **macOS**, or **Linux** (amd64 or arm64)
 - **Unix:** `curl`, `jq`
 - **Windows:** PowerShell 5.1+ (ships with Windows 10/11)
+
+## Troubleshooting
+
+**ctx binary not found:**
+Run `/ctx:setup` to reinstall. Requires `curl` and `jq` on Unix, PowerShell on Windows.
+
+**Knowledge not being stored:**
+Check that `<ctx:remember>` commands aren't inside code blocks. Only bare commands in response text are parsed.
+
+**Too much context being injected:**
+You have too many pinned nodes. Run `ctx list --tier pinned` to see what's loaded, then move older items to reference tier with `ctx tag <id> tier:reference`.
+
+**Recall not working:**
+Results are injected on the *next* prompt, not immediately. Send another message to see the results.
+
+**Database corrupted:**
+Delete `~/.ctx/store.db` and start fresh. Consider backing up this file periodically.
 
 ## FAQ
 

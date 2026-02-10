@@ -2,7 +2,7 @@
 
 > **A development workflow where Claude does the work and you stay in control.**
 
-[![Version](https://img.shields.io/badge/version-3.9.2-blue)](./CHANGELOG.md) [![Commands](https://img.shields.io/badge/commands-15-orange)](#commands) [![Agents](https://img.shields.io/badge/agents-7-green)](#agents) [![Skills](https://img.shields.io/badge/skills-14-purple)](#skills)
+[![Version](https://img.shields.io/badge/version-3.18.2-blue)](./CHANGELOG.md) [![Commands](https://img.shields.io/badge/commands-13-orange)](#commands) [![Agents](https://img.shields.io/badge/agents-7-green)](#agents) [![Skills](https://img.shields.io/badge/skills-15-purple)](#skills)
 
 **What devloop gives you:**
 - **Structured plans** that persist across sessions (`.devloop/plan.md`)
@@ -359,6 +359,22 @@ Run `/devloop:fresh`, then `/clear`, then `/devloop:run` to resume.
 
 ### Skill not loading
 Check `skills/INDEX.md` for the exact skill name. Use `Skill: exact-name`.
+
+---
+
+## Migration from v3.17
+
+v3.18 consolidated commands into flag-based modes:
+
+| Old Command | New Command |
+|-------------|-------------|
+| `/devloop:spike` | `/devloop:plan --deep` |
+| `/devloop:quick` | `/devloop:plan --quick` |
+| `/devloop:from-issue N` | `/devloop:plan --from-issue N` |
+| `/devloop:continue` | `/devloop:run --interactive` |
+| `/devloop:ralph` | `/devloop:run` |
+
+The old commands still work as aliases but are deprecated.
 
 ---
 

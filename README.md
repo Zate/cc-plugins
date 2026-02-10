@@ -2,7 +2,7 @@
 
 **A curated marketplace of high-quality Claude Code plugins for professional development workflows.**
 
-[![Plugins](https://img.shields.io/badge/plugins-1-blue)](.claude-plugin/marketplace.json) [![Claude Code](https://img.shields.io/badge/Claude%20Code-compatible-green)](https://code.claude.com) [![License](https://img.shields.io/badge/license-MIT-purple)](LICENSE)
+[![Plugins](https://img.shields.io/badge/plugins-3-blue)](.claude-plugin/marketplace.json) [![Claude Code](https://img.shields.io/badge/Claude%20Code-compatible-green)](https://code.claude.com) [![License](https://img.shields.io/badge/license-MIT-purple)](LICENSE)
 
 ---
 
@@ -12,33 +12,27 @@
 # Add this marketplace
 /plugin marketplace add Zate/cc-plugins
 
-# Install the devloop plugin
-/plugin install devloop
-
-# Start with exploration (recommended)
-/devloop:spike How should I implement user authentication?
-
-# Save state and clear context
-/devloop:fresh
-/clear
-
-# Resume work with fresh context
-/devloop:continue
+# Install plugins
+/plugin install devloop    # Workflow engine
+/plugin install ctx        # Persistent memory (optional but recommended)
 ```
 
-That's it. You're ready to go.
+### The 4-Step Workflow
 
-**New to plugins?** Check out the [Getting Started Guide](docs/GETTING_STARTED.md) for a complete walkthrough, or grab the [Quick Reference](docs/QUICK_REFERENCE.md) cheat sheet.
+```bash
+/devloop:plan "add user authentication"   # 1. Plan - explore and design
+/devloop:run                               # 2. Build - implement autonomously
+/devloop:ship                              # 3. Ship - commit and PR
+# Repeat                                   # 4. Start next feature
+```
 
-### The Recommended Workflow
+That's it. Claude does the work. You stay in control.
 
-devloop works best with the **spike → fresh → continue loop**:
+**Need deep exploration?** Use `/devloop:plan --deep "topic"` for comprehensive analysis.
 
-1. **Spike first** - `/devloop:spike` explores and creates a solid plan
-2. **Fresh regularly** - `/devloop:fresh` + `/clear` resets context every 5-10 tasks
-3. **Continue seamlessly** - `/devloop:continue` picks up exactly where you left off
+**Context getting heavy?** Use `/devloop:fresh && /clear && /devloop:run` every 5-10 tasks.
 
-This pattern keeps responses fast and focused while maintaining progress.
+**New to plugins?** Check out the [Getting Started Guide](docs/GETTING_STARTED.md) for a complete walkthrough.
 
 ---
 
@@ -46,48 +40,43 @@ This pattern keeps responses fast and focused while maintaining progress.
 
 | Plugin | Description | Components |
 |--------|-------------|------------|
-| **[devloop](plugins/devloop)** | Token-conscious feature development workflow with codebase refactoring analysis, 17 specialized agents, 22 skills, task completion enforcement, and strategic model selection | 17 agents, 11 commands, 22 skills |
+| **[devloop](plugins/devloop)** | Development workflow engine with autonomous planning and execution | 13 commands, 7 agents, 15 skills |
+| **[ctx](plugins/ctx)** | Persistent memory for Claude across sessions | 3 commands, 1 skill |
+| **[security](plugins/security)** | OWASP ASVS-aligned security audits | 1 command, 17 agents |
 
 ---
 
 ## Featured: devloop
 
-The flagship plugin for professional software development. A complete 12-phase workflow from requirements through deployment, plus codebase refactoring analysis.
+The flagship plugin for professional software development. Simple workflow: plan, build, ship, repeat.
 
 ```bash
 /plugin install devloop
 
-# The recommended workflow: spike → fresh → continue loop
-/devloop:spike How should we add user authentication?
-/devloop:fresh
-/clear
-/devloop:continue  # Work on tasks...
-/devloop:fresh     # After 5-10 tasks
-/clear
-/devloop:continue  # Keep going...
+# The workflow
+/devloop:plan "add user authentication"   # Plan with autonomous exploration
+/devloop:run                               # Execute tasks autonomously
+/devloop:ship                              # Commit and create PR
 
-# Other powerful commands
-/devloop:analyze   # Find tech debt and refactoring opportunities
-/devloop:quick Fix the typo in the header
-/devloop:review    # Code review before shipping
+# Variations
+/devloop:plan --deep "should we use OAuth?"  # Deep exploration first
+/devloop:plan --quick "fix the typo"         # Skip planning for tiny tasks
+/devloop:plan --from-issue 42                # Start from GitHub issue
 ```
 
 **Why devloop?**
 
-- **Fresh Start Loop**: Clear context regularly for faster, more focused responses
-- **Token-conscious**: Strategic model selection (20% opus / 60% sonnet / 20% haiku)
-- **Workflow Loop**: Mandatory checkpoints ensure tasks are actually completed
-- **Consolidated Agents**: 9 super-agents (down from 18) with multi-mode operation
-- **Refactoring Analysis**: Identify technical debt, large files, and code quality issues
-- **Language-aware**: Built-in patterns for Go, React, Java, and Python
-- **Quality-focused**: Security scanning, code review, and Definition of Done validation
+- **Claude does the work directly** - No routine agent spawning
+- **Fresh context = better reasoning** - Clear after 5-10 tasks
+- **Plans survive sessions** - Pick up where you left off
+- **Language-aware skills** - Go, React, Java, Python patterns on demand
+- **GitHub integration** - Issue-to-PR workflow
 
-**Recent Updates (v2.2.1)**:
-- Fresh start mechanism for context management
-- Workflow loop enforcement with mandatory checkpoints
-- Spike-to-plan application workflow
-- Agent consolidation reducing token overhead
-- Unified issue tracking system
+**v3.18 Highlights:**
+- Consolidated commands with flag-based modes
+- Autonomous execution with `/devloop:run`
+- Simplified agent set (7 focused agents)
+- 15 on-demand skills
 
 [Read the full devloop documentation →](plugins/devloop/README.md)
 
