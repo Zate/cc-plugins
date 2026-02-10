@@ -5,6 +5,34 @@ All notable changes to the devloop plugin are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.17.7] - 2026-02-10
+
+### Changed - Command Prompt Compression
+
+Compressed the 6 largest command prompts by ~51% for better performance:
+
+| Command | Before | After | Reduction |
+|---------|--------|-------|-----------|
+| run.md | 529 | 232 | -56% |
+| spike.md | 494 | 222 | -55% |
+| new.md | 499 | 233 | -53% |
+| help.md | 495 | 253 | -49% |
+| ship.md | 328 | 168 | -49% |
+| plan.md | 292 | 176 | -40% |
+| **Total** | **2637** | **1284** | **-51%** |
+
+**Preserved:**
+- All AskUserQuestion checkpoints and decision logic
+- All Bash commands and script invocations
+- Frontmatter (allowed-tools, description, etc.)
+- Phased structure and step numbering
+
+**Removed:**
+- Redundant explanations (said once, not three times)
+- Verbose examples (trimmed to minimum needed)
+- Wall-of-text sections
+- Repetitive concept descriptions
+
 ## [3.17.6] - 2026-02-10
 
 ### Added - Skill Auto-Triggers

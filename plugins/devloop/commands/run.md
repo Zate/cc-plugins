@@ -19,9 +19,7 @@ allowed-tools:
 
 # Devloop Run - Autonomous Plan Execution
 
-The unified command for executing plan tasks. Runs autonomously by default (ralph behavior).
-
-**You do the work directly.**
+Execute plan tasks autonomously. **You do the work directly.**
 
 ## Step 1: Check Plan State
 
@@ -29,31 +27,11 @@ The unified command for executing plan tasks. Runs autonomously by default (ralp
 "${CLAUDE_PLUGIN_ROOT}/scripts/check-plan-complete.sh" .devloop/plan.md
 ```
 
-Parse the JSON output:
-- `complete`: boolean - all tasks done?
-- `total`: number of total tasks
-- `done`: number completed
-- `pending`: number remaining
+Parse JSON: `complete`, `total`, `done`, `pending`.
 
-### If no plan exists (script errors or file missing):
+**No plan exists:** Display entry points (`/devloop:spike`, `/devloop:from-issue`, `/devloop`). STOP.
 
-```
-No active plan found.
-
-Start with:
-  /devloop:spike "topic"    - Explore before implementing
-  /devloop:from-issue 123   - Work from GitHub issue
-  /devloop                   - Smart entry point
-```
-
-Then STOP - do not continue.
-
-### If plan is complete (`complete: true`):
-
-```
-Plan complete! All [total] tasks finished.
-```
-
+**Plan complete (`complete: true`):**
 ```yaml
 AskUserQuestion:
   questions:
@@ -68,395 +46,145 @@ AskUserQuestion:
         - label: "Review first"
           description: "Review work before shipping"
 ```
+Route: Ship → `/devloop:ship`, Archive → run archive script then `/devloop`, Review → `/devloop:review`. STOP.
 
-**Routing:**
-- "Ship it" → `/devloop:ship`
-- "Archive and start new" → Run archive script, then `/devloop`
-- "Review first" → `/devloop:review`
-
-Then STOP - do not continue to autonomous execution.
-
-### If plan has pending tasks:
-
-Continue to Step 2.
+**Pending tasks:** Continue to Step 2.
 
 ## Step 2: Parse Arguments
 
-Check for flags in `$ARGUMENTS`:
+Flags in `$ARGUMENTS`:
+- `--max-iterations N`: Override 50 iteration limit
+- `--interactive`: Prompt at each task
+- `--next-issue[=auto]`: Issue-to-ship workflow
 
-- `--max-iterations N`: Override default 50 iteration limit
-- `--interactive`: Disable autonomous mode, prompt at each task
-- `--next-issue`: Fetch next GitHub issue, create plan, then run autonomously
-- `--next-issue=auto`: Same as above but skip issue selection confirmation
+Default: **autonomous** (no `--interactive`).
 
-Default behavior is **autonomous** (no `--interactive` flag).
-
-### If `--next-issue` flag detected:
-
-Jump to **Step 2b: Next Issue Workflow** instead of continuing to Step 3.
+If `--next-issue`: Jump to Step 2b.
 
 ## Step 2b: Next Issue Workflow
 
-When `--next-issue` is specified, orchestrate a complete issue-to-ship workflow:
+### 1. Check existing plan
+If incomplete plan exists, prompt to replace or cancel.
 
-### 1. Check for existing incomplete plan
-
-```bash
-"${CLAUDE_PLUGIN_ROOT}/scripts/check-plan-complete.sh" .devloop/plan.md
-```
-
-If plan exists and is incomplete, prompt:
-```yaml
-AskUserQuestion:
-  questions:
-    - question: "Existing plan has N pending tasks. Replace with next issue?"
-      header: "Conflict"
-      multiSelect: false
-      options:
-        - label: "Replace"
-          description: "Overwrite and start from next issue"
-        - label: "Cancel"
-          description: "Keep existing plan, exit --next-issue mode"
-```
-
-### 2. Fetch open issues
-
+### 2. Fetch issues
 ```bash
 gh issue list --state open --limit 20 --json number,title,labels,createdAt
 ```
+No issues? Display help and STOP.
 
-**If no open issues:**
-```
-No open issues found.
-
-Create issues at: gh issue create
-Or start work with: /devloop:plan "your feature"
-```
-Then STOP.
-
-### 3. Prioritize issues
-
-Apply prioritization logic:
-
+### 3. Prioritize
 | Priority | Criteria |
 |----------|----------|
-| 1 (highest) | Label contains "bug", "critical", "urgent" |
-| 2 | Label contains "security" |
-| 3 | Label contains "feat", "feature", "enhancement" |
-| 4 | Oldest issues (by createdAt) |
-| 5 (lowest) | Everything else |
-
-Select the highest priority issue.
+| 1 | bug, critical, urgent |
+| 2 | security |
+| 3 | feat, feature, enhancement |
+| 4 | Oldest by createdAt |
+| 5 | Everything else |
 
 ### 4. Confirm or auto-select
-
-**If `--next-issue` (no =auto):**
-```yaml
-AskUserQuestion:
-  questions:
-    - question: "Selected Issue #N: [title]. Work on this?"
-      header: "Issue"
-      multiSelect: false
-      options:
-        - label: "Yes, start work"
-          description: "Create plan and begin"
-        - label: "Pick different"
-          description: "Show all issues"
-        - label: "Cancel"
-          description: "Exit"
-```
-
-**If `--next-issue=auto`:**
-Display: "Auto-selected Issue #N: [title]"
-Proceed without confirmation.
+`--next-issue`: Prompt confirmation. `--next-issue=auto`: Proceed immediately.
 
 ### 5. Create plan from issue
-
-Fetch issue details and create plan:
 ```bash
 gh issue view $ISSUE_NUMBER --json number,title,body,labels,url
 ```
 
-Generate plan at `.devloop/plan.md` with this **required frontmatter**:
-
+Generate `.devloop/plan.md` with **required frontmatter**:
 ```yaml
 ---
 title: [Issue title]
-issue: [ISSUE_NUMBER]           # REQUIRED - used for auto-close
-issue_url: [Full GitHub URL]    # For reference
+issue: [ISSUE_NUMBER]           # REQUIRED for auto-close
+issue_url: [Full GitHub URL]
 status: In Progress
 created: [ISO date]
 ---
 ```
 
-**CRITICAL**: The `issue:` field is MANDATORY when creating from `--next-issue`. Without it, the auto-close workflow in Step 2b.7 will fail.
-
-Then generate:
-- Tasks derived from issue description
-- Standard plan structure (phases, tasks, progress log)
-
-Display: "Plan created from Issue #N"
-
-### 6. Continue to normal execution
-
-After plan is created, continue to Step 3 (Fresh Start State check) and proceed with normal autonomous execution.
+### 6. Continue to Step 3
 
 ### 7. Post-completion: Validate and ship
+Run validation (tests, lint, build). If fails, prompt fix/ship-anyway/stop.
 
-When all tasks complete (before Step 7's AskUserQuestion):
-
-**Run validation:**
+**IMPORTANT:** Commit MUST close the issue:
 ```bash
-# Detect and run tests
-if [ -f "package.json" ]; then npm test; fi
-if [ -f "go.mod" ]; then go test ./...; fi
-if [ -f "pyproject.toml" ] || [ -f "requirements.txt" ]; then pytest; fi
+git add -A && git commit -m "feat(scope): summary
 
-# Detect and run lint
-if [ -f "package.json" ] && grep -q '"lint"' package.json; then npm run lint; fi
-if [ -f "go.mod" ]; then golangci-lint run 2>/dev/null || go vet ./...; fi
-if [ -f "pyproject.toml" ]; then ruff check . 2>/dev/null || flake8 . 2>/dev/null; fi
-
-# Detect and run build
-if [ -f "package.json" ] && grep -q '"build"' package.json; then npm run build; fi
-if [ -f "go.mod" ]; then go build ./...; fi
+Closes #${ISSUE_NUMBER}"
 ```
 
-**If validation fails:**
-```yaml
-AskUserQuestion:
-  questions:
-    - question: "Validation failed. How to proceed?"
-      header: "Validation"
-      multiSelect: false
-      options:
-        - label: "Fix issues"
-          description: "Attempt to fix failing tests"
-        - label: "Ship anyway"
-          description: "Commit despite failures"
-        - label: "Stop"
-          description: "Pause for manual intervention"
-```
-
-**If validation passes (or skipped):**
-
-**IMPORTANT: In `--next-issue` mode, the commit MUST close the issue.**
-
-1. Read the issue number from `.devloop/plan.md` frontmatter (`issue: N`)
-2. Stage and commit with closing keyword:
+## Step 3: Check Fresh Start State
 
 ```bash
-git add -A
-git commit -m "$(cat <<'EOF'
-feat(scope): summary of changes
-
-Closes #${ISSUE_NUMBER}
-EOF
-)"
+if [ -f ".devloop/next-action.json" ]; then cat .devloop/next-action.json; rm .devloop/next-action.json; fi
 ```
-
-**The `Closes #N` line is MANDATORY in `--next-issue` mode** - do not ask, do not check config. The purpose of `--next-issue` is to work on an issue and close it. If the commit doesn't include the closing keyword, the issue won't close and the workflow fails.
-
-After successful commit, display:
-```
-Committed with: Closes #N
-Issue #N will be closed when pushed/merged.
-```
-
-Then offer next actions (push, create PR, etc.).
-
-## Step 3: Check for Fresh Start State
-
-```bash
-if [ -f ".devloop/next-action.json" ]; then
-  cat .devloop/next-action.json
-  rm .devloop/next-action.json
-fi
-```
-
-If `next-action.json` exists:
-1. Read the saved state
-2. Delete the file (single-use)
-3. Display: "Resuming from checkpoint: [context]"
+If exists: Resume from saved state.
 
 ## Step 4: Setup Autonomous Mode
 
-Unless `--interactive` was specified, set up ralph-loop state:
-
+Unless `--interactive`, create ralph-loop state:
 ```bash
-mkdir -p .claude
-
-cat > .claude/ralph-loop.local.md <<'RALPH_STATE'
+mkdir -p .claude && cat > .claude/ralph-loop.local.md <<'EOF'
 ---
 active: true
 iteration: 1
 max_iterations: ${MAX_ITERATIONS:-50}
 completion_promise: "ALL PLAN TASKS COMPLETE"
-started_at: "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
 devloop_integration: true
 ---
-
-Continue working on tasks from .devloop/plan.md.
-
-Work on the NEXT UNCHECKED task (marked `- [ ]`).
-After completing it, mark it `- [x]` in the plan.
-
-When ALL tasks are complete, output:
-<promise>ALL PLAN TASKS COMPLETE</promise>
-RALPH_STATE
+Work on NEXT UNCHECKED task (`- [ ]`). Mark `- [x]` when done.
+When ALL complete: <promise>ALL PLAN TASKS COMPLETE</promise>
+EOF
 ```
 
-Display status:
+Display: `Autonomous mode active. Progress: [done]/[total]. Starting...`
 
-```
-Autonomous mode active
-Plan: .devloop/plan.md
-Progress: [done]/[total] tasks ([pending] remaining)
-Max iterations: [max_iterations]
-
-Starting work...
-```
-
-## Step 4b: Sync Plan Tasks to Native Task System (Optional)
-
-For real-time progress tracking in Claude Code UI, sync pending tasks:
+## Step 4b: Sync to Native Tasks (Optional)
 
 ```bash
 "${CLAUDE_PLUGIN_ROOT}/scripts/sync-plan-to-tasks.sh" .devloop/plan.md
 ```
 
-For each pending task in the JSON output, use `TaskCreate`:
-- `subject`: Task subject from plan
-- `description`: Task description
-- `activeForm`: Present continuous form (e.g., "Implementing X")
+Use `TaskCreate` for pending tasks (subject, description, activeForm). Native tasks show UI progress; plan.md is authoritative.
 
-This creates native tasks that show progress in the UI. The plan.md remains the source of truth for persistence.
-
-**Note**: This step is optional. Native tasks provide UI feedback but plan.md is authoritative.
-
-**Large Plans (50+ tasks)**: For plans with many tasks, consider creating native tasks only for the current phase to avoid cluttering the `/tasks` view. Recreate tasks for the next phase when a phase completes.
-
-**Session Resume**: When resuming after `/clear` or a new session, run the sync script again to recreate native tasks from plan.md pending items. Already-completed tasks in plan.md are not recreated.
-
-**Task Marker Mapping**:
-
-| plan.md | Native Task Status |
-|---------|-------------------|
-| `- [ ]` | pending |
-| `- [~]` | in_progress |
-| `- [x]` | completed |
-| `- [!]` | blocked (use blockedBy) |
+**Task markers:** `- [ ]` pending, `- [~]` in_progress, `- [x]` completed, `- [!]` blocked.
 
 ## Step 5: Execute Tasks
 
-Read the plan:
+Read plan, find next `- [ ]` task.
 
-```bash
-cat .devloop/plan.md
-```
+**Do the work directly:**
+- Write/Edit for code
+- Bash for tests and git
+- Read/Grep/Glob for files
 
-Find the next pending task (marked with `- [ ]`).
+**Only use agents for:** parallel work, security scans, large exploration (50+ files).
 
-### Implement the Task Directly
-
-**You do the work. Do NOT spawn agents for routine tasks.**
-
-- Write code → Use Write/Edit tools
-- Run tests → Use Bash
-- Git operations → Use Bash
-- Read files → Use Read/Grep/Glob tools
-
-### Only Use Agents For:
-- **Parallel work**: Multiple independent tasks running simultaneously
-- **Security scan**: Full codebase audit (`devloop:security-scanner`)
-- **Large exploration**: Use `Explore` agent for codebase understanding
-
-### Before Starting Each Task
-
-If native tasks were created in Step 4b, mark the current task as in-progress:
-
-```
-TaskUpdate: taskId=[task-id], status="in_progress"
-```
-
-This shows a progress spinner in the UI while you work on the task.
+Mark current task `in_progress` via TaskUpdate before starting.
 
 ## Step 6: Update Plan After Each Task
 
-After completing a task:
+1. Mark done: `- [x] Task description`
+2. Update native task: `TaskUpdate status: "completed"`
+3. Check completion: `"${CLAUDE_PLUGIN_ROOT}/scripts/check-plan-complete.sh" .devloop/plan.md`
 
-1. Mark it done in the plan:
-   ```markdown
-   - [x] Completed task description
-   ```
+**All complete:** Output `<promise>ALL PLAN TASKS COMPLETE</promise>`
 
-2. **Update native task status** (if tasks were created in Step 4b):
-   - Use `TaskUpdate` with `status: "completed"` for the finished task
-   - Use `TaskUpdate` with `status: "in_progress"` for the next task
-
-3. Check completion status:
-   ```bash
-   "${CLAUDE_PLUGIN_ROOT}/scripts/check-plan-complete.sh" .devloop/plan.md
-   ```
-
-4. **If all tasks complete** (`complete: true`):
-
-   Output the promise tag to terminate the loop:
-   ```
-   All plan tasks complete!
-
-   <promise>ALL PLAN TASKS COMPLETE</promise>
-   ```
-
-5. **If tasks remain** (`complete: false`):
-
-   In autonomous mode: Continue to next task (no prompt)
-
-   In interactive mode (`--interactive`):
-   ```yaml
-   AskUserQuestion:
-     questions:
-       - question: "Completed [task]. What next?"
-         header: "Checkpoint"
-         multiSelect: false
-         options:
-           - label: "Continue"
-             description: "Move to next task"
-           - label: "Commit"
-             description: "Git commit this work"
-           - label: "Break"
-             description: "Save state, take a break"
-   ```
+**Tasks remain:**
+- Autonomous: Continue to next task
+- Interactive: Prompt continue/commit/break
 
 ## Step 6b: Auto-Commit at Phase Checkpoints
-
-Check local config for auto-commit setting:
 
 ```bash
 "${CLAUDE_PLUGIN_ROOT}/scripts/parse-local-config.sh" | grep -o '"auto_commit":[^,}]*' | cut -d: -f2
 ```
 
-**If `auto_commit: true` and a phase is complete** (all tasks in current phase marked `[x]`):
-
-1. Detect phase completion by checking if the next pending task is in a different phase
-2. Auto-commit the phase work:
-   ```bash
-   git add -A
-   git commit -m "feat(devloop): complete Phase N - [phase description]"
-   ```
-3. Display: "Auto-committed Phase N completion"
-4. Continue to next phase
-
-**Phase detection**: A phase is complete when the next `- [ ]` task appears under a different `## Phase` heading than the current completed task.
-
-In autonomous mode with `auto_commit: true`, commits happen automatically at phase boundaries without prompting.
+If `auto_commit: true` and phase complete:
+```bash
+git add -A && git commit -m "feat(devloop): complete Phase N - [description]"
+```
 
 ## Step 7: Handle Completion
-
-When all tasks are marked `[x]`:
-
-1. Output the promise tag (terminates ralph loop)
-2. Offer next steps:
 
 ```yaml
 AskUserQuestion:
@@ -473,56 +201,31 @@ AskUserQuestion:
           description: "Review before shipping"
 ```
 
-## When the Loop Stops
+## Loop Termination
 
-The autonomous loop terminates when:
-- All tasks marked `[x]` AND promise tag output
-- Max iterations reached (safety limit)
-- User runs `/cancel-ralph` (manual stop)
-- Error or ambiguous situation requiring user input
+- All tasks `[x]` AND promise tag output
+- Max iterations reached
+- `/cancel-ralph`
+- Error requiring user input
 
-## Available Skills (Load On Demand)
+## Skills (On Demand)
 
-If you need specialized knowledge:
+Load when needed: `plan-management`, `git-workflows`, `testing-strategies`, `[language]-patterns`.
 
-```
-Skill: plan-management      # Plan file conventions
-Skill: git-workflows        # Complex git operations
-Skill: testing-strategies   # Test design patterns
-Skill: [language]-patterns  # Language-specific idioms
-```
-
-Load skills when the task requires domain expertise, not preemptively.
-
-## Example Usage
+## Examples
 
 ```bash
-# Default: autonomous execution
-/devloop:run
-
-# Extended iterations for large plans
-/devloop:run --max-iterations 100
-
-# Interactive mode (prompt at each task)
-/devloop:run --interactive
-
-# Auto-select next issue, plan, run, validate, and ship
-/devloop:run --next-issue
-
-# Fully autonomous: no confirmation prompts
-/devloop:run --next-issue=auto
-
-# Check progress mid-run
-head -10 .claude/ralph-loop.local.md
+/devloop:run                          # Autonomous (default)
+/devloop:run --max-iterations 100     # Extended limit
+/devloop:run --interactive            # Prompt each task
+/devloop:run --next-issue             # Full issue-to-ship
+/devloop:run --next-issue=auto        # No confirmation
 ```
 
-## Migration Notes
+## Migration
 
-This command replaces:
-- `/devloop:continue` - Use `/devloop:run --interactive` for similar behavior
-- `/devloop:ralph` - `/devloop:run` is autonomous by default
-
-Both old commands now alias to this one.
+- `/devloop:continue` → `/devloop:run --interactive`
+- `/devloop:ralph` → `/devloop:run`
 
 ---
 

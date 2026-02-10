@@ -17,33 +17,21 @@ allowed-tools:
 
 # Ship - Commit and PR
 
-Validate and ship your changes with branch-aware workflow. **You do the work directly.**
+Validate and ship changes with branch-aware workflow. **You do the work directly.**
 
 ## Phase 1: Pre-flight Check
 
-**Gather context:**
-
 ```bash
-git status
-git diff --stat
-git branch --show-current
+git status && git diff --stat && git branch --show-current
 ```
 
-**Check for local config:**
+Read `.devloop/local.md` for preferences: `git.pr-on-complete`, `commits.style`.
 
-If `.devloop/local.md` exists, read git workflow preferences:
-- `git.pr-on-complete`: ask | always | never
-- `commits.style`: conventional | simple
-
-**Determine branch context:**
-
-| Branch | Likely Flow |
-|--------|-------------|
-| `main`/`master` | Direct commit (caution) |
-| `feat/*`, `fix/*` | Feature branch → PR |
+| Branch | Flow |
+|--------|------|
+| main/master | Direct commit (caution) |
+| feat/*, fix/* | Feature branch → PR |
 | Other | Ask user |
-
-**Ask ship mode:**
 
 ```yaml
 AskUserQuestion:
@@ -62,267 +50,119 @@ AskUserQuestion:
           description: "One commit per completed plan task"
 ```
 
----
-
 ## Phase 2: Validation (if Full mode)
 
-**Run tests:**
+**Run tests:** Detect from package.json/go.mod/requirements.txt/pom.xml.
+**Code review:** If `review.before-commit: always`, use `devloop:code-reviewer`.
+**Safety:** No secrets, no debug code, correct branch.
 
-Detect test runner from project:
-```bash
-npm test          # package.json
-go test ./...     # go.mod
-pytest            # requirements.txt/pyproject.toml
-mvn test          # pom.xml
-```
+## Phase 3: Smart Commit
 
-**Code review check:**
-
-If `review.before-commit` is `always` or user chooses:
-- Use `devloop:code-reviewer` agent
-- Or specified `review.use-plugin`
-
-**Safety checks:**
-- No secrets in staged files (API keys, passwords)
-- No debug code (console.log, print statements)
-- Verify correct branch
-
-**Tip**: If the `superpowers` plugin is installed, consider using `Skill: superpowers:verification-before-completion` for rigorous verification.
-
----
-
-## Phase 3: Smart Commit Strategy
-
-**If plan exists at `.devloop/plan.md`:**
-
+If plan exists:
 1. Find tasks marked `[x]` since last commit
-2. Offer commit strategy:
+2. Offer: single commit vs atomic commits
 
-```yaml
-AskUserQuestion:
-  questions:
-    - question: "Found N completed tasks. How to commit?"
-      header: "Strategy"
-      multiSelect: false
-      options:
-        - label: "Single commit"
-          description: "Squash all into one commit"
-        - label: "Atomic commits"
-          description: "One commit per task"
+**Conventional style:**
+```
+<type>(<scope>): <description>
+
+- Task 1.1: Description
+- Task 1.2: Description
 ```
 
-**Generate commit messages:**
-
-For conventional style (`commits.style: conventional`):
-```
-<type>(<scope>): <task description>
-
-- Task 1.1: Created local-config skill
-- Task 1.2: Added config parsing
-```
-
-Type mapping from task names:
 | Task Contains | Type |
 |---------------|------|
-| Create, Add, Implement | `feat` |
-| Fix, Resolve, Repair | `fix` |
-| Refactor, Clean, Improve | `refactor` |
-| Test, Spec | `test` |
-| Doc, README | `docs` |
-| Other | `chore` |
+| Create, Add, Implement | feat |
+| Fix, Resolve | fix |
+| Refactor, Clean | refactor |
+| Test, Spec | test |
+| Doc, README | docs |
+| Other | chore |
 
-Scope: Use plan name slugified, or detect from files changed.
-
-**Add GitHub issue closing keyword (if linked):**
-
-If `.devloop/plan.md` has an `issue:` field in frontmatter:
-
-1. Read the issue number from plan frontmatter
-2. Check `github.auto_close` config:
-   - `always`: Auto-add closing keyword
-   - `ask`: Prompt user
-   - `never`: Skip
-
-3. If adding closing keyword:
-   - For `fix` commits: Use `Fixes #N`
-   - For other commits: Use `Closes #N`
-   - Add on a blank line after the commit body
-
-```yaml
-# Only if github.auto_close is "ask"
-AskUserQuestion:
-  questions:
-    - question: "Close Issue #N with this commit?"
-      header: "Issue"
-      multiSelect: false
-      options:
-        - label: "Yes, close it"
-          description: "Add 'Closes #N' to commit"
-        - label: "No, keep open"
-          description: "Don't add closing keyword"
-```
-
-**Execute commits:**
+**Issue closing:** If plan has `issue:` in frontmatter:
+- `github.auto_close: always` → Auto-add `Closes #N`
+- `github.auto_close: ask` → Prompt
+- `github.auto_close: never` → Skip
 
 ```bash
-git add -A
-git commit -m "$(cat <<'EOF'
-feat(git-workflow): add local config system
+git add -A && git commit -m "$(cat <<'EOF'
+feat(scope): description
 
-- Task 1.1: Created skills/local-config/SKILL.md
-- Task 1.2: Added scripts/parse-local-config.sh
-- Task 1.3: Updated session-start hook
+- Task 1.1: Description
+- Task 1.2: Description
 
 Closes #42
 EOF
 )"
 ```
 
-Note: The `Closes #42` line is only added when:
-- Plan has `issue:` in frontmatter
-- `github.auto_close` is `always`, or user confirms when `ask`
-
----
-
 ## Phase 4: PR Creation
-
-**When to create PR:**
 
 | Condition | Action |
 |-----------|--------|
-| On main/master | Skip PR (already on main) |
-| `pr-on-complete: never` | Skip PR |
-| `pr-on-complete: always` | Auto-create |
-| `pr-on-complete: ask` | Ask user |
+| On main/master | Skip |
+| pr-on-complete: never | Skip |
+| pr-on-complete: always | Auto-create |
+| pr-on-complete: ask | Ask user |
 
-**Generate PR description from plan:**
-
+Generate PR from plan:
 ```markdown
 ## Summary
-
-[Plan title and overview from .devloop/plan.md]
+[Plan title and overview]
 
 ## Changes
-
 - [x] Task 1.1: Description
 - [x] Task 1.2: Description
-- [x] Task 1.3: Description
 
 ## Testing
-
 - [ ] Tests pass locally
 - [ ] Code reviewed
-
-## Related
-
-- Spike: `.devloop/spikes/[topic].md`
 ```
-
-**Create PR:**
 
 ```bash
-gh pr create --title "[Plan Title]" --body "$(cat <<'EOF'
-[Generated description]
-EOF
-)"
+gh pr create --title "[Plan Title]" --body "[Description]"
 ```
 
-If PR created successfully, capture URL for plan update.
+## Phase 5: Post-Ship
 
----
-
-## Phase 5: Post-Ship Actions
-
-**Update plan:**
-
-If `.devloop/plan.md` exists:
-
-1. Add PR link to plan header (if PR created):
-   ```markdown
-   **PR**: https://github.com/owner/repo/pull/123
-   ```
-
-2. Add Progress Log entry:
-   ```markdown
-   - YYYY-MM-DD: Shipped Phase N - [brief description]
-   ```
-
+1. Add PR link to plan header
+2. Add Progress Log entry
 3. If all tasks complete, update status to `Complete`
-
-**Check if plan is complete and offer archival:**
 
 ```bash
 "${CLAUDE_PLUGIN_ROOT}/scripts/check-plan-complete.sh" .devloop/plan.md
 ```
 
-If `complete: true`, suggest next action with archive option:
-
+**If complete:**
 ```yaml
 AskUserQuestion:
   questions:
-    - question: "Ship complete. All tasks done! What next?"
+    - question: "All tasks done! What next?"
       header: "Next"
       multiSelect: false
       options:
         - label: "Archive plan"
-          description: "Move completed plan to archive, start fresh"
+          description: "Move to archive, start fresh"
         - label: "Wait for review"
-          description: "PR created, wait for feedback before archiving"
+          description: "PR created, wait for feedback"
         - label: "Done"
           description: "Keep plan for reference"
 ```
 
-### If "Archive plan":
-```bash
-"${CLAUDE_PLUGIN_ROOT}/scripts/archive-plan.sh" .devloop/plan.md
-```
+Archive: `"${CLAUDE_PLUGIN_ROOT}/scripts/archive-plan.sh" .devloop/plan.md`
 
-Display:
-```
-Plan archived to: .devloop/archive/YYYY-MM-DD-{slug}.md
-
-Great work! Ready for the next project.
-```
-
-If plan is NOT complete, offer:
-
-```yaml
-AskUserQuestion:
-  questions:
-    - question: "Ship complete. What next?"
-      header: "Next"
-      multiSelect: false
-      options:
-        - label: "Continue work"
-          description: "Move to next phase"
-        - label: "Wait for review"
-          description: "PR created, wait for feedback"
-        - label: "Done for now"
-          description: "Take a break"
-```
-
----
+**If not complete:** Offer continue/wait/break.
 
 ## Safety Checklist
 
-Before any commit:
-- [ ] No secrets in staged files
-- [ ] No debug statements
-- [ ] Correct branch
-- [ ] Tests pass (if validation mode)
-
-Before PR:
-- [ ] Meaningful commit messages
-- [ ] PR description complete
-- [ ] Base branch correct (usually main)
-
----
+Before commit: No secrets, no debug, correct branch, tests pass.
+Before PR: Good messages, PR description, correct base branch.
 
 ## Quick Reference
 
-| Mode | What It Does |
-|------|--------------|
+| Mode | Flow |
+|------|------|
 | Full validation | Test → Review → Commit → PR |
 | Quick commit | Commit only |
-| PR only | Create PR from existing commits |
-| Atomic commits | One commit per plan task |
+| PR only | Create PR from commits |
+| Atomic commits | One commit per task |

@@ -8,11 +8,11 @@ allowed-tools:
 
 # Devloop Help
 
-Interactive guide to using devloop effectively.
+Interactive guide to devloop.
 
-## Step 1: Choose a Topic
+## Step 1: Choose Topic
 
-If `$ARGUMENTS` specifies a topic, skip to that section. Otherwise, ask:
+If `$ARGUMENTS` specifies a topic, skip to that section. Otherwise:
 
 ```yaml
 AskUserQuestion:
@@ -24,16 +24,12 @@ AskUserQuestion:
         - label: "Getting Started"
           description: "New to devloop? Start here"
         - label: "Commands"
-          description: "What each command does and when to use it"
+          description: "What each command does"
         - label: "The Loop"
           description: "The spike -> fresh -> continue cycle"
         - label: "Skills & Agents"
           description: "On-demand knowledge and parallel work"
 ```
-
-## Step 2: Show Topic Content
-
-Based on selection, display the appropriate section below.
 
 ---
 
@@ -41,161 +37,108 @@ Based on selection, display the appropriate section below.
 
 ## What is devloop?
 
-devloop is a development workflow plugin where **Claude does the work directly**.
+Development workflow where **Claude does the work directly**. No routine agents. Just you, Claude, and the code.
 
-No routine agent spawning. No model selection. Just you, Claude, and the code.
-
-## Philosophy
-
-> "Ship features, not excuses."
-
-- **You stay in control** - checkpoints, approvals, visibility
-- **Claude does the work** - reads files, writes code, runs tests, commits
-- **Agents only for parallel work** - not routine tasks
-
-## Quick Start (3 Commands)
+## Quick Start
 
 ```bash
-# 1. Explore and plan
-/devloop:spike How should we implement feature X?
-
-# 2. Save state, clear context
-/devloop:fresh
-/clear
-
-# 3. Resume and work
-/devloop:continue
+/devloop:spike How should we implement feature X?   # Explore and plan
+/devloop:fresh && /clear                            # Save state, clear context
+/devloop:run                                        # Execute tasks
 ```
 
-That's the core loop. Repeat steps 2-3 every 5-10 tasks.
+Repeat fresh/clear/run every 5-10 tasks.
 
-## Your First Session
+## First Session
 
-1. **Have a task?** Run `/devloop:spike [your task]`
-2. **Claude explores** the codebase, creates a plan
-3. **You approve** the plan
-4. **Run `/devloop:fresh`** then `/clear`
-5. **Run `/devloop:continue`** to start implementing
-6. **Checkpoint every few tasks** - commit, break, or continue
+1. Have a task? `/devloop:spike [task]`
+2. Claude explores, creates plan
+3. You approve
+4. `/devloop:fresh` then `/clear`
+5. `/devloop:run` to implement
+6. Checkpoint every few tasks
 
 ---
 
 # Topic: Commands
 
-## Which Command Should I Use?
+## Decision Tree
 
 ```
 Starting new work?
-├── Unclear requirements → /devloop:spike (explore first)
-├── Small, clear task → /devloop:quick (skip planning)
-└── Have a plan already → /devloop:continue
+├── Unclear requirements → /devloop:spike
+├── Small, clear task    → /devloop:quick
+└── Have a plan          → /devloop:run
 
 Mid-workflow?
-├── Need to clear context → /devloop:fresh → /clear → /devloop:continue
-├── Ready to commit → /devloop:ship
-└── Want code review → /devloop:review
+├── Context heavy        → /devloop:fresh → /clear → /devloop:run
+├── Ready to commit      → /devloop:ship
+└── Want review          → /devloop:review
 
-Returning to work?
-└── Always → /devloop:continue
+Returning?
+└── /devloop:run
 ```
 
 ## Command Reference
 
-| Command | Purpose | When to Use |
-|---------|---------|-------------|
-| `/devloop` | Start new workflow | No plan exists, starting fresh |
-| `/devloop:spike` | Explore & plan | Unclear requirements, need research |
-| `/devloop:run` | Autonomous execution | Execute plan tasks without prompting |
-| `/devloop:run --interactive` | Interactive execution | Execute with checkpoint prompts |
-| `/devloop:run --next-issue` | Full auto workflow | Pick next issue, plan, run, validate, ship |
-| `/devloop:run-swarm` | Swarm execution | Large plans (10+ tasks), fresh context per task |
-| `/devloop:fresh` | Save state | Before clearing context |
-| `/devloop:quick` | Fast implementation | Bug fixes, small changes |
-| `/devloop:review` | Code review | Before shipping, PR review |
-| `/devloop:ship` | Commit & PR | Ready to ship changes |
-| `/devloop:archive` | Archive completed plan | Plan is done, want fresh start |
-| `/devloop:from-issue` | Start from GH issue | Issue-driven development |
-| `/devloop:statusline` | Configure statusline | Set up devloop statusline |
-| `/devloop:help` | This guide | Learning devloop |
-
-## Examples
-
-**New feature with unclear scope:**
-```bash
-/devloop:spike Add user authentication
-# Claude explores, creates plan
-/devloop:fresh && /clear
-/devloop:continue
-```
-
-**Quick bug fix:**
-```bash
-/devloop:quick Fix null pointer in UserService.getById()
-```
-
-**Resume yesterday's work:**
-```bash
-/devloop:run
-```
+| Command | Purpose |
+|---------|---------|
+| `/devloop` | Start new workflow |
+| `/devloop:spike` | Explore & plan |
+| `/devloop:run` | Autonomous execution |
+| `/devloop:run --interactive` | With checkpoints |
+| `/devloop:run --next-issue` | Full issue-to-ship |
+| `/devloop:run-swarm` | Swarm for 10+ tasks |
+| `/devloop:fresh` | Save state for clear |
+| `/devloop:quick` | Fast implementation |
+| `/devloop:review` | Code review |
+| `/devloop:ship` | Commit & PR |
+| `/devloop:archive` | Archive completed plan |
+| `/devloop:from-issue` | Start from GH issue |
+| `/devloop:statusline` | Configure statusline |
+| `/devloop:help` | This guide |
 
 ---
 
 # Topic: The Loop
 
-## The Pattern
+## Pattern
 
 ```
-┌─────────────────────────────────────────────────────────┐
-│  1. /devloop:spike [topic]                              │
-│     └─→ Explores codebase, creates plan                 │
-└────────────────────────┬────────────────────────────────┘
-                         ↓
-┌─────────────────────────────────────────────────────────┐
-│  2. /devloop:fresh                                      │
-│     └─→ Saves state to .devloop/next-action.json        │
-└────────────────────────┬────────────────────────────────┘
-                         ↓
-┌─────────────────────────────────────────────────────────┐
-│  3. /clear                                              │
-│     └─→ Resets conversation context                     │
-└────────────────────────┬────────────────────────────────┘
-                         ↓
-┌─────────────────────────────────────────────────────────┐
-│  4. /devloop:continue                                   │
-│     └─→ Resumes from saved state                        │
-│     └─→ Works through tasks with checkpoints            │
-└────────────────────────┬────────────────────────────────┘
-                         │
-                   After 5-10 tasks?
-                         │
-              ┌──────────┴──────────┐
-              Yes                   No
-               ↓                     ↓
-         Loop back to 2        Keep working
+/devloop:spike [topic]  →  Creates plan
+       ↓
+/devloop:fresh          →  Saves state
+       ↓
+/clear                  →  Resets context
+       ↓
+/devloop:run            →  Implements tasks
+       ↓
+After 5-10 tasks?
+├── Yes → Loop to fresh
+└── No  → Continue
 ```
 
-## Why This Works
+## Why It Works
 
-1. **Fresh context = better reasoning** - Claude performs better with clean context
-2. **Plan preserves progress** - Work never lost between sessions
-3. **Checkpoints keep you in control** - Approve, adjust, or pause anytime
-4. **Sustainable pace** - Avoid context overload
+- Fresh context = better reasoning
+- Plan preserves progress
+- Checkpoints keep control
+- Sustainable pace
 
-## When to Fresh Start
+## When to Fresh
 
-- After completing 5-10 tasks
-- When responses feel slow
-- After long exploration or agent work
+- After 5-10 tasks
+- When responses slow
+- After long exploration
 - Before taking a break
-- When Claude suggests it
 
 ## State Files
 
 | File | Purpose |
 |------|---------|
-| `.devloop/plan.md` | Current task plan (persists) |
-| `.devloop/next-action.json` | Fresh start state (consumed on continue) |
-| `.devloop/worklog.md` | Optional work history |
+| `.devloop/plan.md` | Current plan (persists) |
+| `.devloop/next-action.json` | Fresh state (consumed) |
+| `.devloop/worklog.md` | Work history |
 
 ---
 
@@ -203,67 +146,38 @@ Returning to work?
 
 ## Skills: On-Demand Knowledge
 
-Skills are specialized knowledge that Claude loads when needed.
-
-**How to use:**
-```
-Skill: skill-name
-```
-
-**Available skills:**
+Load when needed: `Skill: skill-name`
 
 | Skill | Purpose |
 |-------|---------|
-| `plan-management` | Working with .devloop/plan.md |
-| `go-patterns` | Go idioms, error handling, testing |
-| `python-patterns` | Python best practices, pytest |
-| `react-patterns` | React/TypeScript, hooks, components |
-| `java-patterns` | Java/Spring patterns |
-| `git-workflows` | Git operations, branching |
-| `atomic-commits` | Commit best practices |
-| `testing-strategies` | Test design patterns |
-| `api-design` | REST/GraphQL API design |
-| `database-patterns` | SQL, schema design |
-| `architecture-patterns` | System design, SOLID |
-| `security-checklist` | Security review, OWASP |
+| `plan-management` | Working with plan.md |
+| `go-patterns` | Go idioms, testing |
+| `python-patterns` | Python best practices |
+| `react-patterns` | React/TypeScript |
+| `java-patterns` | Java/Spring |
+| `git-workflows` | Git operations |
+| `atomic-commits` | Commit practices |
+| `testing-strategies` | Test design |
+| `api-design` | REST/GraphQL |
+| `database-patterns` | SQL, schema |
+| `architecture-patterns` | System design |
+| `security-checklist` | Security review |
 
-**Don't preload.** Claude loads skills automatically when the task requires specialized knowledge.
+**Don't preload.** Claude loads automatically when needed.
 
 ## Agents: Parallel Work Only
 
-Agents are for **parallel, independent tasks** - not routine work.
-
-**When to use agents:**
-- Multiple independent implementations running simultaneously
-- Full codebase security scan
-- Large codebase exploration (50+ files)
-
-**When NOT to use agents:**
-- Writing code (Claude does it directly)
-- Running tests (use Bash)
-- Git operations (use Bash)
-- Single-file changes
-- Documentation
-
-**Available agents:**
+**Use for:** parallel implementations, security scans, large exploration (50+ files)
+**Don't use for:** writing code, tests, git ops, single files, docs
 
 | Agent | Purpose |
 |-------|---------|
-| `devloop:engineer` | Code exploration, architecture, refactoring |
-| `devloop:qa-engineer` | Test generation, bug tracking |
+| `devloop:engineer` | Exploration, architecture |
+| `devloop:qa-engineer` | Test generation |
 | `devloop:task-planner` | Planning, requirements |
 | `devloop:code-reviewer` | Quality review |
-| `devloop:security-scanner` | OWASP, secrets, injection risks |
+| `devloop:security-scanner` | OWASP, secrets |
 | `devloop:doc-generator` | READMEs, API docs |
-
-## Optional: Superpowers Integration
-
-If you have the `superpowers` plugin installed, devloop skills link to complementary superpowers skills:
-- `testing-strategies` → `superpowers:test-driven-development`
-- `git-workflows` → `superpowers:using-git-worktrees`, `superpowers:finishing-a-development-branch`
-- `architecture-patterns` → `superpowers:systematic-debugging`
-
-Superpowers is NOT required - devloop works standalone.
 
 ---
 
@@ -271,75 +185,18 @@ Superpowers is NOT required - devloop works standalone.
 
 ## Common Issues
 
-### Plan file corrupted or stuck
-```bash
-# Delete and start fresh
-rm .devloop/plan.md
-/devloop
-```
-
-### Session ended unexpectedly
-```bash
-# Just run - picks up from plan
-/devloop:run
-```
-
-### Want to abandon current plan
-```bash
-# Archive old plan (if complete), start new
-/devloop:archive
-/devloop
-```
-
-### Issue-driven development
-```bash
-# Start work from GitHub issue
-/devloop:from-issue 123
-# On completion, plan syncs back to issue
-```
-
-### Context feels heavy/slow
-```bash
-# Try partial summarization first (lighter than full reset)
-# Press Esc+Esc to compress context without losing state
-
-# If that's not enough, do a full reset
-/devloop:fresh
-/clear
-/devloop:run
-```
-
-### Skill not loading
-Check `skills/INDEX.md` for exact name. Use `Skill: exact-name`.
-
-### Plan progress not saving
-Make sure tasks are marked `[x]` not `[X]`. Case matters in some parsers.
-
-### Statusline not showing
-```bash
-# Configure the devloop statusline
-/devloop:statusline
-# Then restart Claude Code
-```
-
-If `jq` is missing, install it first:
-- macOS: `brew install jq`
-- Linux: `sudo apt install jq`
-
-## Where to Get More Help
-
-- **README**: Full plugin documentation
-- **skills/INDEX.md**: All available skills
-- **docs/living/**: Deep-dive documentation
-- **GitHub Issues**: Report bugs or request features
+**Plan corrupted:** `rm .devloop/plan.md && /devloop`
+**Session ended:** `/devloop:run`
+**Abandon plan:** `/devloop:archive && /devloop`
+**Context heavy:** `/devloop:fresh && /clear && /devloop:run`
+**Skill not loading:** Check exact name in skills/INDEX.md
+**Progress not saving:** Use `[x]` not `[X]`
+**Statusline missing:** `/devloop:statusline`, restart Claude Code
 
 ## Reset Everything
 
-Nuclear option - start completely fresh:
-
 ```bash
-rm -rf .devloop/
-/devloop
+rm -rf .devloop/ && /devloop
 ```
 
 ---
@@ -348,139 +205,40 @@ rm -rf .devloop/
 
 ## Autonomous Execution
 
-Run devloop tasks automatically until plan completion.
-
-**Prerequisites:**
-- Install ralph-loop: `/plugin install ralph-loop`
-- Have a plan: `.devloop/plan.md`
-
-## Basic Usage
-
 ```bash
-# Start automated execution (up to 50 iterations)
-/devloop:run
-
-# With custom iteration limit
-/devloop:run --max-iterations 100
-
-# With interactive checkpoints
-/devloop:run --interactive
+/devloop:run                      # Up to 50 iterations
+/devloop:run --max-iterations 100 # Custom limit
+/devloop:run --interactive        # With checkpoints
 ```
 
 ## How It Works
 
-```
-┌─────────────────────────────────────────────────┐
-│  /devloop:run                                   │
-│  └─> Creates ralph-loop state                   │
-│  └─> Sets promise: "ALL PLAN TASKS COMPLETE"    │
-│  └─> Starts working on tasks                    │
-└───────────────────────┬─────────────────────────┘
-                        ↓
-┌─────────────────────────────────────────────────┐
-│  Claude completes a task                        │
-│  └─> Marks task [x] in plan                     │
-│  └─> Checks: all tasks done?                    │
-└───────────────────────┬─────────────────────────┘
-                        │
-                ┌───────┴───────┐
-              No tasks           All tasks
-              remaining          complete
-                │                    │
-                ↓                    ↓
-         Stop hook              Output promise:
-         feeds prompt           <promise>ALL PLAN
-         back to Claude         TASKS COMPLETE</promise>
-                │                    │
-                ↓                    ↓
-         Another iteration       Loop terminates
-```
+1. `/devloop:run` creates ralph-loop state
+2. Claude works on tasks, marks `[x]`
+3. When all done, outputs `<promise>ALL PLAN TASKS COMPLETE</promise>`
+4. Loop terminates
 
-## When to Use
+## Context Guard
 
-**Good for:**
-- Well-defined plans with clear tasks
-- Overnight or background execution
-- Automated implementation of spike-created plans
-
-**Not good for:**
-- Tasks requiring human decisions
-- Creative or design work
-- Unclear or evolving requirements
-
-## The Promise Mechanism
-
-Ralph's Stop hook looks for a `<promise>` tag in Claude's output. When all plan tasks are marked `[x]`, devloop outputs:
-
-```
-<promise>ALL PLAN TASKS COMPLETE</promise>
-```
-
-This signals Ralph to terminate the loop.
-
-## Context Guard (Auto-Exit)
-
-The loop automatically exits when context usage exceeds 70%, preventing degradation.
-
-**How it works:**
-1. Statusline writes context % to `.claude/context-usage.json`
-2. Stop hook checks context when Claude tries to stop
-3. If context >= threshold and ralph active, gracefully exits
-4. You'll see: "Run `/devloop:fresh` then `/devloop:run` to resume"
-
-**Configure threshold** in `.devloop/local.md`:
+Auto-exits at 70% context usage. Configure in `.devloop/local.md`:
 ```yaml
----
-context_threshold: 80  # Default is 70
----
+context_threshold: 80
 ```
 
 ## Stopping Early
 
-```bash
-# Cancel the active ralph loop
-/cancel-ralph
-```
-
-Or set `--max-iterations` for a safety limit.
-The context guard also stops the loop automatically at high context.
-
-## Monitoring Progress
-
-```bash
-# Check ralph iteration count
-head -10 .claude/ralph-loop.local.md
-
-# Check plan progress
-./plugins/devloop/scripts/check-plan-complete.sh
-```
-
-## Comparison: Interactive vs Autonomous
-
-| Aspect | Interactive (--interactive) | Autonomous (default) |
-|--------|----------------------------|----------------------|
-| Context management | You run /fresh + /clear | Context accumulates |
-| Human checkpoints | Yes | No |
-| Works overnight | No | Yes |
-| Best for | Complex, evolving work | Clear, defined tasks |
-
-## Tips
-
-1. **Create good plans first** - Run `/devloop:spike` before `/devloop:run`
-2. **Use iteration limits** - Set `--max-iterations` as a safety net
-3. **Review results** - Check work after loop completes
-4. **Large plans** - Consider `/devloop:run-swarm` for 20+ tasks
+- `/cancel-ralph`
+- Max iterations reached
+- Context guard triggered
 
 ---
 
-## Step 3: Offer Related Topics
-
-After showing topic content, offer to explore more:
+## Step 3: Offer More
 
 ```yaml
 AskUserQuestion:
   questions:
-    - question: "Would you like to learn about another topic?"
+    - question: "Learn about another topic?"
       header: "More"
       multiSelect: false
       options:
@@ -490,6 +248,6 @@ AskUserQuestion:
           description: "Exit help"
 ```
 
-If "Yes", return to Step 1. If "No", end with:
+If yes, return to Step 1. If no:
 
-> Ready to start? Try `/devloop:spike [your task]` or `/devloop:continue` if you have a plan.
+> Ready to start? Try `/devloop:spike [task]` or `/devloop:run` if you have a plan.
