@@ -7,37 +7,52 @@ The iterative cycle that makes devloop effective.
 ## The Pattern
 
 ```
-┌─────────┐     ┌─────────┐     ┌──────────┐     ┌─────────────┐
-│  SPIKE  │────▶│  FRESH  │────▶│ CONTINUE │────▶│ WORK 5-10   │
-│         │     │         │     │          │     │ tasks       │
-└─────────┘     └────┬────┘     └──────────┘     └──────┬──────┘
-                     │                                   │
-                     │                           Context heavy?
-                     │                                   │
-                     │              ┌────────────────────┴───┐
-                     │              Yes                      No
-                     │               │                        │
-                     │               ▼                        ▼
-                     │          ┌─────────┐            Keep working
-                     │          │  FRESH  │                  │
-                     │          └────┬────┘                  │
-                     │               │                       │
-                     └───────────────┴───────────────────────┘
+┌─────────┐     ┌─────────┐     ┌─────────────┐
+│  PLAN   │────▶│   RUN   │────▶│ WORK 5-10   │
+│         │     │         │     │ tasks       │
+└─────────┘     └────┬────┘     └──────┬──────┘
+                     │                  │
+                     │          Context heavy?
+                     │                  │
+                     │     ┌────────────┴───┐
+                     │     Yes              No
+                     │      │                │
+                     │      ▼                ▼
+                     │ ┌─────────┐    Keep working
+                     │ │  FRESH  │           │
+                     │ └────┬────┘           │
+                     │      │                │
+                     └──────┴────────────────┘
 ```
 
 ---
 
 ## Commands
 
-### `/devloop:spike`
+### `/devloop:plan`
 
-Explore and plan before implementation.
+Create actionable plan with exploration.
 
 ```bash
-/devloop:spike How should we add user authentication?
+/devloop:plan "Add user authentication"
 ```
 
 Creates: `.devloop/plan.md` with task breakdown.
+
+Flags:
+- `--deep`: Comprehensive exploration with spike report
+- `--quick`: Fast path for small tasks
+- `--from-issue N`: Start from GitHub issue
+
+### `/devloop:run`
+
+Execute plan tasks autonomously.
+
+```bash
+/devloop:run
+```
+
+Reads plan, finds next `[ ]` task, works on it.
 
 ### `/devloop:fresh`
 
@@ -46,18 +61,8 @@ Save state for context refresh.
 ```bash
 /devloop:fresh
 /clear
-/devloop:continue
+/devloop:run
 ```
-
-### `/devloop:continue`
-
-Resume work from plan.
-
-```bash
-/devloop:continue
-```
-
-Reads plan, finds next `[ ]` task, works on it.
 
 ---
 
@@ -74,18 +79,18 @@ Reads plan, finds next `[ ]` task, works on it.
 
 ```bash
 # Day 1: Understand and plan
-/devloop:spike Add rate limiting to API
+/devloop:plan "Add rate limiting to API"
+
+# Day 1-2: Work autonomously
+/devloop:run  # Tasks 1.1, 1.2, 1.3, ...
+
+# Context heavy? Fresh and continue
 /devloop:fresh
 /clear
+/devloop:run  # Resumes from checkpoint
 
-# Day 1-2: Work
-/devloop:continue  # Tasks 1.1, 1.2, 1.3
-/devloop:fresh
-/clear
-
-# Day 2: Continue
-/devloop:continue  # Tasks 2.1, 2.2, 2.3
-/devloop:ship      # Done!
+# Done?
+/devloop:ship
 ```
 
 ---

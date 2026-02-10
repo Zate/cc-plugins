@@ -53,7 +53,7 @@ AskUserQuestion:
 ## Phase 2: Validation (if Full mode)
 
 **Run tests:** Detect from package.json/go.mod/requirements.txt/pom.xml.
-**Code review:** If `review.before-commit: always`, use `devloop:code-reviewer`.
+**Code review:** If `review.before-commit: always`, use `devloop:engineer` in reviewer mode.
 **Safety:** No secrets, no debug code, correct branch.
 
 ## Phase 3: Smart Commit

@@ -151,7 +151,7 @@ if ($fresh -eq 'true') {
     $context += "`n`n**Fresh start detected** -> Run ``/devloop:run`` to resume"
 }
 
-$context += "`n`n**Commands**: /devloop, /devloop:run, /devloop:spike, /devloop:fresh"
+$context += "`n`n**Commands**: /devloop, /devloop:run, /devloop:plan, /devloop:fresh"
 
 if ($gitWorkflow) {
     $context += ', /devloop:ship'

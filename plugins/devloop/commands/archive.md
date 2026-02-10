@@ -23,7 +23,7 @@ Parse the JSON output to get task counts.
 **If no plan exists:**
 ```
 No active plan to archive.
-Run /devloop or /devloop:spike to create a new plan.
+Run /devloop or /devloop:plan to create a new plan.
 ```
 
 **If plan has pending tasks:**
@@ -102,7 +102,7 @@ Plan archived successfully!
   Tasks completed: N
 
 Next steps:
-  - /devloop:spike "topic"  - Start new exploration
+  - /devloop:plan --deep "topic"  - Start new exploration
   - /devloop               - Start new plan directly
   - git add .devloop/archive/  - Commit archive to git
 ```

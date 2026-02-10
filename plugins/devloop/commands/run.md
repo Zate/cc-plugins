@@ -29,7 +29,7 @@ Execute plan tasks autonomously. **You do the work directly.**
 
 Parse JSON: `complete`, `total`, `done`, `pending`.
 
-**No plan exists:** Display entry points (`/devloop:spike`, `/devloop:from-issue`, `/devloop`). STOP.
+**No plan exists:** Display entry points (`/devloop:plan`, `/devloop:plan --deep`, `/devloop:issues`). STOP.
 
 **Plan complete (`complete: true`):**
 ```yaml

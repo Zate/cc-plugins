@@ -3,6 +3,9 @@ name: qa-engineer
 description: |
   Use this agent for test generation, test execution, bug tracking, and deployment validation.
 
+  Use when: User asks to write tests, run tests, track bugs, or validate deployment readiness.
+  Do NOT use when: User needs code review (use engineer), security scan (use security-scanner), or code exploration (use engineer).
+
   <example>
   user: "Write tests for the new UserService"
   assistant: "I'll launch devloop:qa-engineer to create tests."

@@ -43,7 +43,7 @@ claude --init
 /devloop:run
 
 # Or for detailed exploration without immediate action
-/devloop:spike "should we use OAuth or JWT?"
+/devloop:plan --deep "should we use OAuth or JWT?"
 ```
 
 ### Project Initialization
@@ -88,7 +88,8 @@ Choose the workflow that fits your task:
 | Workflow | Best For | Human Checkpoints |
 |----------|----------|-------------------|
 | /devloop:plan | Most work (quick to actionable) | 1-2 prompts |
-| /devloop:spike | Deep exploration (detailed reports) | 4-5 prompts |
+| /devloop:plan --deep | Deep exploration (detailed reports) | 4-5 prompts |
+| /devloop:plan --quick | Small, well-defined fixes | 0-1 prompts |
 | /devloop:run --interactive | Complex decisions needed | Per task |
 
 ---
@@ -97,17 +98,17 @@ Choose the workflow that fits your task:
 
 | Command | Purpose |
 |---------|---------|
-| `/devloop` | Start development workflow |
+| `/devloop` | Start development workflow (smart entry point) |
 | `/devloop:plan` | **Autonomous exploration → actionable plan** (recommended) |
+| `/devloop:plan --deep` | Deep exploration with spike report (replaces /devloop:spike) |
+| `/devloop:plan --quick` | Fast implementation for small tasks (replaces /devloop:quick) |
+| `/devloop:plan --from-issue N` | Start from GitHub issue (replaces /devloop:from-issue) |
 | `/devloop:run` | **Execute plan autonomously** |
-| `/devloop:spike` | Deep exploration (detailed reports) |
 | `/devloop:fresh` | Save state for context restart |
-| `/devloop:quick` | Fast implementation for small tasks |
 | `/devloop:review` | Code review for changes or PR |
 | `/devloop:ship` | Validation, commit, and PR creation |
 | `/devloop:pr-feedback` | Integrate PR review comments into plan |
 | `/devloop:archive` | Archive completed plan to .devloop/archive/ |
-| `/devloop:from-issue` | Start work from a GitHub issue |
 | `/devloop:issues` | List GitHub issues for the current repo |
 | `/devloop:statusline` | Configure the devloop statusline |
 | `/devloop:new` | Create a new issue (bug, feature, task) |
@@ -122,12 +123,12 @@ Seven specialized agents for complex parallel work:
 
 | Agent | Purpose |
 |-------|---------|
-| `devloop:engineer` | Code exploration, architecture, refactoring, git |
+| `devloop:engineer` | Code exploration, architecture, refactoring, git, code review |
 | `devloop:qa-engineer` | Test generation, execution, bug tracking |
 | `devloop:task-planner` | Planning, requirements, issue management |
-| `devloop:code-reviewer` | Quality review with confidence filtering |
 | `devloop:security-scanner` | OWASP Top 10, secrets, injection risks |
 | `devloop:doc-generator` | READMEs, API docs, changelogs |
+| `devloop:swarm-worker` | Autonomous task execution for swarm mode |
 | `devloop:statusline-setup` | Configure statusline settings |
 
 ---
@@ -166,12 +167,10 @@ Plan → Run → [auto until done or context heavy] → Fresh → Run → ...
 
 ```bash
 # Start new work (recommended)
-/devloop:plan "add feature X"     # Autonomous explore → plan (1-2 prompts)
-/devloop:plan --from-issue 42     # From GitHub issue with exploration
-/devloop:quick "fix small bug"    # Skip planning for tiny tasks
-
-# Deep exploration (when needed)
-/devloop:spike "should we use X?" # Detailed exploration report
+/devloop:plan "add feature X"        # Autonomous explore → plan (1-2 prompts)
+/devloop:plan --from-issue 42        # From GitHub issue with exploration
+/devloop:plan --quick "fix small bug" # Skip planning for tiny tasks
+/devloop:plan --deep "should we use X?" # Deep exploration with report
 
 # Execute plan
 /devloop:run                      # Autonomous execution (default)
@@ -267,7 +266,7 @@ github:
 
 **Issue-driven workflow:**
 
-1. `/devloop:from-issue 123` - Fetch issue, create plan with link
+1. `/devloop:plan --from-issue 123` - Fetch issue, create plan with link
 2. Work on tasks, mark complete
 3. On plan completion, post summary to issue
 4. Optionally close the issue automatically
@@ -331,7 +330,7 @@ Run plan tasks automatically until completion with `/devloop:run`. Requires the 
 
 **When to use `/devloop:run`:**
 - Most development work (autonomous is the default)
-- Well-defined plans from `/devloop:spike`
+- Well-defined plans from `/devloop:plan --deep`
 - Overnight or background execution
 
 **When to use `--interactive`:**

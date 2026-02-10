@@ -34,9 +34,9 @@ Spike → Fresh → Continue → [Work] → Fresh → Continue → Ship
 
 | Task Size | Approach |
 |-----------|----------|
-| Small fix | `/devloop:quick` |
-| Feature | `/devloop` |
-| Exploration | `/devloop:spike` |
+| Small fix | `/devloop:plan --quick` |
+| Feature | `/devloop:plan` |
+| Exploration | `/devloop:plan --deep` |
 
 ---
 
@@ -45,10 +45,11 @@ Spike → Fresh → Continue → [Work] → Fresh → Continue → Ship
 | Command | Purpose |
 |---------|---------|
 | `/devloop` | Start new work |
-| `/devloop:continue` | Resume from plan |
-| `/devloop:spike` | Time-boxed exploration |
+| `/devloop:plan` | Autonomous planning (default) |
+| `/devloop:plan --deep` | Deep exploration with report |
+| `/devloop:plan --quick` | Small, well-defined fixes |
+| `/devloop:run` | Execute plan autonomously |
 | `/devloop:fresh` | Save state for context clear |
-| `/devloop:quick` | Small, well-defined fixes |
 | `/devloop:review` | Code review |
 | `/devloop:ship` | Commit and/or PR |
 
@@ -58,14 +59,15 @@ Spike → Fresh → Continue → [Work] → Fresh → Continue → Ship
 
 ```bash
 # Start with exploration
-/devloop:spike How should we add user authentication?
+/devloop:plan --deep "How should we add user authentication?"
 
-# Save state and clear context
+# Execute plan
+/devloop:run
+
+# Context heavy? Save state and clear context
 /devloop:fresh
 /clear
-
-# Resume work
-/devloop:continue
+/devloop:run
 ```
 
 ---
@@ -83,7 +85,7 @@ Plans live at `.devloop/plan.md`:
 - [ ] Write unit tests
 ```
 
-After 5-10 tasks, run `/devloop:fresh` + `/clear` + `/devloop:continue`.
+After 5-10 tasks, run `/devloop:fresh` + `/clear` + `/devloop:run`.
 
 ---
 

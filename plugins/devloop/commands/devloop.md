@@ -54,18 +54,21 @@ AskUserQuestion:
       header: "Setup"
       multiSelect: false
       options:
-        - label: "Start a spike (Recommended)"
-          description: "Explore and plan before implementing"
+        - label: "Create a plan (Recommended)"
+          description: "Autonomous exploration -> actionable plan"
+        - label: "Deep exploration"
+          description: "Comprehensive investigation with spike report"
         - label: "Quick task"
           description: "Small, well-defined fix or change"
-        - label: "Create from GitHub issue"
-          description: "Start work from an existing issue"
+        - label: "GitHub issues"
+          description: "Start from an existing issue"
 ```
 
 **Routing:**
-- "Start a spike" → `/devloop:spike $ARGUMENTS`
-- "Quick task" → `/devloop:quick $ARGUMENTS`
-- "Create from GitHub issue" → `/devloop:issues`
+- "Create a plan" -> `/devloop:plan $ARGUMENTS`
+- "Deep exploration" -> `/devloop:plan --deep $ARGUMENTS`
+- "Quick task" -> `/devloop:plan --quick $ARGUMENTS`
+- "GitHub issues" -> `/devloop:issues`
 
 ### State: `active_plan` (Priority 2)
 
@@ -95,10 +98,10 @@ AskUserQuestion:
 ```
 
 **Routing:**
-- "Continue working" → `/devloop:continue`
-- "Ship progress" → `/devloop:ship`
-- "View full plan" → Display `.devloop/plan.md` content
-- "Start fresh" → Archive then `/devloop:spike` or ask what to do
+- "Continue working" -> `/devloop:run`
+- "Ship progress" -> `/devloop:ship`
+- "View full plan" -> Display `.devloop/plan.md` content
+- "Start fresh" -> Archive then ask what to do
 
 ### State: `uncommitted` (Priority 3)
 
@@ -125,10 +128,10 @@ AskUserQuestion:
 ```
 
 **Routing:**
-- "Commit changes" → `/devloop:ship`
-- "Review changes" → Run `git diff --stat` then `git diff`
-- "Continue without committing" → Proceed with $ARGUMENTS or ask
-- "Stash changes" → Run `git stash push -m "devloop: work in progress"`
+- "Commit changes" -> `/devloop:ship`
+- "Review changes" -> Run `git diff --stat` then `git diff`
+- "Continue without committing" -> Proceed with $ARGUMENTS or ask
+- "Stash changes" -> Run `git stash push -m "devloop: work in progress"`
 
 ### State: `open_bugs` (Priority 4)
 
@@ -147,14 +150,14 @@ AskUserQuestion:
           description: "View and work on open bugs"
         - label: "Start new feature"
           description: "Work on something new instead"
-        - label: "Create spike"
+        - label: "Deep exploration"
           description: "Research or explore an idea"
 ```
 
 **Routing:**
-- "Fix a bug" → List bugs from `.devloop/issues/` then create plan
-- "Start new feature" → Ask for details, create plan
-- "Create spike" → `/devloop:spike`
+- "Fix a bug" -> List bugs from GitHub issues then create plan
+- "Start new feature" -> Ask for details, `/devloop:plan`
+- "Deep exploration" -> `/devloop:plan --deep`
 
 ### State: `backlog` (Priority 5)
 
@@ -171,16 +174,16 @@ AskUserQuestion:
       options:
         - label: "Work on backlog item"
           description: "Pick from existing features/tasks"
-        - label: "Start new spike"
+        - label: "Deep exploration"
           description: "Research or explore an idea"
         - label: "Quick task"
           description: "Small, well-defined fix"
 ```
 
 **Routing:**
-- "Work on backlog item" → List items then create plan
-- "Start new spike" → `/devloop:spike`
-- "Quick task" → `/devloop:quick`
+- "Work on backlog item" -> List items then `/devloop:plan --from-issue N`
+- "Deep exploration" -> `/devloop:plan --deep`
+- "Quick task" -> `/devloop:plan --quick`
 
 ### State: `complete_plan` (Priority 6)
 
@@ -205,9 +208,9 @@ AskUserQuestion:
 ```
 
 **Routing:**
-- "Ship it" → `/devloop:ship`
-- "Archive and start new" → Archive then ask what's next
-- "Review before shipping" → `/devloop:review`
+- "Ship it" -> `/devloop:ship`
+- "Archive and start new" -> Archive then ask what's next
+- "Review before shipping" -> `/devloop:review`
 
 ### State: `clean` (Priority 7)
 
@@ -224,9 +227,9 @@ AskUserQuestion:
       multiSelect: false
       options:
         - label: "Create a plan (Recommended)"
-          description: "Autonomous exploration → actionable plan"
-        - label: "Start a spike"
-          description: "Deep exploration without immediate action"
+          description: "Autonomous exploration -> actionable plan"
+        - label: "Deep exploration"
+          description: "Comprehensive investigation with spike report"
         - label: "GitHub issues"
           description: "View and work from GitHub issues"
         - label: "Quick task"
@@ -234,10 +237,10 @@ AskUserQuestion:
 ```
 
 **Routing:**
-- "Create a plan" → `/devloop:plan`
-- "Start a spike" → `/devloop:spike`
-- "GitHub issues" → `/devloop:issues`
-- "Quick task" → `/devloop:quick`
+- "Create a plan" -> `/devloop:plan`
+- "Deep exploration" -> `/devloop:plan --deep`
+- "GitHub issues" -> `/devloop:issues`
+- "Quick task" -> `/devloop:plan --quick`
 
 ## Step 3: Handle Arguments
 
@@ -245,8 +248,8 @@ If `$ARGUMENTS` is provided and non-empty:
 - Skip state display
 - Use arguments as task description
 - Route appropriately based on state:
-  - `active_plan` → Ask: continue plan or start new with this task?
-  - Other states → Create new plan/spike with the description
+  - `active_plan` -> Ask: continue plan or start new with this task?
+  - Other states -> Create new plan with the description
 
 ## Key Principles
 
@@ -260,12 +263,13 @@ If `$ARGUMENTS` is provided and non-empty:
 | Command | Purpose |
 |---------|---------|
 | `/devloop` | Smart entry point (this command) |
-| `/devloop:plan` | Autonomous exploration → actionable plan |
+| `/devloop:plan` | Autonomous exploration -> actionable plan |
+| `/devloop:plan --deep` | Comprehensive exploration with spike report |
+| `/devloop:plan --quick` | Fast path for small tasks |
+| `/devloop:plan --from-issue N` | Start from GitHub issue |
 | `/devloop:run` | Execute plan autonomously |
-| `/devloop:spike` | Deep exploration (detailed reports) |
 | `/devloop:fresh` | Save state and exit cleanly |
-| `/devloop:quick` | Small, well-defined fixes |
-| `/devloop:new` | Create local issue |
+| `/devloop:new` | Create GitHub issue |
 | `/devloop:issues` | List GitHub issues |
 | `/devloop:review` | Code review |
 | `/devloop:ship` | Commit and/or PR |
@@ -275,8 +279,7 @@ If `$ARGUMENTS` is provided and non-empty:
 - `.devloop/plan.md` - Current task plan
 - `.devloop/local.md` - Project settings (git workflow, etc.)
 - `.devloop/next-action.json` - Fresh start state
-- `.devloop/issues/` - Local issue tracker
-- `.devloop/spikes/` - Spike reports
+- `.devloop/spikes/` - Spike reports (from --deep exploration)
 
 ---
 

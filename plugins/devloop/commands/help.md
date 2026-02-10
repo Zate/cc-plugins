@@ -26,7 +26,7 @@ AskUserQuestion:
         - label: "Commands"
           description: "What each command does"
         - label: "The Loop"
-          description: "The spike -> fresh -> continue cycle"
+          description: "The plan -> run -> fresh cycle"
         - label: "Skills & Agents"
           description: "On-demand knowledge and parallel work"
 ```
@@ -42,21 +42,20 @@ Development workflow where **Claude does the work directly**. No routine agents.
 ## Quick Start
 
 ```bash
-/devloop:spike How should we implement feature X?   # Explore and plan
-/devloop:fresh && /clear                            # Save state, clear context
+/devloop:plan "How should we implement feature X?"  # Plan (or --deep for exploration)
 /devloop:run                                        # Execute tasks
+/devloop:fresh && /clear                           # Save state, clear context (every 5-10 tasks)
+/devloop:run                                        # Continue execution
 ```
-
-Repeat fresh/clear/run every 5-10 tasks.
 
 ## First Session
 
-1. Have a task? `/devloop:spike [task]`
+1. Have a task? `/devloop:plan [task]` (or `--deep` for detailed exploration)
 2. Claude explores, creates plan
 3. You approve
-4. `/devloop:fresh` then `/clear`
-5. `/devloop:run` to implement
-6. Checkpoint every few tasks
+4. `/devloop:run` to implement
+5. Every 5-10 tasks: `/devloop:fresh` then `/clear` then `/devloop:run`
+6. Done? `/devloop:ship`
 
 ---
 
@@ -66,37 +65,51 @@ Repeat fresh/clear/run every 5-10 tasks.
 
 ```
 Starting new work?
-├── Unclear requirements → /devloop:spike
-├── Small, clear task    → /devloop:quick
-└── Have a plan          → /devloop:run
+|-- Unclear requirements  -> /devloop:plan --deep
+|-- Small, clear task     -> /devloop:plan --quick
+|-- Normal feature        -> /devloop:plan
+|-- Have a plan           -> /devloop:run
 
 Mid-workflow?
-├── Context heavy        → /devloop:fresh → /clear → /devloop:run
-├── Ready to commit      → /devloop:ship
-└── Want review          → /devloop:review
+|-- Context heavy         -> /devloop:fresh -> /clear -> /devloop:run
+|-- Ready to commit       -> /devloop:ship
+|-- Want review           -> /devloop:review
 
 Returning?
-└── /devloop:run
+|-- /devloop:run
 ```
 
 ## Command Reference
 
 | Command | Purpose |
 |---------|---------|
-| `/devloop` | Start new workflow |
-| `/devloop:spike` | Explore & plan |
+| `/devloop` | Start new workflow (smart entry point) |
+| `/devloop:plan` | Autonomous planning (default mode) |
+| `/devloop:plan --deep` | Comprehensive exploration with spike report |
+| `/devloop:plan --quick` | Fast path for small, clear tasks |
+| `/devloop:plan --from-issue N` | Start from GitHub issue #N |
 | `/devloop:run` | Autonomous execution |
 | `/devloop:run --interactive` | With checkpoints |
-| `/devloop:run --next-issue` | Full issue-to-ship |
+| `/devloop:run --next-issue` | Full issue-to-ship pipeline |
 | `/devloop:run-swarm` | Swarm for 10+ tasks |
 | `/devloop:fresh` | Save state for clear |
-| `/devloop:quick` | Fast implementation |
 | `/devloop:review` | Code review |
 | `/devloop:ship` | Commit & PR |
 | `/devloop:archive` | Archive completed plan |
-| `/devloop:from-issue` | Start from GH issue |
+| `/devloop:new` | Create GitHub issue |
+| `/devloop:issues` | List GitHub issues |
 | `/devloop:statusline` | Configure statusline |
 | `/devloop:help` | This guide |
+
+### Migration from Old Commands
+
+| Old Command | New Command |
+|-------------|-------------|
+| `/devloop:spike` | `/devloop:plan --deep` |
+| `/devloop:quick` | `/devloop:plan --quick` |
+| `/devloop:from-issue N` | `/devloop:plan --from-issue N` |
+| `/devloop:continue` | `/devloop:run --interactive` |
+| `/devloop:ralph` | `/devloop:run` |
 
 ---
 
@@ -105,17 +118,13 @@ Returning?
 ## Pattern
 
 ```
-/devloop:spike [topic]  →  Creates plan
-       ↓
-/devloop:fresh          →  Saves state
-       ↓
-/clear                  →  Resets context
-       ↓
-/devloop:run            →  Implements tasks
-       ↓
+/devloop:plan [topic]    ->  Creates plan
+       |
+/devloop:run             ->  Implements tasks
+       |
 After 5-10 tasks?
-├── Yes → Loop to fresh
-└── No  → Continue
+|-- Yes -> /devloop:fresh -> /clear -> /devloop:run
+|-- No  -> Continue
 ```
 
 ## Why It Works
@@ -172,10 +181,9 @@ Load when needed: `Skill: skill-name`
 
 | Agent | Purpose |
 |-------|---------|
-| `devloop:engineer` | Exploration, architecture |
+| `devloop:engineer` | Exploration, architecture, code review |
 | `devloop:qa-engineer` | Test generation |
 | `devloop:task-planner` | Planning, requirements |
-| `devloop:code-reviewer` | Quality review |
 | `devloop:security-scanner` | OWASP, secrets |
 | `devloop:doc-generator` | READMEs, API docs |
 
@@ -250,4 +258,4 @@ AskUserQuestion:
 
 If yes, return to Step 1. If no:
 
-> Ready to start? Try `/devloop:spike [task]` or `/devloop:run` if you have a plan.
+> Ready to start? Try `/devloop:plan [task]` or `/devloop:run` if you have a plan.

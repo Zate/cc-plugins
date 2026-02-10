@@ -12,10 +12,9 @@ plugins/devloop/
 │   └── plugin.json          # Plugin manifest
 ├── commands/                 # User-invokable commands
 │   ├── devloop.md           # Main entry point
-│   ├── continue.md          # Resume work
-│   ├── spike.md             # Time-boxed exploration
+│   ├── plan.md              # Unified planning (--deep/--quick/--from-issue)
+│   ├── run.md               # Autonomous execution
 │   ├── fresh.md             # Save state for context clear
-│   ├── quick.md             # Small fixes
 │   ├── review.md            # Code review
 │   └── ship.md              # Commit/PR
 ├── hooks/
@@ -39,10 +38,11 @@ Markdown files with YAML frontmatter defining the command interface.
 | Command | Purpose |
 |---------|---------|
 | `/devloop` | Start work |
-| `/devloop:continue` | Resume from plan |
-| `/devloop:spike` | Explore unknown territory |
+| `/devloop:plan` | Unified planning (default) |
+| `/devloop:plan --deep` | Deep exploration |
+| `/devloop:plan --quick` | Fast fix |
+| `/devloop:run` | Autonomous execution |
 | `/devloop:fresh` | Save & exit |
-| `/devloop:quick` | Fast fix |
 | `/devloop:ship` | Commit |
 
 ### Skills
@@ -72,7 +72,7 @@ Rarely used. Only for parallel work, security scans, or large exploration.
 
 ### Fresh Start (`.devloop/next-action.json`)
 
-Temporary file created by `/devloop:fresh`, read and deleted by `/devloop:continue`.
+Temporary file created by `/devloop:fresh`, read and deleted by `/devloop:run`.
 
 ---
 

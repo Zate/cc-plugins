@@ -3,6 +3,9 @@ name: doc-generator
 description: |
   Use this agent to generate or update READMEs, API docs, inline comments, and changelogs.
 
+  Use when: User asks to write or update documentation, README, API docs, CHANGELOG, or code comments.
+  Do NOT use when: User needs code exploration (use engineer), test writing (use qa-engineer), or security analysis (use security-scanner).
+
   <example>
   user: "Update the API documentation"
   assistant: "I'll launch devloop:doc-generator to document the API changes."

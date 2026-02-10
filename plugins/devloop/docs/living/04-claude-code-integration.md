@@ -23,9 +23,10 @@ plugins/devloop/
 Markdown files in `commands/` that define workflows.
 
 ```bash
-/devloop         # Start workflow
-/devloop:spike   # Technical exploration
-/devloop:fresh   # Save state for restart
+/devloop            # Start workflow
+/devloop:plan       # Planning (--deep/--quick/--from-issue)
+/devloop:run        # Execute plan
+/devloop:fresh      # Save state for restart
 ```
 
 ---

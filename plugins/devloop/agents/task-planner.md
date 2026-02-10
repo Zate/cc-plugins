@@ -3,6 +3,9 @@ name: task-planner
 description: |
   Use this agent for planning implementations, gathering requirements, managing issues, and validating completion.
 
+  Use when: User asks to break down tasks, plan implementation, gather requirements, validate DoD, or manage issues.
+  Do NOT use when: User wants to explore code (use engineer), write tests (use qa-engineer), or generate docs (use doc-generator).
+
   <example>
   user: "Break this into tasks"
   assistant: "I'll launch devloop:task-planner to create an implementation plan."

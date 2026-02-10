@@ -85,7 +85,7 @@ When using issue-driven development (configured in `local.md`):
 
 ### Starting from Issue
 
-Use `/devloop:from-issue 123` to fetch issue details and create a plan with:
+Use `/devloop:plan --from-issue 123` to fetch issue details and create a plan with:
 - `**Issue**: #123 (URL)` in the header
 - Issue title becomes plan title
 - Issue body provides context for planning

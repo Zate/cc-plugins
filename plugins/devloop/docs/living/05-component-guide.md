@@ -4,15 +4,17 @@ What's in devloop v3.1.0.
 
 ---
 
-## Commands (7)
+## Commands
 
 | Command | Purpose |
 |---------|---------|
 | `/devloop` | Start development workflow |
-| `/devloop:continue` | Resume work from plan |
-| `/devloop:spike` | Technical exploration/POC |
+| `/devloop:plan` | Unified planning (default mode) |
+| `/devloop:plan --deep` | Deep exploration with spike report |
+| `/devloop:plan --quick` | Fast implementation for small tasks |
+| `/devloop:plan --from-issue N` | Start from GitHub issue |
+| `/devloop:run` | Autonomous plan execution |
 | `/devloop:fresh` | Save state for context restart |
-| `/devloop:quick` | Fast implementation for small tasks |
 | `/devloop:review` | Code review for changes or PR |
 | `/devloop:ship` | Validation and git integration |
 
@@ -24,10 +26,9 @@ For parallel work and specialized scans.
 
 | Agent | Purpose |
 |-------|---------|
-| `devloop:engineer` | Code exploration, architecture, git |
+| `devloop:engineer` | Code exploration, architecture, git, code review |
 | `devloop:qa-engineer` | Test generation, execution, bugs |
 | `devloop:task-planner` | Planning, requirements, issues |
-| `devloop:code-reviewer` | Quality review with confidence |
 | `devloop:security-scanner` | OWASP Top 10, secrets |
 | `devloop:doc-generator` | READMEs, API docs, changelogs |
 

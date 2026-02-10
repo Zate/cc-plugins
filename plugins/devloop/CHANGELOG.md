@@ -5,6 +5,137 @@ All notable changes to the devloop plugin are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.18.2] - 2026-02-10
+
+### Changed - Script Simplification
+
+Simplified shell scripts across devloop and ctx plugins. Removed Python dependencies, unnecessary fallback chains, and complexity.
+
+#### Script Changes
+
+| Script | Before | After | Savings |
+|--------|--------|-------|---------|
+| `list-issues.sh` | 245 lines | 102 lines | -143 lines |
+| `parse-local-config.sh` | 154 lines | 82 lines | -72 lines |
+| `context-guard.sh` | 59 lines | 23 lines | -36 lines |
+| ctx `session-start.sh` | 163 lines | 67 lines | -96 lines |
+| **Total** | 621 lines | 274 lines | **-347 lines** |
+
+#### Key Improvements
+
+- **list-issues.sh**: Removed embedded Python formatter (58 lines), removed curl fallback. Uses jq for all formatting.
+- **parse-local-config.sh**: Removed Python+PyYAML fallback. Uses yq or basic awk fallback for flat YAML.
+- **context-guard.sh**: Fixed 70% threshold, early exit pattern, simplified logic.
+- **ctx session-start.sh**: Removed auto-installation and version checking (belongs in /ctx:setup). Now just checks if ctx exists and calls the hook.
+- **run-hook.cmd files**: Added sync comments to all 3 polyglot files for maintainability.
+
+---
+
+## [3.18.1] - 2026-02-10
+
+### Changed - Agent Simplification
+
+Merged `code-reviewer` agent into `engineer` agent, reducing agent count from 8 to 7. Added clear "when to use" dispatch criteria to all agents for better auto-dispatch decisions.
+
+#### Changes
+
+- **Merged code-reviewer into engineer**: Engineer now has 5 modes: Explorer, Architect, Refactorer, Git, and **Reviewer**
+  - Reviewer mode includes confidence-based filtering (only report issues with confidence >= 80%)
+  - Preserved code-reviewer's PostToolUse hook for file logging
+  - Preserved skills preloading (security-checklist)
+  - Added permissionMode: plan for review workflows
+- **Added dispatch criteria to all agents**: Each agent now includes "Use when:" and "Do NOT use when:" in its description
+- **Updated references**: ship.md, help.md, README.md, 05-component-guide.md updated to reference engineer for code review
+
+#### Files Changed
+
+- `agents/engineer.md` - Added Reviewer Mode, skills, hooks, dispatch criteria
+- `agents/code-reviewer.md` - **Deleted** (merged into engineer)
+- `agents/qa-engineer.md` - Added dispatch criteria
+- `agents/task-planner.md` - Added dispatch criteria
+- `agents/doc-generator.md` - Added dispatch criteria
+- `agents/security-scanner.md` - Added dispatch criteria
+- `agents/swarm-worker.md` - Added dispatch criteria
+- `agents/statusline-setup.md` - Added dispatch criteria
+
+#### Agent Roster (7 agents, down from 8)
+
+| Agent | Purpose |
+|-------|---------|
+| engineer | Code exploration, architecture, refactoring, git, **code review** |
+| qa-engineer | Test generation, execution, bug tracking |
+| task-planner | Planning, requirements, issue management |
+| security-scanner | OWASP Top 10, secrets, injection risks |
+| doc-generator | READMEs, API docs, changelogs |
+| swarm-worker | Autonomous task execution for swarm mode |
+| statusline-setup | Configure statusline settings |
+
+---
+
+## [3.18.0] - 2026-02-10
+
+### Changed - Command Consolidation (BREAKING)
+
+Consolidated devloop commands from 15 down to ~10 by merging overlapping commands into flags on `/devloop:plan`. This reduces cognitive load and returns devloop to its core "plan, build, validate, deploy" philosophy.
+
+#### Migration Guide
+
+| Old Command | New Command |
+|-------------|-------------|
+| `/devloop:spike` | `/devloop:plan --deep` |
+| `/devloop:quick` | `/devloop:plan --quick` |
+| `/devloop:from-issue N` | `/devloop:plan --from-issue N` |
+| `/devloop:continue` | `/devloop:run --interactive` (deprecated in 3.17.5) |
+| `/devloop:ralph` | `/devloop:run` (deprecated in 3.17.5) |
+
+#### Files Deleted
+
+- `commands/spike.md` (223 lines) - Merged into `plan.md --deep`
+- `commands/quick.md` (90 lines) - Merged into `plan.md --quick`
+- `commands/from-issue.md` (191 lines) - Merged into `plan.md --from-issue`
+
+**Total: 504 lines removed, ~350 lines of functionality consolidated into plan.md**
+
+#### New `/devloop:plan` Flags
+
+| Flag | Effect | Prompts |
+|------|--------|---------|
+| (none) | Autonomous exploration | 1-2 |
+| `--deep` | Comprehensive with spike report | 4-5 |
+| `--quick` | Skip exploration, fast execution | 0-1 |
+| `--from-issue N` | Fetch from GitHub issue #N | +0 |
+
+#### Resulting Command Set (10 core commands)
+
+- `/devloop` - Smart entry point
+- `/devloop:plan` - Unified planning (--deep/--quick/--from-issue)
+- `/devloop:run` - Autonomous execution
+- `/devloop:fresh` - Context management
+- `/devloop:ship` - Validate + commit + PR
+- `/devloop:review` - Code review
+- `/devloop:pr-feedback` - PR comment integration
+- `/devloop:new` - Create issue
+- `/devloop:issues` - List issues
+- `/devloop:help` - Documentation
+- `/devloop:archive` - Cleanup
+- `/devloop:run-swarm` - Parallel execution
+- `/devloop:statusline` - Tooling
+
+### Updated - Cross-Reference Updates
+
+Updated all command references across the codebase:
+- `help.md` - Updated command table with migration notes
+- `devloop.md` - Routes through plan with flags
+- `run.md` - Updated "no plan" message
+- `run-swarm.md` - Updated entry point suggestions
+- `archive.md` - Updated post-archive suggestions
+- `issues.md` - Updated to use `--from-issue` flag
+- `new.md` - Updated routing
+- `README.md` - Updated command table and examples
+- Session hooks (sh/ps1) - Updated command list
+- `scripts/archive-plan.sh` - Updated suggestions
+- Skills and living docs - Updated throughout
+
 ## [3.17.7] - 2026-02-10
 
 ### Changed - Command Prompt Compression

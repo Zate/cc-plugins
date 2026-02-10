@@ -98,7 +98,7 @@ AskUserQuestion:
           description: "Return to conversation"
 ```
 
-Route: Start → `/devloop:from-issue N`, More → loop, View → `/devloop:issues`, Done → exit.
+Route: Start → `/devloop:plan --from-issue N`, More → loop, View → `/devloop:issues`, Done → exit.
 
 ---
 

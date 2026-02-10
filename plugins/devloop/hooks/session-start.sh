@@ -206,7 +206,7 @@ fi
 
 CONTEXT="$CONTEXT
 
-**Commands**: /devloop, /devloop:run, /devloop:spike, /devloop:fresh"
+**Commands**: /devloop, /devloop:run, /devloop:plan, /devloop:fresh"
 
 # Add ship command if git workflow is configured
 if [ -n "$GIT_WORKFLOW" ]; then

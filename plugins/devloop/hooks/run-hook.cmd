@@ -1,3 +1,4 @@
+# Shared polyglot pattern - keep in sync across plugins (devloop/hooks, devloop/scripts, ctx/hooks)
 : << 'CMDBLOCK'
 @echo off
 set "SCRIPT_DIR=%~dp0"

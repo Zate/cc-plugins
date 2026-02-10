@@ -87,7 +87,7 @@ AskUserQuestion:
       multiSelect: false
       options:
         - label: "Start work on an issue"
-          description: "Use /devloop:from-issue <number>"
+          description: "Use /devloop:plan --from-issue <number>"
         - label: "Filter differently"
           description: "Search with different criteria"
         - label: "Done"
@@ -95,7 +95,7 @@ AskUserQuestion:
 ```
 
 ### If "Start work on an issue":
-Ask which issue number, then run `/devloop:from-issue <number>`
+Ask which issue number, then run `/devloop:plan --from-issue <number>`
 
 ### If "Filter differently":
 Ask for new filter criteria and re-run Step 3

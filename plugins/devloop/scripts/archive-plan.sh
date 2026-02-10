@@ -114,7 +114,7 @@ cat > "$PLAN_FILE" << 'EOF'
 
 **Status**: No active plan
 
-Run `/devloop` or `/devloop:spike` to start a new plan.
+Run `/devloop` or `/devloop:plan` to start a new plan.
 EOF
 
 # Build output JSON

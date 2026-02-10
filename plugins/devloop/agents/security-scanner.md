@@ -3,11 +3,14 @@ name: security-scanner
 description: |
   Use this agent for security vulnerability scanning including OWASP Top 10, hardcoded secrets, and injection risks.
 
+  Use when: User asks about security, vulnerabilities, hardcoded secrets, injection risks, or OWASP compliance.
+  Do NOT use when: User needs code review for quality (use engineer), test generation (use qa-engineer), or general code exploration (use engineer).
+
   <example>
   user: "Check if this auth code is secure"
   assistant: "I'll launch devloop:security-scanner to analyze security."
   </example>
-tools: Bash, Read, Grep, Glob, TaskCreate, TaskUpdate, TaskList
+tools: Bash, Read, Grep, Glob, TaskCreate, TaskUpdate, TaskList, Write, Edit
 model: haiku
 memory: user
 color: red

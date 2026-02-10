@@ -1,59 +1,23 @@
 #!/bin/bash
-
-# Devloop Context Guard - Stop Hook
-# Monitors context usage and gracefully exits ralph loop when threshold exceeded
-#
-# This hook runs on Stop events and checks:
-# 1. Is ralph-loop active? (state file exists)
-# 2. Is context usage above threshold?
-# If both true, removes ralph state file so ralph-loop's hook will allow exit
-
+# Context Guard - Stop Hook
+# Gracefully exits ralph loop when context exceeds threshold
 set -euo pipefail
 
-# Default threshold (can be overridden in .devloop/local.md)
-DEFAULT_THRESHOLD=70
-
-RALPH_STATE_FILE=".claude/ralph-loop.local.md"
+RALPH_STATE=".claude/ralph-loop.local.md"
 CONTEXT_FILE=".claude/context-usage.json"
-LOCAL_CONFIG=".devloop/local.md"
+THRESHOLD=70  # Fixed default
 
-# If no ralph loop active, nothing to do
-if [[ ! -f "$RALPH_STATE_FILE" ]]; then
-    exit 0
-fi
+# Early exit if no ralph loop active (most common case)
+[[ -f "$RALPH_STATE" ]] || exit 0
+[[ -f "$CONTEXT_FILE" ]] || exit 0
 
-# If no context file, statusline hasn't run yet - continue
-if [[ ! -f "$CONTEXT_FILE" ]]; then
-    exit 0
-fi
-
-# Read threshold from local config if available
-THRESHOLD=$DEFAULT_THRESHOLD
-if [[ -f "$LOCAL_CONFIG" ]]; then
-    # Parse YAML frontmatter for context_threshold
-    CONFIG_THRESHOLD=$(sed -n '/^---$/,/^---$/{ /^---$/d; p; }' "$LOCAL_CONFIG" | grep '^context_threshold:' | sed 's/context_threshold: *//' || echo "")
-    if [[ "$CONFIG_THRESHOLD" =~ ^[0-9]+$ ]]; then
-        THRESHOLD=$CONFIG_THRESHOLD
-    fi
-fi
-
-# Read current context percentage
+# Read context percentage
 CONTEXT_PCT=$(jq -r '.context_pct // 0' "$CONTEXT_FILE" 2>/dev/null || echo "0")
+[[ "$CONTEXT_PCT" =~ ^[0-9]+$ ]] || exit 0
 
-# Validate it's a number
-if [[ ! "$CONTEXT_PCT" =~ ^[0-9]+$ ]]; then
-    exit 0
-fi
-
-# Check if context exceeds threshold
+# Check threshold and remove state file if exceeded
 if [[ $CONTEXT_PCT -ge $THRESHOLD ]]; then
-    echo "⚠️  Context usage at ${CONTEXT_PCT}% (threshold: ${THRESHOLD}%)" >&2
-    echo "   Gracefully stopping ralph loop to preserve context quality." >&2
-    echo "" >&2
-    echo "   Run /devloop:fresh then /devloop:run to resume with fresh context." >&2
-
-    # Remove ralph state file - ralph-loop's hook will then allow exit
-    rm -f "$RALPH_STATE_FILE"
+    echo "Context at ${CONTEXT_PCT}% (threshold: ${THRESHOLD}%). Stopping ralph loop." >&2
+    echo "Run /devloop:fresh then /devloop:run to resume." >&2
+    rm -f "$RALPH_STATE"
 fi
-
-exit 0

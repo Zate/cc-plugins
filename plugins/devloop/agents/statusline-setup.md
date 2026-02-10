@@ -3,6 +3,9 @@ name: statusline-setup
 description: |
   Use this agent to configure the user's Claude Code status line setting.
 
+  Use when: User asks to set up, configure, or update the devloop statusline.
+  Do NOT use when: User asks about statusline content/data (that's the statusline script itself).
+
   <example>
   user: "Set up the devloop statusline"
   assistant: "I'll configure the devloop statusline for you."

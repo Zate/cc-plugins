@@ -50,9 +50,9 @@ Parse the JSON output:
 No active plan found.
 
 Start with:
-  /devloop:spike "topic"    - Explore before implementing
-  /devloop:from-issue 123   - Work from GitHub issue
-  /devloop                   - Smart entry point
+  /devloop:plan --deep "topic"      - Explore before implementing
+  /devloop:plan --from-issue 123   - Work from GitHub issue
+  /devloop                          - Smart entry point
 ```
 
 Then STOP.

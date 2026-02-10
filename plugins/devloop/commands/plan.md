@@ -1,6 +1,6 @@
 ---
 description: Create an actionable plan with autonomous exploration
-argument-hint: What to plan (topic, feature, or question)
+argument-hint: <topic> [--deep|--quick|--from-issue N]
 allowed-tools:
   - Read
   - Write
@@ -13,23 +13,45 @@ allowed-tools:
   - AskUserQuestion
   - WebSearch
   - WebFetch
+  - TaskCreate
+  - TaskUpdate
+  - TaskList
 ---
 
-# Devloop Plan - Autonomous Plan Generation
+# Devloop Plan - Unified Planning Command
 
-Create actionable plan from topic/feature with minimal user interaction.
+Create actionable plan from topic/feature. **You do the work directly.**
 
-**Design**: Autonomous by default. Prompt only when genuinely ambiguous.
+**Modes:**
+- (default): Autonomous planning with 1-2 prompts
+- `--deep`: Comprehensive exploration with spike report (4-5 prompts)
+- `--quick`: Skip exploration, fast path to execution
+- `--from-issue N`: Fetch from GitHub issue
 
 ## Step 1: Parse Input
 
 Extract topic from `$ARGUMENTS`.
 
-**No topic:** Display usage with examples.
+**No topic:** Display usage:
+```
+Usage: /devloop:plan <topic> [flags]
+
+Flags:
+  --deep         Comprehensive exploration with spike report (4-5 prompts)
+  --quick        Skip exploration, fast path to execution
+  --from-issue N Fetch from GitHub issue #N
+
+Examples:
+  /devloop:plan "add user authentication"
+  /devloop:plan "fix login bug" --quick
+  /devloop:plan "new caching strategy" --deep
+  /devloop:plan --from-issue 42
+```
 
 **Flags:**
 - `--from-issue N`: Fetch from GitHub issue
-- `--thorough`: Deep exploration
+- `--deep`: Comprehensive exploration (replaces /devloop:spike)
+- `--quick`: Skip exploration (replaces /devloop:quick)
 
 If `--from-issue`:
 ```bash
@@ -46,7 +68,185 @@ Use issue title as topic, body as context.
 **Incomplete plan:** Prompt to replace or cancel (only prompt in this flow).
 **Complete or none:** Proceed silently (auto-archive if complete).
 
-## Step 3: Context Detection (Silent)
+## Step 3: Route by Mode
+
+### If `--quick`: Fast Path
+
+**When to use:**
+- Bug fixes with known cause
+- Small feature additions to existing patterns
+- Configuration changes, documentation updates
+
+**When NOT to use (escalate to default mode):**
+- New features with unclear requirements
+- Changes touching multiple systems
+- Security-related changes
+
+**Quick Implementation Flow:**
+
+1. Create brief todo list (2-4 tasks max)
+2. If unclear, ask ONE clarifying question
+3. If too complex, suggest removing `--quick` flag
+
+**Then implement directly:**
+1. Read relevant files (limit to 3-5)
+2. Make changes using Write/Edit
+3. Follow existing patterns exactly
+4. Run tests: `npm test --` or `go test ./...` or `pytest -x`
+5. Brief summary: what changed, files modified, follow-up needed
+
+**Escalation:**
+```yaml
+AskUserQuestion:
+  questions:
+    - question: "This is more complex than expected. Switch to full planning?"
+      header: "Escalate"
+      multiSelect: false
+      options:
+        - label: "Yes, full planning"
+          description: "Remove --quick, do comprehensive planning"
+        - label: "Continue quick"
+          description: "Accept limitations, keep going"
+```
+
+**After quick completion:** STOP (no further steps).
+
+---
+
+### If `--deep`: Comprehensive Exploration
+
+**When to use:**
+- Unclear requirements that need investigation
+- Technology decisions ("Should we use X?")
+- Feasibility checks before committing
+- Architecture redesigns
+
+**Deep Exploration Flow:**
+
+#### Step 3a: Define Scope
+
+Detect spike type from topic:
+
+| Topic Pattern | Type | Suggested Aspects |
+|---------------|------|-------------------|
+| "Should we use X" | Technology decision | Feasibility, Risk, Integration |
+| "Add X", "Implement X" | New feature | Scope, Risk, Effort |
+| "Is X possible" | Feasibility check | Feasibility, Risk |
+| "X vs Y" | Comparison | Approach, Risk, Effort |
+| "Redesign X", "Refactor X" | Architecture | Scope, Risk, Dependencies |
+| "Fix X", "Why is X" | Investigation | Feasibility, Scope, Risk |
+| General | General | Scope, Risk, Feasibility |
+
+Display: `Detected: [Type] exploration. Mode: Deep`
+
+```yaml
+AskUserQuestion:
+  questions:
+    - question: "What aspects matter most?"
+      header: "Aspects"
+      multiSelect: true
+      options:
+        - label: "[Aspect 1] (Recommended)"
+          description: "[From table above]"
+        - label: "[Aspect 2] (Recommended)"
+          description: "[From table above]"
+        - label: "[Aspect 3]"
+          description: "[From table above]"
+```
+
+**Available aspects:** Feasibility, Scope, Risk, Dependencies, Approach, Effort, User impact, Performance, Integration.
+
+#### Step 3b: Research
+
+For each selected aspect:
+
+| Aspect | Investigation |
+|--------|---------------|
+| Feasibility | Search for similar code, identify blockers, check constraints |
+| Scope | Map affected files/components, blast radius, secondary effects |
+| Risk | Identify unknowns, worst cases, reversibility concerns |
+| Dependencies | What needs to exist first, external services, teams |
+| Approach | Find 2-3 viable approaches, research pros/cons |
+| Effort | Break into task list, identify complexity drivers |
+| User impact | Who affected, breaking changes, migration path |
+| Performance | Critical paths, bottlenecks, scalability |
+| Integration | Integration points, API compatibility, conflicts |
+
+**Depth:** 8-10 files for deep exploration.
+
+#### Step 3c: Evaluate
+
+For each explored aspect, provide verdict:
+
+| Aspect | Verdict Format |
+|--------|---------------|
+| Feasibility | Yes/No/Partial + Confidence + Blockers |
+| Scope | XS/S/M/L/XL + Files affected + Secondary effects |
+| Risk | Low/Medium/High + Top risks + Mitigation possible? |
+| Dependencies | Blockers + External + Can start now? |
+| Approach | Best + Runner-up + Confidence |
+| Effort | Hours/Days/Weeks + Complexity drivers |
+| User impact | Users affected + Breaking changes + Migration? |
+| Performance | Acceptable/Needs work/Blocker + Concerns |
+| Integration | Compatible/Needs adaptation/Incompatible |
+
+**Overall:** Recommendation (Proceed/Caution/Don't/Need more), Confidence, Next step.
+
+#### Step 3d: Write Spike Report
+
+Write to `.devloop/spikes/{topic}.md`:
+
+```markdown
+## Spike: [Topic]
+
+**Question**: [What we investigated]
+**Type**: [From detection]
+**Explored**: [Selected aspects]
+
+### Findings
+[Include only sections for explored aspects]
+
+### Summary
+| Aspect | Finding | Confidence |
+|--------|---------|------------|
+| [Explored] | [Verdict] | High/Med/Low |
+
+### Recommendation
+**[Proceed / Proceed with caution / Don't proceed / Need more info]**
+[Brief explanation and next step]
+```
+
+#### Step 3e: Display Summary
+
+**MUST display before next steps:**
+
+```
+## Deep Exploration Complete: [Topic]
+
+### Answer
+[Direct answer to question]
+
+### Recommendation
+**[Verdict]** - [1-2 sentence explanation]
+
+### Key Findings
+1. [Most important]
+2. [Second most important]
+
+### Complexity & Risk
+- **Complexity**: [Size] - [reason]
+- **Risk**: [Level] - [top risk if Medium/High]
+
+*Full report: .devloop/spikes/{topic}.md*
+```
+
+**Then continue to Step 4** (Context Detection) to generate plan from findings.
+
+---
+
+### Default Mode: Autonomous Planning
+
+## Step 4: Context Detection (Silent)
 
 ```bash
 "${CLAUDE_PLUGIN_ROOT}/scripts/check-devloop-state.sh"
@@ -54,16 +254,16 @@ Use issue title as topic, body as context.
 
 Detect: tech stack, project structure, patterns from CLAUDE.md.
 
-## Step 4: Exploration (Silent)
+## Step 5: Exploration (Silent)
 
 1. **Search**: Grep for topic keywords, Glob for patterns
 2. **Read**: 3-5 most relevant files, understand patterns
 3. **Assess**: Files affected, dependencies, complexity (XS/S/M/L/XL)
 4. **Risks**: What could go wrong, breaking changes
 
-**Depth:** Standard = 3-5 files. Thorough = 8-10 files.
+**Depth:** Standard = 3-5 files. Deep = 8-10 files.
 
-## Step 5: Plan Generation (Silent)
+## Step 6: Plan Generation (Silent)
 
 | Complexity | Tasks | Phases |
 |------------|-------|--------|
@@ -108,7 +308,7 @@ Detect: tech stack, project structure, patterns from CLAUDE.md.
 
 **Task criteria:** Specific, actionable, testable, scoped.
 
-## Step 6: Review Checkpoint
+## Step 7: Review Checkpoint
 
 Display summary:
 ```
@@ -146,31 +346,21 @@ AskUserQuestion:
 
 ## Flags Reference
 
-| Flag | Effect |
-|------|--------|
-| `--from-issue N` | Fetch from GitHub issue #N |
-| `--thorough` | Deeper exploration |
+| Flag | Effect | Prompts |
+|------|--------|---------|
+| (none) | Autonomous exploration | 1-2 |
+| `--deep` | Comprehensive with spike report | 4-5 |
+| `--quick` | Skip exploration, fast execution | 0-1 |
+| `--from-issue N` | Fetch from GitHub issue #N | +0 |
 
-## Prompt Budget
+## Migration Notes
 
-**Target: 1-2 prompts**
-
-| Scenario | Prompts |
-|----------|---------|
-| No existing plan | 1 (review) |
-| Complete plan | 1 (review) |
-| Incomplete plan | 2 (conflict + review) |
-
-## vs spike.md
-
-| Aspect | spike | plan |
-|--------|-------|------|
-| Prompts | 4-5 | 1-2 |
-| Output | Spike report | Actionable plan |
-| Next step | Manual plan | Ready for /devloop:run |
-
-Use spike for detailed exploration. Use plan to start quickly.
+| Old Command | New Equivalent |
+|-------------|----------------|
+| `/devloop:spike` | `/devloop:plan --deep` |
+| `/devloop:quick` | `/devloop:plan --quick` |
+| `/devloop:from-issue N` | `/devloop:plan --from-issue N` |
 
 ---
 
-**Now**: Parse input and begin autonomous exploration.
+**Now**: Parse input and begin.
