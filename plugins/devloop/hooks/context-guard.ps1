@@ -36,7 +36,7 @@ if ($contextPct -ge $threshold) {
     [Console]::Error.WriteLine("Warning: Context usage at ${contextPct}% (threshold: ${threshold}%)")
     [Console]::Error.WriteLine('   Gracefully stopping ralph loop to preserve context quality.')
     [Console]::Error.WriteLine('')
-    [Console]::Error.WriteLine('   Run /devloop:fresh then /devloop:continue to resume with fresh context.')
+    [Console]::Error.WriteLine('   Run /devloop:fresh then /devloop:run to resume with fresh context.')
 
     # Remove ralph state file - ralph-loop's hook will then allow exit
     Remove-Item -Force $ralphStateFile -ErrorAction SilentlyContinue

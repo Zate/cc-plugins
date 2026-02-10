@@ -5,6 +5,34 @@ All notable changes to the devloop plugin are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.17.5] - 2026-02-10
+
+### Removed - Deprecated Commands
+
+Removed deprecated commands that were superseded by `/devloop:run`:
+- **Deleted** `commands/continue.md` (230 lines) - Use `/devloop:run --interactive` instead
+- **Deleted** `commands/ralph.md` (183 lines) - Use `/devloop:run` instead (autonomous is default)
+
+### Fixed - POSIX Compliance
+
+Fixed POSIX compliance issues in shell scripts:
+- `hooks/session-start.sh`: Changed `${BASH_SOURCE[0]}` to `$0` for POSIX compatibility
+- `plugins/ctx/hooks/session-start.sh`: Same fix applied
+
+### Added - Plugin Metadata
+
+Added missing metadata to plugin.json:
+- `homepage`: https://github.com/Zate/cc-plugins
+- `repository`: https://github.com/Zate/cc-plugins
+- `license`: MIT
+- `keywords`: ["devloop", "workflow", "planning", "development"]
+
+### Changed - Documentation Updates
+
+Updated documentation to remove references to deprecated commands:
+- `commands/help.md`: Removed `/devloop:continue` from command table, updated examples to use `/devloop:run`
+- `README.md`: Removed deprecated commands section, updated workflow references
+
 ## [3.17.1] - 2026-02-09
 
 ### Fixed - Windows Compatibility & YAML Parse Errors

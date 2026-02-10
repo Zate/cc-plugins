@@ -6,7 +6,7 @@
 
 **What devloop gives you:**
 - **Structured plans** that persist across sessions (`.devloop/plan.md`)
-- **Context management** so Claude stays sharp (spike → fresh → continue loop)
+- **Context management** so Claude stays sharp (spike → fresh → run loop)
 - **GitHub integration** for issue-driven development
 - **Automation** with ralph-loop for hands-off execution
 
@@ -113,11 +113,6 @@ Choose the workflow that fits your task:
 | `/devloop:new` | Create a new issue (bug, feature, task) |
 | `/devloop:help` | Interactive guide to using devloop |
 
-**Deprecated commands** (still work, but prefer alternatives):
-| Command | Use Instead |
-|---------|-------------|
-| `/devloop:continue` | `/devloop:run --interactive` |
-| `/devloop:ralph` | `/devloop:run` (autonomous is default) |
 
 ---
 
@@ -297,7 +292,7 @@ When all plan tasks are done, archive for team visibility:
 # Manually archive completed plan
 /devloop:archive
 
-# Or it's offered automatically in /devloop:continue and /devloop:ship
+# Or it's offered automatically in /devloop:run and /devloop:ship
 ```
 
 **Archive location:** `.devloop/archive/YYYY-MM-DD-{slug}.md`
@@ -323,7 +318,7 @@ Run plan tasks automatically until completion with `/devloop:run`. Requires the 
 # With iteration limit
 /devloop:run --max-iterations 100
 
-# With checkpoint prompts (old /devloop:continue behavior)
+# With checkpoint prompts
 /devloop:run --interactive
 ```
 
@@ -354,14 +349,14 @@ See `/devloop:help` → "Automation" for detailed documentation.
 Delete `.devloop/plan.md` and run `/devloop` to start fresh.
 
 ### Session ended unexpectedly
-Run `/devloop:continue` - it will pick up from the last checkpoint in your plan.
+Run `/devloop:run` - it will pick up from the last checkpoint in your plan.
 
 ### Want to abandon current plan
 Run `/devloop:archive` to archive a completed plan, then run `/devloop`.
 Or delete `.devloop/plan.md` and run `/devloop`.
 
 ### Context feels heavy/slow
-Run `/devloop:fresh`, then `/clear`, then `/devloop:run`.
+Run `/devloop:fresh`, then `/clear`, then `/devloop:run` to resume.
 
 ### Skill not loading
 Check `skills/INDEX.md` for the exact skill name. Use `Skill: exact-name`.

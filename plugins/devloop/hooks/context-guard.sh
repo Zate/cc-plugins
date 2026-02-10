@@ -50,7 +50,7 @@ if [[ $CONTEXT_PCT -ge $THRESHOLD ]]; then
     echo "⚠️  Context usage at ${CONTEXT_PCT}% (threshold: ${THRESHOLD}%)" >&2
     echo "   Gracefully stopping ralph loop to preserve context quality." >&2
     echo "" >&2
-    echo "   Run /devloop:fresh then /devloop:continue to resume with fresh context." >&2
+    echo "   Run /devloop:fresh then /devloop:run to resume with fresh context." >&2
 
     # Remove ralph state file - ralph-loop's hook will then allow exit
     rm -f "$RALPH_STATE_FILE"

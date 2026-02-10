@@ -5,7 +5,7 @@
 
 set -euo pipefail
 
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 PLUGIN_ROOT="$(dirname "$SCRIPT_DIR")"
 
 # ============================================================================
@@ -201,12 +201,12 @@ fi
 if [ "$FRESH" = "true" ]; then
     CONTEXT="$CONTEXT
 
-**⚡ Fresh start detected** → Run \`/devloop:continue\` to resume"
+**⚡ Fresh start detected** → Run \`/devloop:run\` to resume"
 fi
 
 CONTEXT="$CONTEXT
 
-**Commands**: /devloop, /devloop:continue, /devloop:spike, /devloop:fresh"
+**Commands**: /devloop, /devloop:run, /devloop:spike, /devloop:fresh"
 
 # Add ship command if git workflow is configured
 if [ -n "$GIT_WORKFLOW" ]; then

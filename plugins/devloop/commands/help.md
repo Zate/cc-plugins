@@ -106,9 +106,9 @@ Returning to work?
 | `/devloop` | Start new workflow | No plan exists, starting fresh |
 | `/devloop:spike` | Explore & plan | Unclear requirements, need research |
 | `/devloop:run` | Autonomous execution | Execute plan tasks without prompting |
+| `/devloop:run --interactive` | Interactive execution | Execute with checkpoint prompts |
 | `/devloop:run --next-issue` | Full auto workflow | Pick next issue, plan, run, validate, ship |
 | `/devloop:run-swarm` | Swarm execution | Large plans (10+ tasks), fresh context per task |
-| `/devloop:continue` | Resume work | Plan exists, returning to work |
 | `/devloop:fresh` | Save state | Before clearing context |
 | `/devloop:quick` | Fast implementation | Bug fixes, small changes |
 | `/devloop:review` | Code review | Before shipping, PR review |
@@ -135,7 +135,7 @@ Returning to work?
 
 **Resume yesterday's work:**
 ```bash
-/devloop:continue
+/devloop:run
 ```
 
 ---
@@ -280,8 +280,8 @@ rm .devloop/plan.md
 
 ### Session ended unexpectedly
 ```bash
-# Just continue - picks up from plan
-/devloop:continue
+# Just run - picks up from plan
+/devloop:run
 ```
 
 ### Want to abandon current plan
@@ -306,7 +306,7 @@ rm .devloop/plan.md
 # If that's not enough, do a full reset
 /devloop:fresh
 /clear
-/devloop:continue
+/devloop:run
 ```
 
 ### Skill not loading
@@ -346,9 +346,9 @@ rm -rf .devloop/
 
 # Topic: Automation
 
-## Ralph Loop Integration
+## Autonomous Execution
 
-Run devloop tasks automatically until plan completion using the ralph-loop plugin.
+Run devloop tasks automatically until plan completion.
 
 **Prerequisites:**
 - Install ralph-loop: `/plugin install ralph-loop`
@@ -358,26 +358,29 @@ Run devloop tasks automatically until plan completion using the ralph-loop plugi
 
 ```bash
 # Start automated execution (up to 50 iterations)
-/devloop:ralph
+/devloop:run
 
 # With custom iteration limit
-/devloop:ralph --max-iterations 100
+/devloop:run --max-iterations 100
+
+# With interactive checkpoints
+/devloop:run --interactive
 ```
 
 ## How It Works
 
 ```
 ┌─────────────────────────────────────────────────┐
-│  /devloop:ralph                                 │
-│  └─→ Creates ralph-loop state                   │
-│  └─→ Sets promise: "ALL PLAN TASKS COMPLETE"    │
-│  └─→ Starts working on tasks                    │
+│  /devloop:run                                   │
+│  └─> Creates ralph-loop state                   │
+│  └─> Sets promise: "ALL PLAN TASKS COMPLETE"    │
+│  └─> Starts working on tasks                    │
 └───────────────────────┬─────────────────────────┘
                         ↓
 ┌─────────────────────────────────────────────────┐
 │  Claude completes a task                        │
-│  └─→ Marks task [x] in plan                     │
-│  └─→ Checks: all tasks done?                    │
+│  └─> Marks task [x] in plan                     │
+│  └─> Checks: all tasks done?                    │
 └───────────────────────┬─────────────────────────┘
                         │
                 ┌───────┴───────┐
@@ -423,7 +426,7 @@ The loop automatically exits when context usage exceeds 70%, preventing degradat
 1. Statusline writes context % to `.claude/context-usage.json`
 2. Stop hook checks context when Claude tries to stop
 3. If context >= threshold and ralph active, gracefully exits
-4. You'll see: "Run `/devloop:fresh` then `/devloop:continue` to resume"
+4. You'll see: "Run `/devloop:fresh` then `/devloop:run` to resume"
 
 **Configure threshold** in `.devloop/local.md`:
 ```yaml
@@ -452,10 +455,10 @@ head -10 .claude/ralph-loop.local.md
 ./plugins/devloop/scripts/check-plan-complete.sh
 ```
 
-## Comparison: Manual vs Automated
+## Comparison: Interactive vs Autonomous
 
-| Aspect | Manual (spike/fresh/continue) | Automated (ralph) |
-|--------|-------------------------------|-------------------|
+| Aspect | Interactive (--interactive) | Autonomous (default) |
+|--------|----------------------------|----------------------|
 | Context management | You run /fresh + /clear | Context accumulates |
 | Human checkpoints | Yes | No |
 | Works overnight | No | Yes |
@@ -463,10 +466,10 @@ head -10 .claude/ralph-loop.local.md
 
 ## Tips
 
-1. **Create good plans first** - Run `/devloop:spike` before `/devloop:ralph`
+1. **Create good plans first** - Run `/devloop:spike` before `/devloop:run`
 2. **Use iteration limits** - Set `--max-iterations` as a safety net
 3. **Review results** - Check work after loop completes
-4. **Large plans** - Consider manual loop for 20+ tasks (context builds up)
+4. **Large plans** - Consider `/devloop:run-swarm` for 20+ tasks
 
 ---
 
