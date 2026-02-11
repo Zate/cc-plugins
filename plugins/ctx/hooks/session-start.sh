@@ -19,6 +19,21 @@ if [[ -z "$CTX_BIN" ]]; then
     exit 0
 fi
 
+# Minimum binary version required by this plugin
+MIN_BINARY_VERSION="0.3.1"
+BINARY_HINT=""
+if RAW_VERSION=$("$CTX_BIN" version 2>/dev/null); then
+    CURRENT_VER=$(echo "$RAW_VERSION" | sed -n 's/ctx \([^ ]*\).*/\1/p' | sed 's/^v//')
+    if [[ "$CURRENT_VER" == "dev" ]]; then
+        BINARY_HINT="**ctx binary is a dev build** - run \`/ctx:setup\` to install the release version (v${MIN_BINARY_VERSION}+)."
+    elif [[ -n "$CURRENT_VER" ]]; then
+        # Compare versions (works for semver x.y.z)
+        if printf '%s\n%s' "$MIN_BINARY_VERSION" "$CURRENT_VER" | sort -V | head -1 | grep -q "^${CURRENT_VER}$" && [[ "$CURRENT_VER" != "$MIN_BINARY_VERSION" ]]; then
+            BINARY_HINT="**ctx binary outdated:** v${CURRENT_VER} installed, v${MIN_BINARY_VERSION}+ required. Run \`/ctx:setup\` to upgrade."
+        fi
+    fi
+fi
+
 # Detect current project from git repo
 PROJECT_NAME=""
 if command -v git &>/dev/null; then
@@ -41,9 +56,14 @@ if [[ -f "$PLUGIN_ROOT/skills/using-ctx/SKILL.md" ]]; then
     SKILL_CONTENT=$(awk 'BEGIN{skip=0} /^---$/{skip++; next} skip>=2{print}' "$PLUGIN_ROOT/skills/using-ctx/SKILL.md")
 fi
 
-# Combine context + skill
+# Combine hints + context + skill
 COMBINED=""
-[[ -n "$CTX_CONTEXT" ]] && COMBINED="$CTX_CONTEXT"
+[[ -n "$BINARY_HINT" ]] && COMBINED="$BINARY_HINT"
+if [[ -n "$CTX_CONTEXT" ]]; then
+    [[ -n "$COMBINED" ]] && COMBINED="$COMBINED
+
+$CTX_CONTEXT" || COMBINED="$CTX_CONTEXT"
+fi
 if [[ -n "$SKILL_CONTENT" ]]; then
     [[ -n "$COMBINED" ]] && COMBINED="$COMBINED
 

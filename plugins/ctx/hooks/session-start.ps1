@@ -36,7 +36,7 @@ if (-not $ctxCmd) {
 }
 
 # --- Minimum binary version required by this plugin ---
-$minBinaryVersion = '0.3.0'
+$minBinaryVersion = '0.3.1'
 $binaryHint = ''
 try {
     $rawVersion = & $ctxCmd version 2>$null

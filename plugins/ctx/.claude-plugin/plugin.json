@@ -1,6 +1,6 @@
 {
   "name": "ctx",
-  "version": "1.0.7",
+  "version": "1.0.8",
   "description": "Persistent memory for Claude Code agents. Stores decisions, patterns, and knowledge in a structured graph database that persists across sessions.",
   "author": {
     "name": "Zate",
