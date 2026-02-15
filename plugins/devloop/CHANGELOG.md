@@ -5,6 +5,28 @@ All notable changes to the devloop plugin are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.18.3] - 2026-02-15
+
+### Fixed - Windows Support
+
+- Replaced `${BASH_SOURCE[0]}` with `$0` in all directly-executed scripts for POSIX compatibility
+- Fixed `check-devloop-state.sh` and `archive-plan.sh` to use `$0` instead of `${BASH_SOURCE[0]}`
+- Fixed test scripts to use `$0` for consistency
+
+### Added - PowerShell Equivalents for Windows
+
+New `.ps1` versions of all devloop scripts for native Windows support:
+- `scripts/check-plan-complete.ps1`
+- `scripts/check-devloop-state.ps1`
+- `scripts/archive-plan.ps1`
+- `scripts/check-gh-setup.ps1`
+- `scripts/check-plugin.ps1`
+- `scripts/list-issues.ps1`
+- `scripts/parse-local-config.ps1`
+- `scripts/sync-plan-to-tasks.ps1`
+- `scripts/gather-task-context.ps1`
+- `statusline/devloop-statusline.ps1`
+
 ## [3.18.2] - 2026-02-10
 
 ### Changed - Script Simplification

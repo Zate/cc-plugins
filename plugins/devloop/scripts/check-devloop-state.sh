@@ -24,7 +24,7 @@
 set -euo pipefail
 
 # Get script directory for calling sibling scripts
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 
 # Initialize result
 STATE="clean"

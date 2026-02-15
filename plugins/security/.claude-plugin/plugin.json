@@ -1,6 +1,6 @@
 {
   "name": "security",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "Comprehensive security plugin with consolidated super-auditors (18→6), 60% token reduction, mode-based scanning, ASVS 5.0 alignment, and real-time validation hooks",
   "author": {
     "name": "cc-plugins",

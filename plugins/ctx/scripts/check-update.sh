@@ -21,7 +21,7 @@ if [ -z "$CURRENT" ]; then
 fi
 
 # Extract semver from "ctx v0.1.0 (commit abc, built ...)" or "ctx dev ..."
-CURRENT_TAG=$(echo "$CURRENT" | grep -oP 'ctx \K[^\s]+' || echo "")
+CURRENT_TAG=$(echo "$CURRENT" | sed -n 's/^ctx \([^ ]*\).*/\1/p')
 if [ -z "$CURRENT_TAG" ] || [ "$CURRENT_TAG" = "dev" ]; then
     echo "check-failed:dev-build"
     exit 0

@@ -29,7 +29,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash ${CLAUDE_PLUGIN_ROOT}/scripts/post-write-scan.sh",
+            "command": "\"${CLAUDE_PLUGIN_ROOT}/scripts/run-script.cmd\" post-write-scan",
             "timeout": 5
           }
         ]
