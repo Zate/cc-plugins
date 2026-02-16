@@ -1,6 +1,6 @@
 {
   "name": "wsl-clipboard-fix",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Fixes image pasting in WSL2 by auto-converting BMP clipboard content to PNG. Runs a background daemon that monitors the Wayland clipboard and converts Windows BMP images so Claude Code can detect them.",
   "author": {
     "name": "Zate",
