@@ -14,6 +14,7 @@ set -e
 
 PIDFILE="${TMPDIR:-/tmp}/clip2png.pid"
 LOGFILE="${TMPDIR:-/tmp}/clip2png.log"
+STATEFILE="${TMPDIR:-/tmp}/clip2png.state"
 POLL_INTERVAL=2
 LAST_HASH=""
 
@@ -84,6 +85,7 @@ convert_once() {
         if [ -s "$tmpfile" ]; then
             # Write PNG back to clipboard
             wl-copy --type image/png < "$tmpfile" 2>/dev/null
+            printf "%s" "$(date +%s)" > "$STATEFILE" 2>/dev/null
             log "Converted BMP to PNG"
             rm -f "$tmpfile"
             trap - EXIT
@@ -164,10 +166,24 @@ do_stop() {
 }
 
 do_status() {
+    last_convert=""
+    if [ -f "$STATEFILE" ]; then
+        convert_ts=$(cat "$STATEFILE" 2>/dev/null)
+        if [ -n "$convert_ts" ]; then
+            now=$(date +%s)
+            ago=$((now - convert_ts))
+            if [ "$ago" -lt 60 ]; then
+                last_convert=" (last convert: ${ago}s ago)"
+            elif [ "$ago" -lt 3600 ]; then
+                last_convert=" (last convert: $((ago / 60))m ago)"
+            fi
+        fi
+    fi
+
     if [ -f "$PIDFILE" ]; then
         pid=$(cat "$PIDFILE" 2>/dev/null)
         if [ -n "$pid" ] && kill -0 "$pid" 2>/dev/null; then
-            printf "clip2png: Running (PID %s)\n" "$pid"
+            printf "clip2png: Running (PID %s)%s\n" "$pid" "$last_convert"
             exit 0
         fi
         rm -f "$PIDFILE"

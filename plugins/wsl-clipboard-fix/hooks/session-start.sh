@@ -37,8 +37,9 @@ sleep 0.2
 status=$("$CLIP2PNG" --status 2>/dev/null) || true
 
 if echo "$status" | grep -q "Running"; then
-    pid=$(echo "$status" | grep -o '[0-9]*$')
-    printf '{"suppressOutput":true,"systemMessage":"wsl-clipboard-fix: clip2png watcher active (PID %s)","hookSpecificOutput":{"hookEventName":"SessionStart","additionalContext":"clip2png BMP-to-PNG watcher started for WSL2 image paste support"}}\n' "$pid"
+    # Extract just the status text after "clip2png: "
+    status_text=$(echo "$status" | sed 's/^clip2png: //')
+    printf '{"suppressOutput":true,"systemMessage":"wsl-clipboard-fix: %s","hookSpecificOutput":{"hookEventName":"SessionStart","additionalContext":"clip2png BMP-to-PNG watcher started for WSL2 image paste support"}}\n' "$status_text"
 else
     printf '{"suppressOutput":true,"systemMessage":"wsl-clipboard-fix: watcher failed to start, check /tmp/clip2png.log"}\n'
 fi
