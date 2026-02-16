@@ -1,0 +1,28 @@
+{
+  "description": "WSL clipboard fix hooks - start/stop clip2png watcher daemon with Claude Code sessions",
+  "hooks": {
+    "SessionStart": [
+      {
+        "matcher": ".*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"${CLAUDE_PLUGIN_ROOT}/hooks/run-hook.cmd\" session-start",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "SessionEnd": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"${CLAUDE_PLUGIN_ROOT}/hooks/run-hook.cmd\" session-end",
+            "timeout": 5
+          }
+        ]
+      }
+    ]
+  }
+}

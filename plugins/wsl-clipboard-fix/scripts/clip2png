@@ -1,0 +1,195 @@
+#!/bin/sh
+# clip2png - Convert BMP clipboard content to PNG for WSL2 Claude Code image paste
+# Requires: wl-clipboard (wl-paste, wl-copy), imagemagick (convert)
+#
+# Usage:
+#   clip2png --once     Convert clipboard BMP to PNG once, then exit
+#   clip2png --watch    Poll clipboard every 2s, convert BMP to PNG
+#   clip2png --stop     Stop a running --watch daemon
+#   clip2png --status   Check if daemon is running
+#
+# The script detects WSL automatically and exits silently on non-WSL systems.
+
+set -e
+
+PIDFILE="${TMPDIR:-/tmp}/clip2png.pid"
+LOGFILE="${TMPDIR:-/tmp}/clip2png.log"
+POLL_INTERVAL=2
+LAST_HASH=""
+
+# --- Helpers ---
+
+log() {
+    printf "%s clip2png: %s\n" "$(date '+%H:%M:%S')" "$1" >> "$LOGFILE" 2>/dev/null
+}
+
+die() {
+    printf "clip2png: %s\n" "$1" >&2
+    exit 1
+}
+
+is_wsl() {
+    # Check multiple WSL indicators
+    if [ -f /proc/sys/fs/binfmt_misc/WSLInterop ] || [ -f /proc/sys/fs/binfmt_misc/WSLInterop-late ]; then
+        return 0
+    fi
+    if grep -qi microsoft /proc/version 2>/dev/null; then
+        return 0
+    fi
+    return 1
+}
+
+check_deps() {
+    missing=""
+    for cmd in wl-paste wl-copy convert; do
+        if ! command -v "$cmd" >/dev/null 2>&1; then
+            missing="$missing $cmd"
+        fi
+    done
+    if [ -n "$missing" ]; then
+        die "Missing dependencies:$missing. Install with: sudo apt install wl-clipboard imagemagick"
+    fi
+}
+
+clipboard_has_bmp() {
+    # Check if clipboard has BMP content but NOT already PNG
+    targets=$(wl-paste -l 2>/dev/null) || return 1
+    case "$targets" in
+        *image/bmp*)
+            # If PNG is already available, no conversion needed
+            case "$targets" in
+                *image/png*) return 1 ;;
+            esac
+            return 0
+            ;;
+    esac
+    return 1
+}
+
+clipboard_bmp_hash() {
+    # Get a quick hash of current BMP clipboard to detect changes
+    wl-paste --type image/bmp 2>/dev/null | cksum 2>/dev/null || echo ""
+}
+
+convert_once() {
+    if ! clipboard_has_bmp; then
+        return 1
+    fi
+
+    tmpfile="${TMPDIR:-/tmp}/clip2png_convert_$$.png"
+    trap 'rm -f "$tmpfile"' EXIT
+
+    # Extract BMP from clipboard, convert to PNG
+    if wl-paste --type image/bmp 2>/dev/null | convert bmp:- png:"$tmpfile" 2>/dev/null; then
+        if [ -s "$tmpfile" ]; then
+            # Write PNG back to clipboard
+            wl-copy --type image/png < "$tmpfile" 2>/dev/null
+            log "Converted BMP to PNG"
+            rm -f "$tmpfile"
+            trap - EXIT
+            return 0
+        fi
+    fi
+
+    rm -f "$tmpfile"
+    trap - EXIT
+    log "Conversion failed"
+    return 1
+}
+
+# --- Commands ---
+
+do_once() {
+    if ! is_wsl; then
+        exit 0
+    fi
+    check_deps
+    if convert_once; then
+        printf "clip2png: Converted clipboard BMP to PNG\n"
+    else
+        printf "clip2png: No BMP content in clipboard\n"
+    fi
+}
+
+do_watch() {
+    if ! is_wsl; then
+        log "Not WSL, exiting"
+        exit 0
+    fi
+    check_deps
+
+    # Check for existing daemon
+    if [ -f "$PIDFILE" ]; then
+        old_pid=$(cat "$PIDFILE" 2>/dev/null)
+        if [ -n "$old_pid" ] && kill -0 "$old_pid" 2>/dev/null; then
+            log "Daemon already running (PID $old_pid)"
+            printf "clip2png: Already running (PID %s)\n" "$old_pid"
+            exit 0
+        fi
+        rm -f "$PIDFILE"
+    fi
+
+    # Daemonize: redirect output and background
+    log "Starting watcher (PID $$)"
+    printf "%s" "$$" > "$PIDFILE"
+
+    trap 'rm -f "$PIDFILE"; log "Stopped"; exit 0' INT TERM
+
+    while true; do
+        if clipboard_has_bmp; then
+            current_hash=$(clipboard_bmp_hash)
+            if [ "$current_hash" != "$LAST_HASH" ]; then
+                if convert_once; then
+                    LAST_HASH="$current_hash"
+                fi
+            fi
+        fi
+        sleep "$POLL_INTERVAL"
+    done
+}
+
+do_stop() {
+    if [ -f "$PIDFILE" ]; then
+        pid=$(cat "$PIDFILE" 2>/dev/null)
+        if [ -n "$pid" ] && kill -0 "$pid" 2>/dev/null; then
+            kill "$pid" 2>/dev/null
+            rm -f "$PIDFILE"
+            log "Stopped daemon (PID $pid)"
+            printf "clip2png: Stopped (PID %s)\n" "$pid"
+            exit 0
+        fi
+        rm -f "$PIDFILE"
+    fi
+    printf "clip2png: No daemon running\n"
+}
+
+do_status() {
+    if [ -f "$PIDFILE" ]; then
+        pid=$(cat "$PIDFILE" 2>/dev/null)
+        if [ -n "$pid" ] && kill -0 "$pid" 2>/dev/null; then
+            printf "clip2png: Running (PID %s)\n" "$pid"
+            exit 0
+        fi
+        rm -f "$PIDFILE"
+    fi
+    printf "clip2png: Not running\n"
+    exit 1
+}
+
+# --- Main ---
+
+case "${1:-}" in
+    --once)   do_once ;;
+    --watch)  do_watch ;;
+    --stop)   do_stop ;;
+    --status) do_status ;;
+    *)
+        printf "Usage: clip2png [--once|--watch|--stop|--status]\n"
+        printf "\n"
+        printf "  --once     Convert clipboard BMP to PNG once\n"
+        printf "  --watch    Poll clipboard, auto-convert BMP to PNG\n"
+        printf "  --stop     Stop the watch daemon\n"
+        printf "  --status   Check if daemon is running\n"
+        exit 1
+        ;;
+esac

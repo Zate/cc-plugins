@@ -7,7 +7,7 @@
   },
   "metadata": {
     "description": "A curated marketplace of Claude Code plugins and skills for enhanced development workflows",
-    "version": "0.4.8",
+    "version": "0.5.0",
     "pluginRoot": "./plugins"
   },
   "plugins": [
@@ -31,6 +31,13 @@
       "description": "Persistent memory for Claude Code agents. Stores decisions, patterns, and knowledge in a structured graph database across sessions with auto-injection and enforcement.",
       "category": "development",
       "tags": ["memory", "context", "persistence", "knowledge-graph", "sessions"]
+    },
+    {
+      "name": "wsl-clipboard-fix",
+      "source": "./plugins/wsl-clipboard-fix",
+      "description": "Fixes image pasting in WSL2 by auto-converting BMP clipboard content to PNG. Runs a background clip2png daemon that monitors the Wayland clipboard during Claude Code sessions.",
+      "category": "utilities",
+      "tags": ["wsl", "wsl2", "clipboard", "image-paste", "wayland", "bmp", "png"]
     }
   ]
 }

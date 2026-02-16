@@ -1,0 +1,13 @@
+{
+  "name": "wsl-clipboard-fix",
+  "version": "1.0.0",
+  "description": "Fixes image pasting in WSL2 by auto-converting BMP clipboard content to PNG. Runs a background daemon that monitors the Wayland clipboard and converts Windows BMP images so Claude Code can detect them.",
+  "author": {
+    "name": "Zate",
+    "email": "zate75+claude-code-plugins@gmail.com"
+  },
+  "homepage": "https://github.com/Zate/cc-plugins",
+  "repository": "https://github.com/Zate/cc-plugins",
+  "license": "MIT",
+  "keywords": ["wsl", "wsl2", "clipboard", "image-paste", "bmp", "png", "wayland"]
+}
