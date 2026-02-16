@@ -27,11 +27,14 @@ for cmd in wl-paste wl-copy convert; do
     fi
 done
 
-# Start watcher in background
+# Start watcher in background (no-op if already running)
 "$CLIP2PNG" --watch >/dev/null 2>&1 &
 
 # Brief pause to let daemon write PID file
 sleep 0.2
+
+# Register this session
+"$CLIP2PNG" --ref-up >/dev/null 2>&1
 
 # Check status for reporting
 status=$("$CLIP2PNG" --status 2>/dev/null) || true

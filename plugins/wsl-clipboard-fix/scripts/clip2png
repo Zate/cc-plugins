@@ -14,6 +14,7 @@ set -e
 
 PIDFILE="${TMPDIR:-/tmp}/clip2png.pid"
 LOGFILE="${TMPDIR:-/tmp}/clip2png.log"
+REFFILE="${TMPDIR:-/tmp}/clip2png.refs"
 POLL_INTERVAL=2
 LAST_HASH=""
 
@@ -148,7 +149,40 @@ do_watch() {
     done
 }
 
+ref_up() {
+    count=0
+    if [ -f "$REFFILE" ]; then
+        count=$(cat "$REFFILE" 2>/dev/null) || count=0
+    fi
+    count=$((count + 1))
+    printf "%s" "$count" > "$REFFILE" 2>/dev/null
+    log "Ref up: $count sessions"
+    printf "clip2png: %s session(s) registered\n" "$count"
+}
+
+ref_down() {
+    count=0
+    if [ -f "$REFFILE" ]; then
+        count=$(cat "$REFFILE" 2>/dev/null) || count=0
+    fi
+    if [ "$count" -gt 0 ] 2>/dev/null; then
+        count=$((count - 1))
+    fi
+    printf "%s" "$count" > "$REFFILE" 2>/dev/null
+    log "Ref down: $count sessions"
+    printf "%s" "$count"
+}
+
 do_stop() {
+    # Decrement ref count; only kill daemon when no sessions remain
+    remaining=$(ref_down)
+    if [ "$remaining" -gt 0 ] 2>/dev/null; then
+        printf "clip2png: %s session(s) still active, keeping daemon\n" "$remaining"
+        exit 0
+    fi
+
+    # Last session — kill the daemon
+    rm -f "$REFFILE"
     if [ -f "$PIDFILE" ]; then
         pid=$(cat "$PIDFILE" 2>/dev/null)
         if [ -n "$pid" ] && kill -0 "$pid" 2>/dev/null; then
@@ -179,17 +213,19 @@ do_status() {
 # --- Main ---
 
 case "${1:-}" in
-    --once)   do_once ;;
-    --watch)  do_watch ;;
-    --stop)   do_stop ;;
-    --status) do_status ;;
+    --once)    do_once ;;
+    --watch)   do_watch ;;
+    --stop)    do_stop ;;
+    --status)  do_status ;;
+    --ref-up)  ref_up ;;
     *)
         printf "Usage: clip2png [--once|--watch|--stop|--status]\n"
         printf "\n"
         printf "  --once     Convert clipboard BMP to PNG once\n"
         printf "  --watch    Poll clipboard, auto-convert BMP to PNG\n"
-        printf "  --stop     Stop the watch daemon\n"
+        printf "  --stop     Stop the watch daemon (ref-counted)\n"
         printf "  --status   Check if daemon is running\n"
+        printf "  --ref-up   Register a session (used by hooks)\n"
         exit 1
         ;;
 esac
