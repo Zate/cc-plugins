@@ -15,7 +15,7 @@ elif [[ -x "$HOME/.local/bin/ctx" ]]; then
 fi
 
 if [[ -z "$CTX_BIN" ]]; then
-    echo '{"suppressOutput":true,"systemMessage":"ctx: not installed. Run /ctx:setup to install."}'
+    echo '{"suppressOutput":false,"systemMessage":"ctx: not installed. Run /ctx:setup to install."}'
     exit 0
 fi
 
@@ -71,7 +71,7 @@ $SKILL_CONTENT" || COMBINED="$SKILL_CONTENT"
 fi
 
 if [[ -z "$COMBINED" ]]; then
-    echo '{"suppressOutput":true,"systemMessage":"ctx: ready (empty context)"}'
+    echo '{"suppressOutput":false,"systemMessage":"ctx: ready (empty context)"}'
     exit 0
 fi
 
@@ -81,7 +81,7 @@ NODE_COUNT=$(echo "$CTX_CONTEXT" | grep -c '^\- \[' 2>/dev/null || echo "0")
 # Output JSON
 if command -v jq &> /dev/null; then
     jq -n --arg ctx "$COMBINED" --arg status "ctx: ${NODE_COUNT} nodes loaded" \
-        '{suppressOutput: true, systemMessage: $status, hookSpecificOutput: {hookEventName: "SessionStart", additionalContext: $ctx}}'
+        '{suppressOutput: false, systemMessage: $status, hookSpecificOutput: {hookEventName: "SessionStart", additionalContext: $ctx}}'
 else
     echo "$CTX_OUTPUT"
 fi
