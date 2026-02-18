@@ -11,7 +11,7 @@ description: |
   assistant: "I'll launch devloop:doc-generator to document the API changes."
   </example>
 tools: Read, Write, Edit, Grep, Glob, TaskCreate, TaskUpdate, TaskList
-model: sonnet
+model: haiku
 color: teal
 ---
 

@@ -45,7 +45,7 @@ Once configured, restart Claude Code to see the statusline at the bottom of your
 
 Example output:
 ```
-Opus-4.5 | █░░░░ 23% | 45.2K | 5h 12% 7d 8% | cc-plugins | main | P:3/10
+Opus-4.6 | █░░░░ 23% | 45.2K | 5h 12% 7d 8% | cc-plugins | main | P:3/10
 ```
 
 ## Dependencies
