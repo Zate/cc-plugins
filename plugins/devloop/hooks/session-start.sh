@@ -175,7 +175,10 @@ ISSUE_STATUS=$(get_linked_issue_status)
 STATUSLINE_STATUS=$(check_statusline_configured)
 
 # Build minimal context message
-CONTEXT="## devloop v3.0
+# Read version from plugin.json
+DEVLOOP_VERSION=$(jq -r '.version // "3.x"' "${PLUGIN_ROOT}/.claude-plugin/plugin.json" 2>/dev/null || echo "3.x")
+
+CONTEXT="## devloop v${DEVLOOP_VERSION}
 
 **Project**: $PROJECT"
 [ "$LANG" != "unknown" ] && CONTEXT="$CONTEXT ($LANG)"

@@ -12,6 +12,7 @@ description: |
   </example>
 tools: Read, Edit
 model: haiku
+maxTurns: 10
 color: cyan
 ---
 

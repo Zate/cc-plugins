@@ -9,7 +9,7 @@ allowed-tools:
   - Glob
   - Bash
   - Bash(${CLAUDE_PLUGIN_ROOT}/scripts/*.sh:*)
-  - Task
+  - Agent
   - AskUserQuestion
   - WebSearch
   - WebFetch

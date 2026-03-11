@@ -17,6 +17,7 @@ description: |
   </example>
 tools: Bash, Read, Write, Edit, Grep, Glob, TaskCreate, TaskUpdate, TaskList, AskUserQuestion
 model: sonnet
+maxTurns: 30
 color: green
 ---
 

@@ -5,6 +5,26 @@ All notable changes to the devloop plugin are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.19.0] - 2026-03-11
+
+### Changed - Claude Code 2.1.x Modernization
+
+- Updated `Task` tool references to `Agent` in allowed-tools for 5 commands (run, plan, devloop, run-swarm, statusline) and inline documentation
+- Updated CLAUDE.md with comprehensive Claude Code 2.1.x plugin development docs (new hook types, skill frontmatter, agent frontmatter, commands-to-skills migration guidance)
+- Session-start hooks (`.sh` and `.ps1`) now read version dynamically from plugin.json instead of hardcoded "v3.0"
+
+### Added
+
+- `maxTurns` limits on 6 agents to prevent runaway execution:
+  - swarm-worker: 25, doc-generator: 20, security-scanner: 30, qa-engineer: 30, task-planner: 20, statusline-setup: 10
+  - engineer agent intentionally uncapped (open-ended, user-interactive)
+
+### Research
+
+- Agent Teams integration spike: deferred -- experimental, model mismatch with autonomous execution (`.devloop/spikes/agent-teams-integration.md`)
+- Commands-to-skills migration plan: deferred -- no urgency, commands still work (`.devloop/spikes/commands-to-skills-migration.md`)
+- Built-in overlap analysis: no features to remove, devloop's plan-driven approach is distinct from built-in `/loop`/`/batch`/`/simplify` (`.devloop/spikes/builtin-overlap-analysis.md`)
+
 ## [3.18.3] - 2026-02-15
 
 ### Fixed - Windows Support

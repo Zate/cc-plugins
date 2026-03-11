@@ -9,7 +9,7 @@ allowed-tools:
   - Glob
   - Bash
   - Bash(${CLAUDE_PLUGIN_ROOT}/scripts/*.sh:*)
-  - Task
+  - Agent
   - AskUserQuestion
   - TaskCreate
   - TaskUpdate
@@ -207,7 +207,7 @@ These files are likely involved (read them to understand context):
 ### 4c. Spawn Worker
 
 ```
-Task:
+Agent:
   description: "Execute task [N.M]: [brief]"
   subagent_type: "devloop:swarm-worker"
   prompt: [constructed prompt from 4b]

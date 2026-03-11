@@ -73,26 +73,38 @@ Required location: `.claude-plugin/plugin.json`
 
 ### Component Types
 
-1. **Commands**: Custom slash commands in `commands/` directory
-   - Markdown files with frontmatter
-   - Integrate into `/command-name` syntax
-
-2. **Agents**: Specialized subagents in `agents/` directory
-   - Claude invokes automatically based on context
-   - Markdown files with capabilities and usage guidelines
-
-3. **Skills**: Model-invoked capabilities in `skills/` subdirectories
+1. **Skills** (recommended): Model-invoked capabilities in `skills/` subdirectories
    - Each skill has its own directory with `SKILL.md`
    - Claude autonomously determines when to apply
    - Include "when to use" and "when NOT to use" sections
+   - Frontmatter fields: `name`, `description`, `argument-hint`, `allowed-tools`, `model`, `context` (`fork`), `agent`, `hooks`, `user-invocable`, `disable-model-invocation`
+   - Supports `$ARGUMENTS`, `$N` (positional), `${CLAUDE_SKILL_DIR}`, `${CLAUDE_SESSION_ID}`
+   - Dynamic context injection: `` !`command` `` runs shell before content is sent to Claude
+
+2. **Commands** (legacy, still works): Custom slash commands in `commands/` directory
+   - Markdown files with frontmatter
+   - Commands have been merged into skills -- both `commands/deploy.md` and `skills/deploy/SKILL.md` create `/deploy`
+   - Use `skills/` for new development
+
+3. **Agents**: Specialized subagents in `agents/` directory
+   - Claude invokes automatically based on context
+   - Frontmatter fields: `name`, `description`, `tools`, `disallowedTools`, `model`, `permissionMode`, `maxTurns`, `skills`, `mcpServers`, `hooks`, `memory` (`user`/`project`/`local`), `background`, `isolation` (`worktree`)
+   - The `Task` tool was renamed to `Agent` (v2.1.63) -- `Task(...)` still works as alias
 
 4. **Hooks**: Event handlers responding to lifecycle events
    - Configure via `hooks.json` or inline in `plugin.json`
-   - Support validation, automation, and notifications
+   - Four handler types: `command` (shell), `http` (POST), `prompt` (LLM eval), `agent` (multi-turn)
+   - Events: `SessionStart`, `SessionEnd`, `UserPromptSubmit`, `PreToolUse`, `PostToolUse`, `PermissionRequest`, `Stop`, `SubagentStart`, `SubagentStop`, `Notification`, `PreCompact`, `InstructionsLoaded`, `ConfigChange`, `WorktreeCreate`, `WorktreeRemove`, `TeammateIdle`, `TaskCompleted`, `Setup`
+   - PreToolUse: use `hookSpecificOutput.permissionDecision` (not top-level `decision`/`reason` -- deprecated)
+   - `async: true` for background hooks, `once: true` for run-once (skills only)
 
 5. **MCP Servers**: External tool integrations
    - Configure in `.mcp.json`
    - Start automatically when plugin activates
+
+6. **LSP Servers** (new): Language Server Protocol integration
+   - Configure in `.lsp.json`
+   - Provides code intelligence (go-to-definition, diagnostics)
 
 ### Environment Variables
 
@@ -100,6 +112,10 @@ Use `${CLAUDE_PLUGIN_ROOT}` for absolute plugin directory paths in:
 - Hook scripts
 - MCP configurations
 - Any file references
+
+Use `${CLAUDE_SKILL_DIR}` for skill self-references (points to skill's own directory).
+
+Use `CLAUDE_ENV_FILE` in SessionStart hooks to persist environment variables across the session.
 
 ### Best Practices
 

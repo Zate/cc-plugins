@@ -13,6 +13,7 @@ description: |
 tools: Glob, Grep, Read, Write, Edit, Bash
 disallowedTools: AskUserQuestion
 model: sonnet
+maxTurns: 25
 color: cyan
 memory: project
 ---

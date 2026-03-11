@@ -6,7 +6,7 @@ allowed-tools:
   - Edit
   - Bash
   - AskUserQuestion
-  - Task
+  - Agent
 ---
 
 # Devloop Statusline Setup
@@ -26,10 +26,10 @@ Configure the devloop statusline to display real-time session information.
 
 ## Setup Process
 
-Use the Task tool to launch the `statusline-setup` agent:
+Use the Agent tool to launch the `statusline-setup` agent:
 
 ```
-Task: statusline-setup agent
+Agent: statusline-setup agent
 Prompt: Configure the devloop statusline. Check for existing statusline configuration and set up appropriately.
 ```
 

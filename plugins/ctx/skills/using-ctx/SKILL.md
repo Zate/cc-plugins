@@ -113,6 +113,26 @@ This brings in past decisions without them cluttering every session.
 - `recall` and `status` results are injected on the next user prompt
 - Use `project:X` tags for cross-project organization
 
+## Remote Sync (Optional)
+
+ctx can sync knowledge to a remote server, enabling shared memory across devices. When configured:
+
+- **Auto-sync pull** runs on session start (before knowledge injection)
+- **Auto-sync push** runs on session end (after command parsing)
+- This is transparent — no changes needed to how you use ctx commands
+
+Setup commands (run by the user, not the agent):
+```bash
+ctx remote set https://server-url:8377
+ctx auth                    # Device flow authentication
+ctx sync push               # Manual push
+ctx sync pull               # Manual pull
+```
+
+Auto-sync is enabled by setting `auto_sync: true` in `~/.ctx/server.yaml` or `CTX_AUTO_SYNC=true`.
+
+You do NOT need to manage sync — hooks handle it automatically. Just use `<ctx:remember>`, `<ctx:recall>`, etc. as normal.
+
 ## Coordination with MEMORY.md
 
 Claude Code has a built-in auto memory system (`MEMORY.md` in `~/.claude/projects/<project>/memory/`) that loads project-scoped notes into every conversation's system prompt. ctx is a separate structured knowledge graph. Both are loaded at session start, so duplicated content wastes context tokens.

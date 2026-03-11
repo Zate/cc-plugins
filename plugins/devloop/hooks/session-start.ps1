@@ -130,8 +130,17 @@ $prStatus = Get-PrStatus
 $issueStatus = Get-LinkedIssueStatus
 $statuslineStatus = Check-StatuslineConfigured
 
+# Read version from plugin.json
+$scriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
+$pluginRoot = Split-Path -Parent $scriptDir
+$pluginJsonPath = Join-Path $pluginRoot '.claude-plugin' 'plugin.json'
+$devloopVersion = '3.x'
+if (Test-Path $pluginJsonPath) {
+    try { $devloopVersion = (Get-Content $pluginJsonPath -Raw | ConvertFrom-Json).version } catch {}
+}
+
 # Build minimal context message
-$context = "## devloop v3.0`n`n**Project**: $project"
+$context = "## devloop v${devloopVersion}`n`n**Project**: $project"
 if ($lang -ne 'unknown') { $context += " ($lang)" }
 if ($branch) { $context += " | branch: $branch" }
 

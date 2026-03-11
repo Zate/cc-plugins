@@ -12,6 +12,7 @@ description: |
   </example>
 tools: Bash, Read, Grep, Glob, TaskCreate, TaskUpdate, TaskList, Write, Edit
 model: haiku
+maxTurns: 30
 memory: user
 color: red
 permissionMode: plan

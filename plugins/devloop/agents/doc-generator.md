@@ -12,6 +12,7 @@ description: |
   </example>
 tools: Read, Write, Edit, Grep, Glob, TaskCreate, TaskUpdate, TaskList
 model: haiku
+maxTurns: 20
 color: teal
 ---
 
