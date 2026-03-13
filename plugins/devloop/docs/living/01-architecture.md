@@ -10,19 +10,18 @@
 plugins/devloop/
 ├── .claude-plugin/
 │   └── plugin.json          # Plugin manifest
-├── commands/                 # User-invokable commands
-│   ├── devloop.md           # Main entry point
-│   ├── plan.md              # Unified planning (--deep/--quick/--from-issue)
-│   ├── run.md               # Autonomous execution
-│   ├── fresh.md             # Save state for context clear
-│   ├── review.md            # Code review
-│   └── ship.md              # Commit/PR
 ├── hooks/
 │   ├── hooks.json           # Minimal hook definitions
 │   └── session-start.sh     # Session initialization
-├── skills/                   # On-demand knowledge
+├── skills/                   # Slash commands + on-demand knowledge
 │   ├── INDEX.md             # Skill catalog
-│   └── [skill-name]/SKILL.md
+│   ├── devloop/SKILL.md     # Main entry point
+│   ├── plan/SKILL.md        # Unified planning (--deep/--quick/--from-issue)
+│   ├── run/SKILL.md         # Autonomous execution
+│   ├── fresh/SKILL.md       # Save state for context clear
+│   ├── review/SKILL.md      # Code review
+│   ├── ship/SKILL.md        # Commit/PR
+│   └── [pattern]/SKILL.md   # Reference skills (go-patterns, etc.)
 ├── agents/                   # Specialized agents (rarely used)
 └── docs/living/             # Documentation
 ```
@@ -31,9 +30,9 @@ plugins/devloop/
 
 ## Components
 
-### Commands
+### Skills (Slash Commands)
 
-Markdown files with YAML frontmatter defining the command interface.
+SKILL.md files with YAML frontmatter defining the command interface.
 
 | Command | Purpose |
 |---------|---------|

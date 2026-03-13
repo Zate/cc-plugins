@@ -1,4 +1,5 @@
 ---
+name: plan
 description: Create an actionable plan with autonomous exploration
 argument-hint: <topic> [--deep|--quick|--from-issue N]
 allowed-tools:

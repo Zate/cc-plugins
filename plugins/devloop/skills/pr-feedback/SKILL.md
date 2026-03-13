@@ -1,133 +1,207 @@
 ---
 name: pr-feedback
 description: This skill should be used for integrating PR review comments back into devloop plan, parsing review feedback, addressing reviewer concerns
-whenToUse: Integrating PR review comments, addressing reviewer concerns, iterating on PR
-whenNotToUse: Initial development before PR, writing new code
+argument-hint: Optional PR number
+allowed-tools:
+  - Read
+  - Write
+  - Edit
+  - Grep
+  - Glob
+  - Bash
+  - AskUserQuestion
+  - TaskCreate
+  - TaskUpdate
+  - TaskList
 ---
 
-# PR Feedback Integration
+# PR Feedback - Integrate Review Comments
 
-Parse PR review comments and integrate actionable items into the devloop plan.
+Fetch PR review feedback and add actionable items to the plan. **You do the work directly.**
 
-## When to Use
+## Step 1: Identify PR
 
-- PR has review comments or change requests
-- Reviewer requested changes
-- Need to track which feedback has been addressed
-- Iterating on PR after initial review
+**If PR number provided:** Use `$ARGUMENTS`
 
-## Fetching PR Feedback
-
-**Get PR details with comments:**
+**Otherwise, detect from current branch:**
 
 ```bash
-# View PR with all comments
-gh pr view --json number,title,body,comments,reviews,reviewDecision
-
-# Get review comments (inline code comments)
-gh api repos/{owner}/{repo}/pulls/{number}/comments
-
-# Get PR conversation comments
-gh api repos/{owner}/{repo}/issues/{number}/comments
+gh pr view --json number,title,state,reviewDecision
 ```
 
-**Key fields to extract:**
+If no PR found for current branch, inform user and exit.
 
-| Field | Purpose |
-|-------|---------|
-| `reviewDecision` | APPROVED, CHANGES_REQUESTED, REVIEW_REQUIRED |
-| `reviews` | List of reviews with state and body |
-| `comments` | Conversation comments |
+## Step 2: Fetch Feedback
 
-## Parsing Feedback
+**Get PR details:**
 
-**Categorize feedback:**
+```bash
+gh pr view --json number,title,body,reviews,reviewDecision,comments
+```
 
-| Type | Description |
-|------|-------------|
-| **Blocker** | Must fix before merge |
-| **Suggestion** | Should consider |
-| **Question** | Needs response |
-| **Nitpick** | Nice to have |
+**Get inline code comments:**
 
-**Identify actionable items:**
+```bash
+gh api repos/{owner}/{repo}/pulls/{number}/comments --jq '.[] | {path, line, body, user: .user.login}'
+```
 
-Look for patterns:
-- "Please..." / "Could you..." → Action request
-- "This should..." / "Consider..." → Suggestion
-- "Why..." / "What if..." → Question
-- "Nit:" / "Minor:" → Low priority
+## Step 3: Parse Comments
 
-## Adding to Plan
+**Categorize each comment:**
 
-**Create PR Feedback section in plan:**
+| Pattern | Category |
+|---------|----------|
+| Review state = CHANGES_REQUESTED | Blocker |
+| "must", "need to", "please fix" | Blocker |
+| "should", "consider", "might" | Suggestion |
+| "why", "what if", "?$" | Question |
+| "nit", "minor", "optional" | Nitpick |
+
+**Extract actionable items:**
+
+For each comment/review body:
+1. Check if it requests action
+2. Summarize the request
+3. Note the author
+4. Track file/line if inline comment
+
+## Step 4: Present Findings
+
+**Display to user:**
 
 ```markdown
-## PR Feedback
+## PR #123 Feedback
 
-PR #123 - Review by @reviewer (CHANGES_REQUESTED)
+**Status**: CHANGES_REQUESTED by @reviewer
 
-### Blockers
-- [ ] [PR-123-1] Fix null handling in parseConfig (@reviewer)
-- [ ] [PR-123-2] Add tests for edge cases (@reviewer)
+### Blockers (must address)
+1. Fix null handling in parseConfig (src/config.ts:42)
+2. Add tests for edge cases
 
 ### Suggestions
-- [ ] [PR-123-3] Consider caching config (@reviewer)
+3. Consider caching the parsed config
 
-### Questions
-- [ ] [PR-123-4] Respond: Why not use existing parser? (@reviewer)
+### Questions (respond or address)
+4. Why not use the existing parser?
+
+### Nitpicks (optional)
+5. Rename variable for clarity
 ```
 
-**Task ID format:** `[PR-{number}-{item}]`
+**Ask which to add to plan:**
 
-## Tracking Resolution
+```yaml
+AskUserQuestion:
+  questions:
+    - question: "Which feedback items should be added to the plan?"
+      header: "Select"
+      multiSelect: true
+      options:
+        - label: "All blockers"
+          description: "Add items 1-2"
+        - label: "Blockers + suggestions"
+          description: "Add items 1-3"
+        - label: "All items"
+          description: "Add everything"
+        - label: "Select individually"
+          description: "Choose specific items"
+```
 
-When addressing feedback:
+## Step 5: Update Plan
 
-1. Make the fix
-2. Mark task complete in plan
-3. Reply to the comment on GitHub
-4. Push changes
+**Add PR Feedback section to `.devloop/plan.md`:**
 
-**Reply template:**
+```markdown
+---
+
+## PR Feedback
+
+PR #123 - @reviewer (CHANGES_REQUESTED)
+
+### Blockers
+- [ ] [PR-123-1] Fix null handling in parseConfig
+- [ ] [PR-123-2] Add tests for edge cases
+
+### Suggestions
+- [ ] [PR-123-3] Consider caching config
+
+---
+```
+
+**Add Progress Log entry:**
+
+```markdown
+- YYYY-MM-DD: Added N PR feedback items from review
+```
+
+## Step 6: Next Steps
+
+```yaml
+AskUserQuestion:
+  questions:
+    - question: "Feedback added to plan. What next?"
+      header: "Action"
+      multiSelect: false
+      options:
+        - label: "Start fixing"
+          description: "Work on first blocker"
+        - label: "Respond first"
+          description: "Reply to questions"
+        - label: "Review plan"
+          description: "See updated plan"
+```
+
+---
+
+## Handling Responses
+
+**For questions that need responses (not code changes):**
 
 ```bash
-gh pr comment {number} --body "Addressed in commit {sha}:
-- Fixed null handling
-- Added edge case tests"
+gh pr comment {number} --body "Re: [question]
+
+[Your response]"
 ```
 
-## Example Workflow
+**After addressing feedback:**
 
 ```bash
-# 1. Check PR status
-gh pr view --json reviewDecision,reviews
+gh pr comment {number} --body "Addressed feedback:
+- [x] Fixed null handling
+- [x] Added edge case tests
 
-# 2. If changes requested, get details
-gh pr view --comments
-
-# 3. Parse into plan tasks (manual or use /devloop:pr-feedback)
-
-# 4. Work through feedback tasks
-
-# 5. Push and reply
-git push
-gh pr comment --body "Ready for re-review"
+Ready for re-review."
 ```
 
-## Integration with /devloop:pr-feedback
+---
 
-The `/devloop:pr-feedback` command automates:
+## Quick Reference
 
-1. Fetching current PR comments
-2. Parsing actionable items
-3. Presenting to user for selection
-4. Adding selected items to plan
-5. Updating Progress Log
+| Command | Purpose |
+|---------|---------|
+| `gh pr view` | Get PR details |
+| `gh pr view --comments` | See all comments |
+| `gh api .../comments` | Get inline comments |
+| `gh pr comment` | Reply to PR |
 
-## Best Practices
+---
 
-- Address blockers first
-- Reply to each comment when resolved
-- Push frequently during feedback iteration
-- Re-request review when ready
+## Example Output
+
+```
+Fetching PR #42 feedback...
+
+Found 5 comments from review by @alice:
+
+BLOCKERS (2):
+  1. [src/parser.ts:15] Handle null input
+  2. [src/parser.ts:42] Add input validation
+
+SUGGESTIONS (1):
+  3. Consider using zod for validation
+
+QUESTIONS (1):
+  4. Why a custom parser vs. existing library?
+
+Added 4 items to plan under "PR Feedback" section.
+```

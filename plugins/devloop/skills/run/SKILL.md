@@ -1,5 +1,7 @@
 ---
+name: run
 description: Execute plan tasks autonomously until completion
+disable-model-invocation: true
 argument-hint: "[--max-iterations N] [--interactive]"
 allowed-tools:
   - Read

@@ -1,5 +1,7 @@
 ---
+name: ship
 description: Complete validation and git integration for shipping a feature
+disable-model-invocation: true
 argument-hint: Optional commit message or PR title
 allowed-tools:
   - Read

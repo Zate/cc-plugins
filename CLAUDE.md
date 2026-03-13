@@ -39,15 +39,18 @@ Each plugin MUST follow this structure:
 plugin-name/
 ├── .claude-plugin/
 │   └── plugin.json        # Required manifest file
-├── commands/              # Optional: Custom slash commands (.md files)
 ├── agents/                # Optional: Agent definitions (.md files)
-├── skills/                # Optional: Skills (subdirs with SKILL.md)
+├── skills/                # Optional: Skills and commands (subdirs with SKILL.md)
 ├── hooks/                 # Optional: Event handlers
 ├── .mcp.json             # Optional: MCP server configuration
+├── .lsp.json             # Optional: LSP server configuration
+├── settings.json         # Optional: Plugin default settings
 └── README.md             # Plugin documentation
 ```
 
-**Critical**: Component directories (commands/, agents/, skills/, hooks/) MUST be at plugin root, NOT inside .claude-plugin/
+**Note**: `commands/` is legacy. Both `commands/deploy.md` and `skills/deploy/SKILL.md` create `/deploy`. Use `skills/` for new development.
+
+**Critical**: Component directories (agents/, skills/, hooks/) MUST be at plugin root, NOT inside .claude-plugin/
 
 ## Plugin Development Guidelines
 

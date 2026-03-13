@@ -1,4 +1,5 @@
 ---
+name: devloop
 description: Start development workflow - lightweight entry point
 argument-hint: Optional task description
 allowed-tools:

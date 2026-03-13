@@ -22,10 +22,10 @@ claude --debug
 
 ## Adding Components
 
-### Command
+### Skill (Slash Command)
 
-1. Create `commands/my-command.md`
-2. Add frontmatter and phases
+1. Create `skills/my-command/SKILL.md`
+2. Add frontmatter (`name`, `description`, `allowed-tools`) and phases
 3. Use checkpoints between phases
 
 ### Agent

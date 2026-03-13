@@ -10,17 +10,16 @@ How devloop uses the Claude Code plugin system.
 plugins/devloop/
 ├── .claude-plugin/
 │   └── plugin.json       # Manifest (name, version)
-├── commands/             # Slash commands
 ├── agents/               # Specialized agents
-├── skills/               # Domain knowledge
+├── skills/               # Slash commands + domain knowledge (SKILL.md)
 └── hooks/                # Event handlers
 ```
 
 ---
 
-## Commands
+## Skills (Slash Commands)
 
-Markdown files in `commands/` that define workflows.
+Skill directories in `skills/` that define workflows and reference knowledge.
 
 ```bash
 /devloop            # Start workflow

@@ -1,4 +1,5 @@
 ---
+name: help
 description: Learn how to use devloop - interactive guide to commands, workflow, and best practices
 argument-hint: Optional topic (commands, loop, skills, troubleshooting)
 allowed-tools:

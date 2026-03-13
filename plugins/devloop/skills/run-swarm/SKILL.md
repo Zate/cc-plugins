@@ -1,5 +1,7 @@
 ---
+name: run-swarm
 description: Execute plan tasks via fresh-context subagents (swarm mode)
+disable-model-invocation: true
 argument-hint: "[--max-tasks N] [--dry-run]"
 allowed-tools:
   - Read

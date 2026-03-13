@@ -1,5 +1,7 @@
 ---
+name: fresh
 description: Save current plan state and prepare for fresh context restart
+disable-model-invocation: true
 argument-hint: none
 allowed-tools:
   - Read

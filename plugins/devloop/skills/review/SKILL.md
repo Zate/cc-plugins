@@ -1,4 +1,5 @@
 ---
+name: review
 description: Comprehensive code review for existing changes or PR
 argument-hint: Optional file/PR to review
 allowed-tools:

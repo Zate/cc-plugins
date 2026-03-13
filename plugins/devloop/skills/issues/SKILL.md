@@ -1,4 +1,5 @@
 ---
+name: issues
 description: List GitHub issues for the current repository
 argument-hint: "[--state open|closed|all] [--label LABEL] [--assignee USER]"
 allowed-tools:

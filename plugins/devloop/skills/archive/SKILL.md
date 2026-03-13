@@ -1,5 +1,7 @@
 ---
+name: archive
 description: Archive a completed plan to .devloop/archive/
+disable-model-invocation: true
 argument-hint: "[--force]"
 allowed-tools:
   - Read

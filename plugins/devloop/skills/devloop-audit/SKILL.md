@@ -36,7 +36,6 @@ Audit devloop against Claude Code's evolving capabilities.
 ### Step 2: Analyze Current devloop
 
 ```bash
-ls plugins/devloop/commands/
 ls plugins/devloop/agents/
 ls plugins/devloop/skills/
 ```

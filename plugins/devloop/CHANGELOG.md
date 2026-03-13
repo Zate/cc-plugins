@@ -5,6 +5,26 @@ All notable changes to the devloop plugin are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.20.0] - 2026-03-13
+
+### Changed - Commands to Skills Migration
+
+- Migrated all 13 commands from `commands/` (legacy) to `skills/` (recommended) format
+- Each command is now a `skills/<name>/SKILL.md` file with proper skill frontmatter
+- Merged `pr-feedback` command into existing `pr-feedback` skill (combined execution instructions with skill metadata)
+- Added `name` frontmatter field to all migrated skills
+- Added `disable-model-invocation: true` to 6 execution-only skills: run, run-swarm, fresh, ship, archive, statusline
+- Deleted `commands/` directory entirely -- all slash commands now live in `skills/`
+- Updated `skills/INDEX.md` (v4.0) with "Workflow Commands" section listing all 27 skills
+- Updated architecture docs, contributing guide, and integration docs to reflect skills-only structure
+- Removed `commands/` references from CLAUDE.md plugin structure and devloop-audit skill
+
+### Notes
+
+- No user-facing breaking changes -- both `commands/` and `skills/` produce identical `/devloop:*` slash commands
+- Historical references to `commands/` in CHANGELOG preserved as-is
+- Spike report: `.devloop/spikes/commands-to-skills-migration.md`
+
 ## [3.19.0] - 2026-03-11
 
 ### Changed - Claude Code 2.1.x Modernization
