@@ -7,7 +7,7 @@
   },
   "metadata": {
     "description": "A curated marketplace of Claude Code plugins and skills for enhanced development workflows",
-    "version": "0.5.6",
+    "version": "0.6.0",
     "pluginRoot": "./plugins"
   },
   "plugins": [
@@ -38,6 +38,13 @@
       "description": "Fixes image pasting in WSL2 by auto-converting BMP clipboard content to PNG. Runs a background clip2png daemon that monitors the Wayland clipboard during Claude Code sessions.",
       "category": "utilities",
       "tags": ["wsl", "wsl2", "clipboard", "image-paste", "wayland", "bmp", "png"]
+    },
+    {
+      "name": "blog-writer",
+      "source": "./plugins/blog-writer",
+      "description": "Conversational blog post creator that interviews you about your topic, captures your writing voice, drafts in your style, strips AI tells, and publishes as markdown or HTML.",
+      "category": "content",
+      "tags": ["blog", "writing", "content", "voice", "de-ai", "markdown", "html"]
     }
   ]
 }

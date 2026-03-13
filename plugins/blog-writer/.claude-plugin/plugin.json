@@ -1,0 +1,10 @@
+{
+  "name": "blog-writer",
+  "version": "1.0.0",
+  "description": "Conversational blog post creator that interviews you, writes in your voice, and strips AI tells",
+  "author": "Zate",
+  "homepage": "https://github.com/zate/cc-plugins",
+  "repository": "https://github.com/zate/cc-plugins",
+  "license": "MIT",
+  "keywords": ["claude-code", "plugin", "blog", "writing", "content"]
+}
