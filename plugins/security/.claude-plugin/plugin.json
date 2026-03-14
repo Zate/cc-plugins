@@ -1,12 +1,13 @@
 {
   "name": "security",
-  "version": "2.0.1",
-  "description": "Comprehensive security plugin with consolidated super-auditors (18→6), 60% token reduction, mode-based scanning, ASVS 5.0 alignment, and real-time validation hooks",
+  "version": "3.0.0",
+  "description": "Hybrid security scanner: deterministic SAST tools (Semgrep, Gitleaks, Trivy) for detection, LLM for triage. Reproducible findings, provenance-labeled, zero-dependency fallback mode.",
   "author": {
-    "name": "cc-plugins",
+    "name": "Zate",
     "email": "zate75+claude-code-plugins@gmail.com"
   },
   "homepage": "https://github.com/Zate/cc-plugins",
   "repository": "https://github.com/Zate/cc-plugins",
-  "license": "MIT"
+  "license": "MIT",
+  "keywords": ["security", "sast", "vulnerability", "semgrep", "gitleaks", "trivy", "owasp"]
 }

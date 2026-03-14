@@ -1,0 +1,317 @@
+[
+  {
+    "id": "SEC001",
+    "category": "hardcoded-secrets",
+    "severity": "CRITICAL",
+    "pattern": "AKIA[0-9A-Z]{16}",
+    "description": "AWS Access Key ID found hardcoded in source",
+    "cwe": "CWE-798",
+    "languages": "all"
+  },
+  {
+    "id": "SEC002",
+    "category": "hardcoded-secrets",
+    "severity": "CRITICAL",
+    "pattern": "(?i)(aws_secret_access_key|aws_secret_key)\\s*[=:]\\s*[\"']?[A-Za-z0-9/+=]{40}",
+    "description": "AWS Secret Access Key found hardcoded",
+    "cwe": "CWE-798",
+    "languages": "all"
+  },
+  {
+    "id": "SEC003",
+    "category": "hardcoded-secrets",
+    "severity": "CRITICAL",
+    "pattern": "-----BEGIN (RSA |EC |DSA |OPENSSH )?PRIVATE KEY-----",
+    "description": "Private key found in source code",
+    "cwe": "CWE-321",
+    "languages": "all"
+  },
+  {
+    "id": "SEC004",
+    "category": "hardcoded-secrets",
+    "severity": "CRITICAL",
+    "pattern": "(?i)(api[_-]?key|apikey|api[_-]?secret)\\s*[=:]\\s*[\"'][A-Za-z0-9_\\-]{20,}[\"']",
+    "description": "API key or secret found hardcoded",
+    "cwe": "CWE-798",
+    "languages": "all"
+  },
+  {
+    "id": "SEC005",
+    "category": "hardcoded-secrets",
+    "severity": "CRITICAL",
+    "pattern": "(?i)(password|passwd|pwd)\\s*[=:]\\s*[\"'][^\"']{8,}[\"']",
+    "description": "Password found hardcoded in source",
+    "cwe": "CWE-259",
+    "languages": "all"
+  },
+  {
+    "id": "SEC006",
+    "category": "hardcoded-secrets",
+    "severity": "CRITICAL",
+    "pattern": "(?i)(mongodb|postgres|mysql|redis|amqp|mssql)://[^\\s\"']+:[^\\s\"']+@",
+    "description": "Database connection string with credentials found",
+    "cwe": "CWE-798",
+    "languages": "all"
+  },
+  {
+    "id": "SEC007",
+    "category": "hardcoded-secrets",
+    "severity": "HIGH",
+    "pattern": "eyJ[A-Za-z0-9_-]{10,}\\.eyJ[A-Za-z0-9_-]{10,}\\.[A-Za-z0-9_-]+",
+    "description": "JWT token found hardcoded in source",
+    "cwe": "CWE-798",
+    "languages": "all"
+  },
+  {
+    "id": "SEC008",
+    "category": "hardcoded-secrets",
+    "severity": "HIGH",
+    "pattern": "(?i)(secret[_-]?key|signing[_-]?key|encryption[_-]?key)\\s*[=:]\\s*[\"'][^\"']{8,}[\"']",
+    "description": "Secret or signing key found hardcoded",
+    "cwe": "CWE-798",
+    "languages": "all"
+  },
+  {
+    "id": "SEC010",
+    "category": "dangerous-functions",
+    "severity": "HIGH",
+    "pattern": "\\beval\\s*\\(",
+    "description": "Use of eval() can lead to code injection",
+    "cwe": "CWE-95",
+    "languages": ["python", "javascript", "typescript", "php", "ruby"]
+  },
+  {
+    "id": "SEC011",
+    "category": "dangerous-functions",
+    "severity": "HIGH",
+    "pattern": "\\bexec\\s*\\(",
+    "description": "Use of exec() can lead to code injection",
+    "cwe": "CWE-95",
+    "languages": ["python", "php"]
+  },
+  {
+    "id": "SEC012",
+    "category": "dangerous-functions",
+    "severity": "HIGH",
+    "pattern": "os\\.system\\s*\\(",
+    "description": "os.system() is vulnerable to command injection",
+    "cwe": "CWE-78",
+    "languages": ["python"]
+  },
+  {
+    "id": "SEC013",
+    "category": "dangerous-functions",
+    "severity": "HIGH",
+    "pattern": "subprocess\\.(call|run|Popen)\\s*\\(.*shell\\s*=\\s*True",
+    "description": "subprocess with shell=True enables command injection",
+    "cwe": "CWE-78",
+    "languages": ["python"]
+  },
+  {
+    "id": "SEC014",
+    "category": "dangerous-functions",
+    "severity": "HIGH",
+    "pattern": "pickle\\.loads?\\s*\\(",
+    "description": "pickle deserialization can execute arbitrary code",
+    "cwe": "CWE-502",
+    "languages": ["python"]
+  },
+  {
+    "id": "SEC015",
+    "category": "dangerous-functions",
+    "severity": "HIGH",
+    "pattern": "yaml\\.load\\s*\\([^)]*(?!Loader\\s*=\\s*yaml\\.SafeLoader)",
+    "description": "yaml.load() without SafeLoader can execute arbitrary code",
+    "cwe": "CWE-502",
+    "languages": ["python"]
+  },
+  {
+    "id": "SEC016",
+    "category": "dangerous-functions",
+    "severity": "HIGH",
+    "pattern": "\\.innerHTML\\s*=",
+    "description": "Direct innerHTML assignment enables XSS",
+    "cwe": "CWE-79",
+    "languages": ["javascript", "typescript"]
+  },
+  {
+    "id": "SEC017",
+    "category": "dangerous-functions",
+    "severity": "HIGH",
+    "pattern": "dangerouslySetInnerHTML",
+    "description": "dangerouslySetInnerHTML enables XSS in React",
+    "cwe": "CWE-79",
+    "languages": ["javascript", "typescript"]
+  },
+  {
+    "id": "SEC018",
+    "category": "dangerous-functions",
+    "severity": "HIGH",
+    "pattern": "child_process\\.exec\\s*\\(",
+    "description": "child_process.exec() is vulnerable to command injection",
+    "cwe": "CWE-78",
+    "languages": ["javascript", "typescript"]
+  },
+  {
+    "id": "SEC019",
+    "category": "dangerous-functions",
+    "severity": "MEDIUM",
+    "pattern": "require\\s*\\(\\s*[^\"'][^)]*\\)",
+    "description": "Dynamic require with variable input may allow code injection",
+    "cwe": "CWE-94",
+    "languages": ["javascript"]
+  },
+  {
+    "id": "SEC020",
+    "category": "sql-injection",
+    "severity": "CRITICAL",
+    "pattern": "(?i)(execute|query|raw)\\s*\\(\\s*f[\"'].*(?:SELECT|INSERT|UPDATE|DELETE)",
+    "description": "SQL query using f-string interpolation (SQL injection risk)",
+    "cwe": "CWE-89",
+    "languages": ["python"]
+  },
+  {
+    "id": "SEC021",
+    "category": "sql-injection",
+    "severity": "CRITICAL",
+    "pattern": "(?i)(execute|query)\\s*\\(\\s*[\"']\\s*(?:SELECT|INSERT|UPDATE|DELETE)[^\"']*[\"']\\s*\\+",
+    "description": "SQL query built with string concatenation (SQL injection risk)",
+    "cwe": "CWE-89",
+    "languages": "all"
+  },
+  {
+    "id": "SEC022",
+    "category": "sql-injection",
+    "severity": "CRITICAL",
+    "pattern": "(?i)(execute|query)\\s*\\(\\s*`[^`]*\\$\\{",
+    "description": "SQL query using template literal interpolation (SQL injection risk)",
+    "cwe": "CWE-89",
+    "languages": ["javascript", "typescript"]
+  },
+  {
+    "id": "SEC023",
+    "category": "sql-injection",
+    "severity": "HIGH",
+    "pattern": "(?i)(execute|query)\\s*\\(\\s*[\"'].*%s",
+    "description": "SQL query using %-formatting (SQL injection risk)",
+    "cwe": "CWE-89",
+    "languages": ["python"]
+  },
+  {
+    "id": "SEC030",
+    "category": "config-issues",
+    "severity": "MEDIUM",
+    "pattern": "(?i)DEBUG\\s*=\\s*True",
+    "description": "Debug mode enabled (should be False in production)",
+    "cwe": "CWE-489",
+    "languages": ["python"]
+  },
+  {
+    "id": "SEC031",
+    "category": "config-issues",
+    "severity": "HIGH",
+    "pattern": "ALLOWED_HOSTS\\s*=\\s*\\[\\s*[\"']\\*[\"']\\s*\\]",
+    "description": "ALLOWED_HOSTS set to wildcard (accepts all hosts)",
+    "cwe": "CWE-183",
+    "languages": ["python"]
+  },
+  {
+    "id": "SEC032",
+    "category": "config-issues",
+    "severity": "HIGH",
+    "pattern": "verify\\s*=\\s*False",
+    "description": "SSL/TLS verification disabled",
+    "cwe": "CWE-295",
+    "languages": ["python"]
+  },
+  {
+    "id": "SEC033",
+    "category": "config-issues",
+    "severity": "HIGH",
+    "pattern": "InsecureSkipVerify\\s*:\\s*true",
+    "description": "TLS certificate verification skipped in Go",
+    "cwe": "CWE-295",
+    "languages": ["go"]
+  },
+  {
+    "id": "SEC034",
+    "category": "config-issues",
+    "severity": "MEDIUM",
+    "pattern": "(?i)NODE_TLS_REJECT_UNAUTHORIZED\\s*=\\s*[\"']?0",
+    "description": "Node.js TLS verification disabled via environment variable",
+    "cwe": "CWE-295",
+    "languages": ["javascript", "typescript"]
+  },
+  {
+    "id": "SEC035",
+    "category": "config-issues",
+    "severity": "MEDIUM",
+    "pattern": "(?i)Access-Control-Allow-Origin\\s*[=:]\\s*[\"']\\*[\"']",
+    "description": "CORS wildcard allows any origin",
+    "cwe": "CWE-942",
+    "languages": "all"
+  },
+  {
+    "id": "SEC040",
+    "category": "command-injection",
+    "severity": "CRITICAL",
+    "pattern": "shell\\s*=\\s*True.*\\$|\\$.*shell\\s*=\\s*True",
+    "description": "Shell execution with variable input (command injection risk)",
+    "cwe": "CWE-78",
+    "languages": ["python"]
+  },
+  {
+    "id": "SEC041",
+    "category": "command-injection",
+    "severity": "HIGH",
+    "pattern": "`\\$[A-Za-z_]",
+    "description": "Backtick execution with variable interpolation",
+    "cwe": "CWE-78",
+    "languages": ["ruby", "perl", "shell"]
+  },
+  {
+    "id": "SEC042",
+    "category": "command-injection",
+    "severity": "HIGH",
+    "pattern": "Runtime\\.getRuntime\\(\\)\\.exec\\s*\\(",
+    "description": "Java runtime command execution",
+    "cwe": "CWE-78",
+    "languages": ["java"]
+  },
+  {
+    "id": "SEC050",
+    "category": "dangerous-functions",
+    "severity": "MEDIUM",
+    "pattern": "\\bDocument\\.write\\s*\\(|document\\.write\\s*\\(",
+    "description": "document.write() can enable DOM-based XSS",
+    "cwe": "CWE-79",
+    "languages": ["javascript", "typescript"]
+  },
+  {
+    "id": "SEC051",
+    "category": "dangerous-functions",
+    "severity": "HIGH",
+    "pattern": "new\\s+Function\\s*\\(",
+    "description": "new Function() constructor can execute arbitrary code",
+    "cwe": "CWE-95",
+    "languages": ["javascript", "typescript"]
+  },
+  {
+    "id": "SEC052",
+    "category": "dangerous-functions",
+    "severity": "HIGH",
+    "pattern": "Marshal\\.load|Marshal\\.restore",
+    "description": "Ruby Marshal deserialization can execute arbitrary code",
+    "cwe": "CWE-502",
+    "languages": ["ruby"]
+  },
+  {
+    "id": "SEC053",
+    "category": "dangerous-functions",
+    "severity": "HIGH",
+    "pattern": "unserialize\\s*\\(",
+    "description": "PHP unserialize() can lead to object injection",
+    "cwe": "CWE-502",
+    "languages": ["php"]
+  }
+]

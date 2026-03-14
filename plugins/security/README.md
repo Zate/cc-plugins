@@ -1,403 +1,125 @@
-# Security Plugin for Claude Code
+# security
 
-A comprehensive security plugin providing OWASP ASVS 5.0-aligned audits and real-time security validation for Claude Code.
+> **Hybrid security scanning: deterministic tools detect, LLM triages.**
 
-## Features
+[![Version](https://img.shields.io/badge/version-3.0.0-blue)](./CHANGELOG.md)
 
-### Security Audits (`/security:audit`)
+## Philosophy
 
-Structured security assessments aligned with OWASP Application Security Verification Standard (ASVS) 5.0:
+LLMs are unreliable at finding vulnerabilities directly (21-34% recall). Static analysis tools are reliable but noisy (35% precision). This plugin combines both: **tools detect, LLM triages** -- achieving ~90% precision with reproducible results.
 
-- **17 Domain-Specific Auditors** covering all ASVS chapters (369 requirements)
-- **Parallel Execution** for fast, comprehensive analysis
-- **Interactive Scoping** to customize audit focus
-- **Consolidated Reports** with severity classification and ASVS mapping
-- **Remediation Guidance** with prioritized fix recommendations and code examples
-
-### Live Security Guard (Hooks)
-
-Real-time security validation during development:
-
-- **PreToolUse Validation** on Write/Edit/Bash operations
-- **Configurable Enforcement** modes: strict, warning, advisory
-- **Per-Category Rule Overrides** for fine-grained control
-- **Project Auto-Detection** for tech stack-specific rules
-- **Fast Checks** (<5s) to avoid blocking workflow
-
-### Skills
-
-| Skill | Description |
-|-------|-------------|
-| `vulnerability-patterns` | Index to detection pattern skills |
-| `vuln-patterns-core` | Universal patterns: secrets, SQL/command injection, path traversal |
-| `vuln-patterns-languages` | Language-specific patterns: JS/TS, Python, Go, Java, Ruby, PHP |
-| `remediation-library` | Index to remediation skills |
-| `remediation-injection` | Fixes for SQL, command injection, XSS |
-| `remediation-crypto` | Fixes for weak cryptography, randomness, TLS |
-| `remediation-auth` | Fixes for credentials, JWT, deserialization, access control |
-| `remediation-config` | Fixes for path traversal, debug mode, security headers |
-| `asvs-requirements` | Full OWASP ASVS 5.0 requirements database |
-| `project-context` | Auto-detect project tech stack and applicable rules |
-| `audit-report` | Standardized security report format |
-
-## Installation
-
-```bash
-/plugin install Zate/cc-plugins:security
-```
-
-Or add the marketplace and install:
-```bash
-/plugin marketplace add Zate/cc-plugins
-/plugin install security
-```
+Every finding is labeled with its source:
+- **[Static]** -- Detected by deterministic tools. Reproducible.
+- **[LLM]** -- Assessed by language model. Tool evidence cited.
 
 ## Quick Start
 
-### Run a Security Audit
-
 ```bash
-/security:audit
+# Install the plugin
+/plugin install security
+
+# Install recommended tools (optional but recommended)
+/security:setup
+
+# Run a security scan
+/security:scan
+
+# Quick scan (30 seconds, no LLM)
+/security:scan --quick
+
+# Deep scan (5-30 minutes, full analysis)
+/security:scan --deep
 ```
 
-The audit workflow:
-1. **Discovery** - Analyzes your project structure and tech stack
-2. **Scoping** - Interactive questions to customize the audit
-3. **Execution** - Parallel domain auditors analyze relevant areas
-4. **Reporting** - Consolidated findings with severity and remediation
+## How It Works
 
-### Check Plugin Status
-
-```bash
-/security
+```
+Phase 0: Recon        Detect tech stack, available tools, estimate coverage
+Phase 1: Scan         Run deterministic tools (Semgrep, Gitleaks, Trivy, etc.)
+Phase 2: Correlate    Dedup findings, cross-reference across tools
+Phase 3: Triage       LLM classifies: true positive / false positive / needs review
+Phase 4: Report       Provenance-labeled findings with remediation
 ```
 
-Shows current configuration, enabled features, and available commands.
+## Tool Stack
 
-## Configuration
+| Tier | Tools | Coverage |
+|------|-------|----------|
+| **Built-in** (always) | Regex patterns | ~35% |
+| **Recommended** | + Semgrep + Gitleaks | ~70% |
+| **Full** | + Trivy + Bandit/gosec | ~85% |
 
-Configure in your project's `.claude/settings.json`:
+**Works with zero tools installed** via built-in regex patterns. Install Semgrep for best results.
 
-```json
-{
-  "plugins": {
-    "security": {
-      "enforcement": "warning",
-      "enableLiveGuard": true,
-      "auditLevel": "L2",
-      "auditScope": ["all"],
-      "blockOnCritical": true
-    }
-  }
-}
+## Scan Modes
+
+| Mode | Time | Token Cost | Max Findings |
+|------|------|-----------|-------------|
+| `--quick` | ~30s | ~10k tokens | 10 |
+| Standard | ~3min | ~30k tokens | 25 |
+| `--deep` | ~15min | ~100k tokens | 50 |
+
+## What Gets Scanned
+
+**Detection (deterministic tools):**
+- Hardcoded secrets and API keys
+- SQL injection, command injection, XSS patterns
+- Path traversal, SSRF, unsafe deserialization
+- Known vulnerable dependencies (CVEs)
+- Configuration issues (debug mode, weak TLS)
+
+**Triage (LLM assessment):**
+- CWE-specialized false positive elimination
+- Framework-aware suppression (Django ORM = no SQLi)
+- Context-aware severity adjustment (test file vs production endpoint)
+- Grouped related findings with root cause analysis
+
+## Languages Supported
+
+| Language | Tools | Detection Quality |
+|----------|-------|-------------------|
+| Python | Semgrep + Bandit + regex | Excellent |
+| JavaScript/TypeScript | Semgrep + regex | Good |
+| Go | Semgrep + gosec + regex | Good |
+| Others | Semgrep + regex | Basic |
+
+## Artifacts
+
+Results are saved to `.security/`:
+
+```
+.security/
++-- recon.json              # Project analysis
++-- artifacts/              # Raw tool outputs
+|   +-- semgrep.sarif.json
+|   +-- gitleaks.json
+|   +-- trivy.json
+|   +-- regex-scan.json
++-- correlated.json         # Deduplicated findings
++-- triage.json             # LLM-assessed findings
++-- report.md               # Human-readable report
 ```
 
-### Enforcement Modes
+## Real-Time Protection
 
-| Mode | Behavior |
-|------|----------|
-| `strict` | Block operations with security issues |
-| `warning` | Alert but allow operations to proceed |
-| `advisory` | Log issues without interrupting workflow |
+The plugin includes PreToolUse hooks that validate code changes in real-time:
+- Blocks hardcoded secrets before they're written
+- Warns about dangerous patterns (eval, shell=True with variables)
+- Validates bash commands for destructive operations
 
-### ASVS Verification Levels
+## Commands
 
-| Level | Name | Applicability |
-|-------|------|---------------|
-| `L1` | Opportunistic | Minimum baseline for all applications |
-| `L2` | Standard | Recommended for most applications |
-| `L3` | Advanced | High-value or critical applications |
+| Command | Purpose |
+|---------|---------|
+| `/security:scan` | Run security assessment |
+| `/security:scan --quick` | Fast scan, tools only, no LLM |
+| `/security:scan --deep` | Comprehensive analysis |
+| `/security:setup` | Install security tools |
 
-### Rule Overrides
+## Author
 
-Override enforcement for specific vulnerability categories:
-
-```json
-{
-  "plugins": {
-    "security": {
-      "enforcement": "warning",
-      "ruleOverrides": {
-        "injection": "strict",
-        "secrets": "strict",
-        "crypto": "warning",
-        "xss": "warning",
-        "deserialization": "strict",
-        "tls": "advisory",
-        "auth": "warning"
-      }
-    }
-  }
-}
-```
-
-Available categories:
-- `injection` - SQL/Command injection
-- `secrets` - Hardcoded credentials
-- `crypto` - Weak cryptography
-- `xss` - Cross-site scripting
-- `deserialization` - Unsafe deserialization
-- `tls` - TLS/certificate validation
-- `auth` - Authentication security
-
-### Path Exclusions
-
-Exclude specific paths from security checks:
-
-```json
-{
-  "plugins": {
-    "security": {
-      "excludePaths": [
-        "**/test/**",
-        "**/__tests__/**",
-        "**/fixtures/**",
-        "**/mocks/**",
-        "**/examples/**"
-      ]
-    }
-  }
-}
-```
-
-### Full Configuration Reference
-
-```json
-{
-  "plugins": {
-    "security": {
-      "enforcement": "warning",
-      "enableLiveGuard": true,
-      "auditScope": ["all"],
-      "auditLevel": "L2",
-      "ruleOverrides": {},
-      "excludePaths": ["**/test/**", "**/__tests__/**"],
-      "includeLanguages": ["python", "javascript", "typescript", "java", "go", "ruby", "php"],
-      "blockOnCritical": true,
-      "logFindings": true
-    }
-  }
-}
-```
-
-| Setting | Type | Default | Description |
-|---------|------|---------|-------------|
-| `enforcement` | string | `"warning"` | Default enforcement level |
-| `enableLiveGuard` | boolean | `true` | Enable real-time hook validation |
-| `auditScope` | array | `["all"]` | ASVS chapters to include |
-| `auditLevel` | string | `"L2"` | ASVS verification level |
-| `ruleOverrides` | object | `{}` | Per-category enforcement |
-| `excludePaths` | array | `[...]` | Paths to exclude |
-| `includeLanguages` | array | `[...]` | Languages to scan |
-| `blockOnCritical` | boolean | `true` | Always block critical issues |
-| `logFindings` | boolean | `true` | Log findings to file |
-
-## ASVS 5.0 Coverage
-
-This plugin implements auditors for all 17 chapters of OWASP ASVS 5.0:
-
-| Auditor | ASVS | Focus Area | Requirements |
-|---------|------|------------|--------------|
-| encoding-auditor | V1 | Injection prevention | 28 |
-| validation-auditor | V2 | Input validation | 15 |
-| frontend-auditor | V3 | XSS, CSP, browser security | 32 |
-| api-auditor | V4 | REST/GraphQL security | 17 |
-| file-auditor | V5 | File upload/download | 14 |
-| authentication-auditor | V6 | Auth, MFA, credentials | 44 |
-| session-auditor | V7 | Session management | 18 |
-| authorization-auditor | V8 | Access control, RBAC | 11 |
-| token-auditor | V9 | JWT security | 7 |
-| oauth-auditor | V10 | OAuth/OIDC | 50 |
-| crypto-auditor | V11 | Cryptography | 32 |
-| communication-auditor | V12 | TLS, certificates | 13 |
-| config-auditor | V13 | Secrets, configuration | 18 |
-| data-protection-auditor | V14 | Data classification | 15 |
-| architecture-auditor | V15 | Secure coding patterns | 20 |
-| logging-auditor | V16 | Security logging | 19 |
-| webrtc-auditor | V17 | WebRTC security | 15 |
-
-**Total: 369 requirements covered**
-
-## Live Security Guard
-
-The live security guard uses PreToolUse hooks to validate code changes in real-time.
-
-### What Gets Checked
-
-**On Write/Edit operations:**
-- Hardcoded secrets (API keys, passwords, private keys)
-- SQL injection patterns
-- Command injection patterns
-- XSS vulnerabilities
-- Unsafe deserialization
-- Weak cryptography
-- TLS verification disabled
-- Debug mode in production
-
-**On Bash commands:**
-- Destructive commands (`rm -rf /`, etc.)
-- Credential exposure
-- Reverse shells
-- Data exfiltration attempts
-- Force flags on dangerous commands
-
-### How It Works
-
-1. **PreToolUse Hook** - Claude validates each Write/Edit/Bash operation
-2. **Pattern Matching** - Uses `vulnerability-patterns` skill for detection
-3. **Decision** - Returns approve/warn/block based on severity and enforcement mode
-4. **PostToolUse Hook** - Logs findings for audit trail
-
-### Severity Levels
-
-| Severity | Action (strict) | Action (warning) | Action (advisory) |
-|----------|-----------------|------------------|-------------------|
-| Critical | Block | Warn | Log |
-| High | Block | Warn | Log |
-| Medium | Warn | Warn | Log |
-| Low | Log | Log | Log |
-
-## Scripts
-
-The plugin includes command-line scripts for manual scanning:
-
-### validate-security.sh
-
-Full security scan with JSON output:
-
-```bash
-./plugins/security/scripts/validate-security.sh [files...] [--quick|--full]
-```
-
-Options:
-- `--quick` - Skip test files, use fast patterns (default)
-- `--full` - Scan all files with all patterns
-
-Exit codes:
-- `0` - No issues found
-- `1` - Critical security issues
-- `2` - High severity issues
-- `3` - Medium severity issues
-
-### post-write-scan.sh
-
-Lightweight post-write logging:
-
-```bash
-./plugins/security/scripts/post-write-scan.sh
-```
-
-## Integration with Devloop
-
-This plugin works seamlessly with the devloop plugin:
-
-- **Shared project-context** - Both plugins use the same tech stack detection
-- **Workflow integration** - Run security audits as part of development flow
-- **Compatible configuration** - Same enforcement patterns and settings style
-
-To enable security in your devloop workflow:
-
-```json
-{
-  "plugins": {
-    "devloop": { "..." },
-    "security": {
-      "enforcement": "warning",
-      "enableLiveGuard": true
-    }
-  }
-}
-```
-
-## Commands Reference
-
-| Command | Description |
-|---------|-------------|
-| `/security` | Main entry point, shows status and commands |
-| `/security:audit` | Run comprehensive security audit |
-
-### /security:audit Arguments
-
-```bash
-/security:audit [scope] [--level L1|L2|L3] [--quick]
-```
-
-Examples:
-```bash
-/security:audit                    # Full audit with interactive scoping
-/security:audit V1,V6,V11          # Audit specific chapters
-/security:audit --level L1         # Quick L1 baseline check
-/security:audit --quick            # Fast scan without interactive scoping
-```
-
-## Extending the Plugin
-
-### Adding Custom Patterns
-
-For universal patterns (secrets, injection), edit `skills/vuln-patterns-core/SKILL.md`.
-For language-specific patterns, edit `skills/vuln-patterns-languages/SKILL.md`.
-
-### Adding Custom Remediation
-
-Choose the appropriate skill based on vulnerability type:
-- `skills/remediation-injection/SKILL.md` - SQL, command injection, XSS fixes
-- `skills/remediation-crypto/SKILL.md` - Cryptography, randomness, TLS fixes
-- `skills/remediation-auth/SKILL.md` - Credentials, JWT, deserialization fixes
-- `skills/remediation-config/SKILL.md` - Path traversal, debug, headers fixes
-
-### Custom Hooks
-
-Modify `hooks/hooks.json` to customize validation behavior:
-
-```json
-{
-  "hooks": {
-    "PreToolUse": [
-      {
-        "matcher": "Write|Edit",
-        "hooks": [
-          {
-            "type": "prompt",
-            "prompt": "Your custom validation prompt...",
-            "timeout": 20
-          }
-        ]
-      }
-    ]
-  }
-}
-```
-
-## Troubleshooting
-
-### Hooks Not Running
-
-1. Verify plugin is installed: `/plugin list`
-2. Check `enableLiveGuard` is `true` in settings
-3. Run Claude Code with `--debug` to see hook loading
-
-### Too Many False Positives
-
-1. Add paths to `excludePaths`
-2. Change enforcement to `advisory` for specific categories
-3. Check if files are test/example code
-
-### Audit Taking Too Long
-
-1. Limit scope: `/security:audit V1,V6`
-2. Use `--quick` flag
-3. Lower audit level to L1
-
-## Requirements
-
-- Claude Code >= 1.0.0
+**Zate** - [@Zate](https://github.com/Zate)
 
 ## License
 
-MIT
-
-## References
-
-- [OWASP ASVS 5.0](https://owasp.org/www-project-application-security-verification-standard/)
-- [OWASP Top 10:2025](https://owasp.org/Top10/)
-- [CWE/SANS Top 25](https://cwe.mitre.org/top25/)
+MIT License
