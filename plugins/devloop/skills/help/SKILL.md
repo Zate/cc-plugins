@@ -184,9 +184,9 @@ Load when needed: `Skill: skill-name`
 |-------|---------|
 | `devloop:engineer` | Exploration, architecture, code review |
 | `devloop:qa-engineer` | Test generation |
-| `devloop:task-planner` | Planning, requirements |
 | `devloop:security-scanner` | OWASP, secrets |
 | `devloop:doc-generator` | READMEs, API docs |
+| `devloop:swarm-worker` | Parallel task execution |
 
 ---
 

@@ -5,6 +5,19 @@ All notable changes to the devloop plugin are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.22.0] - 2026-03-14
+
+### Changed - Agent & Skill Rationalization
+
+- Removed `statusline-setup` agent - logic inlined into `/devloop:statusline` skill
+- Removed `task-planner` agent - redundant with `/devloop:plan` skill
+- Removed auto-trigger (`whenToUse`/`whenNotToUse`) from 9 generic reference skills
+  - go-patterns, python-patterns, react-patterns, java-patterns, testing-strategies
+  - api-design, database-patterns, architecture-patterns, security-checklist
+  - Still available via explicit `Skill: skill-name` invocation
+- Updated INDEX.md: 7 -> 5 agents, generic skills moved to "Explicit-Load" section
+- Updated README, component guide, help skill agent tables
+
 ## [3.21.3] - 2026-03-14
 
 ### Fixed - Documentation Overhaul

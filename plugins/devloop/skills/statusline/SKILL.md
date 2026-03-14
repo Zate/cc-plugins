@@ -8,7 +8,6 @@ allowed-tools:
   - Edit
   - Bash
   - AskUserQuestion
-  - Agent
 ---
 
 # Devloop Statusline Setup
@@ -20,35 +19,75 @@ Configure the devloop statusline to display real-time session information.
 - **Model**: Current model name (Opus/Sonnet/Haiku)
 - **Context**: Progress bar + percentage of context window used
 - **Tokens**: Total session tokens (formatted as K/M)
-- **API Limits**: 5-hour and 7-day usage percentages (if available)
 - **Path**: Current working directory (shortened)
 - **Git Branch**: Current branch name
 - **Plan Progress**: Tasks completed (X/Y) from `.devloop/plan.md`
-- **Bug Count**: Open issues from `.devloop/issues/`
 
-## Setup Process
+## Step 1: Read Current Settings
 
-Use the Agent tool to launch the `statusline-setup` agent:
+Read the user's Claude Code settings:
 
 ```
-Agent: statusline-setup agent
-Prompt: Configure the devloop statusline. Check for existing statusline configuration and set up appropriately.
+Read ~/.claude/settings.json
 ```
 
-The agent will:
-1. Check `~/.claude/settings.json` for existing statusline
-2. Handle conflicts (offer to replace or keep existing)
-3. Configure the devloop statusline path
-4. Confirm the setup
+## Step 2: Check Current Status
 
-## After Setup
+Analyze the settings to determine the current state:
 
-Once configured, restart Claude Code to see the statusline at the bottom of your terminal.
+1. **No statusLine field**: Safe to configure
+2. **Existing devloop statusline**: May need path update
+3. **Other statusline**: Ask user what to do
 
-Example output:
+## Step 3: Get Plugin Path
+
+The devloop statusline script path follows this pattern:
+`~/.claude/plugins/cache/cc-plugins/devloop/{version}/statusline/devloop-statusline.sh`
+
+Find the installed version by checking the plugin cache directory.
+
+## Step 4: Handle Based on State
+
+### If no statusline configured:
+Add the statusLine field to settings.json:
+
+```json
+{
+  "statusLine": {
+    "type": "command",
+    "command": "~/.claude/plugins/cache/cc-plugins/devloop/{version}/statusline/devloop-statusline.sh",
+    "padding": 0
+  }
+}
 ```
-Opus-4.6 | █░░░░ 23% | 45.2K | 5h 12% 7d 8% | cc-plugins | main | P:3/10
+
+### If existing devloop statusline:
+Check if path needs updating (version change). Update if necessary.
+
+### If other statusline configured:
+```yaml
+AskUserQuestion:
+  questions:
+    - question: "You have an existing statusline configured. What would you like to do?"
+      header: "Statusline"
+      multiSelect: false
+      options:
+        - label: "Replace with devloop"
+          description: "Use devloop statusline instead"
+        - label: "Keep existing"
+          description: "Don't change current statusline"
 ```
+
+## Step 5: Apply Configuration
+
+Use the Edit tool to update `~/.claude/settings.json` with the statusLine configuration.
+
+## Step 6: Confirm
+
+Tell the user:
+- Statusline has been configured
+- Restart Claude Code to see the changes
+- The statusline shows: Model, Context %, Tokens, Path, Git branch, Plan progress
 
 ## Dependencies
 

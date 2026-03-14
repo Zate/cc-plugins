@@ -2,7 +2,7 @@
 
 > **A development workflow where Claude does the work and you stay in control.**
 
-[![Version](https://img.shields.io/badge/version-3.21.3-blue)](./CHANGELOG.md) [![Skills](https://img.shields.io/badge/skills-27-purple)](#skills) [![Agents](https://img.shields.io/badge/agents-7-green)](#agents)
+[![Version](https://img.shields.io/badge/version-3.22.0-blue)](./CHANGELOG.md) [![Skills](https://img.shields.io/badge/skills-27-purple)](#skills) [![Agents](https://img.shields.io/badge/agents-5-green)](#agents)
 
 **What devloop gives you:**
 - **Structured plans** that persist across sessions (`.devloop/plan.md`)
@@ -119,17 +119,15 @@ Choose the workflow that fits your task:
 
 ## Agents
 
-Seven specialized agents for complex parallel work:
+Five specialized agents for complex parallel work:
 
 | Agent | Purpose |
 |-------|---------|
 | `devloop:engineer` | Code exploration, architecture, refactoring, git, code review |
 | `devloop:qa-engineer` | Test generation, execution, bug tracking |
-| `devloop:task-planner` | Planning, requirements, issue management |
 | `devloop:security-scanner` | OWASP Top 10, secrets, injection risks |
 | `devloop:doc-generator` | READMEs, API docs, changelogs |
 | `devloop:swarm-worker` | Autonomous task execution for swarm mode |
-| `devloop:statusline-setup` | Configure statusline settings |
 
 ---
 

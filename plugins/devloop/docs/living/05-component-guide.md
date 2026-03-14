@@ -27,7 +27,7 @@ What's in devloop v3.21.
 
 ---
 
-## Agents (7)
+## Agents (5)
 
 For parallel work and specialized scans.
 
@@ -35,11 +35,9 @@ For parallel work and specialized scans.
 |-------|---------|
 | `devloop:engineer` | Code exploration, architecture, git, code review |
 | `devloop:qa-engineer` | Test generation, execution, bugs |
-| `devloop:task-planner` | Planning, requirements, issues |
 | `devloop:security-scanner` | OWASP Top 10, secrets |
 | `devloop:doc-generator` | READMEs, API docs, changelogs |
 | `devloop:swarm-worker` | Autonomous task execution for swarm mode |
-| `devloop:statusline-setup` | Configure statusline settings |
 
 **Remember**: Claude does work directly. Agents only for parallel tasks.
 

@@ -1,4 +1,4 @@
-# Devloop Skills Index v4.0
+# Devloop Skills Index v5.0
 
 Load skills on demand with `Skill: skill-name`. Don't preload.
 
@@ -37,27 +37,31 @@ These are user-invocable slash commands (`/devloop:<name>`):
 |-------|---------|
 | `devloop-audit` | Audit devloop against Claude Code updates |
 
-## Language Patterns
+## Explicit-Load Skills
 
-| Skill | Purpose | Also Triggers On |
-|-------|---------|------------------|
-| `go-patterns` | Go idioms, error handling, testing | golang, .go files |
-| `python-patterns` | Python best practices, pytest | Django, Flask, FastAPI, pandas |
-| `react-patterns` | React/TypeScript, hooks, components | Next.js, frontend TS, JSX/TSX |
-| `java-patterns` | Java/Spring patterns | Kotlin, Spring Boot, Maven, Gradle |
+These skills provide domain knowledge but don't auto-trigger. Load explicitly with `Skill: skill-name` when needed.
 
-## Development
+### Language Patterns
 
-| Skill | Purpose | Also Triggers On |
-|-------|---------|------------------|
-| `git-workflows` | Git operations, branching | git flow, trunk-based, merge strategies |
-| `atomic-commits` | Commit best practices | splitting PRs, commit hygiene |
-| `testing-strategies` | Test design patterns | TDD, BDD, mocking, test doubles |
-| `architecture-patterns` | System design patterns | SOLID, clean code, refactoring |
-| `api-design` | REST/GraphQL API design | backend routes, HTTP endpoints |
-| `database-patterns` | Database design | SQL, PostgreSQL, MySQL, ORM |
+| Skill | Purpose |
+|-------|---------|
+| `go-patterns` | Go idioms, error handling, testing |
+| `python-patterns` | Python best practices, pytest, Django/Flask/FastAPI |
+| `react-patterns` | React/TypeScript, hooks, components, Next.js |
+| `java-patterns` | Java/Spring patterns, Kotlin, Maven/Gradle |
 
-## Quality
+### Development
+
+| Skill | Purpose |
+|-------|---------|
+| `git-workflows` | Git operations, branching, merge strategies |
+| `atomic-commits` | Commit best practices, splitting PRs |
+| `testing-strategies` | Test design patterns, TDD, mocking |
+| `architecture-patterns` | System design, SOLID, refactoring |
+| `api-design` | REST/GraphQL API design, versioning |
+| `database-patterns` | Database design, SQL, ORM patterns |
+
+### Quality
 
 | Skill | Purpose |
 |-------|---------|
