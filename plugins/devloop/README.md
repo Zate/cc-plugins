@@ -2,11 +2,11 @@
 
 > **A development workflow where Claude does the work and you stay in control.**
 
-[![Version](https://img.shields.io/badge/version-3.22.0-blue)](./CHANGELOG.md) [![Skills](https://img.shields.io/badge/skills-27-purple)](#skills) [![Agents](https://img.shields.io/badge/agents-5-green)](#agents)
+[![Version](https://img.shields.io/badge/version-3.22.1-blue)](./CHANGELOG.md) [![Skills](https://img.shields.io/badge/skills-27-purple)](#skills) [![Agents](https://img.shields.io/badge/agents-5-green)](#agents)
 
 **What devloop gives you:**
 - **Structured plans** that persist across sessions (`.devloop/plan.md`)
-- **Context management** so Claude stays sharp (plan → fresh → run loop)
+- **Context management** so Claude stays sharp (plan → run → fresh loop)
 - **GitHub integration** for issue-driven development
 - **Automation** with ralph-loop for hands-off execution
 
