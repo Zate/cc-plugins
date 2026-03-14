@@ -5,6 +5,18 @@ All notable changes to the devloop plugin are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.21.3] - 2026-03-14
+
+### Fixed - Documentation Overhaul
+
+- Fixed README.md badges: version 3.21.3, skills 27, agents 7
+- Rewrote component guide: accurate counts (7 agents, 27 skills), added statusline/swarm/state files
+- Fixed state management: plan.md tracking "NOT tracked" (ephemeral), added local.md/worklog.md/context.json
+- Fixed architecture doc: plan.md tracking, skill count (14), added context-guard hook, local.md/context.json
+- Modernized Claude Code integration doc: added frontmatter reference for skills/agents, hook types
+- Fixed contributing doc: merged duplicate Skill sections, referenced CLAUDE.md versioning
+- Removed false seeAlso claims from skills/INDEX.md
+
 ## [3.21.2] - 2026-03-14
 
 ### Fixed - Script Consistency & Robustness

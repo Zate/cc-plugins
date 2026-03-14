@@ -22,33 +22,32 @@ claude --debug
 
 ## Adding Components
 
-### Skill (Slash Command)
+### Skill (Slash Command or Reference)
 
-1. Create `skills/my-command/SKILL.md`
-2. Add frontmatter (`name`, `description`, `allowed-tools`) and phases
-3. Use checkpoints between phases
+1. Create `skills/my-skill/SKILL.md`
+2. Add frontmatter (`name`, `description`, `allowed-tools`)
+3. For commands: add workflow phases with checkpoints
+4. For reference skills: add domain knowledge content
+5. Add to `skills/INDEX.md`
 
 ### Agent
 
 1. Create `agents/my-agent.md`
-2. Define capabilities
-3. Add to agent list in docs
-
-### Skill
-
-1. Create `skills/my-skill/SKILL.md`
-2. Include whenToUse/whenNotToUse
-3. Add to `skills/INDEX.md`
+2. Add frontmatter (`name`, `description`, `tools`, `model`, `maxTurns`)
+3. Define capabilities and trigger conditions
+4. Update agent lists in docs
 
 ---
 
 ## Versioning
 
-- Patch (3.1.0 → 3.1.1): Bug fixes
-- Minor (3.1.x → 3.2.0): New features
-- Major (3.x → 4.0.0): Breaking changes
+See `CLAUDE.md` for full versioning guidelines. Summary:
 
-Update: `plugin.json`, `README.md`
+- Patch (3.21.0 -> 3.21.1): Bug fixes, docs, refactoring
+- Minor (3.21.x -> 3.22.0): New features (commands, agents, skills)
+- Major (3.x -> 4.0.0): Breaking changes
+
+Update: `plugin.json`, `CHANGELOG.md`, marketplace.json
 
 ---
 
@@ -57,7 +56,7 @@ Update: `plugin.json`, `README.md`
 Use conventional commits:
 
 ```
-feat(commands): add archive command
+feat(skills): add archive skill
 fix(hooks): handle missing plan
 docs(skills): update go-patterns
 ```

@@ -2,7 +2,7 @@
 
 > **A development workflow where Claude does the work and you stay in control.**
 
-[![Version](https://img.shields.io/badge/version-3.18.2-blue)](./CHANGELOG.md) [![Commands](https://img.shields.io/badge/commands-13-orange)](#commands) [![Agents](https://img.shields.io/badge/agents-7-green)](#agents) [![Skills](https://img.shields.io/badge/skills-15-purple)](#skills)
+[![Version](https://img.shields.io/badge/version-3.21.3-blue)](./CHANGELOG.md) [![Skills](https://img.shields.io/badge/skills-27-purple)](#skills) [![Agents](https://img.shields.io/badge/agents-7-green)](#agents)
 
 **What devloop gives you:**
 - **Structured plans** that persist across sessions (`.devloop/plan.md`)

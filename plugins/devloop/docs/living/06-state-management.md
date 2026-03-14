@@ -8,8 +8,12 @@ Files devloop uses to maintain state.
 
 ```
 .devloop/
-├── plan.md               # Active plan (git-tracked)
-└── next-action.json      # Fresh start state (temporary)
+├── plan.md               # Active plan (NOT git-tracked, ephemeral)
+├── next-action.json      # Fresh start state (temporary)
+├── worklog.md            # Completed work history (git-tracked)
+├── local.md              # Local settings (NOT git-tracked)
+├── context.json          # Tech stack cache (git-tracked)
+└── archive/              # Archived completed plans (git-tracked)
 ```
 
 ---
@@ -35,6 +39,8 @@ The active plan file. Source of truth for current work.
 - `[ ]` - Pending
 - `[~]` - Partial
 - `[x]` - Complete
+- `[-]` - Skipped
+- `[!]` - Blocked
 
 ---
 
@@ -57,16 +63,29 @@ Saved state for fresh start mechanism.
 
 ---
 
+## local.md
+
+Project-specific settings (YAML frontmatter). See `Skill: local-config` for details.
+
+---
+
 ## Git Tracking
 
 | File | Git Status |
 |------|------------|
-| `plan.md` | Tracked |
+| `plan.md` | NOT tracked (ephemeral session state) |
 | `next-action.json` | NOT tracked |
+| `worklog.md` | Tracked |
+| `local.md` | NOT tracked |
+| `context.json` | Tracked |
+| `archive/` | Tracked |
 
 Add to `.gitignore`:
 ```
+.devloop/plan.md
 .devloop/next-action.json
+.devloop/local.md
+.devloop/spikes/
 ```
 
 ---

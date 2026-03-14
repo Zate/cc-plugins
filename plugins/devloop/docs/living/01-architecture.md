@@ -12,7 +12,8 @@ plugins/devloop/
 │   └── plugin.json          # Plugin manifest
 ├── hooks/
 │   ├── hooks.json           # Minimal hook definitions
-│   └── session-start.sh     # Session initialization
+│   ├── session-start.sh     # Session initialization
+│   └── context-guard.sh     # Context usage guard (Stop hook)
 ├── skills/                   # Slash commands + on-demand knowledge
 │   ├── INDEX.md             # Skill catalog
 │   ├── devloop/SKILL.md     # Main entry point
@@ -48,7 +49,7 @@ SKILL.md files with YAML frontmatter defining the command interface.
 
 Knowledge files loaded on-demand via `Skill: skill-name`.
 
-**Available (12):** plan-management, git-workflows, atomic-commits, testing-strategies, go-patterns, python-patterns, react-patterns, java-patterns, api-design, architecture-patterns, database-patterns, security-checklist
+**Available (14):** plan-management, local-config, devloop-audit, git-workflows, atomic-commits, testing-strategies, go-patterns, python-patterns, react-patterns, java-patterns, api-design, architecture-patterns, database-patterns, security-checklist
 
 ### Agents
 
@@ -79,9 +80,11 @@ Temporary file created by `/devloop:fresh`, read and deleted by `/devloop:run`.
 
 | File | Purpose | Git tracked? |
 |------|---------|--------------|
-| `.devloop/plan.md` | Current plan | Yes |
+| `.devloop/plan.md` | Current plan | No (ephemeral) |
 | `.devloop/next-action.json` | Fresh start state | No |
-| `.devloop/worklog.md` | Work history | Optional |
+| `.devloop/worklog.md` | Work history | Yes |
+| `.devloop/local.md` | Local settings | No |
+| `.devloop/context.json` | Tech stack cache | Yes |
 | `.devloop/spikes/` | Spike reports | No |
 
 ---

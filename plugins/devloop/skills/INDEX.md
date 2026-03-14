@@ -67,18 +67,6 @@ These are user-invocable slash commands (`/devloop:<name>`):
 
 **Total**: 27 skills (13 workflow commands + 14 reference skills)
 
-## Cross-References
-
-Skills now include `seeAlso` frontmatter pointing to related skills:
-- `react-patterns` → `testing-strategies`, `architecture-patterns`, **frontend-design plugin**
-- `api-design` → `security-checklist`, `architecture-patterns`, `database-patterns`
-- `testing-strategies` → language-specific patterns
-
-## External Plugin References
-
-Some skills reference external plugins when installed:
-- **`frontend-design`** (claude-plugins-official) - Referenced from `react-patterns` for UI design work
-
 ## Superpowers Integration
 
 When the `superpowers` plugin is installed, devloop skills link to complementary superpowers skills:
