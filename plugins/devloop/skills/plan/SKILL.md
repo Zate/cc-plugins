@@ -1,6 +1,6 @@
 ---
 name: plan
-description: Create an actionable plan with autonomous exploration
+description: Create a devloop workflow plan with autonomous exploration and task breakdown
 argument-hint: <topic> [--deep|--quick|--from-issue N]
 allowed-tools:
   - Read

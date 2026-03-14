@@ -1,6 +1,6 @@
 ---
 name: review
-description: Comprehensive code review for existing changes or PR
+description: Quick inline code review for devloop plan changes or PR diffs
 argument-hint: Optional file/PR to review
 allowed-tools:
   - Read

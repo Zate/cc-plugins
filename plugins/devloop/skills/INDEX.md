@@ -73,7 +73,24 @@ These skills provide domain knowledge but don't auto-trigger. Load explicitly wi
 
 ## Superpowers Integration
 
-When the `superpowers` plugin is installed, devloop skills link to complementary superpowers skills:
+Devloop and superpowers are complementary plugins with distinct lanes:
+
+| Lane | Plugin | Focus |
+|------|--------|-------|
+| **Workflow orchestration** | devloop | Plan, run, fresh, ship cycle |
+| **Quality practices** | superpowers | TDD, debugging, verification, code review |
+
+### When to use which
+
+| Task | Use |
+|------|-----|
+| "Plan and implement feature X" | `/devloop:plan` -> `/devloop:run` |
+| "Write tests first, then implement" | `superpowers:test-driven-development` |
+| "Debug this failing test" | `superpowers:systematic-debugging` |
+| "Review my changes" | `/devloop:review` (quick) or `superpowers:requesting-code-review` (thorough) |
+| "Commit and create PR" | `/devloop:ship` |
+
+### Cross-references
 
 | Devloop Skill | Superpowers Skill | When to Use |
 |---------------|-------------------|-------------|
@@ -82,7 +99,7 @@ When the `superpowers` plugin is installed, devloop skills link to complementary
 | `git-workflows` | `superpowers:finishing-a-development-branch` | Completing work, merge decisions |
 | `architecture-patterns` | `superpowers:systematic-debugging` | Debugging complex issues |
 
-**Note**: Superpowers skills are NOT required. Devloop works standalone. These are optional enhancements.
+**Note**: Superpowers is NOT required. Devloop works fully standalone.
 
 ## Quick Reference
 

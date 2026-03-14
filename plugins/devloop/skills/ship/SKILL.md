@@ -1,6 +1,6 @@
 ---
 name: ship
-description: Complete validation and git integration for shipping a feature
+description: Devloop commit and PR creation with validation for completed plan work
 disable-model-invocation: true
 argument-hint: Optional commit message or PR title
 allowed-tools:

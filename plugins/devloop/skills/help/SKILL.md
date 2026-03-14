@@ -30,6 +30,8 @@ AskUserQuestion:
           description: "The plan -> run -> fresh cycle"
         - label: "Skills & Agents"
           description: "On-demand knowledge and parallel work"
+        - label: "Superpowers"
+          description: "How devloop works with superpowers plugin"
 ```
 
 ---
@@ -239,6 +241,39 @@ context_threshold: 80
 - `/cancel-ralph`
 - Max iterations reached
 - Context guard triggered
+
+---
+
+---
+
+# Topic: Superpowers
+
+## Complement, Not Dependency
+
+Devloop and superpowers are complementary plugins with distinct lanes:
+
+- **Devloop** = Workflow orchestration (plan, run, fresh, ship)
+- **Superpowers** = Quality practices (TDD, debugging, verification, code review)
+
+Devloop works fully standalone. Superpowers is optional.
+
+## When to Use Which
+
+| Task | Use |
+|------|-----|
+| Plan and implement a feature | `/devloop:plan` -> `/devloop:run` |
+| Write tests first, then code | `superpowers:test-driven-development` |
+| Debug a failing test | `superpowers:systematic-debugging` |
+| Quick review of changes | `/devloop:review` |
+| Thorough code review | `superpowers:requesting-code-review` |
+| Commit and PR | `/devloop:ship` |
+
+## Key Difference
+
+- `/devloop:plan` creates **workflow plans** (task breakdown, phased execution)
+- `superpowers:writing-plans` creates **implementation plans** (architecture, design decisions)
+
+Both can coexist. Use devloop for the workflow, superpowers for quality gates within tasks.
 
 ---
 

@@ -5,6 +5,17 @@ All notable changes to the devloop plugin are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.22.1] - 2026-03-14
+
+### Improved - Superpowers Complement Strategy
+
+- Tightened skill descriptions to avoid overlap with superpowers:
+  - review: "Quick inline code review for devloop plan changes"
+  - plan: "Create a devloop workflow plan with autonomous exploration"
+  - ship: "Devloop commit and PR creation with validation"
+- Rewrote INDEX.md Superpowers Integration: defined lanes, added "when to use" table
+- Added Superpowers topic to /devloop:help with complement explanation
+
 ## [3.22.0] - 2026-03-14
 
 ### Changed - Agent & Skill Rationalization
