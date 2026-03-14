@@ -5,14 +5,8 @@ set -euo pipefail
 # Usage: correlate.sh <artifacts_dir> <output_file>
 # Output: Correlated findings JSON written to output_file.
 
-ARTIFACTS_DIR="${1:-}"
-OUTPUT_FILE="${2:-}"
-
-if [ -z "$ARTIFACTS_DIR" ] || [ -z "$OUTPUT_FILE" ]; then
-    echo "Error: both artifacts_dir and output_file arguments required" >&2
-    echo "Usage: correlate.sh <artifacts_dir> <output_file>" >&2
-    exit 1
-fi
+ARTIFACTS_DIR="${1:-.security/artifacts}"
+OUTPUT_FILE="${2:-.security/correlated.json}"
 
 if ! command -v jq &>/dev/null; then
     echo "Error: jq is required for correlation" >&2

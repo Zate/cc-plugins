@@ -5,12 +5,8 @@ set -euo pipefail
 # Usage: run-scanners.sh <output_directory>
 # Output: Summary JSON to stdout. Tool artifacts written to output_directory.
 
-OUTPUT_DIR="${1:-}"
-if [ -z "$OUTPUT_DIR" ]; then
-    echo "Error: output directory argument required" >&2
-    echo "Usage: run-scanners.sh <output_directory>" >&2
-    exit 1
-fi
+OUTPUT_DIR="${1:-.security/artifacts}"
+mkdir -p "$OUTPUT_DIR"
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 mkdir -p "$OUTPUT_DIR"
