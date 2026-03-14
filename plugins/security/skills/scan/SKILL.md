@@ -89,35 +89,63 @@ Display: `"X unique findings after deduplication (from Y raw findings across Z t
 
 **If `--quick`:** Skip triage entirely. Report raw tool findings directly. Jump to Phase 4.
 
-**Otherwise:** Use the triage-agent to classify each finding.
+**Otherwise:** Triage findings yourself using the decision tree below. Do NOT delegate to the triage-agent for standard scans -- do the work directly. Only use the triage-agent for `--deep` scans with 50+ findings.
 
-Read `.security/artifacts/correlated.json` and invoke triage-agent:
+Read `.security/correlated.json`.
 
-```
-Agent(triage-agent): Triage the correlated findings in .security/artifacts/correlated.json.
-Project context is in .security/artifacts/recon.json.
-Classify each finding as TRUE_POSITIVE, FALSE_POSITIVE, or NEEDS_REVIEW.
-Write results to .security/artifacts/triaged.json.
-```
+### Triage Decision Tree (follow IN ORDER, take FIRST match)
 
-### Triage Criteria (passed to agent)
+For each finding, read exactly 5 lines of context around the flagged line, then apply:
 
-For each finding, the agent applies CWE-specific assessment:
+1. **Test fixture/data file?** (testdata/, fixtures/) -> FALSE_POSITIVE
+2. **CWE-798 in test .pem/.key file?** -> FALSE_POSITIVE
+3. **Test file?** (*_test.*, test_*, tests/) -> FALSE_POSITIVE unless testing production patterns
+4. **CWE-798 credential check:**
+   - Placeholder value (changeme, xxx, TODO) -> FALSE_POSITIVE
+   - In .env.example/.env.template -> FALSE_POSITIVE
+   - Looks like a hash ($2b$, hex 32+ chars) -> FALSE_POSITIVE
+   - Public key (not private) -> FALSE_POSITIVE
+   - Loaded from env var at runtime -> FALSE_POSITIVE
+   - Otherwise -> TRUE_POSITIVE
+5. **Framework default protection?** (see table below, NOT bypassed) -> FALSE_POSITIVE
+6. **User input reaches sink?**
+   - No evidence of user input -> FALSE_POSITIVE
+   - Yes, user input reaches sink -> TRUE_POSITIVE
+   - Cannot determine from 5 lines -> NEEDS_REVIEW
+7. **Default:** NEEDS_REVIEW
 
-| CWE | Key Question | Common False Positive |
-|-----|-------------|----------------------|
-| CWE-89 (SQLi) | Does user input reach query without parameterization? | ORM usage, prepared statements |
-| CWE-79 (XSS) | Is output rendered without encoding? | Framework auto-escaping (React, Django) |
-| CWE-78 (Cmd Injection) | Is shell invoked with user input? | Hardcoded commands, no user input |
-| CWE-22 (Path Traversal) | Is file path from user input without validation? | Static paths, canonicalization |
-| CWE-798 (Hardcoded Creds) | Is it a real credential? | Test fixtures, hashes, placeholders |
-| CWE-502 (Deserialization) | Is untrusted data deserialized? | Safe loaders, trusted sources |
+### Framework Protection Table
 
-**Context adjustments:**
-- Test files (`*_test.*`, `test_*`, `tests/`, `spec/`): downgrade severity unless testing production patterns
-- Example/demo files: downgrade to LOW
-- Public endpoints: upgrade severity
-- Framework protections: mark FALSE_POSITIVE if framework provides default protection and code does not bypass it
+| Framework | CWE | Protection | Bypass Indicators |
+|-----------|-----|-----------|-------------------|
+| Django | CWE-89 | ORM parameterizes | .raw(), .extra(), cursor() |
+| Django | CWE-79 | Template auto-escape | \|safe, mark_safe() |
+| SQLAlchemy | CWE-89 | ORM parameterizes | text() with f-string |
+| React | CWE-79 | JSX auto-escapes | dangerouslySetInnerHTML |
+| Rails | CWE-89 | AR parameterizes | find_by_sql(), execute() |
+
+### Fixed Severity Table
+
+| CWE | Base | Upgrade condition | Downgrade condition |
+|-----|------|-------------------|---------------------|
+| CWE-78 | CRITICAL | -- | CLI tool: HIGH |
+| CWE-89 | HIGH | Public unauth endpoint: CRITICAL | Internal: MEDIUM |
+| CWE-79 | HIGH | Stored XSS: CRITICAL | Self-XSS: LOW |
+| CWE-798 | CRITICAL | Production keys | Dev/staging: HIGH |
+| CWE-502 | CRITICAL | Network input | Local cache: MEDIUM |
+| Other | MEDIUM | Public endpoint: HIGH | Test/internal: LOW |
+
+### Explanation Format (use EXACTLY)
+
+TRUE_POSITIVE: `[What]. [Why exploitable]. [What input reaches sink].`
+FALSE_POSITIVE: `[Rule that fired]. [Why it is FP -- cite protection].`
+NEEDS_REVIEW: `[What flagged]. [Why indeterminate]. [What to check].`
+
+### Remediation Format (TRUE_POSITIVE only)
+
+`Replace [vulnerable pattern] with [secure pattern]. Example: [one-line code].`
+
+One fix only. Do not offer alternatives.
 
 ### Findings Budget
 
@@ -199,13 +227,16 @@ cursor.execute("SELECT * FROM users WHERE name = %s", (username,))
 Run `/security:setup` to install missing tools.
 ```
 
-### Report Rules
+### Report Rules (MANDATORY)
 
-1. Every finding MUST have a `[Static: toolname]` or `[LLM: triage]` provenance label
-2. LLM never reads full source files -- only code snippets from tool output
-3. Remediation must be specific and actionable with code examples
-4. False positives are listed but collapsed
-5. Coverage gaps are always shown based on missing tools
+1. **Use this EXACT report structure.** Do not add sections, change table columns, or rearrange.
+2. **Summary table has exactly 4 rows:** CRITICAL, HIGH, MEDIUM, LOW. Count only TRUE_POSITIVE and NEEDS_REVIEW findings.
+3. **Finding headings format:** `### [SEVERITY] CWE-NNN: Title -- file:line`
+4. **Every finding has:** Provenance line, explanation paragraph, code block, remediation block. In that order.
+5. **Provenance format:** `**Provenance:** [Static: toolname1, toolname2]`
+6. **False positives go in collapsed details block.** One line per FP: `- CWE-NNN in file:line -- reason [Static: tool]`
+7. **Coverage gaps always shown** based on detect-tools.sh output.
+8. **Do not read full source files.** Only show the code snippet from the tool finding or the 5-line context read during triage.
 
 Save the report:
 ```bash

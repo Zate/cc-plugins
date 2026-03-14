@@ -57,7 +57,7 @@ if [ -f "$ARTIFACTS_DIR/gitleaks.json" ]; then
             message: .Description,
             cwe: "CWE-798",
             snippet: (.Match // .Secret | .[0:100])
-        }]
+        }] | sort_by(.file + ":" + (.line | tostring))
     ' "$ARTIFACTS_DIR/gitleaks.json" 2>/dev/null || echo "[]")
     all_findings=$(echo "$all_findings" | jq --argjson new "$gitleaks_findings" '. + $new')
 fi
@@ -89,7 +89,7 @@ if [ -f "$ARTIFACTS_DIR/trivy.json" ]; then
                 cwe: "CWE-798",
                 snippet: (.Match // "")[0:100]
             }
-        )]
+        )] | sort_by(.file + ":" + (.line | tostring))
     ' "$ARTIFACTS_DIR/trivy.json" 2>/dev/null || echo "[]")
     all_findings=$(echo "$all_findings" | jq --argjson new "$trivy_findings" '. + $new')
 fi
@@ -195,12 +195,12 @@ correlated=$(echo "$all_findings" | jq '
             } | del(.source, .rule_id)
         end
     )
-    # Sort by severity
+    # Sort by severity, then by file+line for deterministic ordering
     | sort_by(
-        if .severity == "CRITICAL" then 0
-        elif .severity == "HIGH" then 1
-        elif .severity == "MEDIUM" then 2
-        else 3 end
+        (if .severity == "CRITICAL" then "0"
+        elif .severity == "HIGH" then "1"
+        elif .severity == "MEDIUM" then "2"
+        else "3" end) + ":" + .file + ":" + (.line | tostring)
     )
 ')
 
