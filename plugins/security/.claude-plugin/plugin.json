@@ -1,6 +1,6 @@
 {
   "name": "security",
-  "version": "3.0.0",
+  "version": "3.1.0",
   "description": "Hybrid security scanner: deterministic SAST tools (Semgrep, Gitleaks, Trivy) for detection, LLM for triage. Reproducible findings, provenance-labeled, zero-dependency fallback mode.",
   "author": {
     "name": "Zate",

@@ -7,7 +7,17 @@ set -euo pipefail
 
 SCAN_DIR="${1:-.}"
 OUTPUT_FILE="${2:-}"
+FILES_JSON=""
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+
+# Parse optional --files arg from remaining args
+shift 2 2>/dev/null || true
+while [ $# -gt 0 ]; do
+    case "$1" in
+        --files) FILES_JSON="$2"; shift 2 ;;
+        *) shift ;;
+    esac
+done
 PATTERNS_FILE="$SCRIPT_DIR/../data/regex-patterns.json"
 
 if [ ! -f "$PATTERNS_FILE" ]; then
@@ -113,8 +123,17 @@ for i in $(seq 0 $((pattern_count - 1))); do
                 "cwe": $cwe,
                 "description": $desc
             }]')
-    done < <(grep -rnE "$p_pattern" "$SCAN_DIR" \
-        "${SOURCE_INCLUDES[@]}" "${EXCLUDE_DIRS[@]}" 2>/dev/null || true)
+    done < <(
+        if [ -n "$FILES_JSON" ] && [ -f "$FILES_JSON" ]; then
+            # Diff mode: grep only changed files
+            jq -r '.files[]' "$FILES_JSON" | while read -r f; do
+                [ -f "$f" ] && grep -nE "$p_pattern" "$f" 2>/dev/null | sed "s|^|$f:|" || true
+            done
+        else
+            grep -rnE "$p_pattern" "$SCAN_DIR" \
+                "${SOURCE_INCLUDES[@]}" "${EXCLUDE_DIRS[@]}" 2>/dev/null || true
+        fi
+    )
 done
 
 # Sort by severity: CRITICAL > HIGH > MEDIUM > LOW

@@ -97,7 +97,13 @@ Results are saved to `.security/`:
 |   +-- regex-scan.json
 +-- correlated.json         # Deduplicated findings
 +-- triage.json             # LLM-assessed findings
++-- suppressions.json       # Persistent false positive overrides
 +-- report.md               # Human-readable report
+```
+
+Add to `.gitignore`:
+```
+.security/
 ```
 
 ## Real-Time Protection
@@ -114,6 +120,9 @@ The plugin includes PreToolUse hooks that validate code changes in real-time:
 | `/security:scan` | Run security assessment |
 | `/security:scan --quick` | Fast scan, tools only, no LLM |
 | `/security:scan --deep` | Comprehensive analysis |
+| `/security:scan --diff` | Scan only changed files vs main branch |
+| `/security:scan --suppress finding-003` | Suppress a false positive permanently |
+| `/security:results` | View most recent scan report |
 | `/security:setup` | Install security tools |
 
 ## Author

@@ -1,7 +1,7 @@
 ---
 name: scan
 description: Run a security assessment using deterministic static analysis tools with LLM-powered triage
-argument-hint: "[--quick] [--deep] [--path <dir>]"
+argument-hint: "[--quick] [--deep] [--diff] [--path <dir>] [--suppress <id>] [--show-suppressed]"
 disable-model-invocation: true
 allowed-tools:
   - Bash
@@ -43,8 +43,19 @@ Display detected stack: languages, frameworks, package managers, infrastructure.
 From `$ARGUMENTS`:
 - `--quick`: Fast scan, skip triage, 10-finding budget
 - `--deep`: Thorough scan, 50-finding budget
-- (default): Standard scan, 25-finding budget
+- `--diff`: Scan only files changed vs main branch (or `--diff-base <ref>`)
 - `--path <dir>`: Scope scan to specific directory (default: project root)
+- `--suppress <id>`: Add a finding to suppressions.json and re-display report
+- `--show-suppressed`: Include suppressed findings in report output
+- (default): Standard scan, 25-finding budget
+
+**If `--suppress <id>`:** Add the finding to `.security/suppressions.json`, then redisplay the last report excluding the suppressed finding. Do NOT re-run the scan. STOP after updating.
+
+**If `--diff`:**
+```bash
+"${CLAUDE_PLUGIN_ROOT}/scripts/get-changed-files.sh"
+```
+Use the output to scope scanners to changed files only. If no files changed, report "No changed files to scan" and STOP.
 
 ## Phase 1: Scan
 
@@ -277,11 +288,14 @@ Route responses:
 ## Examples
 
 ```bash
-/security:scan                    # Standard scan (default)
-/security:scan --quick            # Fast scan, no triage
-/security:scan --deep             # Thorough scan, 50-finding budget
-/security:scan --path src/api     # Scan specific directory
-/security:scan --deep --path .    # Deep scan of current directory
+/security:scan                         # Standard scan (default)
+/security:scan --quick                 # Fast scan, no triage
+/security:scan --deep                  # Thorough scan, 50-finding budget
+/security:scan --diff                  # Scan only changed files vs main
+/security:scan --diff-base HEAD~3      # Scan changes from last 3 commits
+/security:scan --path src/api          # Scan specific directory
+/security:scan --suppress finding-003  # Suppress a false positive permanently
+/security:scan --show-suppressed       # Include suppressed in report
 ```
 
 ---

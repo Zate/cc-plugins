@@ -2,6 +2,32 @@
 
 All notable changes to the security plugin are documented in this file.
 
+## [3.1.0] - 2026-03-15
+
+### Added — Workflow Features
+
+- **Suppression system**: `.security/suppressions.json` persists false positive overrides across scans
+  - `--suppress <finding-id>` adds a finding to suppressions
+  - `--show-suppressed` includes suppressed findings in report
+  - Suppressions match by rule_id, file pattern (glob), and/or CWE
+  - Checked automatically during correlation phase
+- **Diff-only scanning**: `--diff` flag scans only files changed vs main branch
+  - `--diff-base <ref>` to compare against specific git ref
+  - Scopes Semgrep, Gitleaks, Trivy, and regex scanner to changed files
+  - Zero findings = "no changed files to scan" (fast exit)
+- **Results viewer**: `/security:results` displays last scan report without re-running
+  - Shows report age and suggests re-scan if stale (>24 hours)
+- `scripts/apply-suppressions.sh` — filters correlated findings against suppressions
+- `scripts/get-changed-files.sh` — lists changed files vs git ref
+- `data/suppressions-schema.json` — documents suppression file format
+
+### Fixed
+
+- Deterministic ordering: Gitleaks and Trivy findings sorted by file+line before correlation
+- Secondary sort key (file+line) within same severity for fully deterministic output
+- Stricter triage: decision tree, fixed severity table, exact format templates
+- `SCRIPT_DIR` variable added to correlate.sh
+
 ## [3.0.0] - 2026-03-14
 
 ### Changed — Complete Architecture Rewrite

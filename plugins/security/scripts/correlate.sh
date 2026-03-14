@@ -8,6 +8,8 @@ set -euo pipefail
 ARTIFACTS_DIR="${1:-.security/artifacts}"
 OUTPUT_FILE="${2:-.security/correlated.json}"
 
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+
 if ! command -v jq &>/dev/null; then
     echo "Error: jq is required for correlation" >&2
     exit 1
@@ -236,6 +238,19 @@ output=$(jq -n \
 
 echo "$output" > "$OUTPUT_FILE"
 
-# Summary to stderr
-echo "correlate: $total findings ($critical critical, $high high, $medium medium, $low low), $corroborated_count corroborated" >&2
-echo "$output"
+# Apply suppressions if file exists
+SUPPRESSIONS_FILE="$(dirname "$OUTPUT_FILE")/suppressions.json"
+if [ ! -f "$SUPPRESSIONS_FILE" ]; then
+    SUPPRESSIONS_FILE=".security/suppressions.json"
+fi
+if [ -f "$SUPPRESSIONS_FILE" ]; then
+    "$SCRIPT_DIR/apply-suppressions.sh" "$OUTPUT_FILE" "$SUPPRESSIONS_FILE" "$OUTPUT_FILE"
+    # Re-read counts after suppression
+    total=$(jq '.summary.total_after_suppression // .summary.total_findings' "$OUTPUT_FILE")
+    suppressed=$(jq '.summary.suppressed_findings // 0' "$OUTPUT_FILE")
+    echo "correlate: $total findings after suppression ($suppressed suppressed), $corroborated_count corroborated" >&2
+else
+    echo "correlate: $total findings ($critical critical, $high high, $medium medium, $low low), $corroborated_count corroborated" >&2
+fi
+
+cat "$OUTPUT_FILE"

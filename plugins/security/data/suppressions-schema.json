@@ -1,0 +1,69 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "description": "Security scan suppression rules. Findings matching any rule are excluded from triage and reports.",
+  "type": "object",
+  "required": ["suppressions"],
+  "properties": {
+    "suppressions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "rule_id": {
+            "type": "string",
+            "description": "Tool rule ID to suppress (e.g., 'python.django.security.injection.sql-injection', 'private-key'). Matches if any of the finding's rule_ids contain this value."
+          },
+          "file": {
+            "type": "string",
+            "description": "File path pattern to suppress. Supports * (single dir) and ** (recursive). Examples: 'tests/**', 'src/test_*.py', 'fixtures/*'"
+          },
+          "cwe": {
+            "type": "string",
+            "description": "CWE to suppress (e.g., 'CWE-798'). Matches if the finding's CWE contains this value."
+          },
+          "reason": {
+            "type": "string",
+            "description": "Human-readable explanation for why this suppression exists."
+          },
+          "created": {
+            "type": "string",
+            "description": "ISO date when suppression was added."
+          },
+          "author": {
+            "type": "string",
+            "description": "Who added this suppression."
+          }
+        },
+        "anyOf": [
+          {"required": ["rule_id"]},
+          {"required": ["file"]},
+          {"required": ["cwe"]}
+        ],
+        "additionalProperties": false
+      }
+    }
+  },
+  "examples": [
+    {
+      "suppressions": [
+        {
+          "rule_id": "private-key",
+          "file": "testdata/**",
+          "reason": "Test certificate files, not real credentials",
+          "created": "2026-03-15"
+        },
+        {
+          "cwe": "CWE-798",
+          "file": "tests/**",
+          "reason": "Test fixtures use dummy credentials",
+          "created": "2026-03-15"
+        },
+        {
+          "rule_id": "dockerfile.security.missing-user",
+          "reason": "Container runs behind network policy, root is acceptable",
+          "created": "2026-03-15"
+        }
+      ]
+    }
+  ]
+}

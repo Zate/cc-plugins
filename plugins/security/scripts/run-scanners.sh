@@ -2,14 +2,37 @@
 set -euo pipefail
 
 # run-scanners.sh — Orchestrate available security scanning tools.
-# Usage: run-scanners.sh <output_directory>
+# Usage: run-scanners.sh [output_directory] [--files changed-files.json]
 # Output: Summary JSON to stdout. Tool artifacts written to output_directory.
 
 OUTPUT_DIR="${1:-.security/artifacts}"
-mkdir -p "$OUTPUT_DIR"
+FILES_JSON=""
+
+# Parse optional --files arg
+shift || true
+while [ $# -gt 0 ]; do
+    case "$1" in
+        --files) FILES_JSON="$2"; shift 2 ;;
+        *) shift ;;
+    esac
+done
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 mkdir -p "$OUTPUT_DIR"
+
+# If diff mode, build file list for tools that support it
+SCAN_PATHS="."
+SEMGREP_PATHS=""
+if [ -n "$FILES_JSON" ] && [ -f "$FILES_JSON" ]; then
+    file_count=$(jq '.count // 0' "$FILES_JSON")
+    if [ "$file_count" -eq 0 ]; then
+        echo '{"scan_time_seconds":0,"tools":{},"total_raw_findings":0,"diff_mode":true,"changed_files":0}' | jq '.'
+        exit 0
+    fi
+    # Build space-separated file list for semgrep
+    SEMGREP_PATHS=$(jq -r '.files[]' "$FILES_JSON" | tr '\n' ' ')
+    echo "scanner: diff mode, scanning $file_count changed files" >&2
+fi
 
 # Detect available tools
 tools_json=$("$SCRIPT_DIR/detect-tools.sh")
@@ -39,6 +62,10 @@ total_start=$(date +%s)
 if [ "$(tool_available semgrep)" = "true" ]; then
     echo "scanner: running semgrep..." >&2
     start=$(date +%s)
+    semgrep_target="."
+    if [ -n "$SEMGREP_PATHS" ]; then
+        semgrep_target="$SEMGREP_PATHS"
+    fi
     if semgrep scan \
         --config auto \
         --config p/owasp-top-ten \
@@ -46,7 +73,8 @@ if [ "$(tool_available semgrep)" = "true" ]; then
         --output "$OUTPUT_DIR/semgrep.sarif.json" \
         --quiet \
         --no-git-ignore \
-        --timeout 300 2>/dev/null; then
+        --timeout 300 \
+        $semgrep_target 2>/dev/null; then
         tool_ran[semgrep]=true
         count=$(jq '[.runs[].results[]] | length' "$OUTPUT_DIR/semgrep.sarif.json" 2>/dev/null || echo 0)
         tool_findings[semgrep]=$count
@@ -168,7 +196,11 @@ fi
 # --- Always run regex scan as baseline ---
 echo "scanner: running regex scan..." >&2
 start=$(date +%s)
-"$SCRIPT_DIR/run-regex-scan.sh" "." "$OUTPUT_DIR/regex-scan.json" 2>/dev/null || true
+if [ -n "$FILES_JSON" ] && [ -f "$FILES_JSON" ]; then
+    "$SCRIPT_DIR/run-regex-scan.sh" "." "$OUTPUT_DIR/regex-scan.json" --files "$FILES_JSON" 2>/dev/null || true
+else
+    "$SCRIPT_DIR/run-regex-scan.sh" "." "$OUTPUT_DIR/regex-scan.json" 2>/dev/null || true
+fi
 tool_ran[regex]=true
 if [ -f "$OUTPUT_DIR/regex-scan.json" ]; then
     count=$(jq 'length' "$OUTPUT_DIR/regex-scan.json" 2>/dev/null || echo 0)
