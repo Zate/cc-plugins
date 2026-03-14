@@ -41,6 +41,9 @@ function Detect-Framework {
     return ''
 }
 
+$scriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
+$pluginRoot = Split-Path -Parent $scriptDir
+
 $lang = Detect-Language
 $framework = Detect-Framework
 $projectName = Split-Path -Leaf (Get-Location)
@@ -57,7 +60,7 @@ $contextJson = @{
     language = $lang
     framework = $framework
     initialized_at = $timestamp
-    devloop_version = '3.17.0'
+    devloop_version = try { (Get-Content (Join-Path $pluginRoot '.claude-plugin' 'plugin.json') -Raw | ConvertFrom-Json).version } catch { '3.x' }
 } | ConvertTo-Json
 Set-Content -Path "$devloopDir/context.json" -Value $contextJson
 

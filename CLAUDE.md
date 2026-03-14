@@ -322,9 +322,8 @@ During `/devloop:run`:
 
 Configure in `.devloop/local.md`:
 ```yaml
-context:
-  fresh_threshold: 25    # Higher for 1M context models
-  context_threshold: 80  # Context guard exit %
+fresh_threshold: 25    # Higher for 1M context models
+context_threshold: 80  # Context guard exit %
 ```
 
 See `plugins/devloop/skills/fresh/SKILL.md` for details.

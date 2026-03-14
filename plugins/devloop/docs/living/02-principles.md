@@ -23,7 +23,7 @@ Complex features need multiple context-fresh sessions.
 Plan → Run → [fresh_threshold tasks] → Fresh → Run → ...
 ```
 
-- **Fresh every N tasks** (configurable via `context.fresh_threshold` in `.devloop/local.md`, default 10)
+- **Fresh every N tasks** (configurable via `fresh_threshold` in `.devloop/local.md`, default 10)
 - **Plans survive sessions**: `.devloop/plan.md`
 - **State saves at breaks**: `next-action.json`
 

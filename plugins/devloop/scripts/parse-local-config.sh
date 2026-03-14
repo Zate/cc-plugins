@@ -14,7 +14,8 @@ default_config() {
   "commits": {"style": "conventional", "scope_from_plan": true, "sign": false},
   "review": {"before_commit": "ask", "use_plugin": null},
   "github": {"link_issues": false, "auto_close": "ask", "comment_on_complete": true},
-  "context": {"fresh_threshold": 10, "context_threshold": 70}
+  "fresh_threshold": 10,
+  "context_threshold": 70
 }
 EOF
 }

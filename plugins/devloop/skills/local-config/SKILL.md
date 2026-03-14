@@ -51,8 +51,8 @@ github:
 | `github.link-issues` | true/false | false |
 | `github.auto-close` | ask/always/never | ask |
 | `github.comment-on-complete` | true/false | true |
-| `context.fresh_threshold` | 5-50 | 10 |
-| `context.context_threshold` | 50-95 | 70 |
+| `fresh_threshold` | 5-50 | 10 |
+| `context_threshold` | 50-95 | 70 |
 
 ## Example Configurations
 
@@ -99,16 +99,15 @@ github:
 
 ```yaml
 ---
-context:
-  fresh_threshold: 10            # Tasks before suggesting /devloop:fresh (default: 10)
-  context_threshold: 70          # Exit ralph loop at this context % (default: 70)
+fresh_threshold: 10            # Tasks before suggesting /devloop:fresh (default: 10)
+context_threshold: 70          # Exit ralph loop at this context % (default: 70)
 ---
 ```
 
 | Setting | Values | Default | Description |
 |---------|--------|---------|-------------|
-| `context.fresh_threshold` | 5-50 | 10 | Tasks completed before suggesting a fresh restart. Set higher (20-30) for 1M context models. |
-| `context.context_threshold` | 50-95 | 70 | Context usage % that triggers automatic ralph loop exit. |
+| `fresh_threshold` | 5-50 | 10 | Tasks completed before suggesting a fresh restart. Set higher (20-30) for 1M context models. |
+| `context_threshold` | 50-95 | 70 | Context usage % that triggers automatic ralph loop exit. |
 
 ## Plugin Integration
 

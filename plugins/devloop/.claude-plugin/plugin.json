@@ -1,6 +1,6 @@
 {
   "name": "devloop",
-  "version": "3.21.1",
+  "version": "3.21.2",
   "description": "Lightweight development workflow with plan/run/fresh pattern, git workflow integration, PR feedback, and autonomous execution. Optimized for efficiency - minimal hooks, on-demand skills, direct execution.",
   "author": {
     "name": "Zate",

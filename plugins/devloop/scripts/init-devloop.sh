@@ -7,6 +7,8 @@
 set -euo pipefail
 
 DEVLOOP_DIR=".devloop"
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+PLUGIN_ROOT="$(dirname "$SCRIPT_DIR")"
 
 # Check if already initialized
 if [[ -d "$DEVLOOP_DIR" ]]; then
@@ -62,7 +64,7 @@ cat > "$DEVLOOP_DIR/context.json" << EOF
   "language": "$LANG",
   "framework": "$FRAMEWORK",
   "initialized_at": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
-  "devloop_version": "3.12.0"
+  "devloop_version": "$(jq -r '.version // "3.x"' "${PLUGIN_ROOT}/.claude-plugin/plugin.json" 2>/dev/null || echo "3.x")"
 }
 EOF
 

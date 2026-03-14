@@ -36,11 +36,15 @@ filter_code_blocks() {
     ' "$1"
 }
 
-# Count only actual task markers: "- [ ]", "- [x]", "- [~]", "- [!]"
-TOTAL=$(filter_code_blocks "$PLAN_FILE" | grep -cE "^[[:space:]]*- \[[ x~!]\]" 2>/dev/null) || TOTAL=0
+# Count only actual task markers: "- [ ]", "- [x]", "- [~]", "- [!]", "- [-]"
+TOTAL=$(filter_code_blocks "$PLAN_FILE" | grep -cE "^[[:space:]]*- \[[ x~!-]\]" 2>/dev/null) || TOTAL=0
 DONE=$(filter_code_blocks "$PLAN_FILE" | grep -cE "^[[:space:]]*- \[x\]" 2>/dev/null) || DONE=0
+SKIPPED=$(filter_code_blocks "$PLAN_FILE" | grep -cE "^[[:space:]]*- \[-\]" 2>/dev/null) || SKIPPED=0
 PARTIAL=$(filter_code_blocks "$PLAN_FILE" | grep -cE "^[[:space:]]*- \[~\]" 2>/dev/null) || PARTIAL=0
 BLOCKED=$(filter_code_blocks "$PLAN_FILE" | grep -cE "^[[:space:]]*- \[!\]" 2>/dev/null) || BLOCKED=0
+
+# Skipped tasks count as done
+DONE=$((DONE + SKIPPED))
 
 # Pending = Total - Done - Partial - Blocked, but we treat partial/blocked as pending
 PENDING=$((TOTAL - DONE))

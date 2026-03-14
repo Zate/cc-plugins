@@ -5,6 +5,19 @@ All notable changes to the devloop plugin are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.21.2] - 2026-03-14
+
+### Fixed - Script Consistency & Robustness
+
+- Flattened config: `context.fresh_threshold` and `context.context_threshold` are now top-level `fresh_threshold` and `context_threshold` in local.md
+- Updated parse-local-config defaults (.sh and .ps1) to flat format
+- Added `fresh_threshold` and `context_threshold` defaults to PowerShell config parser
+- Updated local-config skill docs and CLAUDE.md config examples to flat format
+- Fixed init-devloop.sh hardcoded version "3.12.0" - now reads dynamically from plugin.json
+- Fixed init-devloop.ps1 hardcoded version "3.17.0" - now reads dynamically from plugin.json
+- Fixed check-plan-complete.sh missing `- [-]` (skipped) task counting to match .ps1 behavior
+- Verified .cmd polyglot dispatchers respect shebangs - bash-isms in .sh files are safe
+
 ## [3.21.1] - 2026-03-14
 
 ### Fixed - Dead Code & Stale References
