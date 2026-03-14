@@ -9,7 +9,7 @@
 Devloop is a Claude Code plugin that brings structure to AI-assisted development. Work in focused loops—explore, plan, implement, checkpoint—without complex orchestration.
 
 **Core benefits:**
-- **Simple Workflow**: Spike → Fresh → Continue pattern
+- **Simple Workflow**: Plan → Run → Fresh pattern
 - **Context Management**: Fresh starts prevent slowdown
 - **Plan Files**: Persistent `.devloop/plan.md` survives sessions
 - **Checkpoints**: Natural pause points to commit or break
@@ -27,7 +27,7 @@ Devloop is a Claude Code plugin that brings structure to AI-assisted development
 ### Work in Loops
 
 ```
-Spike → Fresh → Continue → [Work] → Fresh → Continue → Ship
+Plan → Run → [Work] → Fresh → Run → Ship
 ```
 
 ### Minimal Overhead

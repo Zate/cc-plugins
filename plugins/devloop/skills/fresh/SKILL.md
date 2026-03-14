@@ -48,11 +48,11 @@ State saved to .devloop/next-action.json
 
 Next steps:
 1. Run /clear to reset context
-2. Run /devloop:continue to resume work
+2. Run /devloop:run to resume work
 ```
 
 ---
 
 **Tip**: Before doing a full `/devloop:fresh` + `/clear`, try pressing `Esc+Esc` first. This triggers partial summarization which compresses your context without losing state — often enough to keep working without a restart.
 
-**Note**: The next-action.json file is consumed (deleted) when `/devloop:continue` runs.
+**Note**: The next-action.json file is consumed (deleted) when `/devloop:run` runs.

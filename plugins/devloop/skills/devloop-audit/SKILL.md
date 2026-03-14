@@ -108,7 +108,7 @@ AskUserQuestion:
 
 - [ ] Commands: State detection, run patterns, ship workflow current?
 - [ ] Skills: Standard frontmatter, discoverable by Claude?
-- [ ] Agents: Standard format, aligned with Task tool?
+- [ ] Agents: Standard format, aligned with Agent tool?
 - [ ] Hooks: Current API, best practices?
 - [ ] Task Management: Plan vs session tasks clear?
 - [ ] State: .devloop/ structure current?

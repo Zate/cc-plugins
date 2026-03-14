@@ -35,7 +35,7 @@ Skill directories in `skills/` that define workflows and reference knowledge.
 Specialized subprocesses for parallel work.
 
 ```yaml
-Task:
+Agent:
   subagent_type: devloop:engineer
   description: "Implement feature"
   prompt: "..."
@@ -68,7 +68,8 @@ Event handlers in `hooks/hooks.json`.
   "hooks": [
     {
       "event": "SessionStart",
-      "script": "${CLAUDE_PLUGIN_ROOT}/hooks/session-start.sh"
+      "type": "command",
+      "command": "${CLAUDE_PLUGIN_ROOT}/hooks/session-start.sh"
     }
   ]
 }

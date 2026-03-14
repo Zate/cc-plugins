@@ -39,7 +39,7 @@ Quality assurance for testing, bug tracking, and deployment validation.
 
 ### Bug Tracker Mode
 - Triggers: "Log this bug", "Track this issue"
-- Actions: Create bug report in `.devloop/issues/BUG-NNN.md`
+- Actions: Create bug report via `gh issue create` or `/devloop:new`
 - For non-blocking issues discovered during development
 
 ### Validator Mode

@@ -52,7 +52,7 @@ Saved state for fresh start mechanism.
 
 **Lifecycle**:
 1. Created by `/devloop:fresh`
-2. Read by `/devloop:continue`
+2. Read by `/devloop:run`
 3. Deleted after resume
 
 ---

@@ -1,5 +1,5 @@
 #!/bin/bash
-# Devloop SessionStart hook - v3.1 with local config support
+# Devloop SessionStart hook with local config support
 # Quick project detection, no heavy processing
 # Optimized for speed and low token overhead
 

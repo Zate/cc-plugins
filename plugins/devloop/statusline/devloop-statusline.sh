@@ -1,6 +1,6 @@
 #!/bin/bash
 # Devloop statusline for Claude Code
-# Displays: Model | Context | Tokens | API Limits | Path | Branch | Plan | Bugs
+# Displays: Model | Context | Tokens | Path | Branch | Plan | Bugs
 
 set -euo pipefail
 
@@ -112,33 +112,6 @@ if [ "$SESSION_TOTAL" -gt 0 ]; then
     fi
 fi
 
-# Fetch API usage (cached, fast)
-API_DISPLAY=""
-FETCH_SCRIPT="$SCRIPT_DIR/../scripts/fetch-api-usage.sh"
-if [ -f "$FETCH_SCRIPT" ]; then
-    API_USAGE=$("$FETCH_SCRIPT" 2>/dev/null) || API_USAGE=""
-    if [ -n "$API_USAGE" ] && command -v jq &> /dev/null; then
-        FIVE_HR=$(echo "$API_USAGE" | jq -r '.five_hour_pct // 0' 2>/dev/null)
-        SEVEN_DAY=$(echo "$API_USAGE" | jq -r '.seven_day_pct // 0' 2>/dev/null)
-
-        # Color code API usage
-        color_pct() {
-            local pct=$1
-            if [ "$pct" -ge 90 ]; then
-                echo "${RED}${pct}%${RESET}"
-            elif [ "$pct" -ge 60 ]; then
-                echo "${YELLOW}${pct}%${RESET}"
-            else
-                echo "${GREEN}${pct}%${RESET}"
-            fi
-        }
-
-        FIVE_HR_DISPLAY=$(color_pct "${FIVE_HR:-0}")
-        SEVEN_DAY_DISPLAY=$(color_pct "${SEVEN_DAY:-0}")
-        API_DISPLAY="${DIM}5h ${RESET}$FIVE_HR_DISPLAY ${DIM}7d ${RESET}$SEVEN_DAY_DISPLAY"
-    fi
-fi
-
 # Get git branch if in a git repo
 GIT_BRANCH=""
 WORK_DIR="${CURRENT_DIR:-$(pwd)}"
@@ -213,11 +186,6 @@ fi
 # Session tokens (if available)
 if [ -n "$SESSION_TOKENS" ]; then
     OUTPUT="${OUTPUT} ${DIM}|${RESET} ${CYAN}${SESSION_TOKENS}${RESET}"
-fi
-
-# API limits (if available)
-if [ -n "$API_DISPLAY" ]; then
-    OUTPUT="${OUTPUT} ${DIM}|${RESET} ${API_DISPLAY}"
 fi
 
 # Path (always shown)

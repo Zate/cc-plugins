@@ -38,8 +38,8 @@ Project planning for task breakdown, requirements, issues, and completion valida
 
 ### Issue Manager Mode
 - Triggers: "Log this issue", "Track this bug/feature"
-- Output: Issue file in `.devloop/issues/{TYPE}-{NNN}.md`
-- Types: BUG, FEAT, TASK, CHORE, SPIKE
+- Output: GitHub issue via `gh issue create` or `/devloop:new`
+- Types: bug, feature, task, chore
 
 ### DoD Validator Mode
 - Triggers: "Is it ready to ship?", "Validate completion"

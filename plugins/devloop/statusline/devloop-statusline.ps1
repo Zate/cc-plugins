@@ -1,7 +1,7 @@
 $ErrorActionPreference = 'SilentlyContinue'
 
 # Devloop statusline for Claude Code (PowerShell)
-# Displays: Model | Context | Tokens | API Limits | Path | Branch | Plan | Bugs
+# Displays: Model | Context | Tokens | Path | Branch | Plan | Bugs
 
 $ScriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
 

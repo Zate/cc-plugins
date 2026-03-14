@@ -105,33 +105,14 @@ else
         fi
     fi
 
-    # Check 4: Open bugs in issues (only if clean state)
-    if [ "$STATE" = "clean" ] && [ -d ".devloop/issues" ]; then
-        BUG_COUNT=$(grep -l 'type: bug' .devloop/issues/*.md 2>/dev/null | xargs -I{} grep -l 'status: open' {} 2>/dev/null | wc -l | tr -d ' ') || BUG_COUNT=0
-        if [ "$BUG_COUNT" -gt 0 ]; then
-            STATE="open_bugs"
-            PRIORITY=4
-            DETAILS="{\"bug_count\": $BUG_COUNT}"
-            SUGGESTIONS=$(json_array "Fix a bug" "View open bugs" "Start new feature" "Create spike")
-        fi
-    fi
-
-    # Check 5: Features in backlog (only if still clean)
-    if [ "$STATE" = "clean" ] && [ -d ".devloop/issues" ]; then
-        FEATURE_COUNT=$(grep -l 'type: feature' .devloop/issues/*.md 2>/dev/null | xargs -I{} grep -l 'status: open' {} 2>/dev/null | wc -l | tr -d ' ') || FEATURE_COUNT=0
-        if [ "$FEATURE_COUNT" -gt 0 ]; then
-            STATE="backlog"
-            PRIORITY=5
-            DETAILS="{\"feature_count\": $FEATURE_COUNT}"
-            SUGGESTIONS=$(json_array "Work on backlog item" "View backlog" "Create new spike" "Start fresh task")
-        fi
-    fi
+    # Check 4-5: GitHub issues (replaces local .devloop/issues/ checks)
+    # Use `gh issue list` for issue tracking - local issues are deprecated
 fi
 
 # If still clean, set default suggestions
 if [ "$STATE" = "clean" ]; then
     DETAILS='{"message": "Ready for new work"}'
-    SUGGESTIONS=$(json_array "Start new spike" "Create new issue" "View GitHub issues" "Quick task")
+    SUGGESTIONS=$(json_array "Start new plan" "Create new issue" "View GitHub issues" "Quick task")
 fi
 
 # Output summary line then full JSON

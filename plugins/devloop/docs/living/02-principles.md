@@ -20,7 +20,7 @@ Claude implements tasks directly. Use Write, Edit, Bash, Read tools.
 Complex features need multiple context-fresh sessions.
 
 ```
-Spike → Fresh → Continue → [fresh_threshold tasks] → Fresh → Continue → ...
+Plan → Run → [fresh_threshold tasks] → Fresh → Run → ...
 ```
 
 - **Fresh every N tasks** (configurable via `context.fresh_threshold` in `.devloop/local.md`, default 10)
@@ -40,7 +40,7 @@ All work flows through plan files.
 - [ ] Task 1.3: Write unit tests
 ```
 
-Resume anytime with `/devloop:continue`.
+Resume anytime with `/devloop:run`.
 
 ---
 

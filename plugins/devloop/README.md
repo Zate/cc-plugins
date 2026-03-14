@@ -6,7 +6,7 @@
 
 **What devloop gives you:**
 - **Structured plans** that persist across sessions (`.devloop/plan.md`)
-- **Context management** so Claude stays sharp (spike → fresh → run loop)
+- **Context management** so Claude stays sharp (plan → fresh → run loop)
 - **GitHub integration** for issue-driven development
 - **Automation** with ralph-loop for hands-off execution
 

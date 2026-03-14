@@ -11,7 +11,7 @@ $ScriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
 $State = 'clean'
 $Priority = 7
 $Details = @{ message = 'Ready for new work' }
-$Suggestions = @('Start new spike', 'Create new issue', 'View GitHub issues', 'Quick task')
+$Suggestions = @('Start new plan', 'Create new issue', 'View GitHub issues', 'Quick task')
 
 function ConvertTo-JsonArray { param([string[]]$Items) return ($Items | ForEach-Object { "`"$_`"" }) -join ',' }
 
@@ -20,7 +20,7 @@ if (-not (Test-Path '.devloop' -PathType Container)) {
     $State = 'not_setup'
     $Priority = 1
     $Details = @{ message = 'No .devloop directory found' }
-    $Suggestions = @('Set up devloop', 'Create first spike', 'Start new task')
+    $Suggestions = @('Set up devloop', 'Create first plan', 'Start new task')
 } else {
     # Check 2: Active plan?
     if (Test-Path '.devloop/plan.md') {
@@ -75,37 +75,8 @@ if (-not (Test-Path '.devloop' -PathType Container)) {
         } catch { }
     }
 
-    # Check 4: Open bugs
-    if ($State -eq 'clean' -and (Test-Path '.devloop/issues' -PathType Container)) {
-        $bugCount = 0
-        $issueFiles = Get-ChildItem '.devloop/issues/*.md' -ErrorAction SilentlyContinue
-        foreach ($f in $issueFiles) {
-            $content = Get-Content $f.FullName -Raw -ErrorAction SilentlyContinue
-            if ($content -match 'type: bug' -and $content -match 'status: open') { $bugCount++ }
-        }
-        if ($bugCount -gt 0) {
-            $State = 'open_bugs'
-            $Priority = 4
-            $Details = @{ bug_count = $bugCount }
-            $Suggestions = @('Fix a bug', 'View open bugs', 'Start new feature', 'Create spike')
-        }
-    }
-
-    # Check 5: Features in backlog
-    if ($State -eq 'clean' -and (Test-Path '.devloop/issues' -PathType Container)) {
-        $featureCount = 0
-        $issueFiles = Get-ChildItem '.devloop/issues/*.md' -ErrorAction SilentlyContinue
-        foreach ($f in $issueFiles) {
-            $content = Get-Content $f.FullName -Raw -ErrorAction SilentlyContinue
-            if ($content -match 'type: feature' -and $content -match 'status: open') { $featureCount++ }
-        }
-        if ($featureCount -gt 0) {
-            $State = 'backlog'
-            $Priority = 5
-            $Details = @{ feature_count = $featureCount }
-            $Suggestions = @('Work on backlog item', 'View backlog', 'Create new spike', 'Start fresh task')
-        }
-    }
+    # Check 4-5: GitHub issues (replaces local .devloop/issues/ checks)
+    # Use `gh issue list` for issue tracking - local issues are deprecated
 }
 
 # Output

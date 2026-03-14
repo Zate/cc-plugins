@@ -7,14 +7,14 @@
   },
   "metadata": {
     "description": "A curated marketplace of Claude Code plugins and skills for enhanced development workflows",
-    "version": "0.6.1",
+    "version": "0.6.2",
     "pluginRoot": "./plugins"
   },
   "plugins": [
     {
       "name": "devloop",
       "source": "./plugins/devloop",
-      "description": "Lightweight development workflow with spike/fresh/continue pattern, git workflow integration (branch-per-plan, PR creation, PR feedback), 14 on-demand skills, and 6 specialized agents. Optimized for efficiency with minimal hooks and direct execution.",
+      "description": "Lightweight development workflow with plan/run/fresh pattern, git workflow integration (branch-per-plan, PR creation, PR feedback), on-demand skills, and specialized agents. Optimized for efficiency with minimal hooks and direct execution.",
       "category": "development",
       "tags": ["feature-development", "workflow", "agents", "git", "pr-workflow", "fresh-start", "context-management", "go", "react", "java", "python"]
     },

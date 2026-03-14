@@ -5,6 +5,23 @@ All notable changes to the devloop plugin are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.21.1] - 2026-03-14
+
+### Fixed - Dead Code & Stale References
+
+- Fixed `/devloop:continue` references in fresh skill and docs -> `/devloop:run`
+- Fixed "spike" terminology in overview, principles, README -> plan/run/fresh
+- Fixed deprecated `.devloop/issues/` refs in qa-engineer and task-planner agents -> GitHub issues
+- Removed dead `.devloop/issues/` scanning code from check-devloop-state scripts (.sh and .ps1)
+- Fixed "Start new spike" suggestions -> "Start new plan" in state detection scripts
+- Fixed `Task:` -> `Agent:` syntax in Claude Code integration docs
+- Fixed hooks.json example format in docs (added `type: command`)
+- Fixed "Task tool" -> "Agent tool" in devloop-audit skill
+- Deleted unused `docs/templates/agent_prompt_structure.xml`
+- Removed hardcoded "v3.1" from session-start hook headers (.sh and .ps1)
+- Removed dead `fetch-api-usage.sh` code block from statusline scripts (.sh and .ps1)
+- Updated plugin.json description to use plan/run/fresh terminology
+
 ## [3.21.0] - 2026-03-14
 
 ### Added - Configurable Fresh Threshold
