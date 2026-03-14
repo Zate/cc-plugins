@@ -20,10 +20,10 @@ Claude implements tasks directly. Use Write, Edit, Bash, Read tools.
 Complex features need multiple context-fresh sessions.
 
 ```
-Spike → Fresh → Continue → [5-10 tasks] → Fresh → Continue → ...
+Spike → Fresh → Continue → [fresh_threshold tasks] → Fresh → Continue → ...
 ```
 
-- **Fresh every 5-10 tasks**
+- **Fresh every N tasks** (configurable via `context.fresh_threshold` in `.devloop/local.md`, default 10)
 - **Plans survive sessions**: `.devloop/plan.md`
 - **State saves at breaks**: `next-action.json`
 

@@ -331,7 +331,7 @@ AskUserQuestion:
 | Aspect | `/devloop:run` | `/devloop:run-swarm` |
 |--------|---------------|---------------------|
 | Context | Accumulates, degrades | Fresh per task |
-| Need `/clear` | Every 5-10 tasks | Never |
+| Need `/clear` | Every fresh_threshold tasks (default 10) | Never |
 | Explore agents | Available | Not available (no nesting) |
 | CLAUDE.md | Auto-loaded | Injected per task |
 | Per-task overhead | Low | Higher (agent spawn) |

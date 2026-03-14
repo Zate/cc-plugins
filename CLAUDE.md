@@ -264,7 +264,7 @@ This shows plugin loading, manifest validation, and component registration.
 
 1. **Plan with minimal prompts** - Autonomous exploration, only 1-2 user prompts
 2. **Run autonomously** - Tasks execute without manual intervention
-3. **Fresh when needed** - Clear context every 5-10 tasks if responses slow down
+3. **Fresh when needed** - Clear context per `fresh_threshold` setting (default 10 tasks, configurable in `.devloop/local.md`)
 4. **Faster completion** - Quick from idea to implementation
 
 ### Example Session
@@ -315,12 +315,19 @@ During `/devloop:run`:
 
 ### When to Use Fresh Start
 
-- After completing 5-10 tasks
+- After completing `fresh_threshold` tasks (default 10, configurable in `.devloop/local.md`)
 - When responses feel slow
 - After long agent invocations
 - When context feels heavy
 
-See `plugins/devloop/commands/fresh.md` for details.
+Configure in `.devloop/local.md`:
+```yaml
+context:
+  fresh_threshold: 25    # Higher for 1M context models
+  context_threshold: 80  # Context guard exit %
+```
+
+See `plugins/devloop/skills/fresh/SKILL.md` for details.
 
 ### Deprecated Commands
 

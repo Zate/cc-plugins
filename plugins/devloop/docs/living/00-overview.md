@@ -85,7 +85,7 @@ Plans live at `.devloop/plan.md`:
 - [ ] Write unit tests
 ```
 
-After 5-10 tasks, run `/devloop:fresh` + `/clear` + `/devloop:run`.
+After reaching `fresh_threshold` tasks (default 10, configurable in `.devloop/local.md`), run `/devloop:fresh` + `/clear` + `/devloop:run`.
 
 ---
 

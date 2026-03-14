@@ -45,7 +45,7 @@ Development workflow where **Claude does the work directly**. No routine agents.
 ```bash
 /devloop:plan "How should we implement feature X?"  # Plan (or --deep for exploration)
 /devloop:run                                        # Execute tasks
-/devloop:fresh && /clear                           # Save state, clear context (every 5-10 tasks)
+/devloop:fresh && /clear                           # Save state, clear context (every fresh_threshold tasks (default 10, configurable in .devloop/local.md))
 /devloop:run                                        # Continue execution
 ```
 
@@ -55,7 +55,7 @@ Development workflow where **Claude does the work directly**. No routine agents.
 2. Claude explores, creates plan
 3. You approve
 4. `/devloop:run` to implement
-5. Every 5-10 tasks: `/devloop:fresh` then `/clear` then `/devloop:run`
+5. Every fresh_threshold tasks (default 10, configurable in .devloop/local.md): `/devloop:fresh` then `/clear` then `/devloop:run`
 6. Done? `/devloop:ship`
 
 ---
@@ -123,7 +123,7 @@ Returning?
        |
 /devloop:run             ->  Implements tasks
        |
-After 5-10 tasks?
+After fresh_threshold tasks (default 10, configurable in .devloop/local.md)?
 |-- Yes -> /devloop:fresh -> /clear -> /devloop:run
 |-- No  -> Continue
 ```
@@ -137,7 +137,7 @@ After 5-10 tasks?
 
 ## When to Fresh
 
-- After 5-10 tasks
+- After fresh_threshold tasks (default 10, configurable in .devloop/local.md)
 - When responses slow
 - After long exploration
 - Before taking a break

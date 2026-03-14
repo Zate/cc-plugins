@@ -5,11 +5,18 @@ set -euo pipefail
 
 RALPH_STATE=".claude/ralph-loop.local.md"
 CONTEXT_FILE=".claude/context-usage.json"
-THRESHOLD=70  # Fixed default
+LOCAL_CONFIG=".devloop/local.md"
+THRESHOLD=70  # Default
 
 # Early exit if no ralph loop active (most common case)
 [[ -f "$RALPH_STATE" ]] || exit 0
 [[ -f "$CONTEXT_FILE" ]] || exit 0
+
+# Read threshold from local config if available
+if [[ -f "$LOCAL_CONFIG" ]]; then
+    CONFIG_THRESHOLD=$(grep -oP 'context_threshold:\s*\K[0-9]+' "$LOCAL_CONFIG" 2>/dev/null || true)
+    [[ -n "$CONFIG_THRESHOLD" ]] && THRESHOLD="$CONFIG_THRESHOLD"
+fi
 
 # Read context percentage
 CONTEXT_PCT=$(jq -r '.context_pct // 0' "$CONTEXT_FILE" 2>/dev/null || echo "0")

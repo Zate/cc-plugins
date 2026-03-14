@@ -68,7 +68,7 @@ Save state for context refresh.
 
 ## When to Fresh Start
 
-- After 5-10 tasks completed
+- After fresh_threshold tasks completed (default 10, configurable in `.devloop/local.md`)
 - Context feels heavy/slow
 - After long exploration
 - Before a break

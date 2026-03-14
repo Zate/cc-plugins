@@ -5,6 +5,29 @@ All notable changes to the devloop plugin are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.21.0] - 2026-03-14
+
+### Added - Configurable Fresh Threshold
+
+- Added `context.fresh_threshold` setting to `.devloop/local.md` (default: 10 tasks)
+- Users with 1M context models can set higher values (20-30) for longer autonomous runs
+- Added `context.context_threshold` to local config (previously only in `.ps1`, now also in `.sh`)
+- Fixed `context-guard.sh` to read threshold from local config (was hardcoded to 70)
+- Updated `parse-local-config.sh` defaults to include `context` section
+- Updated all docs/skills referencing hardcoded "5-10 tasks" to use configurable threshold
+- Updated CLAUDE.md with configuration example for 1M context users
+
+### Configuration
+
+```yaml
+# .devloop/local.md
+---
+context:
+  fresh_threshold: 25    # Tasks before suggesting fresh (default: 10)
+  context_threshold: 80  # Context guard exit % (default: 70)
+---
+```
+
 ## [3.20.0] - 2026-03-13
 
 ### Changed - Commands to Skills Migration
