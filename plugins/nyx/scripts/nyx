@@ -210,9 +210,14 @@ set -- "${FILTERED_ARGS[@]+"${FILTERED_ARGS[@]}"}"
 
 # Find plugin directory for --plugin-dir (loads skills, hooks, sub-agents)
 PLUGIN_DIR_FLAG=""
+SETTINGS_FLAG=""
 PLUGIN_DIR=$(find_plugin_dir)
 if [ -n "$PLUGIN_DIR" ]; then
     PLUGIN_DIR_FLAG="--plugin-dir $PLUGIN_DIR"
+    # Load nyx settings (pre-approved permissions, preferences)
+    if [ -f "$PLUGIN_DIR/settings.json" ]; then
+        SETTINGS_FLAG="--settings $PLUGIN_DIR/settings.json"
+    fi
 fi
 
 # Build dynamic system prompt from dimension state
@@ -242,6 +247,7 @@ exec claude --agent nyx \
     --add-dir "$LAUNCH_DIR" \
     --name "$SESSION_NAME" \
     $PLUGIN_DIR_FLAG \
+    $SETTINGS_FLAG \
     $APPEND_PROMPT_FLAG \
     $SKIP_PERMS \
     "$@"
