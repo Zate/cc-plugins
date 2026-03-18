@@ -12,15 +12,16 @@ Session checkpoint and memory promotion ritual. Run this before clearing context
 ## No-Op Guard
 
 Before doing anything, check if there's meaningful state to persist:
-- Read `~/.claude/nyx/current` — is there an active dimension?
-- Check if the dimension state file was discussed or modified this session
+- Check the current git branch in the Nyx home (`~/.nyx/`): `git -C ~/.nyx branch --show-current`
+- If on a `dim/*` branch, there's an active dimension
+- If on `main` with no changes, likely nothing to checkpoint
 - If there's nothing new to persist, say: "Nothing new to checkpoint. You're clear to go." and stop.
 
 ## Phase 1: Checkpoint Active Work
 
-If there IS an active dimension:
+If there IS an active dimension (current branch is `dim/<name>`):
 
-1. Read the dimension state file at `~/.claude/nyx/dimensions/<name>.md`
+1. Read the dimension state file at `dimensions/<name>.md` in the Nyx home
 2. Ask: "What's the active focus for next time?" — update the Active Focus section
 3. Ask: "Anything to add to return notes?" — update the Return Notes section
 4. If any decisions were made this session, append them to the Decision Log with today's date and rationale
@@ -46,4 +47,5 @@ Review working-tier ctx nodes from this session:
    - What was preserved (dimension state, promoted memories)
    - What was left as-is
    - Active dimension and its focus for next session
-4. End with: "Ready for clear."
+4. Commit any changes in Nyx home: `git -C ~/.nyx add -A && git -C ~/.nyx commit -m "dim: checkpoint <name>"`
+5. End with: "Ready for clear."

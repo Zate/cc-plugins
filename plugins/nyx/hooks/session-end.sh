@@ -1,36 +1,42 @@
 #!/bin/bash
+# Nyx Stop hook — memory promotion nudge
+# Checks if there's an active dimension with unsaved state
+
 set -euo pipefail
 
-NYX_DIR="$HOME/.claude/nyx"
-DIM_DIR="$NYX_DIR/dimensions"
-CURRENT_FILE="$NYX_DIR/current"
+NYX_HOME="${NYX_HOME:-$HOME/.nyx}"
 
-# Early exit if no nyx setup
-if [ ! -d "$DIM_DIR" ]; then
+# JSON helper for no-op output
+noop_json() {
     echo '{"suppressOutput":true,"systemMessage":"","hookSpecificOutput":{"hookEventName":"Stop","additionalContext":""}}'
+}
+
+# Early exit if no nyx home
+if [ ! -d "$NYX_HOME/.git" ]; then
+    noop_json
     exit 0
 fi
 
-# Check for active dimension
-CURRENT=""
-if [ -f "$CURRENT_FILE" ]; then
-    CURRENT=$(cat "$CURRENT_FILE" 2>/dev/null | tr -d '[:space:]')
-fi
+# Check current branch
+CURRENT_BRANCH=$(git -C "$NYX_HOME" branch --show-current 2>/dev/null || echo "")
 
-# If no active dimension, no-op
-if [ -z "$CURRENT" ]; then
-    echo '{"suppressOutput":true,"systemMessage":"","hookSpecificOutput":{"hookEventName":"Stop","additionalContext":""}}'
+# Only nudge if on a dimension branch
+if [[ "$CURRENT_BRANCH" != dim/* ]]; then
+    noop_json
     exit 0
 fi
 
-# Check if dimension state file exists
-if [ ! -f "$DIM_DIR/$CURRENT.md" ]; then
-    echo '{"suppressOutput":true,"systemMessage":"","hookSpecificOutput":{"hookEventName":"Stop","additionalContext":""}}'
-    exit 0
-fi
+CURRENT_DIM="${CURRENT_BRANCH#dim/}"
 
-# Output reminder
-CONTEXT="Active dimension: $CURRENT. Consider running /nyx:prepare before clearing to checkpoint your state."
+# Check for uncommitted changes in nyx home
+HAS_CHANGES=$(git -C "$NYX_HOME" status --porcelain 2>/dev/null | head -1)
+
+CONTEXT="Active dimension: $CURRENT_DIM."
+if [ -n "$HAS_CHANGES" ]; then
+    CONTEXT="$CONTEXT Uncommitted changes in Nyx home. Consider running /nyx:prepare before clearing to checkpoint your state."
+else
+    CONTEXT="$CONTEXT Consider running /nyx:prepare before clearing if decisions were made this session."
+fi
 
 if command -v jq &> /dev/null; then
     ESCAPED_CONTEXT=$(printf '%s' "$CONTEXT" | jq -Rs '.')

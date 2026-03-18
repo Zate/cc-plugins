@@ -1,0 +1,183 @@
+#!/bin/bash
+# Nyx launcher — personal agent with dimensional context management
+# Install: cp this to ~/.local/bin/nyx && chmod +x ~/.local/bin/nyx
+#
+# Usage:
+#   nyx                    — launch Nyx from current directory
+#   nyx -p "prompt"        — launch with an initial prompt
+#   nyx --resume           — resume last session
+#   nyx dim <name>         — switch to dimension before launching
+#   nyx --setup            — re-run setup (normally automatic)
+#   nyx <any claude flags> — passed through to claude
+
+set -euo pipefail
+
+NYX_HOME="${NYX_HOME:-$HOME/.nyx}"
+LAUNCH_DIR="$(pwd)"
+
+# ============================================================================
+# Bootstrap — first-time setup (idempotent)
+# ============================================================================
+
+bootstrap_nyx() {
+    echo "Setting up Nyx home at $NYX_HOME..."
+    mkdir -p "$NYX_HOME"
+    cd "$NYX_HOME"
+
+    # Initialize git repo if needed
+    if [ ! -d ".git" ]; then
+        git init -q
+        echo "Initialized Nyx home repository."
+    fi
+
+    # Create directory structure
+    mkdir -p dimensions notes templates .claude/agents
+
+    # Create CLAUDE.md if it doesn't exist
+    if [ ! -f "CLAUDE.md" ]; then
+        cat > CLAUDE.md << 'CLAUDEMD'
+# Nyx Home
+
+This is Nyx's workspace. You are running as Nyx — a personal agent with persistent
+memory, dimensional context management, and structured playbooks.
+
+## Working Directories
+
+Your primary working directory is this Nyx home (`~/.nyx/`). The user's project
+directory is available as an additional working directory — check your working
+directories to find it.
+
+## Dimensions
+
+Dimensions are git branches in this repository (`dim/<name>`). The current branch
+IS the current dimension. `main` is your home — shared knowledge, identity, templates.
+
+- `dimensions/` — State files for each dimension (goal, focus, return notes, decisions)
+- `notes/` — Scratch space, working notes (branch-local)
+- `templates/` — User-forged templates (shared on main, can be branch-local)
+
+## Memory
+
+Use ctx for persistent cross-session knowledge. Use files in this repo for
+dimension-local artifacts (notes, drafts, exports).
+
+## Key Commands
+
+- Switch dimensions: `git checkout dim/<name>` (or use /nyx:dimension)
+- List dimensions: `git branch --list 'dim/*'`
+- Current dimension: `git branch --show-current`
+CLAUDEMD
+        echo "Created CLAUDE.md"
+    fi
+
+    # Create .gitignore
+    if [ ! -f ".gitignore" ]; then
+        cat > .gitignore << 'GITIGNORE'
+# Session artifacts
+.claude/settings.local.json
+
+# OS files
+.DS_Store
+Thumbs.db
+GITIGNORE
+        echo "Created .gitignore"
+    fi
+
+    # Symlink or copy the agent file if it doesn't exist
+    # The agent file lives in the plugin, but we need it in .claude/agents/ for --agent to find it
+    if [ ! -f ".claude/agents/nyx.md" ]; then
+        # Try to find the plugin agent file
+        local plugin_agent=""
+        # Check common plugin cache locations
+        for cache_dir in "$HOME/.claude/plugins/cache"/*/nyx/*/agents/nyx.md; do
+            if [ -f "$cache_dir" ]; then
+                plugin_agent="$cache_dir"
+                break
+            fi
+        done
+
+        if [ -n "$plugin_agent" ]; then
+            cp "$plugin_agent" .claude/agents/nyx.md
+            echo "Copied agent file from plugin cache."
+        else
+            echo "Warning: Could not find nyx agent file in plugin cache."
+            echo "Run 'claude plugin install' to install the nyx plugin first,"
+            echo "then run 'nyx --setup' to complete setup."
+            echo ""
+            echo "Or manually copy agents/nyx.md from the nyx plugin to:"
+            echo "  $NYX_HOME/.claude/agents/nyx.md"
+        fi
+    fi
+
+    # Initial commit if repo is empty
+    if ! git rev-parse HEAD >/dev/null 2>&1; then
+        git add -A
+        git commit -q -m "chore: initialize nyx home"
+        echo "Created initial commit."
+    fi
+
+    echo ""
+    echo "Nyx home ready at $NYX_HOME"
+    echo "Dimensions will be git branches (dim/<name>)"
+    echo ""
+}
+
+# ============================================================================
+# Dimension shortcut — "nyx dim <name>" switches before launching
+# ============================================================================
+
+handle_dimension_shortcut() {
+    local dim_name="$1"
+    shift
+
+    cd "$NYX_HOME"
+
+    # Check if branch exists
+    if git rev-parse --verify "dim/$dim_name" >/dev/null 2>&1; then
+        git checkout -q "dim/$dim_name"
+        echo "Switched to dimension: $dim_name"
+    else
+        echo "Dimension '$dim_name' doesn't exist."
+        echo "Available dimensions:"
+        git branch --list 'dim/*' 2>/dev/null | sed 's/^[* ]*/  /' | sed 's|dim/||'
+        echo ""
+        read -r -p "Create it? [y/N] " response
+        if [[ "$response" =~ ^[Yy]$ ]]; then
+            git checkout -q -b "dim/$dim_name"
+            echo "Created and switched to dimension: $dim_name"
+        else
+            echo "Staying on $(git branch --show-current)"
+        fi
+    fi
+
+    # Continue to launch
+    REMAINING_ARGS=("$@")
+}
+
+# ============================================================================
+# Main
+# ============================================================================
+
+# Handle --setup flag
+if [ "${1:-}" = "--setup" ]; then
+    bootstrap_nyx
+    exit 0
+fi
+
+# Auto-bootstrap if needed
+if [ ! -d "$NYX_HOME/.git" ]; then
+    bootstrap_nyx
+fi
+
+# Handle "nyx dim <name>" shortcut
+REMAINING_ARGS=("$@")
+if [ "${1:-}" = "dim" ] && [ -n "${2:-}" ]; then
+    handle_dimension_shortcut "${@:2}"
+    set -- "${REMAINING_ARGS[@]}"
+fi
+
+# Launch claude from nyx home with caller's directory added
+cd "$NYX_HOME"
+exec claude --agent nyx \
+    --add-dir "$LAUNCH_DIR" \
+    "$@"
