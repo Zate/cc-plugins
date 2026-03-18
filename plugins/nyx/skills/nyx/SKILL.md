@@ -26,9 +26,11 @@ Check `$ARGUMENTS` and route accordingly:
 - "evaluate" or "assess" → `Skill: nyx:evaluate`
 - "interview" or "discover" → `Skill: nyx:interview`
 - "decide" or "decision" → `Skill: nyx:decide`
+- "retro" or "retrospective" or "what did we learn" → `Skill: nyx:retrospective`
+- "troubleshoot" or "debug" or "broken" or "unfuck" → `Skill: nyx:troubleshoot`
 - "principles" → `Skill: nyx:principles`
 
-**Task description (anything else):** Evaluate the request. If it's a simple question or discussion, handle it directly in Nyx's voice. If it's structured work that would benefit from a playbook (research, writing, evaluation, decision-making), suggest and load the appropriate playbook skill. If unclear, ask one clarifying question.
+**Task description (anything else):** Evaluate the request. If it's a simple question or discussion, handle it directly in Nyx's voice. If it's structured work that would benefit from a playbook (research, writing, evaluation, decision-making, troubleshooting, retrospectives), suggest and load the appropriate playbook skill. If unclear, ask one clarifying question.
 
 ## Voice Reference
 

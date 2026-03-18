@@ -1,7 +1,7 @@
 {
   "name": "nyx",
   "version": "0.1.0",
-  "description": "Personal agent with persistent memory, dimensional context management, and structured playbooks for research, writing, evaluation, and creative work",
+  "description": "Personal agent with persistent memory, dimensional context management, and structured playbooks for research, writing, evaluation, and creative work. Nyx is a general-purpose companion with strong opinions and a process for everything. Use when you want an opinionated, capable partner for non-trivial work across any domain.",
   "author": {
     "name": "Zate",
     "email": "zate75+claude-code-plugins@gmail.com"
