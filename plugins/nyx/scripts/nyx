@@ -7,6 +7,7 @@
 #   nyx -p "prompt"        — launch with an initial prompt
 #   nyx --resume           — resume last session
 #   nyx dim <name>         — switch to dimension before launching
+#   nyx --safe             — launch with normal permission prompts
 #   nyx --setup            — re-run setup (normally automatic)
 #   nyx <any claude flags> — passed through to claude
 
@@ -14,6 +15,33 @@ set -euo pipefail
 
 NYX_HOME="${NYX_HOME:-$HOME/.nyx}"
 LAUNCH_DIR="$(pwd)"
+
+# ============================================================================
+# Find the nyx plugin directory (for --plugin-dir)
+# ============================================================================
+
+find_plugin_dir() {
+    # Check plugin cache first (installed via marketplace)
+    local cached
+    cached=$(find "$HOME/.claude/plugins/cache" -path "*/nyx/*/.claude-plugin/plugin.json" 2>/dev/null | head -1)
+    if [ -n "$cached" ]; then
+        # Go up two levels from .claude-plugin/plugin.json to get plugin root
+        dirname "$(dirname "$cached")"
+        return
+    fi
+
+    # Check common dev install paths
+    for dev_path in \
+        "$HOME/projects/cc-plugins/plugins/nyx" \
+        "$HOME/cc-plugins/plugins/nyx"; do
+        if [ -f "$dev_path/.claude-plugin/plugin.json" ]; then
+            echo "$dev_path"
+            return
+        fi
+    done
+
+    echo ""
+}
 
 # ============================================================================
 # Bootstrap — first-time setup (idempotent)
@@ -84,27 +112,12 @@ GITIGNORE
     fi
 
     # Copy the agent file if it doesn't exist
-    # The agent file lives in the plugin, but we need it in .claude/agents/ for --agent to find it
     if [ ! -f ".claude/agents/nyx.md" ]; then
-        local plugin_agent=""
-        # Search plugin cache — structure is cache/<marketplace>/<plugin>/<version>/agents/
-        plugin_agent=$(find "$HOME/.claude/plugins/cache" -path "*/nyx/*/agents/nyx.md" -o -path "*/nyx/agents/nyx.md" 2>/dev/null | head -1)
-
-        # Also check the source repo if it's a dev install
-        if [ -z "$plugin_agent" ]; then
-            for dev_path in \
-                "$HOME/projects/cc-plugins/plugins/nyx/agents/nyx.md" \
-                "$HOME/cc-plugins/plugins/nyx/agents/nyx.md"; do
-                if [ -f "$dev_path" ]; then
-                    plugin_agent="$dev_path"
-                    break
-                fi
-            done
-        fi
-
-        if [ -n "$plugin_agent" ]; then
-            cp "$plugin_agent" .claude/agents/nyx.md
-            echo "Copied agent file from: $plugin_agent"
+        local plugin_dir
+        plugin_dir=$(find_plugin_dir)
+        if [ -n "$plugin_dir" ] && [ -f "$plugin_dir/agents/nyx.md" ]; then
+            cp "$plugin_dir/agents/nyx.md" .claude/agents/nyx.md
+            echo "Copied agent file from: $plugin_dir/agents/nyx.md"
         else
             echo "Warning: Could not find nyx agent file."
             echo "Copy agents/nyx.md from the nyx plugin to:"
@@ -179,20 +192,56 @@ if [ "${1:-}" = "dim" ] && [ -n "${2:-}" ]; then
     set -- "${REMAINING_ARGS[@]}"
 fi
 
-# Launch claude from nyx home with caller's directory added
+# ============================================================================
+# Build launch flags
+# ============================================================================
+
 # Default to --dangerously-skip-permissions unless --safe is passed
 SKIP_PERMS="--dangerously-skip-permissions"
+FILTERED_ARGS=()
 for arg in "$@"; do
     if [ "$arg" = "--safe" ]; then
         SKIP_PERMS=""
-        # Remove --safe from args (it's our flag, not claude's)
-        set -- $(printf '%s\n' "$@" | grep -v '^--safe$')
-        break
+    else
+        FILTERED_ARGS+=("$arg")
     fi
 done
+set -- "${FILTERED_ARGS[@]+"${FILTERED_ARGS[@]}"}"
 
+# Find plugin directory for --plugin-dir (loads skills, hooks, sub-agents)
+PLUGIN_DIR_FLAG=""
+PLUGIN_DIR=$(find_plugin_dir)
+if [ -n "$PLUGIN_DIR" ]; then
+    PLUGIN_DIR_FLAG="--plugin-dir $PLUGIN_DIR"
+fi
+
+# Build dynamic system prompt from dimension state
+APPEND_PROMPT_FLAG=""
 cd "$NYX_HOME"
+CURRENT_BRANCH=$(git branch --show-current 2>/dev/null || echo "main")
+DIM_NAME=""
+if [[ "$CURRENT_BRANCH" == dim/* ]]; then
+    DIM_NAME="${CURRENT_BRANCH#dim/}"
+    DIM_FILE="$NYX_HOME/dimensions/$DIM_NAME.md"
+    if [ -f "$DIM_FILE" ]; then
+        APPEND_PROMPT_FLAG="--append-system-prompt-file $DIM_FILE"
+    fi
+fi
+
+# Session name based on dimension
+SESSION_NAME="nyx"
+if [ -n "$DIM_NAME" ]; then
+    SESSION_NAME="nyx-$DIM_NAME"
+fi
+
+# ============================================================================
+# Launch
+# ============================================================================
+
 exec claude --agent nyx \
     --add-dir "$LAUNCH_DIR" \
+    --name "$SESSION_NAME" \
+    $PLUGIN_DIR_FLAG \
+    $APPEND_PROMPT_FLAG \
     $SKIP_PERMS \
     "$@"
