@@ -74,6 +74,7 @@ To verify or manually install: `/ctx:setup`
 | `/ctx:status` | Node counts, types, tiers, token usage |
 | `/ctx:recall <query>` | Query stored knowledge (e.g. `type:decision AND tag:project:myapp`) |
 | `/ctx:setup` | Manual install and verification |
+| `/ctx:cleanup` | Reconcile ctx and MEMORY.md — find duplicates, stale nodes, conflicts, bloat |
 
 ## What Gets Stored
 
@@ -173,6 +174,7 @@ commands/
   setup.md            # /ctx:setup
 skills/
   using-ctx/SKILL.md  # Enforces memory discipline
+  cleanup/SKILL.md    # Memory reconciliation (/ctx:cleanup)
 scripts/
   install-binary.sh   # Auto-downloads ctx binary (Unix)
   install-binary.ps1  # Auto-downloads ctx binary (Windows)
