@@ -130,13 +130,17 @@ Present findings to the user in a structured report. Group by severity (high fir
 - Estimated token savings: ~N tokens
 ```
 
-After presenting the report, ask the user:
+**MANDATORY**: After presenting the report, MUST use the `AskUserQuestion` tool (not plain text) to ask how to proceed. Use this exact configuration:
 
-> "How would you like to proceed? Options:
-> 1. **Auto-fix all** — Apply all recommendations automatically
-> 2. **Review each** — Walk through issues one by one for approval
-> 3. **Fix high-severity only** — Auto-fix high issues, skip the rest
-> 4. **Skip** — Just show me the report, don't change anything"
+- question: "How would you like to proceed with the N issues found?"
+- header: "Remediation"
+- options:
+  1. label: "Auto-fix all (Recommended)", description: "Apply all recommendations automatically"
+  2. label: "Review each", description: "Walk through issues one by one for approval"
+  3. label: "Fix high-severity only", description: "Auto-fix HIGH issues, skip medium and low"
+  4. label: "Skip", description: "Just show the report, don't change anything"
+
+Do NOT proceed to Phase 4 without this user response. Do NOT present these options as text — use the AskUserQuestion tool.
 
 ### Phase 4: Remediation
 
