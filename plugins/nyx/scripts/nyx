@@ -83,28 +83,31 @@ GITIGNORE
         echo "Created .gitignore"
     fi
 
-    # Symlink or copy the agent file if it doesn't exist
+    # Copy the agent file if it doesn't exist
     # The agent file lives in the plugin, but we need it in .claude/agents/ for --agent to find it
     if [ ! -f ".claude/agents/nyx.md" ]; then
-        # Try to find the plugin agent file
         local plugin_agent=""
-        # Check common plugin cache locations
-        for cache_dir in "$HOME/.claude/plugins/cache"/*/nyx/*/agents/nyx.md; do
-            if [ -f "$cache_dir" ]; then
-                plugin_agent="$cache_dir"
-                break
-            fi
-        done
+        # Search plugin cache — structure is cache/<marketplace>/<plugin>/<version>/agents/
+        plugin_agent=$(find "$HOME/.claude/plugins/cache" -path "*/nyx/*/agents/nyx.md" -o -path "*/nyx/agents/nyx.md" 2>/dev/null | head -1)
+
+        # Also check the source repo if it's a dev install
+        if [ -z "$plugin_agent" ]; then
+            for dev_path in \
+                "$HOME/projects/cc-plugins/plugins/nyx/agents/nyx.md" \
+                "$HOME/cc-plugins/plugins/nyx/agents/nyx.md"; do
+                if [ -f "$dev_path" ]; then
+                    plugin_agent="$dev_path"
+                    break
+                fi
+            done
+        fi
 
         if [ -n "$plugin_agent" ]; then
             cp "$plugin_agent" .claude/agents/nyx.md
-            echo "Copied agent file from plugin cache."
+            echo "Copied agent file from: $plugin_agent"
         else
-            echo "Warning: Could not find nyx agent file in plugin cache."
-            echo "Run 'claude plugin install' to install the nyx plugin first,"
-            echo "then run 'nyx --setup' to complete setup."
-            echo ""
-            echo "Or manually copy agents/nyx.md from the nyx plugin to:"
+            echo "Warning: Could not find nyx agent file."
+            echo "Copy agents/nyx.md from the nyx plugin to:"
             echo "  $NYX_HOME/.claude/agents/nyx.md"
         fi
     fi
