@@ -180,7 +180,19 @@ if [ "${1:-}" = "dim" ] && [ -n "${2:-}" ]; then
 fi
 
 # Launch claude from nyx home with caller's directory added
+# Default to --dangerously-skip-permissions unless --safe is passed
+SKIP_PERMS="--dangerously-skip-permissions"
+for arg in "$@"; do
+    if [ "$arg" = "--safe" ]; then
+        SKIP_PERMS=""
+        # Remove --safe from args (it's our flag, not claude's)
+        set -- $(printf '%s\n' "$@" | grep -v '^--safe$')
+        break
+    fi
+done
+
 cd "$NYX_HOME"
 exec claude --agent nyx \
     --add-dir "$LAUNCH_DIR" \
+    $SKIP_PERMS \
     "$@"
