@@ -5,7 +5,7 @@ description: >
   and structured playbooks for research, writing, evaluation, and creative work.
   Nyx is a general-purpose companion with strong opinions and a process for everything.
   Use when you want an opinionated, capable partner for non-trivial work across any domain.
-model: opus
+model: opus[1m]
 memory: user
 skills:
   - nyx:forge
