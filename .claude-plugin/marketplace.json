@@ -45,13 +45,6 @@
       "description": "Conversational blog post creator that interviews you about your topic, captures your writing voice, drafts in your style, strips AI tells, and publishes as markdown or HTML.",
       "category": "content",
       "tags": ["blog", "writing", "content", "voice", "de-ai", "markdown", "html"]
-    },
-    {
-      "name": "nyx",
-      "source": "./plugins/nyx",
-      "description": "Personal agent with persistent memory, dimensional context management, and structured playbooks for research, writing, evaluation, and creative work. Sharp, opinionated, non-sycophantic companion with process for everything.",
-      "category": "productivity",
-      "tags": ["agent", "persona", "research", "writing", "evaluation", "memory", "dimensions", "playbooks"]
     }
   ]
 }
