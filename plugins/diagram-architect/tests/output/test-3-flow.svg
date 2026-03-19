@@ -1,0 +1,260 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 600" role="img" style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, sans-serif; background: #FAFBFC;">
+  <title>CI/CD Pipeline</title>
+  <desc>CI/CD pipeline flow diagram showing Code Push through Build, Unit Tests, Integration Tests, Deploy to Staging, Smoke Tests, and Deploy to Production, with pass/fail decision points at each test stage.</desc>
+
+  <defs>
+    <!-- Gradients -->
+    <linearGradient id="blueGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#0065FF;stop-opacity:1"/>
+      <stop offset="100%" style="stop-color:#0747A6;stop-opacity:1"/>
+    </linearGradient>
+    <linearGradient id="greenGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#00A76F;stop-opacity:1"/>
+      <stop offset="100%" style="stop-color:#006644;stop-opacity:1"/>
+    </linearGradient>
+    <linearGradient id="purpleGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#8777D9;stop-opacity:1"/>
+      <stop offset="100%" style="stop-color:#5243AA;stop-opacity:1"/>
+    </linearGradient>
+    <linearGradient id="redGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#FF5630;stop-opacity:1"/>
+      <stop offset="100%" style="stop-color:#BF2600;stop-opacity:1"/>
+    </linearGradient>
+
+    <!-- Drop shadow filter -->
+    <filter id="dropShadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="3" stdDeviation="6" flood-color="#172B4D" flood-opacity="0.12"/>
+    </filter>
+
+    <!-- Arrowhead marker -->
+    <marker id="arrowHead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#0052CC"/>
+    </marker>
+
+    <!-- Arrowhead marker for fail paths (red) -->
+    <marker id="arrowHeadFail" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#FF5630"/>
+    </marker>
+
+    <!-- Arrowhead marker for retry paths -->
+    <marker id="arrowHeadRetry" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#0052CC"/>
+    </marker>
+  </defs>
+
+  <!-- ============================================================
+       BACKGROUND
+       ============================================================ -->
+  <rect width="1600" height="600" fill="#FAFBFC"/>
+
+  <!-- ============================================================
+       TITLE
+       ============================================================ -->
+  <text x="40" y="52" font-size="32" font-weight="700" fill="#172B4D" letter-spacing="-0.5">CI/CD Pipeline</text>
+
+  <!-- ============================================================
+       LAYOUT PLAN (main flow y=200, center of shapes)
+       Step widths: 110px, diamonds: 80px wide / 52px half-height
+       Horizontal spacing designed to fit 1600px
+
+       Positions (center x):
+         1. Code Push     : rect  cx=75   (x=20,  w=110)
+         2. Build         : rect  cx=245  (x=190, w=110)
+         3. Unit Tests    : diamond cx=410
+         4. Integration T : diamond cx=590
+         5. Deploy Staging: rect  cx=780  (x=725, w=110)
+         6. Smoke Tests   : diamond cx=960
+         7. Deploy Prod   : rect  cx=1130 (x=1075,w=110)
+
+       Decision diamonds are 100px wide, 64px tall (half=32)
+       Fail boxes at y=380 below each diamond
+       ============================================================ -->
+
+  <!-- ============================================================
+       STEP 1: Code Push  (cx=75, cy=200, w=110, h=52)
+       ============================================================ -->
+  <g filter="url(#dropShadow)">
+    <rect x="20" y="174" width="120" height="52" rx="10" fill="url(#blueGrad)"/>
+  </g>
+  <text x="80" y="197" font-size="14" font-weight="600" fill="white" text-anchor="middle">Code</text>
+  <text x="80" y="215" font-size="14" font-weight="600" fill="white" text-anchor="middle">Push</text>
+
+  <!-- Arrow 1→2 -->
+  <line x1="140" y1="200" x2="188" y2="200" stroke="#0052CC" stroke-width="2" marker-end="url(#arrowHead)"/>
+
+  <!-- ============================================================
+       STEP 2: Build  (cx=248, cy=200, w=120, h=52)
+       ============================================================ -->
+  <g filter="url(#dropShadow)">
+    <rect x="190" y="174" width="120" height="52" rx="10" fill="url(#blueGrad)"/>
+  </g>
+  <text x="250" y="204" font-size="14" font-weight="600" fill="white" text-anchor="middle">Build</text>
+
+  <!-- Arrow 2→3 -->
+  <line x1="310" y1="200" x2="358" y2="200" stroke="#0052CC" stroke-width="2" marker-end="url(#arrowHead)"/>
+
+  <!-- ============================================================
+       STEP 3: Unit Tests DIAMOND  (cx=410, cy=200, half-w=52, half-h=36)
+       Diamond points: top(410,164) right(462,200) bottom(410,236) left(358,200)
+       ============================================================ -->
+  <g filter="url(#dropShadow)">
+    <polygon points="410,164 466,200 410,236 354,200" fill="url(#purpleGrad)"/>
+  </g>
+  <text x="410" y="196" font-size="12" font-weight="600" fill="white" text-anchor="middle">Unit</text>
+  <text x="410" y="210" font-size="12" font-weight="600" fill="white" text-anchor="middle">Tests</text>
+
+  <!-- Arrow 3→4 (pass, right exit) -->
+  <line x1="466" y1="200" x2="514" y2="200" stroke="#0052CC" stroke-width="2" marker-end="url(#arrowHead)"/>
+  <text x="490" y="193" font-size="11" font-weight="600" fill="#00875A" text-anchor="middle">Pass</text>
+
+  <!-- Fail arrow down from Unit Tests diamond -->
+  <line x1="410" y1="236" x2="410" y2="368" stroke="#FF5630" stroke-width="2" stroke-dasharray="5,3" marker-end="url(#arrowHeadFail)"/>
+  <text x="422" y="310" font-size="11" font-weight="600" fill="#FF5630" text-anchor="start">Fail</text>
+
+  <!-- ============================================================
+       STEP 4: Integration Tests DIAMOND  (cx=566, cy=200)
+       Diamond points: top(566,164) right(622,200) bottom(566,236) left(510,200)
+       ============================================================ -->
+  <g filter="url(#dropShadow)">
+    <polygon points="566,164 626,200 566,236 506,200" fill="url(#purpleGrad)"/>
+  </g>
+  <text x="566" y="193" font-size="12" font-weight="600" fill="white" text-anchor="middle">Integration</text>
+  <text x="566" y="207" font-size="12" font-weight="600" fill="white" text-anchor="middle">Tests</text>
+
+  <!-- Arrow 4→5 (pass, right exit) -->
+  <line x1="626" y1="200" x2="682" y2="200" stroke="#0052CC" stroke-width="2" marker-end="url(#arrowHead)"/>
+  <text x="654" y="193" font-size="11" font-weight="600" fill="#00875A" text-anchor="middle">Pass</text>
+
+  <!-- Fail arrow down from Integration Tests diamond -->
+  <line x1="566" y1="236" x2="566" y2="368" stroke="#FF5630" stroke-width="2" stroke-dasharray="5,3" marker-end="url(#arrowHeadFail)"/>
+  <text x="578" y="310" font-size="11" font-weight="600" fill="#FF5630" text-anchor="start">Fail</text>
+
+  <!-- ============================================================
+       STEP 5: Deploy to Staging  (cx=742, cy=200, w=130, h=52)
+       ============================================================ -->
+  <g filter="url(#dropShadow)">
+    <rect x="684" y="174" width="130" height="52" rx="10" fill="url(#greenGrad)"/>
+  </g>
+  <text x="749" y="197" font-size="14" font-weight="600" fill="white" text-anchor="middle">Deploy to</text>
+  <text x="749" y="215" font-size="14" font-weight="600" fill="white" text-anchor="middle">Staging</text>
+
+  <!-- Arrow 5→6 -->
+  <line x1="814" y1="200" x2="864" y2="200" stroke="#0052CC" stroke-width="2" marker-end="url(#arrowHead)"/>
+
+  <!-- ============================================================
+       STEP 6: Smoke Tests DIAMOND  (cx=922, cy=200)
+       Diamond points: top(922,164) right(982,200) bottom(922,236) left(862,200)
+       ============================================================ -->
+  <g filter="url(#dropShadow)">
+    <polygon points="922,164 982,200 922,236 862,200" fill="url(#purpleGrad)"/>
+  </g>
+  <text x="922" y="196" font-size="12" font-weight="600" fill="white" text-anchor="middle">Smoke</text>
+  <text x="922" y="210" font-size="12" font-weight="600" fill="white" text-anchor="middle">Tests</text>
+
+  <!-- Arrow 6→7 (pass, right exit) -->
+  <line x1="982" y1="200" x2="1038" y2="200" stroke="#0052CC" stroke-width="2" marker-end="url(#arrowHead)"/>
+  <text x="1010" y="193" font-size="11" font-weight="600" fill="#00875A" text-anchor="middle">Pass</text>
+
+  <!-- Fail arrow down from Smoke Tests diamond -->
+  <line x1="922" y1="236" x2="922" y2="368" stroke="#FF5630" stroke-width="2" stroke-dasharray="5,3" marker-end="url(#arrowHeadFail)"/>
+  <text x="934" y="310" font-size="11" font-weight="600" fill="#FF5630" text-anchor="start">Fail</text>
+
+  <!-- ============================================================
+       STEP 7: Deploy to Production  (cx=1110, cy=200, w=140, h=52)
+       ============================================================ -->
+  <g filter="url(#dropShadow)">
+    <rect x="1040" y="174" width="140" height="52" rx="10" fill="url(#greenGrad)"/>
+  </g>
+  <text x="1110" y="197" font-size="14" font-weight="600" fill="white" text-anchor="middle">Deploy to</text>
+  <text x="1110" y="215" font-size="14" font-weight="600" fill="white" text-anchor="middle">Production</text>
+
+  <!-- ============================================================
+       FAIL PATHS — Fix & Retry boxes
+       Three fix boxes below their respective diamonds
+       ============================================================ -->
+
+  <!-- Fix & Retry box under Unit Tests (cx=410, y=370, w=120, h=44) -->
+  <g filter="url(#dropShadow)">
+    <rect x="350" y="370" width="120" height="44" rx="10" fill="url(#redGrad)"/>
+  </g>
+  <text x="410" y="388" font-size="12" font-weight="600" fill="white" text-anchor="middle">Fix &amp;</text>
+  <text x="410" y="404" font-size="12" font-weight="600" fill="white" text-anchor="middle">Retry</text>
+
+  <!-- Retry arrow: Fix box → back to Unit Tests diamond (left point at 354,200) -->
+  <!-- Goes left from fix box, then up to diamond left tip -->
+  <path d="M 350,392 L 310,392 L 310,200 L 354,200" fill="none" stroke="#0052CC" stroke-width="2" stroke-dasharray="5,3" marker-end="url(#arrowHeadRetry)"/>
+
+  <!-- Fix & Retry box under Integration Tests (cx=566, y=370, w=130, h=44) -->
+  <g filter="url(#dropShadow)">
+    <rect x="501" y="370" width="130" height="44" rx="10" fill="url(#redGrad)"/>
+  </g>
+  <text x="566" y="388" font-size="12" font-weight="600" fill="white" text-anchor="middle">Fix &amp;</text>
+  <text x="566" y="404" font-size="12" font-weight="600" fill="white" text-anchor="middle">Retry</text>
+
+  <!-- Retry arrow: Fix box → back to Integration Tests diamond left point at 506,200 -->
+  <path d="M 501,392 L 470,392 L 470,222 L 506,222" fill="none" stroke="#0052CC" stroke-width="2" stroke-dasharray="5,3" marker-end="url(#arrowHeadRetry)"/>
+  <!-- Note: left side of integration diamond at 506,200; approach from below-left -->
+
+  <!-- Fix & Retry box under Smoke Tests (cx=922, y=370, w=120, h=44) -->
+  <g filter="url(#dropShadow)">
+    <rect x="862" y="370" width="120" height="44" rx="10" fill="url(#redGrad)"/>
+  </g>
+  <text x="922" y="388" font-size="12" font-weight="600" fill="white" text-anchor="middle">Fix &amp;</text>
+  <text x="922" y="404" font-size="12" font-weight="600" fill="white" text-anchor="middle">Retry</text>
+
+  <!-- Retry arrow: Fix box → back to Smoke Tests diamond left at 862,200 -->
+  <path d="M 862,392 L 830,392 L 830,200 L 862,200" fill="none" stroke="#0052CC" stroke-width="2" stroke-dasharray="5,3" marker-end="url(#arrowHeadRetry)"/>
+
+  <!-- ============================================================
+       LEGEND
+       ============================================================ -->
+  <g transform="translate(1240, 150)">
+    <text x="0" y="0" font-size="13" font-weight="700" fill="#172B4D">Legend</text>
+    <!-- Process step -->
+    <rect x="0" y="12" width="24" height="16" rx="4" fill="url(#blueGrad)"/>
+    <text x="32" y="25" font-size="12" fill="#42526E">Process Step</text>
+    <!-- Deploy step -->
+    <rect x="0" y="36" width="24" height="16" rx="4" fill="url(#greenGrad)"/>
+    <text x="32" y="49" font-size="12" fill="#42526E">Deploy Step</text>
+    <!-- Decision point -->
+    <polygon points="12,58 22,68 12,78 2,68" fill="url(#purpleGrad)"/>
+    <text x="32" y="73" font-size="12" fill="#42526E">Test Decision</text>
+    <!-- Fail path -->
+    <line x1="0" y1="92" x2="24" y2="92" stroke="#FF5630" stroke-width="2" stroke-dasharray="5,3"/>
+    <text x="32" y="96" font-size="12" fill="#42526E">Fail Path</text>
+    <!-- Pass path -->
+    <line x1="0" y1="112" x2="24" y2="112" stroke="#0052CC" stroke-width="2"/>
+    <text x="32" y="116" font-size="12" fill="#42526E">Pass / Flow</text>
+  </g>
+
+  <!-- ============================================================
+       STEP LABELS / SEQUENCE NUMBERS (small chips above each node)
+       ============================================================ -->
+  <text x="80"   y="160" font-size="11" fill="#6B778C" text-anchor="middle" font-weight="500">1</text>
+  <text x="250"  y="160" font-size="11" fill="#6B778C" text-anchor="middle" font-weight="500">2</text>
+  <text x="410"  y="155" font-size="11" fill="#6B778C" text-anchor="middle" font-weight="500">3</text>
+  <text x="566"  y="155" font-size="11" fill="#6B778C" text-anchor="middle" font-weight="500">4</text>
+  <text x="749"  y="160" font-size="11" fill="#6B778C" text-anchor="middle" font-weight="500">5</text>
+  <text x="922"  y="155" font-size="11" fill="#6B778C" text-anchor="middle" font-weight="500">6</text>
+  <text x="1110" y="160" font-size="11" fill="#6B778C" text-anchor="middle" font-weight="500">7</text>
+
+  <!-- ============================================================
+       SUCCESS BADGE at end
+       ============================================================ -->
+  <g transform="translate(1200, 174)">
+    <rect width="90" height="52" rx="26" fill="#E3FCEF" stroke="#00875A" stroke-width="2"/>
+    <text x="45" y="22" font-size="20" text-anchor="middle">&#x2713;</text>
+    <text x="45" y="40" font-size="11" font-weight="600" fill="#006644" text-anchor="middle">Released</text>
+  </g>
+  <!-- Arrow from Deploy Prod → Released badge -->
+  <line x1="1180" y1="200" x2="1199" y2="200" stroke="#0052CC" stroke-width="2" marker-end="url(#arrowHead)"/>
+
+  <!-- ============================================================
+       SUBTITLE / METADATA ROW
+       ============================================================ -->
+  <text x="40" y="88" font-size="13" fill="#6B778C">
+    Automated pipeline with test gates · Decision points enforce quality at each stage
+  </text>
+  <line x1="40" y1="100" x2="1560" y2="100" stroke="#DFE1E6" stroke-width="1"/>
+
+</svg>

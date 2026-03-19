@@ -1,0 +1,325 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1400 800" role="img"
+     style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background: #FAFBFC;">
+
+  <title>Application Architecture</title>
+  <desc>3-layer architecture diagram showing Frontend (React SPA), API Gateway (Kong), and Backend Services (Auth Service, User Service, Payment Service)</desc>
+
+  <!-- Gradient Definitions -->
+  <defs>
+    <!-- Frontend gradient: prodBlue -->
+    <linearGradient id="prodBlue" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#4C9AFF"/>
+      <stop offset="100%" stop-color="#2684FF"/>
+    </linearGradient>
+
+    <!-- Gateway gradient: prodTeal -->
+    <linearGradient id="prodTeal" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#4DD0E1"/>
+      <stop offset="100%" stop-color="#00B8D9"/>
+    </linearGradient>
+
+    <!-- Backend gradient: blueGrad -->
+    <linearGradient id="blueGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0065FF"/>
+      <stop offset="100%" stop-color="#0747A6"/>
+    </linearGradient>
+
+    <!-- Drop shadow filter -->
+    <filter id="shadow" x="-10%" y="-10%" width="120%" height="130%">
+      <feDropShadow dx="0" dy="3" stdDeviation="6" flood-color="#172B4D" flood-opacity="0.12"/>
+    </filter>
+
+    <!-- Lighter shadow for containers -->
+    <filter id="shadowLight" x="-5%" y="-5%" width="110%" height="120%">
+      <feDropShadow dx="0" dy="2" stdDeviation="4" flood-color="#172B4D" flood-opacity="0.07"/>
+    </filter>
+
+    <!-- Arrowhead marker -->
+    <marker id="arrowDown" markerWidth="10" markerHeight="10" refX="5" refY="9" orient="auto">
+      <path d="M2,2 L5,9 L8,2" fill="none" stroke="#172B4D" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+    </marker>
+    <marker id="arrowDownBlue" markerWidth="10" markerHeight="10" refX="5" refY="9" orient="auto">
+      <path d="M2,2 L5,9 L8,2" fill="none" stroke="#2684FF" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+    </marker>
+  </defs>
+
+  <!-- Page background -->
+  <rect width="1400" height="800" fill="#FAFBFC"/>
+
+  <!-- ─────────────────────────────────────────── -->
+  <!-- TITLE                                       -->
+  <!-- ─────────────────────────────────────────── -->
+  <text x="700" y="52" text-anchor="middle"
+        font-size="32" font-weight="700" fill="#172B4D" letter-spacing="-0.5">
+    Application Architecture
+  </text>
+
+  <!-- ─────────────────────────────────────────── -->
+  <!-- LAYER 1: FRONTEND  (y=80..230)             -->
+  <!-- ─────────────────────────────────────────── -->
+
+  <!-- Layer container -->
+  <rect x="60" y="80" width="1280" height="150"
+        rx="10" ry="10"
+        fill="#E8F0FE" stroke="#DFE1E6" stroke-width="1"
+        filter="url(#shadowLight)"/>
+
+  <!-- Layer label -->
+  <text x="85" y="103" font-size="11" font-weight="600"
+        fill="#172B4D" opacity="0.5" letter-spacing="1" text-transform="uppercase">
+    FRONTEND LAYER
+  </text>
+
+  <!-- React SPA box -->
+  <rect x="440" y="112" width="520" height="100"
+        rx="10" ry="10"
+        fill="url(#prodBlue)"
+        filter="url(#shadow)"/>
+
+  <!-- Box title -->
+  <text x="700" y="148" text-anchor="middle"
+        font-size="18" font-weight="600" fill="white">
+    React SPA
+  </text>
+
+  <!-- Box description -->
+  <text x="700" y="172" text-anchor="middle"
+        font-size="13" font-weight="400" fill="white" opacity="0.85">
+    Single-page application served via CDN
+  </text>
+
+  <!-- Tech badge -->
+  <rect x="616" y="186" width="168" height="18" rx="9" fill="rgba(255,255,255,0.18)"/>
+  <text x="700" y="199" text-anchor="middle"
+        font-size="11" font-weight="500" fill="white" opacity="0.9">
+    React 18  ·  TypeScript  ·  Vite
+  </text>
+
+  <!-- ─────────────────────────────────────────── -->
+  <!-- ARROW: Frontend → Gateway                  -->
+  <!-- ─────────────────────────────────────────── -->
+  <line x1="700" y1="232" x2="700" y2="278"
+        stroke="#172B4D" stroke-width="2" stroke-dasharray="0"
+        marker-end="url(#arrowDown)" opacity="0.35"/>
+  <text x="715" y="259" font-size="11" fill="#172B4D" opacity="0.5" font-weight="500">
+    HTTPS / REST
+  </text>
+
+  <!-- ─────────────────────────────────────────── -->
+  <!-- LAYER 2: API GATEWAY  (y=280..430)         -->
+  <!-- ─────────────────────────────────────────── -->
+
+  <!-- Layer container -->
+  <rect x="60" y="280" width="1280" height="150"
+        rx="10" ry="10"
+        fill="#E0F7FA" stroke="#DFE1E6" stroke-width="1"
+        filter="url(#shadowLight)"/>
+
+  <!-- Layer label -->
+  <text x="85" y="303" font-size="11" font-weight="600"
+        fill="#172B4D" opacity="0.5" letter-spacing="1">
+    API GATEWAY LAYER
+  </text>
+
+  <!-- Kong Gateway box -->
+  <rect x="440" y="312" width="520" height="100"
+        rx="10" ry="10"
+        fill="url(#prodTeal)"
+        filter="url(#shadow)"/>
+
+  <text x="700" y="348" text-anchor="middle"
+        font-size="18" font-weight="600" fill="white">
+    API Gateway — Kong
+  </text>
+
+  <text x="700" y="372" text-anchor="middle"
+        font-size="13" font-weight="400" fill="white" opacity="0.85">
+    Routing, auth, rate-limiting, SSL termination
+  </text>
+
+  <rect x="596" y="386" width="208" height="18" rx="9" fill="rgba(255,255,255,0.18)"/>
+  <text x="700" y="399" text-anchor="middle"
+        font-size="11" font-weight="500" fill="white" opacity="0.9">
+    Kong Gateway  ·  Lua plugins  ·  Kubernetes
+  </text>
+
+  <!-- ─────────────────────────────────────────── -->
+  <!-- ARROW: Gateway → Backend                   -->
+  <!-- ─────────────────────────────────────────── -->
+  <line x1="700" y1="432" x2="700" y2="478"
+        stroke="#172B4D" stroke-width="2"
+        marker-end="url(#arrowDown)" opacity="0.35"/>
+  <text x="715" y="459" font-size="11" fill="#172B4D" opacity="0.5" font-weight="500">
+    Internal gRPC / HTTP
+  </text>
+
+  <!-- ─────────────────────────────────────────── -->
+  <!-- LAYER 3: BACKEND  (y=480..660)             -->
+  <!-- ─────────────────────────────────────────── -->
+
+  <!-- Layer container -->
+  <rect x="60" y="480" width="1280" height="185"
+        rx="10" ry="10"
+        fill="#E3EDF7" stroke="#DFE1E6" stroke-width="1"
+        filter="url(#shadowLight)"/>
+
+  <!-- Layer label -->
+  <text x="85" y="503" font-size="11" font-weight="600"
+        fill="#172B4D" opacity="0.5" letter-spacing="1">
+    BACKEND SERVICES LAYER
+  </text>
+
+  <!-- ── Auth Service ── -->
+  <rect x="100" y="514" width="360" height="130"
+        rx="10" ry="10"
+        fill="url(#blueGrad)"
+        filter="url(#shadow)"/>
+
+  <text x="280" y="553" text-anchor="middle"
+        font-size="18" font-weight="600" fill="white">
+    Auth Service
+  </text>
+
+  <text x="280" y="576" text-anchor="middle"
+        font-size="13" font-weight="400" fill="white" opacity="0.85">
+    Identity &amp; access management
+  </text>
+
+  <rect x="192" y="591" width="176" height="18" rx="9" fill="rgba(255,255,255,0.15)"/>
+  <text x="280" y="604" text-anchor="middle"
+        font-size="11" font-weight="500" fill="white" opacity="0.9">
+    Node.js  ·  JWT  ·  OAuth2
+  </text>
+
+  <rect x="192" y="614" width="176" height="22" rx="11" fill="rgba(255,255,255,0.1)"/>
+  <text x="280" y="630" text-anchor="middle"
+        font-size="11" font-weight="500" fill="white" opacity="0.8">
+    port 8081
+  </text>
+
+  <!-- ── User Service ── -->
+  <rect x="520" y="514" width="360" height="130"
+        rx="10" ry="10"
+        fill="url(#blueGrad)"
+        filter="url(#shadow)"/>
+
+  <text x="700" y="553" text-anchor="middle"
+        font-size="18" font-weight="600" fill="white">
+    User Service
+  </text>
+
+  <text x="700" y="576" text-anchor="middle"
+        font-size="13" font-weight="400" fill="white" opacity="0.85">
+    User profiles &amp; preferences
+  </text>
+
+  <rect x="612" y="591" width="176" height="18" rx="9" fill="rgba(255,255,255,0.15)"/>
+  <text x="700" y="604" text-anchor="middle"
+        font-size="11" font-weight="500" fill="white" opacity="0.9">
+    Go  ·  PostgreSQL  ·  Redis
+  </text>
+
+  <rect x="612" y="614" width="176" height="22" rx="11" fill="rgba(255,255,255,0.1)"/>
+  <text x="700" y="630" text-anchor="middle"
+        font-size="11" font-weight="500" fill="white" opacity="0.8">
+    port 8082
+  </text>
+
+  <!-- ── Payment Service ── -->
+  <rect x="940" y="514" width="360" height="130"
+        rx="10" ry="10"
+        fill="url(#blueGrad)"
+        filter="url(#shadow)"/>
+
+  <text x="1120" y="553" text-anchor="middle"
+        font-size="18" font-weight="600" fill="white">
+    Payment Service
+  </text>
+
+  <text x="1120" y="576" text-anchor="middle"
+        font-size="13" font-weight="400" fill="white" opacity="0.85">
+    Transactions &amp; billing
+  </text>
+
+  <rect x="1032" y="591" width="176" height="18" rx="9" fill="rgba(255,255,255,0.15)"/>
+  <text x="1120" y="604" text-anchor="middle"
+        font-size="11" font-weight="500" fill="white" opacity="0.9">
+    Java  ·  Stripe API  ·  MySQL
+  </text>
+
+  <rect x="1032" y="614" width="176" height="22" rx="11" fill="rgba(255,255,255,0.1)"/>
+  <text x="1120" y="630" text-anchor="middle"
+        font-size="11" font-weight="500" fill="white" opacity="0.8">
+    port 8083
+  </text>
+
+  <!-- ─────────────────────────────────────────── -->
+  <!-- GATEWAY → BACKEND fan-out arrows           -->
+  <!-- ─────────────────────────────────────────── -->
+
+  <!-- Gateway bottom-center to fan line -->
+  <line x1="700" y1="432" x2="700" y2="466"
+        stroke="#172B4D" stroke-width="1.5" opacity="0.25"/>
+
+  <!-- Horizontal fan bar -->
+  <line x1="280" y1="466" x2="1120" y2="466"
+        stroke="#172B4D" stroke-width="1.5" opacity="0.25"/>
+
+  <!-- Down to Auth -->
+  <line x1="280" y1="466" x2="280" y2="514"
+        stroke="#172B4D" stroke-width="1.5"
+        marker-end="url(#arrowDown)" opacity="0.3"/>
+
+  <!-- Down to User (straight through center) -->
+  <line x1="700" y1="466" x2="700" y2="514"
+        stroke="#172B4D" stroke-width="1.5"
+        marker-end="url(#arrowDown)" opacity="0.3"/>
+
+  <!-- Down to Payment -->
+  <line x1="1120" y1="466" x2="1120" y2="514"
+        stroke="#172B4D" stroke-width="1.5"
+        marker-end="url(#arrowDown)" opacity="0.3"/>
+
+  <!-- ─────────────────────────────────────────── -->
+  <!-- LEGEND                                      -->
+  <!-- ─────────────────────────────────────────── -->
+  <rect x="60" y="682" width="1280" height="88"
+        rx="10" ry="10"
+        fill="white" stroke="#DFE1E6" stroke-width="1"
+        filter="url(#shadowLight)"/>
+
+  <text x="85" y="704" font-size="11" font-weight="700"
+        fill="#172B4D" opacity="0.6" letter-spacing="1">
+    LEGEND
+  </text>
+
+  <!-- Legend item: Frontend -->
+  <rect x="85" y="715" width="28" height="16" rx="4" fill="url(#prodBlue)"/>
+  <text x="121" y="728" font-size="13" fill="#172B4D" font-weight="500">Frontend Layer</text>
+
+  <!-- Legend item: Gateway -->
+  <rect x="285" y="715" width="28" height="16" rx="4" fill="url(#prodTeal)"/>
+  <text x="321" y="728" font-size="13" fill="#172B4D" font-weight="500">API Gateway Layer</text>
+
+  <!-- Legend item: Backend -->
+  <rect x="510" y="715" width="28" height="16" rx="4" fill="url(#blueGrad)"/>
+  <text x="546" y="728" font-size="13" fill="#172B4D" font-weight="500">Backend Services</text>
+
+  <!-- Legend item: Arrow -->
+  <line x1="735" y1="723" x2="760" y2="723"
+        stroke="#172B4D" stroke-width="2" opacity="0.4"
+        marker-end="url(#arrowDown)"/>
+  <text x="770" y="728" font-size="13" fill="#172B4D" font-weight="500" opacity="0.7">Data flow</text>
+
+  <!-- Legend item: Dashed = external -->
+  <line x1="870" y1="723" x2="905" y2="723"
+        stroke="#172B4D" stroke-width="2" stroke-dasharray="4,3" opacity="0.4"/>
+  <text x="915" y="728" font-size="13" fill="#172B4D" font-weight="500" opacity="0.7">Internal network</text>
+
+  <!-- Version / metadata -->
+  <text x="1320" y="756" text-anchor="end"
+        font-size="11" fill="#172B4D" opacity="0.35">
+    Generated by diagram-architect
+  </text>
+
+</svg>

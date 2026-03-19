@@ -35,6 +35,34 @@ Every generated diagram follows this structure:
 - Complex (16+ elements): Split into multiple diagrams or raise abstraction level
 - If boxes overlap or text gets truncated, the diagram is too dense — simplify
 
+## CRITICAL: Common SVG Mistakes to Avoid
+
+These mistakes appear frequently and MUST be avoided:
+
+1. **DO NOT use CSS `style` attribute on `<svg>`**. Use SVG attributes directly:
+   - WRONG: `<svg style="font-family: ...; background: #FAFBFC">`
+   - RIGHT: `<svg font-family="..." >` + `<rect fill="#FAFBFC"/>` for background
+   - CSS `background` does not work when SVG is used as `<img>` source
+
+2. **DO NOT use `rgba()` in SVG fill/stroke attributes**. Use separate opacity:
+   - WRONG: `fill="rgba(255,255,255,0.18)"`
+   - RIGHT: `fill="white" fill-opacity="0.18"`
+
+3. **DO NOT make diagonal gradients** unless intentional:
+   - WRONG: `<linearGradient x1="0%" y1="0%" x2="100%" y2="100%">`
+   - RIGHT: `<linearGradient x1="0%" y1="0%" x2="0%" y2="100%">` (top-to-bottom)
+
+4. **DO NOT use V-shaped arrowheads** (open chevrons). Use filled triangles:
+   - WRONG: `<path d="M2,2 L5,9 L8,2" fill="none" stroke="#172B4D"/>`
+   - RIGHT: `<path d="M0,0 L12,4 L0,8 L3,4 Z" fill="#0052CC"/>`
+
+5. **ALWAYS include `aria-labelledby="diagramTitle diagramDesc"`** on the `<svg>` element
+
+6. **ALWAYS use the background `<rect>`**, not CSS background:
+   - `<rect width="{width}" height="{height}" fill="#FAFBFC"/>` as first child after `<defs>`
+
+7. **DO NOT use `text-transform` as an SVG attribute** — it's CSS-only. Just write the text in uppercase.
+
 **Standard canvas sizes:**
 - Architecture overview: `viewBox="0 0 1400 1000"`
 - Flow diagram: `viewBox="0 0 1600 800"`
@@ -146,11 +174,31 @@ Three levels of elevation:
 
 ## Arrow Markers
 
+**IMPORTANT: Arrowheads must be FILLED triangles, not open V-shapes.** Copy these exactly:
+
 ```xml
+<!-- Standard blue arrowhead — use this as the default -->
 <marker id="arrowHead" markerWidth="12" markerHeight="8" refX="6" refY="4" orient="auto">
   <path d="M0,0 L12,4 L0,8 L3,4 Z" fill="#0052CC"/>
 </marker>
+
+<!-- Grey arrowhead — for neutral/secondary arrows -->
+<marker id="arrowGray" markerWidth="12" markerHeight="8" refX="6" refY="4" orient="auto">
+  <path d="M0,0 L12,4 L0,8 L3,4 Z" fill="#505F79"/>
+</marker>
+
+<!-- Green arrowhead — for success/admin paths -->
+<marker id="arrowGreen" markerWidth="12" markerHeight="8" refX="6" refY="4" orient="auto">
+  <path d="M0,0 L12,4 L0,8 L3,4 Z" fill="#006644"/>
+</marker>
+
+<!-- Red arrowhead — for error/threat paths -->
+<marker id="arrowRed" markerWidth="12" markerHeight="8" refX="6" refY="4" orient="auto">
+  <path d="M0,0 L12,4 L0,8 L3,4 Z" fill="#DE350B"/>
+</marker>
 ```
+
+The path `M0,0 L12,4 L0,8 L3,4 Z` draws a filled diamond-tipped arrow. Do NOT use `fill="none" stroke="..."` — that creates an open chevron which looks unprofessional.
 
 Create colour variants by duplicating with different `fill` values. Apply via `marker-end="url(#arrowHead)"` on `<line>` or `<path>` elements.
 

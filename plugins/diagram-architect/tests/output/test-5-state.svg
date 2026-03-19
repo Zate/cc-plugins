@@ -1,0 +1,252 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 700" role="img"
+     style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background: #FAFBFC;">
+
+  <title>Order Lifecycle</title>
+  <desc>Order lifecycle state machine showing the happy path from Created through Confirmed, Processing, Shipped to Delivered, with error branches to Cancelled and Failed, and a retry loop from Failed back to Processing.</desc>
+
+  <!-- ═══════════════════════════════════════════════════════
+       DEFS: Gradients, Filters, Arrowhead Markers
+  ═══════════════════════════════════════════════════════ -->
+  <defs>
+
+    <!-- Blue gradient: normal states -->
+    <linearGradient id="blueGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#0065FF;stop-opacity:1"/>
+      <stop offset="100%" style="stop-color:#0747A6;stop-opacity:1"/>
+    </linearGradient>
+
+    <!-- Green gradient: Delivered (success terminal) -->
+    <linearGradient id="greenGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#00A76F;stop-opacity:1"/>
+      <stop offset="100%" style="stop-color:#006644;stop-opacity:1"/>
+    </linearGradient>
+
+    <!-- Red gradient: Cancelled / Failed (error states) -->
+    <linearGradient id="redGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#FF6B6B;stop-opacity:1"/>
+      <stop offset="100%" style="stop-color:#DE350B;stop-opacity:1"/>
+    </linearGradient>
+
+    <!-- Drop-shadow filter -->
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="3" stdDeviation="6"
+                    flood-color="#172B4D" flood-opacity="0.12"/>
+    </filter>
+
+    <!-- Arrowhead for normal (blue/grey) transitions -->
+    <marker id="arrow" markerWidth="10" markerHeight="7"
+            refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#505F79"/>
+    </marker>
+
+    <!-- Arrowhead for error (red) transitions -->
+    <marker id="arrow-red" markerWidth="10" markerHeight="7"
+            refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#DE350B"/>
+    </marker>
+
+    <!-- Arrowhead for retry (green-ish) transition -->
+    <marker id="arrow-retry" markerWidth="10" markerHeight="7"
+            refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#00A76F"/>
+    </marker>
+
+  </defs>
+
+  <!-- ═══════════════════════════════════════════════════════
+       BACKGROUND PANEL
+  ═══════════════════════════════════════════════════════ -->
+  <rect x="0" y="0" width="1200" height="700" fill="#FAFBFC"/>
+
+  <!-- ═══════════════════════════════════════════════════════
+       TITLE
+  ═══════════════════════════════════════════════════════ -->
+  <text x="600" y="52" text-anchor="middle"
+        font-size="32" font-weight="700" fill="#172B4D">
+    Order Lifecycle
+  </text>
+
+  <!-- ═══════════════════════════════════════════════════════
+       LAYOUT PLAN
+       Happy path  (y=200):
+         Created   x=100  cx=180
+         Confirmed x=310  cx=390
+         Processing x=520  cx=600
+         Shipped   x=730  cx=810
+         Delivered x=940  cx=1020
+
+       Error branch (y=420):
+         Cancelled x=100  cx=180   (down from Created)
+         Failed    x=520  cx=600   (down from Processing)
+  ═══════════════════════════════════════════════════════ -->
+
+  <!-- ─────────────────────────────────────────────────────
+       TRANSITIONS  (drawn first so states sit on top)
+  ───────────────────────────────────────────────────── -->
+
+  <!-- Happy path straight arrows -->
+
+  <!-- Created → Confirmed -->
+  <path d="M 260 225 C 280 225, 290 225, 310 225"
+        fill="none" stroke="#505F79" stroke-width="2"
+        marker-end="url(#arrow)"/>
+  <text x="285" y="216" text-anchor="middle"
+        font-size="11" font-weight="500" fill="#505F79">confirm</text>
+
+  <!-- Confirmed → Processing -->
+  <path d="M 470 225 C 490 225, 500 225, 520 225"
+        fill="none" stroke="#505F79" stroke-width="2"
+        marker-end="url(#arrow)"/>
+  <text x="495" y="216" text-anchor="middle"
+        font-size="11" font-weight="500" fill="#505F79">process</text>
+
+  <!-- Processing → Shipped -->
+  <path d="M 680 225 C 700 225, 710 225, 730 225"
+        fill="none" stroke="#505F79" stroke-width="2"
+        marker-end="url(#arrow)"/>
+  <text x="705" y="216" text-anchor="middle"
+        font-size="11" font-weight="500" fill="#505F79">ship</text>
+
+  <!-- Shipped → Delivered -->
+  <path d="M 890 225 C 910 225, 920 225, 940 225"
+        fill="none" stroke="#505F79" stroke-width="2"
+        marker-end="url(#arrow)"/>
+  <text x="915" y="216" text-anchor="middle"
+        font-size="11" font-weight="500" fill="#505F79">deliver</text>
+
+  <!-- Created → Cancelled  (curve down-left) -->
+  <path d="M 180 250 C 180 330, 180 360, 180 420"
+        fill="none" stroke="#DE350B" stroke-width="2"
+        marker-end="url(#arrow-red)"/>
+  <text x="148" y="338" text-anchor="middle"
+        font-size="11" font-weight="500" fill="#DE350B">cancel</text>
+
+  <!-- Processing → Failed  (curve down) -->
+  <path d="M 600 250 C 600 330, 600 360, 600 420"
+        fill="none" stroke="#DE350B" stroke-width="2"
+        marker-end="url(#arrow-red)"/>
+  <text x="568" y="338" text-anchor="middle"
+        font-size="11" font-weight="500" fill="#DE350B">fail</text>
+
+  <!-- Failed → Processing  (curved arc back up, offset to the right) -->
+  <path d="M 680 435 C 780 435, 780 225, 680 225"
+        fill="none" stroke="#00A76F" stroke-width="2" stroke-dasharray="6,3"
+        marker-end="url(#arrow-retry)"/>
+  <text x="768" y="334" text-anchor="middle"
+        font-size="11" font-weight="500" fill="#00875A">retry</text>
+
+  <!-- ─────────────────────────────────────────────────────
+       INITIAL STATE MARKER  →  Created
+  ───────────────────────────────────────────────────── -->
+  <!-- Black filled circle -->
+  <circle cx="60" cy="225" r="8" fill="#172B4D"/>
+  <!-- Arrow from initial dot to Created state -->
+  <path d="M 68 225 L 97 225"
+        fill="none" stroke="#172B4D" stroke-width="2"
+        marker-end="url(#arrow)"/>
+
+  <!-- ─────────────────────────────────────────────────────
+       STATES  — Happy Path  (y=200, height=50, rx=25)
+  ───────────────────────────────────────────────────── -->
+
+  <!-- Created  (blue, normal) -->
+  <g filter="url(#shadow)">
+    <rect x="100" y="200" width="160" height="50" rx="25"
+          fill="url(#blueGrad)"/>
+  </g>
+  <text x="180" y="231" text-anchor="middle"
+        font-size="14" font-weight="600" fill="white">Created</text>
+
+  <!-- Confirmed  (blue, normal) -->
+  <g filter="url(#shadow)">
+    <rect x="310" y="200" width="160" height="50" rx="25"
+          fill="url(#blueGrad)"/>
+  </g>
+  <text x="390" y="231" text-anchor="middle"
+        font-size="14" font-weight="600" fill="white">Confirmed</text>
+
+  <!-- Processing  (blue, normal) -->
+  <g filter="url(#shadow)">
+    <rect x="520" y="200" width="160" height="50" rx="25"
+          fill="url(#blueGrad)"/>
+  </g>
+  <text x="600" y="231" text-anchor="middle"
+        font-size="14" font-weight="600" fill="white">Processing</text>
+
+  <!-- Shipped  (blue, normal) -->
+  <g filter="url(#shadow)">
+    <rect x="730" y="200" width="160" height="50" rx="25"
+          fill="url(#blueGrad)"/>
+  </g>
+  <text x="810" y="231" text-anchor="middle"
+        font-size="14" font-weight="600" fill="white">Shipped</text>
+
+  <!-- Delivered  (green, success terminal — double border) -->
+  <g filter="url(#shadow)">
+    <rect x="940" y="200" width="160" height="50" rx="25"
+          fill="url(#greenGrad)"/>
+    <!-- Inner double-border ring -->
+    <rect x="946" y="206" width="148" height="38" rx="20"
+          fill="none" stroke="white" stroke-width="1.5" opacity="0.4"/>
+  </g>
+  <text x="1020" y="231" text-anchor="middle"
+        font-size="14" font-weight="600" fill="white">Delivered</text>
+
+  <!-- ─────────────────────────────────────────────────────
+       STATES  — Error Branch  (y=420)
+  ───────────────────────────────────────────────────── -->
+
+  <!-- Cancelled  (red, error terminal — double border) -->
+  <g filter="url(#shadow)">
+    <rect x="100" y="420" width="160" height="50" rx="25"
+          fill="url(#redGrad)"/>
+    <!-- Inner double-border ring -->
+    <rect x="106" y="426" width="148" height="38" rx="20"
+          fill="none" stroke="white" stroke-width="1.5" opacity="0.4"/>
+  </g>
+  <text x="180" y="451" text-anchor="middle"
+        font-size="14" font-weight="600" fill="white">Cancelled</text>
+
+  <!-- Failed  (red, error — NOT terminal, has retry out) -->
+  <g filter="url(#shadow)">
+    <rect x="520" y="420" width="160" height="50" rx="25"
+          fill="url(#redGrad)"/>
+  </g>
+  <text x="600" y="451" text-anchor="middle"
+        font-size="14" font-weight="600" fill="white">Failed</text>
+
+  <!-- ─────────────────────────────────────────────────────
+       LEGEND
+  ───────────────────────────────────────────────────── -->
+  <g transform="translate(30, 590)">
+    <!-- Legend box -->
+    <rect x="0" y="0" width="400" height="80" rx="8"
+          fill="white" stroke="#DFE1E6" stroke-width="1"/>
+
+    <!-- Blue swatch -->
+    <rect x="16" y="16" width="24" height="14" rx="4" fill="url(#blueGrad)"/>
+    <text x="48" y="28" font-size="11" fill="#505F79">Normal state</text>
+
+    <!-- Green swatch -->
+    <rect x="150" y="16" width="24" height="14" rx="4" fill="url(#greenGrad)"/>
+    <text x="182" y="28" font-size="11" fill="#505F79">Success terminal</text>
+
+    <!-- Red swatch -->
+    <rect x="16" y="48" width="24" height="14" rx="4" fill="url(#redGrad)"/>
+    <text x="48" y="60" font-size="11" fill="#505F79">Error state / terminal</text>
+
+    <!-- Retry line swatch -->
+    <line x1="150" y1="55" x2="174" y2="55" stroke="#00A76F" stroke-width="2" stroke-dasharray="5,2"/>
+    <polygon points="172,51 180,55 172,59" fill="#00A76F"/>
+    <text x="188" y="60" font-size="11" fill="#505F79">Retry transition</text>
+  </g>
+
+  <!-- ─────────────────────────────────────────────────────
+       SUBTITLE / CAPTION
+  ───────────────────────────────────────────────────── -->
+  <text x="600" y="96" text-anchor="middle"
+        font-size="13" font-weight="400" fill="#7A869A">
+    Happy path: Created &#x2192; Confirmed &#x2192; Processing &#x2192; Shipped &#x2192; Delivered
+  </text>
+
+</svg>

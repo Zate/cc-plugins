@@ -45,7 +45,7 @@ Consult `references/layout-patterns.md` for structural guidance and SVG construc
 
 ### 3. Generate the SVG
 
-Build the SVG using the design system in `references/svg-design-system.md`. Core principles:
+Build the SVG using the design system in `references/svg-design-system.md`. **Read the "Common SVG Mistakes" section first** — it lists the most frequent errors. Core principles:
 
 - **Always use `<defs>`** for gradients, shadows, markers — define once, reference everywhere
 - **System fonts** — `-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif`
