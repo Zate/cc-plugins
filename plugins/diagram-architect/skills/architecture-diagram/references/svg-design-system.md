@@ -8,7 +8,10 @@ Every generated diagram follows this structure:
 
 ```xml
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {width} {height}"
-     font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif">
+     font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif"
+     role="img" aria-labelledby="diagramTitle diagramDesc">
+  <title id="diagramTitle">{Diagram title — concise, descriptive}</title>
+  <desc id="diagramDesc">{1-2 sentence description of what the diagram shows}</desc>
   <defs>
     <!-- Gradients, shadows, markers, patterns, icons -->
   </defs>
@@ -19,6 +22,18 @@ Every generated diagram follows this structure:
   <!-- Content groups, ordered back-to-front -->
 </svg>
 ```
+
+**Accessibility requirements:**
+- Every SVG MUST include `role="img"`, `<title>`, and `<desc>` elements
+- `<title>` is the accessible name (screen readers announce this)
+- `<desc>` provides context for non-visual users
+- Text on dark backgrounds must meet WCAG AA contrast (4.5:1 for normal text, 3:1 for large text). White text on the gradient fills (#0065FF, #006644, #5243AA) meets this.
+
+**Complexity guidance:**
+- Simple (3-6 elements): Use compact canvas (1000x600)
+- Medium (7-15 elements): Use standard canvas (1400x1000)
+- Complex (16+ elements): Split into multiple diagrams or raise abstraction level
+- If boxes overlap or text gets truncated, the diagram is too dense — simplify
 
 **Standard canvas sizes:**
 - Architecture overview: `viewBox="0 0 1400 1000"`

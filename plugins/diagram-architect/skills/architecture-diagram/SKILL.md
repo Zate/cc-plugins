@@ -93,6 +93,23 @@ Match to the organisation or context. If no brand context, use a professional bl
 - **`references/layout-patterns.md`** — Structural patterns for 12+ diagram types with SVG construction guidance
 - **`assets/svg-components.svg`** — Reusable SVG `<defs>` block (gradients, shadows, markers, icons)
 
+## Required Elements
+
+Every SVG must include:
+- `role="img"` on the root `<svg>` element
+- `<title>` with a concise diagram name
+- `<desc>` with a 1-2 sentence description
+- These are accessibility requirements, not optional
+
+## Complexity Check
+
+Before generating, estimate element count:
+- **3-6 elements**: Generate directly, compact canvas
+- **7-15 elements**: Standard canvas, group related elements
+- **16+ elements**: Ask the user — should we split this into multiple diagrams or raise the abstraction level?
+
+If text is getting truncated or boxes overlap, the diagram is too dense. Simplify before adding detail.
+
 ## Anti-Patterns
 
 - **Do not** default to layered-architecture for everything — choose the diagram type that fits the content
