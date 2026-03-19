@@ -1,0 +1,174 @@
+<!--
+  SVG Components Library
+  Copy relevant <defs> into generated diagrams.
+  Do NOT reference this file directly — it is a source of reusable fragments.
+-->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <defs>
+
+    <!-- ======== GRADIENTS ======== -->
+
+    <!-- Primary blue (main content boxes, pillars) -->
+    <linearGradient id="blueGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#0065FF"/>
+      <stop offset="100%" stop-color="#0747A6"/>
+    </linearGradient>
+
+    <!-- Green (admin/user elements) -->
+    <linearGradient id="greenGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#00A76F"/>
+      <stop offset="100%" stop-color="#006644"/>
+    </linearGradient>
+
+    <!-- Purple (observability/monitoring) -->
+    <linearGradient id="purpleGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#8777D9"/>
+      <stop offset="100%" stop-color="#5243AA"/>
+    </linearGradient>
+
+    <!-- Red (error/deny/warning) -->
+    <linearGradient id="redGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#FF6B6B"/>
+      <stop offset="100%" stop-color="#DE350B"/>
+    </linearGradient>
+
+    <!-- Container background -->
+    <linearGradient id="platGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#F4F7FC"/>
+      <stop offset="100%" stop-color="#E9EFF8"/>
+    </linearGradient>
+
+    <!-- Green container (admin experience) -->
+    <linearGradient id="adminExpGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#E3FCEF"/>
+      <stop offset="100%" stop-color="#D4F5E3"/>
+    </linearGradient>
+
+    <!-- Product/consumer gradients -->
+    <linearGradient id="prodBlue" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#4C9AFF"/>
+      <stop offset="100%" stop-color="#2684FF"/>
+    </linearGradient>
+    <linearGradient id="prodOrange" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#FFB74D"/>
+      <stop offset="100%" stop-color="#FF8B00"/>
+    </linearGradient>
+    <linearGradient id="prodTeal" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#4DD0E1"/>
+      <stop offset="100%" stop-color="#00B8D9"/>
+    </linearGradient>
+
+    <!-- Side arrow fading gradients -->
+    <linearGradient id="arrowBlueGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#0052CC" stop-opacity="0.15"/>
+      <stop offset="50%" stop-color="#0052CC" stop-opacity="0.6"/>
+      <stop offset="100%" stop-color="#0052CC"/>
+    </linearGradient>
+    <linearGradient id="arrowPurpleGrad" x1="0%" y1="100%" x2="0%" y2="0%">
+      <stop offset="0%" stop-color="#6554C0" stop-opacity="0.15"/>
+      <stop offset="50%" stop-color="#6554C0" stop-opacity="0.6"/>
+      <stop offset="100%" stop-color="#6554C0"/>
+    </linearGradient>
+
+    <!-- ======== SHADOWS ======== -->
+
+    <filter id="shadowSm" x="-2%" y="-4%" width="104%" height="112%">
+      <feDropShadow dx="0" dy="1" stdDeviation="3" flood-color="#172B4D" flood-opacity="0.08"/>
+    </filter>
+    <filter id="shadow" x="-4%" y="-4%" width="108%" height="112%">
+      <feDropShadow dx="0" dy="3" stdDeviation="6" flood-color="#172B4D" flood-opacity="0.12"/>
+    </filter>
+    <filter id="shadowLg" x="-3%" y="-3%" width="106%" height="110%">
+      <feDropShadow dx="0" dy="4" stdDeviation="10" flood-color="#172B4D" flood-opacity="0.15"/>
+    </filter>
+
+    <!-- ======== ARROW MARKERS ======== -->
+
+    <marker id="arrowBlue" markerWidth="12" markerHeight="8" refX="6" refY="4" orient="auto">
+      <path d="M0,0 L12,4 L0,8 L3,4 Z" fill="#0052CC"/>
+    </marker>
+    <marker id="arrowPurple" markerWidth="12" markerHeight="8" refX="6" refY="4" orient="auto">
+      <path d="M0,0 L12,4 L0,8 L3,4 Z" fill="#6554C0"/>
+    </marker>
+    <marker id="arrowGreen" markerWidth="12" markerHeight="8" refX="6" refY="4" orient="auto">
+      <path d="M0,0 L12,4 L0,8 L3,4 Z" fill="#006644"/>
+    </marker>
+    <marker id="arrowGray" markerWidth="12" markerHeight="8" refX="6" refY="4" orient="auto">
+      <path d="M0,0 L12,4 L0,8 L3,4 Z" fill="#505F79"/>
+    </marker>
+
+    <!-- ======== BACKGROUND PATTERNS ======== -->
+
+    <pattern id="dots" width="24" height="24" patternUnits="userSpaceOnUse">
+      <circle cx="12" cy="12" r="0.7" fill="#0052CC" opacity="0.07"/>
+    </pattern>
+    <pattern id="dotsGreen" width="24" height="24" patternUnits="userSpaceOnUse">
+      <circle cx="12" cy="12" r="0.7" fill="#006644" opacity="0.05"/>
+    </pattern>
+
+    <!-- ======== ICON SYMBOLS ======== -->
+    <!-- Usage: <use href="#iconName" x="..." y="..." width="28" height="28" opacity="0.4"/> -->
+
+    <!-- Shield (security, trust, admin) -->
+    <symbol id="iconShield" viewBox="0 0 24 24">
+      <path d="M12 2L4 6.5V11c0 5.25 3.4 10.15 8 11.5 4.6-1.35 8-6.25 8-11.5V6.5L12 2zm0 2.18l6 3.38V11c0 4.33-2.72 8.35-6 9.45-3.28-1.1-6-5.12-6-9.45V7.56l6-3.38z" fill="white" opacity="0.9"/>
+      <path d="M10 14.2l-2.6-2.6L6 13l4 4 8-8-1.4-1.4L10 14.2z" fill="white" opacity="0.7"/>
+    </symbol>
+
+    <!-- Key (identity, authentication, credentials) -->
+    <symbol id="iconKey" viewBox="0 0 24 24">
+      <path d="M12.65 10a6 6 0 10-3.3 3.3L11 15l2 0 0 2 2 0 0 2 3 0 0-3-5.35-5.35zM7 10.5a1.5 1.5 0 110-3 1.5 1.5 0 010 3z" fill="none" stroke="white" stroke-width="1.5" opacity="0.85"/>
+    </symbol>
+
+    <!-- Checkmark circle (authorization, verification, approval) -->
+    <symbol id="iconCheck" viewBox="0 0 24 24">
+      <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8z" fill="white" opacity="0.3"/>
+      <path d="M9 12l2 2 4-4" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" opacity="0.85"/>
+    </symbol>
+
+    <!-- Layers (data access, storage, resources) -->
+    <symbol id="iconLayers" viewBox="0 0 24 24">
+      <path d="M12 4L2 9l10 5 10-5-10-5z" fill="none" stroke="white" stroke-width="1.5" opacity="0.85"/>
+      <path d="M2 14l10 5 10-5" fill="none" stroke="white" stroke-width="1.5" opacity="0.5"/>
+      <path d="M2 19l10 5 10-5" fill="none" stroke="white" stroke-width="1.5" opacity="0.3"/>
+    </symbol>
+
+    <!-- Eye (observability, monitoring, audit) -->
+    <symbol id="iconEye" viewBox="0 0 24 24">
+      <path d="M12 5C7 5 2.73 8.11 1 12.5 2.73 16.89 7 20 12 20s9.27-3.11 11-7.5C21.27 8.11 17 5 12 5zm0 12.5c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z" fill="white" opacity="0.85"/>
+    </symbol>
+
+    <!-- Gear (settings, configuration, admin experience) -->
+    <symbol id="iconGear" viewBox="0 0 24 24">
+      <path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58a.49.49 0 00.12-.61l-1.92-3.32a.49.49 0 00-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94L14.4 2.81a.47.47 0 00-.47-.41h-3.85c-.24 0-.44.17-.47.41L9.25 5.35c-.59.24-1.13.57-1.62.94l-2.39-.96a.49.49 0 00-.59.22L2.73 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.07.62-.07.94s.02.64.07.94l-2.03 1.58a.49.49 0 00-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.47.41h3.85c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6A3.6 3.6 0 1115.6 12 3.6 3.6 0 0112 15.6z" fill="white" opacity="0.85"/>
+    </symbol>
+
+    <!-- Lock (security, encryption, access control) -->
+    <symbol id="iconLock" viewBox="0 0 24 24">
+      <path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zM9 6c0-1.66 1.34-3 3-3s3 1.34 3 3v2H9V6zm9 14H6V10h12v10zm-6-3c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2z" fill="white" opacity="0.85"/>
+    </symbol>
+
+    <!-- Network/Globe (integrations, external, 3P) -->
+    <symbol id="iconGlobe" viewBox="0 0 24 24">
+      <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z" fill="white" opacity="0.85"/>
+    </symbol>
+
+    <!-- Database (data store, persistence) -->
+    <symbol id="iconDatabase" viewBox="0 0 24 24">
+      <ellipse cx="12" cy="5.5" rx="8" ry="3.5" fill="none" stroke="white" stroke-width="1.5" opacity="0.85"/>
+      <path d="M20 5.5v5c0 1.93-3.58 3.5-8 3.5S4 12.43 4 10.5v-5" fill="none" stroke="white" stroke-width="1.5" opacity="0.6"/>
+      <path d="M20 10.5v5c0 1.93-3.58 3.5-8 3.5S4 17.43 4 15.5v-5" fill="none" stroke="white" stroke-width="1.5" opacity="0.4"/>
+    </symbol>
+
+    <!-- Lightning bolt (speed, automation, agents) -->
+    <symbol id="iconBolt" viewBox="0 0 24 24">
+      <path d="M7 2v11h3v9l7-12h-4l4-8H7z" fill="white" opacity="0.85"/>
+    </symbol>
+
+    <!-- Users/People (teams, organisations) -->
+    <symbol id="iconUsers" viewBox="0 0 24 24">
+      <path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z" fill="white" opacity="0.85"/>
+    </symbol>
+
+  </defs>
+</svg>

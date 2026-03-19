@@ -45,6 +45,13 @@
       "description": "Conversational blog post creator that interviews you about your topic, captures your writing voice, drafts in your style, strips AI tells, and publishes as markdown or HTML.",
       "category": "content",
       "tags": ["blog", "writing", "content", "voice", "de-ai", "markdown", "html"]
+    },
+    {
+      "name": "diagram-architect",
+      "source": "./plugins/diagram-architect",
+      "description": "Generate whitepaper-grade architecture diagrams as SVG. Supports 12+ diagram types including layered architecture, sequence, flow, threat model, state machine, and more with a full design system.",
+      "category": "development",
+      "tags": ["diagrams", "svg", "architecture", "visualization", "sequence-diagram", "flow-diagram", "threat-model"]
     }
   ]
 }

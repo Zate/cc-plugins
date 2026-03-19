@@ -1,0 +1,8 @@
+{
+  "name": "diagram-architect",
+  "version": "1.0.0",
+  "description": "Generate world-class, whitepaper-grade architecture diagrams as SVG",
+  "author": {
+    "name": "Zate Berg"
+  }
+}
