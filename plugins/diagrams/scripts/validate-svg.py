@@ -4,6 +4,8 @@ SVG Diagram Validator
 Checks for common layout issues: arrow-through-box, label overlaps,
 insufficient clearance, parallel arrow collision, container padding.
 
+Handles <g transform="translate(x,y)"> groups to compute absolute positions.
+
 Usage: python3 validate-svg.py <file.svg>
 
 Exit codes:
@@ -15,8 +17,9 @@ No external dependencies -- uses only Python stdlib.
 """
 
 import sys
+import re
 import xml.etree.ElementTree as ET
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from typing import List, Tuple, Optional
 
 # Clearance thresholds (pixels)
@@ -25,26 +28,28 @@ PARALLEL_ARROW_MIN_SEP = 30
 LABEL_LINE_CLEARANCE = 8
 CONTAINER_PADDING = 15
 
+# Minimum sizes to avoid noise
+MIN_BOX_SIZE = 20       # skip tiny decorative rects
+MIN_LINE_LENGTH = 30    # skip short connector stubs
+MIN_LABEL_LENGTH = 3    # skip single chars (step numbers)
+
+SVG_NS = "{http://www.w3.org/2000/svg}"
+
 
 @dataclass
 class Box:
-    """A rectangle element (node, container, boundary)."""
     id: str
     x: float
     y: float
     w: float
     h: float
-    is_container: bool = False  # dashed stroke = container/boundary
-    label: str = ""
+    is_container: bool = False
+    group_id: str = ""  # parent group for sibling detection
 
     @property
     def x2(self): return self.x + self.w
     @property
     def y2(self): return self.y + self.h
-    @property
-    def cx(self): return self.x + self.w / 2
-    @property
-    def cy(self): return self.y + self.h / 2
 
     def contains_point(self, px, py, margin=0):
         return (self.x - margin <= px <= self.x2 + margin and
@@ -65,13 +70,13 @@ class Box:
 
 @dataclass
 class Line:
-    """A line element (arrow/connector)."""
     id: str
     x1: float
     y1: float
     x2: float
     y2: float
-    has_marker: bool = False  # has arrowhead
+    has_marker: bool = False
+    group_id: str = ""
 
     @property
     def is_horizontal(self): return abs(self.y2 - self.y1) < 3
@@ -84,13 +89,13 @@ class Line:
 
 @dataclass
 class Label:
-    """A text element."""
     id: str
     x: float
     y: float
     text: str
     font_size: float = 12
     anchor: str = "start"
+    group_id: str = ""
 
     @property
     def approx_width(self):
@@ -110,128 +115,24 @@ class Label:
         return (self.x, self.y - h, w, h)
 
 
-def line_intersects_box(line: Line, box: Box, margin: float = 0) -> bool:
-    """Check if a line segment passes through a box (with margin)."""
-    bx1 = box.x - margin
-    by1 = box.y - margin
-    bx2 = box.x2 + margin
-    by2 = box.y2 + margin
-
-    # Quick check: if both endpoints are on the same side, no intersection
-    lx1, ly1, lx2, ly2 = line.x1, line.y1, line.x2, line.y2
-
-    # Check if either endpoint is inside the box
-    if bx1 <= lx1 <= bx2 and by1 <= ly1 <= by2:
-        return True
-    if bx1 <= lx2 <= bx2 and by1 <= ly2 <= by2:
-        return True
-
-    # For axis-aligned lines (most SVG diagram arrows), simplified check
-    if line.is_vertical:
-        x = lx1
-        if bx1 <= x <= bx2:
-            min_y = min(ly1, ly2)
-            max_y = max(ly1, ly2)
-            if min_y <= by2 and max_y >= by1:
-                return True
-        return False
-
-    if line.is_horizontal:
-        y = ly1
-        if by1 <= y <= by2:
-            min_x = min(lx1, lx2)
-            max_x = max(lx1, lx2)
-            if min_x <= bx2 and max_x >= bx1:
-                return True
-        return False
-
-    # General case: check line-rect intersection using parametric form
-    dx = lx2 - lx1
-    dy = ly2 - ly1
-    edges = [
-        (bx1, by1, bx2, by1),  # top
-        (bx1, by2, bx2, by2),  # bottom
-        (bx1, by1, bx1, by2),  # left
-        (bx2, by1, bx2, by2),  # right
-    ]
-    for ex1, ey1, ex2, ey2 in edges:
-        if segments_intersect(lx1, ly1, lx2, ly2, ex1, ey1, ex2, ey2):
-            return True
-    return False
-
-
-def segments_intersect(ax1, ay1, ax2, ay2, bx1, by1, bx2, by2) -> bool:
-    """Check if two line segments intersect."""
-    def cross(ox, oy, ax, ay, bx, by):
-        return (ax - ox) * (by - oy) - (ay - oy) * (bx - ox)
-
-    d1 = cross(bx1, by1, bx2, by2, ax1, ay1)
-    d2 = cross(bx1, by1, bx2, by2, ax2, ay2)
-    d3 = cross(ax1, ay1, ax2, ay2, bx1, by1)
-    d4 = cross(ax1, ay1, ax2, ay2, bx2, by2)
-
-    if ((d1 > 0 and d2 < 0) or (d1 < 0 and d2 > 0)) and \
-       ((d3 > 0 and d4 < 0) or (d3 < 0 and d4 > 0)):
-        return True
-    return False
-
-
-def lines_are_parallel_and_close(a: Line, b: Line, threshold: float) -> bool:
-    """Check if two lines are roughly parallel and closer than threshold."""
-    # Both horizontal
-    if a.is_horizontal and b.is_horizontal:
-        if abs(a.y1 - b.y1) < threshold:
-            # Check x-overlap
-            a_min_x = min(a.x1, a.x2)
-            a_max_x = max(a.x1, a.x2)
-            b_min_x = min(b.x1, b.x2)
-            b_max_x = max(b.x1, b.x2)
-            if a_min_x < b_max_x and b_min_x < a_max_x:
-                return True
-
-    # Both vertical
-    if a.is_vertical and b.is_vertical:
-        if abs(a.x1 - b.x1) < threshold:
-            a_min_y = min(a.y1, a.y2)
-            a_max_y = max(a.y1, a.y2)
-            b_min_y = min(b.y1, b.y2)
-            b_max_y = max(b.y1, b.y2)
-            if a_min_y < b_max_y and b_min_y < a_max_y:
-                return True
-
-    return False
-
-
-def label_overlaps_line(label: Label, line: Line, clearance: float) -> bool:
-    """Check if a label's bounding box overlaps or is too close to a line."""
-    lx, ly, lw, lh = label.get_bbox()
-    lx2 = lx + lw
-    ly2 = ly + lh
-
-    if line.is_horizontal:
-        y = line.y1
-        min_x = min(line.x1, line.x2)
-        max_x = max(line.x1, line.x2)
-        if lx < max_x and lx2 > min_x:
-            if abs(y - ly) < clearance or abs(y - ly2) < clearance or (ly <= y <= ly2):
-                return True
-
-    if line.is_vertical:
-        x = line.x1
-        min_y = min(line.y1, line.y2)
-        max_y = max(line.y1, line.y2)
-        if ly < max_y and ly2 > min_y:
-            if abs(x - lx) < clearance or abs(x - lx2) < clearance or (lx <= x <= lx2):
-                return True
-
-    return False
-
-
-def label_overlaps_box(label: Label, box: Box) -> bool:
-    """Check if a label's bounding box overlaps a box it's not inside of."""
-    lx, ly, lw, lh = label.get_bbox()
-    label_box = Box(id="label", x=lx, y=ly, w=lw, h=lh)
-    return label_box.intersects(box)
+def parse_transform(transform_str: str) -> Tuple[float, float]:
+    """Extract translate(x, y) from a transform string. Returns (dx, dy)."""
+    if not transform_str:
+        return (0, 0)
+    m = re.search(r'translate\(\s*([^,\s]+)[,\s]+([^)]+)\)', transform_str)
+    if m:
+        try:
+            return (float(m.group(1)), float(m.group(2)))
+        except ValueError:
+            return (0, 0)
+    # translate(x) with no y
+    m = re.search(r'translate\(\s*([^,)\s]+)\s*\)', transform_str)
+    if m:
+        try:
+            return (float(m.group(1)), 0)
+        except ValueError:
+            return (0, 0)
+    return (0, 0)
 
 
 def parse_float(val: Optional[str], default: float = 0) -> float:
@@ -243,8 +144,101 @@ def parse_float(val: Optional[str], default: float = 0) -> float:
         return default
 
 
+def line_intersects_box(line: Line, box: Box) -> bool:
+    """Check if a line segment passes through a box."""
+    lx1, ly1, lx2, ly2 = line.x1, line.y1, line.x2, line.y2
+    bx1, by1, bx2, by2 = box.x, box.y, box.x2, box.y2
+
+    # Either endpoint inside box = connected, not an overlap
+    if bx1 <= lx1 <= bx2 and by1 <= ly1 <= by2:
+        return True
+    if bx1 <= lx2 <= bx2 and by1 <= ly2 <= by2:
+        return True
+
+    if line.is_vertical:
+        x = lx1
+        if bx1 <= x <= bx2:
+            min_y, max_y = min(ly1, ly2), max(ly1, ly2)
+            if min_y <= by2 and max_y >= by1:
+                return True
+        return False
+
+    if line.is_horizontal:
+        y = ly1
+        if by1 <= y <= by2:
+            min_x, max_x = min(lx1, lx2), max(lx1, lx2)
+            if min_x <= bx2 and max_x >= bx1:
+                return True
+        return False
+
+    # General case: parametric segment-rect intersection
+    edges = [
+        (bx1, by1, bx2, by1), (bx1, by2, bx2, by2),
+        (bx1, by1, bx1, by2), (bx2, by1, bx2, by2),
+    ]
+    for ex1, ey1, ex2, ey2 in edges:
+        if segments_intersect(lx1, ly1, lx2, ly2, ex1, ey1, ex2, ey2):
+            return True
+    return False
+
+
+def segments_intersect(ax1, ay1, ax2, ay2, bx1, by1, bx2, by2) -> bool:
+    def cross(ox, oy, ax, ay, bx, by):
+        return (ax - ox) * (by - oy) - (ay - oy) * (bx - ox)
+    d1 = cross(bx1, by1, bx2, by2, ax1, ay1)
+    d2 = cross(bx1, by1, bx2, by2, ax2, ay2)
+    d3 = cross(ax1, ay1, ax2, ay2, bx1, by1)
+    d4 = cross(ax1, ay1, ax2, ay2, bx2, by2)
+    if ((d1 > 0 and d2 < 0) or (d1 < 0 and d2 > 0)) and \
+       ((d3 > 0 and d4 < 0) or (d3 < 0 and d4 > 0)):
+        return True
+    return False
+
+
+def lines_are_parallel_and_close(a: Line, b: Line, threshold: float) -> bool:
+    if a.is_horizontal and b.is_horizontal:
+        if abs(a.y1 - b.y1) < threshold:
+            a_min_x, a_max_x = min(a.x1, a.x2), max(a.x1, a.x2)
+            b_min_x, b_max_x = min(b.x1, b.x2), max(b.x1, b.x2)
+            if a_min_x < b_max_x and b_min_x < a_max_x:
+                return True
+    if a.is_vertical and b.is_vertical:
+        if abs(a.x1 - b.x1) < threshold:
+            a_min_y, a_max_y = min(a.y1, a.y2), max(a.y1, a.y2)
+            b_min_y, b_max_y = min(b.y1, b.y2), max(b.y1, b.y2)
+            if a_min_y < b_max_y and b_min_y < a_max_y:
+                return True
+    return False
+
+
+def label_overlaps_line(label: Label, line: Line, clearance: float) -> bool:
+    lx, ly, lw, lh = label.get_bbox()
+    lx2 = lx + lw
+    ly2 = ly + lh
+
+    if line.is_horizontal:
+        y = line.y1
+        min_x, max_x = min(line.x1, line.x2), max(line.x1, line.x2)
+        if lx < max_x and lx2 > min_x:
+            if abs(y - ly) < clearance or abs(y - ly2) < clearance or (ly <= y <= ly2):
+                return True
+    if line.is_vertical:
+        x = line.x1
+        min_y, max_y = min(line.y1, line.y2), max(line.y1, line.y2)
+        if ly < max_y and ly2 > min_y:
+            if abs(x - lx) < clearance or abs(x - lx2) < clearance or (lx <= x <= lx2):
+                return True
+    return False
+
+
+def label_overlaps_box(label: Label, box: Box) -> bool:
+    lx, ly, lw, lh = label.get_bbox()
+    label_box = Box(id="label", x=lx, y=ly, w=lw, h=lh)
+    return label_box.intersects(box)
+
+
 def parse_svg(filepath: str):
-    """Parse SVG file and extract boxes, lines, and labels."""
+    """Parse SVG, walking the tree to accumulate transforms for absolute positions."""
     try:
         tree = ET.parse(filepath)
     except ET.ParseError as e:
@@ -252,13 +246,19 @@ def parse_svg(filepath: str):
         sys.exit(2)
 
     root = tree.getroot()
-    ns = {"svg": "http://www.w3.org/2000/svg"}
 
     boxes: List[Box] = []
     lines: List[Line] = []
     labels: List[Label] = []
-
     elem_counter = 0
+
+    # Detect background rect size from viewBox
+    vb = root.get("viewBox", "")
+    vb_w, vb_h = 0, 0
+    if vb:
+        parts = vb.split()
+        if len(parts) == 4:
+            vb_w, vb_h = float(parts[2]), float(parts[3])
 
     def get_id(elem):
         nonlocal elem_counter
@@ -266,157 +266,170 @@ def parse_svg(filepath: str):
         eid = elem.get("id", "")
         return eid if eid else f"elem-{elem_counter}"
 
-    # Find all rects
-    for rect in root.iter("{http://www.w3.org/2000/svg}rect"):
-        x = parse_float(rect.get("x"))
-        y = parse_float(rect.get("y"))
-        w = parse_float(rect.get("width"))
-        h = parse_float(rect.get("height"))
+    def walk(elem, offset_x=0, offset_y=0, group_path=""):
+        """Recursively walk SVG tree, accumulating translate transforms."""
+        # Accumulate this element's transform
+        tx, ty = parse_transform(elem.get("transform", ""))
+        abs_x = offset_x + tx
+        abs_y = offset_y + ty
 
-        if w < 10 or h < 10:
-            continue  # skip tiny rects (decorative)
+        tag = elem.tag
 
-        # Check if it's the background rect
-        vb = root.get("viewBox", "")
-        if vb:
-            parts = vb.split()
-            if len(parts) == 4:
-                vb_w, vb_h = float(parts[2]), float(parts[3])
-                if abs(w - vb_w) < 5 and abs(h - vb_h) < 5:
-                    continue  # skip background rect
+        # Generate a group path for sibling detection
+        current_group = group_path
+        if tag == f"{SVG_NS}g":
+            current_group = f"{group_path}/{get_id(elem)}"
 
-        is_container = False
-        stroke_da = rect.get("stroke-dasharray", "")
-        if stroke_da:
-            is_container = True
-        fill = rect.get("fill", "")
-        if "none" == fill.lower():
-            is_container = True
+        # Process rect
+        if tag == f"{SVG_NS}rect":
+            x = parse_float(elem.get("x")) + abs_x
+            y = parse_float(elem.get("y")) + abs_y
+            w = parse_float(elem.get("width"))
+            h = parse_float(elem.get("height"))
 
-        boxes.append(Box(
-            id=get_id(rect),
-            x=x, y=y, w=w, h=h,
-            is_container=is_container
-        ))
+            if w < MIN_BOX_SIZE or h < MIN_BOX_SIZE:
+                pass  # skip tiny
+            elif abs(w - vb_w) < 5 and abs(h - vb_h) < 5:
+                pass  # skip background
+            else:
+                is_container = bool(elem.get("stroke-dasharray", ""))
+                if elem.get("fill", "").lower() == "none":
+                    is_container = True
 
-    # Find all lines
-    for line_elem in root.iter("{http://www.w3.org/2000/svg}line"):
-        x1 = parse_float(line_elem.get("x1"))
-        y1 = parse_float(line_elem.get("y1"))
-        x2 = parse_float(line_elem.get("x2"))
-        y2 = parse_float(line_elem.get("y2"))
+                boxes.append(Box(
+                    id=get_id(elem), x=x, y=y, w=w, h=h,
+                    is_container=is_container, group_id=current_group
+                ))
 
-        has_marker = bool(line_elem.get("marker-end", ""))
+        # Process line
+        elif tag == f"{SVG_NS}line":
+            x1 = parse_float(elem.get("x1")) + abs_x
+            y1 = parse_float(elem.get("y1")) + abs_y
+            x2 = parse_float(elem.get("x2")) + abs_x
+            y2 = parse_float(elem.get("y2")) + abs_y
+            has_marker = bool(elem.get("marker-end", ""))
 
-        lines.append(Line(
-            id=get_id(line_elem),
-            x1=x1, y1=y1, x2=x2, y2=y2,
-            has_marker=has_marker
-        ))
+            lines.append(Line(
+                id=get_id(elem), x1=x1, y1=y1, x2=x2, y2=y2,
+                has_marker=has_marker, group_id=current_group
+            ))
 
-    # Find all text
-    for text_elem in root.iter("{http://www.w3.org/2000/svg}text"):
-        x = parse_float(text_elem.get("x"))
-        y = parse_float(text_elem.get("y"))
-        text = text_elem.text or ""
-        # Include tspans
-        for tspan in text_elem:
-            if tspan.text:
-                text += tspan.text
-        text = text.strip()
-        if not text:
-            continue
+        # Process text
+        elif tag == f"{SVG_NS}text":
+            x = parse_float(elem.get("x")) + abs_x
+            y = parse_float(elem.get("y")) + abs_y
+            text = elem.text or ""
+            for child in elem:
+                if child.text:
+                    text += child.text
+                if child.tail:
+                    text += child.tail
+            text = text.strip()
+            if text:
+                font_size = parse_float(elem.get("font-size"), 12)
+                anchor = elem.get("text-anchor", "start")
+                labels.append(Label(
+                    id=get_id(elem), x=x, y=y, text=text,
+                    font_size=font_size, anchor=anchor,
+                    group_id=current_group
+                ))
 
-        font_size = parse_float(text_elem.get("font-size"), 12)
-        anchor = text_elem.get("text-anchor", "start")
+        # Recurse into children
+        for child in elem:
+            walk(child, abs_x, abs_y, current_group)
 
-        labels.append(Label(
-            id=get_id(text_elem),
-            x=x, y=y,
-            text=text,
-            font_size=font_size,
-            anchor=anchor
-        ))
-
+    walk(root)
     return boxes, lines, labels
+
+
+def same_group(a_group: str, b_group: str) -> bool:
+    """Check if two elements share the same immediate parent group."""
+    if not a_group or not b_group:
+        return False
+    return a_group == b_group
 
 
 def validate(boxes, lines, labels):
     """Run all validation checks. Returns list of issue strings."""
     issues = []
 
-    # Separate node boxes from container boxes
     node_boxes = [b for b in boxes if not b.is_container]
     containers = [b for b in boxes if b.is_container]
 
     # --- Check 1: Arrow lines passing through unrelated boxes ---
     for line in lines:
-        if line.length < 15:
-            continue  # skip very short lines (connectors between adjacent elements)
+        if line.length < MIN_LINE_LENGTH:
+            continue
         for box in node_boxes:
-            # Skip if line starts or ends inside/at the box (it's connected)
-            starts_at = box.contains_point(line.x1, line.y1, margin=5)
-            ends_at = box.contains_point(line.x2, line.y2, margin=5)
+            # Skip if same group (they're part of the same component)
+            if same_group(line.group_id, box.group_id):
+                continue
+            # Skip if line starts or ends at the box (connected)
+            starts_at = box.contains_point(line.x1, line.y1, margin=8)
+            ends_at = box.contains_point(line.x2, line.y2, margin=8)
             if starts_at or ends_at:
                 continue
-
             if line_intersects_box(line, box):
                 issues.append(
-                    f"OVERLAP: Line {line.id} ({line.x1:.0f},{line.y1:.0f} -> "
-                    f"{line.x2:.0f},{line.y2:.0f}) passes through box {box.id} "
+                    f"OVERLAP: Line ({line.x1:.0f},{line.y1:.0f} -> "
+                    f"{line.x2:.0f},{line.y2:.0f}) passes through box "
                     f"at ({box.x:.0f},{box.y:.0f} {box.w:.0f}x{box.h:.0f})"
                 )
 
     # --- Check 2: Parallel arrows too close ---
     for i, a in enumerate(lines):
-        if a.length < 30:
+        if a.length < MIN_LINE_LENGTH:
             continue
         for b in lines[i+1:]:
-            if b.length < 30:
+            if b.length < MIN_LINE_LENGTH:
+                continue
+            # Skip if same group (e.g., legend example lines)
+            if same_group(a.group_id, b.group_id):
                 continue
             if lines_are_parallel_and_close(a, b, PARALLEL_ARROW_MIN_SEP):
                 if a.is_horizontal and b.is_horizontal:
                     sep = abs(a.y1 - b.y1)
                     issues.append(
-                        f"PARALLEL: Horizontal lines {a.id} (y={a.y1:.0f}) and "
-                        f"{b.id} (y={b.y1:.0f}) are only {sep:.0f}px apart "
-                        f"(min: {PARALLEL_ARROW_MIN_SEP}px)"
+                        f"PARALLEL: Horizontal lines (y={a.y1:.0f}) and "
+                        f"(y={b.y1:.0f}) are {sep:.0f}px apart (min: {PARALLEL_ARROW_MIN_SEP}px)"
                     )
                 elif a.is_vertical and b.is_vertical:
                     sep = abs(a.x1 - b.x1)
                     issues.append(
-                        f"PARALLEL: Vertical lines {a.id} (x={a.x1:.0f}) and "
-                        f"{b.id} (x={b.x1:.0f}) are only {sep:.0f}px apart "
-                        f"(min: {PARALLEL_ARROW_MIN_SEP}px)"
+                        f"PARALLEL: Vertical lines (x={a.x1:.0f}) and "
+                        f"(x={b.x1:.0f}) are {sep:.0f}px apart (min: {PARALLEL_ARROW_MIN_SEP}px)"
                     )
 
-    # --- Check 3: Labels overlapping lines ---
+    # --- Check 3: Labels overlapping lines (skip if same group) ---
     for label in labels:
-        if len(label.text) < 2:
-            continue  # skip single chars (step numbers etc.)
+        if len(label.text) < MIN_LABEL_LENGTH:
+            continue
         for line in lines:
-            if line.length < 15:
+            if line.length < MIN_LINE_LENGTH:
+                continue
+            if same_group(label.group_id, line.group_id):
                 continue
             if label_overlaps_line(label, line, LABEL_LINE_CLEARANCE):
                 issues.append(
-                    f"LABEL-LINE: Label \"{label.text[:30]}\" at ({label.x:.0f},"
-                    f"{label.y:.0f}) overlaps line {line.id}"
+                    f"LABEL-LINE: \"{label.text[:40]}\" at ({label.x:.0f},"
+                    f"{label.y:.0f}) overlaps line at ({line.x1:.0f},{line.y1:.0f})"
                 )
 
-    # --- Check 4: Labels overlapping unrelated boxes ---
+    # --- Check 4: Labels overlapping unrelated boxes (skip same group + inside) ---
     for label in labels:
-        if len(label.text) < 3:
+        if len(label.text) < MIN_LABEL_LENGTH:
             continue
-        lx, ly, lw, lh = label.get_bbox()
         for box in node_boxes:
+            # Skip if same group (label belongs to this box)
+            if same_group(label.group_id, box.group_id):
+                continue
             # Skip if label is inside the box (it's the box's own label)
-            if box.contains_point(label.x, label.y, margin=2):
+            if box.contains_point(label.x, label.y, margin=5):
                 continue
             if label_overlaps_box(label, box):
                 issues.append(
-                    f"LABEL-BOX: Label \"{label.text[:30]}\" at ({label.x:.0f},"
-                    f"{label.y:.0f}) overlaps box {box.id} at "
-                    f"({box.x:.0f},{box.y:.0f})"
+                    f"LABEL-BOX: \"{label.text[:40]}\" at ({label.x:.0f},"
+                    f"{label.y:.0f}) overlaps box at ({box.x:.0f},{box.y:.0f})"
                 )
 
     # --- Check 5: Container boundary padding ---
@@ -424,7 +437,6 @@ def validate(boxes, lines, labels):
         enclosed = [b for b in node_boxes if container.contains_box(b, padding=0)]
         for box in enclosed:
             if not container.contains_box(box, padding=CONTAINER_PADDING):
-                # Find which side is too close
                 gaps = {
                     "left": box.x - container.x,
                     "top": box.y - container.y,
@@ -434,9 +446,9 @@ def validate(boxes, lines, labels):
                 tight = {k: v for k, v in gaps.items() if v < CONTAINER_PADDING}
                 sides = ", ".join(f"{k}={v:.0f}px" for k, v in tight.items())
                 issues.append(
-                    f"PADDING: Box {box.id} at ({box.x:.0f},{box.y:.0f}) is too "
-                    f"close to container {container.id} boundary ({sides}, "
-                    f"min: {CONTAINER_PADDING}px)"
+                    f"PADDING: Box at ({box.x:.0f},{box.y:.0f}) too close to "
+                    f"container at ({container.x:.0f},{container.y:.0f}) "
+                    f"({sides}, min: {CONTAINER_PADDING}px)"
                 )
 
     return issues
