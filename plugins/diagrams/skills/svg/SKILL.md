@@ -75,7 +75,32 @@ Beyond these fundamentals, **adapt the visual treatment to the diagram type**:
 
 The design system references are a **toolkit of components**, not a template. Select the right components for the diagram type.
 
-### 4. Iterate
+### 4. Validate
+
+After writing the SVG file, run the validation script to check for layout issues:
+
+```bash
+python3 ${CLAUDE_PLUGIN_ROOT}/scripts/validate-svg.py <file.svg>
+```
+
+The validator checks for:
+- **OVERLAP**: Arrow lines passing through unrelated boxes
+- **PARALLEL**: Parallel arrows closer than 30px (visually merge)
+- **LABEL-LINE**: Labels overlapping arrow lines
+- **LABEL-BOX**: Labels overlapping unrelated boxes
+- **PADDING**: Container boundaries clipping enclosed elements
+
+**Exit codes**: 0 = clean, 1 = issues found, 2 = parse error.
+
+**How to interpret results:**
+- **OVERLAP and PARALLEL** are the most critical -- these are structural defects that must be fixed by rerouting arrows or adding separation
+- **LABEL-LINE** usually means a label needs to be repositioned (offset 8-12px from the line)
+- **LABEL-BOX** can be false positives for labels intentionally inside boxes (the validator does not know which labels belong to which boxes by default) -- focus on cases where a label from one element overlaps a different element's box
+- **PADDING** means a dashed container boundary is too tight around an enclosed element -- expand the container or shrink the element
+
+Fix any OVERLAP or PARALLEL issues before presenting to the user. LABEL and PADDING issues are worth fixing but are lower priority.
+
+### 5. Iterate
 
 Present the SVG and ask for feedback. Common refinements: information density, visual emphasis, terminology alignment, color palette, annotations.
 
