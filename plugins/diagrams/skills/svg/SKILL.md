@@ -54,11 +54,11 @@ Before generating anything, establish:
 
 If the content could work as multiple types, choose the one that best highlights the **primary relationship** the reader needs to understand. When in doubt, ask the user.
 
-Consult `references/layout-patterns.md` for structural guidance and SVG construction patterns for each type.
+Consult `${CLAUDE_SKILL_DIR}/references/layout-patterns.md` for structural guidance and SVG construction patterns for each type.
 
 ### 3. Generate the SVG
 
-Build the SVG using the component library in `references/svg-design-system.md`. **Read the "Common SVG Mistakes" section first** -- it lists the most frequent errors. Core principles:
+Build the SVG using the component library in `${CLAUDE_SKILL_DIR}/references/svg-design-system.md`. **Read the "Common SVG Mistakes" section first** -- it lists the most frequent errors. Core principles:
 
 - **Always use `<defs>`** for gradients, shadows, markers -- define once, reference everywhere
 - **System fonts** -- `-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif`
@@ -176,9 +176,9 @@ SVG is token-expensive (~24x more tokens than Mermaid for equivalent diagrams). 
 
 ## Additional Resources
 
-- **`references/svg-design-system.md`** -- SVG toolkit: gradients, shadows, typography, icons, element construction patterns
-- **`references/layout-patterns.md`** -- Structural patterns for 12+ diagram types with SVG construction guidance
-- **`assets/svg-components.svg`** -- Reusable SVG `<defs>` block (gradients, shadows, markers, icons)
+- **`${CLAUDE_SKILL_DIR}/references/svg-design-system.md`** -- SVG toolkit: gradients, shadows, typography, icons, element construction patterns
+- **`${CLAUDE_SKILL_DIR}/references/layout-patterns.md`** -- Structural patterns for 12+ diagram types with SVG construction guidance
+- **`${CLAUDE_SKILL_DIR}/assets/svg-components.svg`** -- Reusable SVG `<defs>` block (gradients, shadows, markers, icons)
 
 ## Anti-Patterns
 
