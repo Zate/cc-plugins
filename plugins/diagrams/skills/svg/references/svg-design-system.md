@@ -61,7 +61,17 @@ These mistakes appear frequently and MUST be avoided:
 6. **ALWAYS use the background `<rect>`**, not CSS background:
    - `<rect width="{width}" height="{height}" fill="#FAFBFC"/>` as first child after `<defs>`
 
-7. **DO NOT use `text-transform` as an SVG attribute** — it's CSS-only. Just write the text in uppercase.
+7. **DO NOT use `text-transform` as an SVG attribute** -- it's CSS-only. Just write the text in uppercase.
+
+8. **DO NOT route arrow lines through unrelated boxes.** If a connection from A to C would cross through box B, route AROUND B with an L-shaped or Z-shaped path. Maintain 20px clearance from any unrelated box edge.
+
+9. **DO NOT stack parallel arrows closer than 30px.** When multiple arrows run in the same direction nearby, they visually merge into one thick line. Offset them clearly.
+
+10. **DO NOT let labels overlap lines or boxes.** Arrow labels must be offset 8-12px from the line. Check that label text does not extend into nearby elements.
+
+11. **DO NOT clip container boundaries against enclosed elements.** Dashed scope indicators (PCI DSS, trust boundaries) must have 15px+ padding on all sides around enclosed elements.
+
+**Self-check:** After writing the SVG, mentally trace each arrow path. Does it cross through any box it does not connect to? Does any label overlap a line or box? Do container boundaries fully enclose their targets? If any answer is yes, fix before presenting.
 
 **Standard canvas sizes:**
 - Architecture overview: `viewBox="0 0 1400 1000"`

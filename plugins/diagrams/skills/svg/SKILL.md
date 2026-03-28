@@ -128,6 +128,42 @@ Every generated SVG follows this structure:
 5. **DO NOT use `text-transform` as SVG attribute** -- it is CSS-only. Write the text in uppercase directly.
 6. **ALWAYS use background `<rect>`** -- not CSS background. `<rect width="{w}" height="{h}" fill="#FAFBFC"/>` as first child after `<defs>`.
 
+### Arrow and Layout Clearance Rules
+
+These rules prevent the most common SVG quality issues -- overlapping arrows, lines running through boxes, and labels colliding with elements.
+
+**Arrow routing -- NEVER route through unrelated boxes:**
+- Before drawing any arrow/line path, check whether it crosses through a box it is not connected to
+- If a straight line would pass through an intermediate box, route AROUND it using L-shaped or Z-shaped paths with enough clearance
+- Minimum clearance between an arrow path and any unrelated box edge: **20px**
+
+**Parallel arrow separation:**
+- When multiple arrows run parallel (same direction, nearby coordinates), maintain **minimum 30px separation** between them
+- If two L-shaped routes share a vertical or horizontal segment, offset them visually so they are clearly distinct paths, not a single thick line
+- Label each parallel path clearly so the reader can trace individual connections
+
+**Arrow-to-label clearance:**
+- Arrow labels must not overlap the arrow line itself -- offset labels **8-12px** perpendicular to the line
+- Labels must not overlap any box they are not labeling -- check that label text bounds do not intersect nearby elements
+- For vertical arrows, place labels to the left or right (not centered on the line where they become unreadable)
+
+**Box-to-box clearance:**
+- Minimum gap between boxes at the same level: **40px** (enough for arrows to route between them)
+- Minimum gap between a container boundary (trust boundary, group box) and its contained elements: **20px** on all sides
+- Dashed boundary indicators (like PCI DSS scope) must fully enclose their target with **15px+ padding** on all sides -- never clip the edge of a box
+
+**Annotation and badge placement:**
+- Security control badges (shield icons, TLS/AUTH/WAF pills) should be placed ON the boundary line between zones, not floating in space
+- Badges must not overlap arrow paths or box labels
+- If a badge would collide with an arrow, move the badge along the boundary to a clear spot
+
+**Self-check before output:**
+After constructing the SVG, mentally trace each arrow path and verify:
+1. Does this line pass through any box it is not connected to? If yes, reroute.
+2. Is this line visually distinguishable from nearby parallel lines? If no, add separation.
+3. Does any label overlap a line, box, or other label? If yes, reposition.
+4. Do all container/scope boundaries fully enclose their targets with padding? If no, expand.
+
 ### Token Budget Awareness
 
 SVG is token-expensive (~24x more tokens than Mermaid for equivalent diagrams). Manage this by:

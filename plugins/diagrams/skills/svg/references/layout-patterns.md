@@ -289,13 +289,42 @@ Structural patterns for different diagram types. Each type has a distinct visual
 - Descriptions: 12-14px regular
 - Annotations: 11-12px, reduced opacity
 
+### Arrow Routing
+
+**Never route arrows through unrelated boxes.** This is the most common layout defect.
+
+When connecting two elements that are not adjacent:
+1. **Check the path** -- does a straight line cross through any box it is not connected to?
+2. **If yes, route around** -- use L-shaped (one bend) or Z-shaped (two bends) paths
+3. **Maintain 20px clearance** from any unrelated box edge
+
+**Routing strategies by layout:**
+
+| Situation | Strategy |
+|-----------|----------|
+| Vertical connection crossing a horizontal row of boxes | Route to the LEFT or RIGHT of the intermediate boxes, then turn back in |
+| Multiple arrows from one source to many targets | Fan out from distinct exit points on the source box (top, right, bottom) -- do not stack all on one side |
+| Parallel routes to nearby targets | Maintain 30px minimum separation between parallel lines |
+| Crossing a trust/zone boundary | Route perpendicular to the boundary, place security badge on the crossing point |
+
+**Arrow label placement:**
+- Horizontal arrows: label ABOVE the line, 8px offset
+- Vertical arrows: label to the LEFT or RIGHT, 8px offset
+- Never center a label directly on a line -- it becomes unreadable
+- Labels must not extend into nearby boxes
+
+**Container/scope boundaries:**
+- Dashed scope indicators (PCI DSS, trust boundaries) must fully enclose their target elements
+- Minimum padding between scope boundary and enclosed elements: 15px all sides
+- Scope labels go in the top-right or top-left corner INSIDE the boundary, not on the edge
+
 ### Canvas Sizes
 | Diagram Type | Recommended viewBox |
 |-------------|-------------------|
 | Architecture | 1400×1000 |
 | Sequence | 1400×800 to 1600×900 |
 | Flow | 1400×600 to 1600×800 |
-| Threat model | 1400×900 |
+| Threat model | 1400×900 to 1520×980 |
 | Timeline | 1500×600 to 1500×700 |
 | State machine | 1200×800 |
 | Comparison | 1400×700 |
