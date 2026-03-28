@@ -12,10 +12,8 @@ Select the best output format and diagram type for the user's request, then dele
 If the user explicitly requests a format, use it:
 - "Draw this in SVG" / "as SVG" / "raw SVG" --> **svg** skill
 - "Mermaid diagram" / "in mermaid" / "as mermaid" --> **mermaid** skill
-- "Excalidraw" / "whiteboard style" / "hand-drawn" --> **excalidraw** skill (check availability first -- see below)
+- "Excalidraw" / "whiteboard style" / "hand-drawn" --> **excalidraw** skill
 - "D2 diagram" / "in d2" --> **d2** skill
-
-**Excalidraw availability check:** Before routing to Excalidraw, confirm `mcp__claude_ai_Excalidraw__create_view` is in the available tools. This is an external MCP server not included with this plugin. If unavailable, inform the user and fall back to SVG: "Excalidraw rendering requires the Excalidraw MCP server which isn't available in this session. I'll generate this as SVG instead -- you'll still get a great diagram."
 
 If they specified a format, skip to Step 3.
 
@@ -29,7 +27,7 @@ If they specified a format, skip to Step 3.
 | "For the README" / "in markdown" / "GitHub" | **SVG** | GitHub renders SVG natively. Quality matters. |
 | "Quick" / "simple" / "basic" | **SVG** | Still SVG -- it handles simple diagrams well too |
 | User explicitly says "mermaid" | **Mermaid** | They asked for it |
-| User explicitly says "excalidraw" / "whiteboard" / "sketch" / "hand-drawn" | **Excalidraw** (if MCP available, else SVG) | Hand-drawn aesthetic, editable in app |
+| User explicitly says "excalidraw" / "whiteboard" / "sketch" / "hand-drawn" | **Excalidraw** | Hand-drawn aesthetic, saves .excalidraw file |
 | User explicitly says "d2" | **D2** | They asked for it |
 
 **The rule is simple: SVG unless the user says otherwise.** The user can always convert later ("convert that to mermaid", "make that an excalidraw", etc.).

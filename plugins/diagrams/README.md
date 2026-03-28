@@ -87,5 +87,5 @@ All formats share a consistent design system:
 |--------|----------|
 | SVG | Nothing (browser-native) |
 | Mermaid | Nothing (renders in GitHub/GitLab) or `npx @mermaid-js/mermaid-cli` for CLI |
-| Excalidraw | Excalidraw MCP server (`mcp__claude_ai_Excalidraw`) -- **not included with this plugin**, may be available as an Anthropic-provided MCP in some Claude Code environments. Falls back to SVG if unavailable. |
+| Excalidraw | Nothing (generates `.excalidraw` file). View in Excalidraw web/desktop/VS Code extension/Obsidian plugin. |
 | D2 | `d2` CLI binary ([install](https://d2lang.com/)) |

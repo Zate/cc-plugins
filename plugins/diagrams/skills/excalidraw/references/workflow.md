@@ -3,80 +3,63 @@
 ## Creation Flow
 
 ```
-1. Plan layout    --> Estimate positions, choose camera sizes
-2. create_view    --> Renders inline with streaming animations
-3. User reviews   --> Sees diagram with camera pans
-4. Iterate        --> Use checkpointId to restore + modify
-5. Export          --> export_to_excalidraw for shareable URL
+1. Plan layout    --> Estimate positions, sizes, connections
+2. Build JSON     --> Construct the .excalidraw file structure
+3. Write file     --> Save as .excalidraw using Write tool
+4. User views     --> Opens in Excalidraw app/web/VS Code/Obsidian
+5. Iterate        --> User requests changes, update and re-save
 ```
 
-## Iteration with Checkpoints
+## File Structure
 
-After `create_view`, the response includes a `checkpointId`.
-
-**To add elements:**
 ```json
-[
-  {"type": "restoreCheckpoint", "id": "<checkpointId>"},
-  {"type": "rectangle", "id": "newBox", ...}
-]
+{
+  "type": "excalidraw",
+  "version": 2,
+  "source": "diagrams-plugin",
+  "elements": [ ... ],
+  "appState": {
+    "viewBackgroundColor": "#ffffff",
+    "gridSize": null
+  },
+  "files": {}
+}
 ```
 
-**To replace elements:**
-```json
-[
-  {"type": "restoreCheckpoint", "id": "<checkpointId>"},
-  {"type": "delete", "ids": "oldBox"},
-  {"type": "rectangle", "id": "newBox", ...}
-]
-```
+## Element Construction Order
 
-**To zoom/pan to a section:**
-```json
-[
-  {"type": "restoreCheckpoint", "id": "<checkpointId>"},
-  {"type": "cameraUpdate", "width": 400, "height": 300, "x": 200, "y": 100}
-]
-```
+Build elements in this order for clean relationships:
+1. Background zones/groups (largest rectangles, low opacity)
+2. Shapes (rectangles, ellipses, diamonds)
+3. Bound text (text with `containerId` referencing shapes)
+4. Arrows (with `startBinding`/`endBinding` referencing shapes)
+5. Standalone labels/annotations
 
-## Camera Animation Patterns
+## Binding Checklist
 
-### Progressive Build (most common)
-1. Zoom in on title area (M camera)
-2. Draw title and subtitle
-3. Pan to first section (M camera)
-4. Draw section elements
-5. Pan to next section
-6. Repeat for each section
-7. Zoom out to full view (L or XL camera)
+For every arrow-shape connection:
+1. Arrow has `startBinding.elementId` or `endBinding.elementId` pointing to the shape
+2. Shape has `boundElements` array including `{ "type": "arrow", "id": "arrow-id" }`
 
-### Section Focus
-1. Start with overview (L camera)
-2. Zoom into detail area (S camera)
-3. Draw detail elements
-4. Zoom back out
+For every text-inside-shape:
+1. Text has `containerId` pointing to the shape
+2. Shape has `boundElements` array including `{ "type": "text", "id": "text-id" }`
 
-### Transform Animation
-1. Draw initial state
-2. Camera nudge (shift 1px)
-3. Delete old elements
-4. Draw new elements at same positions
-5. Camera nudge again
-6. Creates smooth transformation effect
+Missing either side of the binding means the connection won't work in Excalidraw.
 
-## Export Options
+## Viewing Options
 
-| Method | Result |
-|--------|--------|
-| `export_to_excalidraw` | Shareable URL on excalidraw.com |
-| Copy JSON from checkpoint | Can be pasted into any Excalidraw instance |
-| Save `.excalidraw` file | Write JSON to local file for offline use |
+| Tool | How to Open |
+|------|-------------|
+| Excalidraw web | excalidraw.com -- drag & drop or File > Open |
+| VS Code | Install Excalidraw extension, double-click .excalidraw file |
+| Obsidian | Install Excalidraw plugin, embed or open file |
+| Desktop app | Open with Excalidraw desktop |
 
 ## Tips
 
-- Camera pans are the signature feature -- use them generously
-- Draw progressively (shape -> label -> arrow) not by type (all shapes -> all arrows)
-- Background zones should be drawn before the elements they contain
-- Art/decorations go last
+- Use descriptive element IDs (`"box-auth-service"` not `"r1"`) for easier iteration
 - Keep labels short -- long text overflows small shapes
-- Test readability at the chosen camera size before finalizing
+- Use `fontFamily: 1` (Virgil) for the hand-drawn aesthetic, `2` (Helvetica) for cleaner text
+- Generous spacing prevents the hand-drawn style from looking cluttered
+- Background zones at low opacity (30-40) create visual grouping without overwhelming
