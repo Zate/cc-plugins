@@ -167,6 +167,9 @@ foreach ($line in ($ctxContext -split "`n")) {
     if ($line -match '^\- \[') { $nodeCount++ }
 }
 $status = "ctx: $nodeCount nodes loaded"
+if ($binaryHint) {
+    $status = "ctx: UPGRADE REQUIRED (v${currentVer} -> v${minBinaryVersion}+). Run /ctx:setup"
+}
 
 # --- Output JSON ---
 $output = @{

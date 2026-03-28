@@ -82,9 +82,15 @@ fi
 # Count nodes for status
 NODE_COUNT=$(echo "$CTX_CONTEXT" | grep -c '^\- \[' 2>/dev/null || echo "0")
 
+# Build status message — include upgrade warning if needed
+STATUS="ctx: ${NODE_COUNT} nodes loaded"
+if [[ -n "$BINARY_HINT" ]]; then
+    STATUS="ctx: UPGRADE REQUIRED (v${CURRENT_VER} -> v${MIN_BINARY_VERSION}+). Run /ctx:setup"
+fi
+
 # Output JSON
 if command -v jq &> /dev/null; then
-    jq -n --arg ctx "$COMBINED" --arg status "ctx: ${NODE_COUNT} nodes loaded" \
+    jq -n --arg ctx "$COMBINED" --arg status "$STATUS" \
         '{suppressOutput: false, systemMessage: $status, hookSpecificOutput: {hookEventName: "SessionStart", additionalContext: $ctx}}'
 else
     echo "$CTX_OUTPUT"
