@@ -1,4 +1,4 @@
-# Diagram Architect Test Suite
+# Diagrams Test Suite
 
 Run each prompt, save the SVG output, and evaluate against the quality checklist.
 
@@ -86,7 +86,7 @@ For each generated SVG, evaluate:
 
 ## Running Tests
 
-1. Start a session with the diagram-architect plugin loaded
+1. Start a session with the diagrams plugin loaded
 2. Run each test prompt
 3. Save SVG output to `tests/output/test-N-type.svg`
 4. Open in browser to visually inspect

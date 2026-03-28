@@ -1,6 +1,6 @@
-# diagram-architect
+# diagrams
 
-Generate whitepaper-grade architecture diagrams as SVG. Supports 12+ diagram types with a full design system.
+Generate amazing diagrams using text-based formats. Supports SVG, Mermaid, Excalidraw, D2, and more. 12+ diagram types with a full design system.
 
 ## Usage
 

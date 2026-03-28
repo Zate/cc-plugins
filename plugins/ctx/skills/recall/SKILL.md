@@ -1,6 +1,8 @@
 ---
+name: recall
 description: Query ctx memory and inject results into context
 argument-hint: "Query string, e.g. type:decision AND tag:project:myproject"
+user-invocable: true
 allowed-tools:
   - Bash
 ---

@@ -1,0 +1,12 @@
+{
+  "name": "diagrams",
+  "version": "1.1.0",
+  "description": "Generate amazing diagrams using text-based formats (SVG, Mermaid, Excalidraw, D2)",
+  "author": {
+    "name": "Zate Berg",
+    "email": "zate75+claude-code-plugins@gmail.com"
+  },
+  "homepage": "https://github.com/Zate/cc-plugins/tree/main/plugins/diagrams",
+  "repository": "https://github.com/Zate/cc-plugins",
+  "license": "MIT"
+}

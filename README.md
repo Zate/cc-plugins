@@ -2,7 +2,7 @@
 
 **A curated marketplace of high-quality Claude Code plugins for professional development workflows.**
 
-[![Plugins](https://img.shields.io/badge/plugins-3-blue)](.claude-plugin/marketplace.json) [![Claude Code](https://img.shields.io/badge/Claude%20Code-compatible-green)](https://code.claude.com) [![License](https://img.shields.io/badge/license-MIT-purple)](LICENSE)
+[![Plugins](https://img.shields.io/badge/plugins-6-blue)](.claude-plugin/marketplace.json) [![Claude Code](https://img.shields.io/badge/Claude%20Code-compatible-green)](https://code.claude.com) [![License](https://img.shields.io/badge/license-MIT-purple)](LICENSE)
 
 ---
 
@@ -41,8 +41,11 @@ That's it. Claude does the work. You stay in control.
 | Plugin | Description | Components |
 |--------|-------------|------------|
 | **[devloop](plugins/devloop)** | Development workflow engine with autonomous planning and execution | 13 commands, 7 agents, 15 skills |
-| **[ctx](plugins/ctx)** | Persistent memory for Claude across sessions | 3 commands, 1 skill |
+| **[ctx](plugins/ctx)** | Persistent memory for Claude across sessions | 3 skills |
 | **[security](plugins/security)** | OWASP ASVS-aligned security audits | 1 command, 17 agents |
+| **[diagrams](plugins/diagrams)** | Text-based diagram generation (SVG, Mermaid, Excalidraw, D2) | 1 skill |
+| **[blog-writer](plugins/blog-writer)** | Conversational blog post creator | 1 command, 2 agents |
+| **[wsl-clipboard-fix](plugins/wsl-clipboard-fix)** | WSL2 clipboard image paste fix | 1 skill, hooks |
 
 ---
 

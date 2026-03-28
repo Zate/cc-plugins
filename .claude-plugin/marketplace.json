@@ -7,7 +7,7 @@
   },
   "metadata": {
     "description": "A curated marketplace of Claude Code plugins and skills for enhanced development workflows",
-    "version": "0.10.0",
+    "version": "0.10.1",
     "pluginRoot": "./plugins"
   },
   "plugins": [
@@ -47,11 +47,11 @@
       "tags": ["blog", "writing", "content", "voice", "de-ai", "markdown", "html"]
     },
     {
-      "name": "diagram-architect",
-      "source": "./plugins/diagram-architect",
-      "description": "Generate whitepaper-grade architecture diagrams as SVG. Supports 12+ diagram types including layered architecture, sequence, flow, threat model, state machine, and more with a full design system.",
+      "name": "diagrams",
+      "source": "./plugins/diagrams",
+      "description": "Generate amazing diagrams using text-based formats. Supports SVG, Mermaid, Excalidraw, D2, and more. 12+ diagram types including layered architecture, sequence, flow, threat model, state machine, and more with a full design system.",
       "category": "development",
-      "tags": ["diagrams", "svg", "architecture", "visualization", "sequence-diagram", "flow-diagram", "threat-model"]
+      "tags": ["diagrams", "svg", "mermaid", "excalidraw", "d2", "architecture", "visualization", "sequence-diagram", "flow-diagram", "threat-model"]
     }
   ]
 }

@@ -1,6 +1,8 @@
 ---
+name: setup
 description: Install, upgrade, or verify ctx persistent memory system
 argument-hint: None required
+user-invocable: true
 allowed-tools:
   - Bash
   - AskUserQuestion
