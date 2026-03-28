@@ -54,11 +54,11 @@ Before generating anything, establish:
 
 If the content could work as multiple types, choose the one that best highlights the **primary relationship** the reader needs to understand. When in doubt, ask the user.
 
-Consult `${CLAUDE_SKILL_DIR}/references/layout-patterns.md` for structural guidance and SVG construction patterns for each type.
+The layout patterns below (injected from references) provide structural guidance for each type.
 
 ### 3. Generate the SVG
 
-Build the SVG using the component library in `${CLAUDE_SKILL_DIR}/references/svg-design-system.md`. **Read the "Common SVG Mistakes" section first** -- it lists the most frequent errors. Core principles:
+Build the SVG using the design system components below (injected from references). **Read the "Common SVG Mistakes" section first** -- it lists the most frequent errors. Core principles:
 
 - **Always use `<defs>`** for gradients, shadows, markers -- define once, reference everywhere
 - **System fonts** -- `-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif`
@@ -199,12 +199,6 @@ SVG is token-expensive (~24x more tokens than Mermaid for equivalent diagrams). 
 - Preferring simple geometric shapes over complex paths where possible
 - Using `<symbol>` for icon libraries rather than inline paths
 
-## Additional Resources
-
-- **`${CLAUDE_SKILL_DIR}/references/svg-design-system.md`** -- SVG toolkit: gradients, shadows, typography, icons, element construction patterns
-- **`${CLAUDE_SKILL_DIR}/references/layout-patterns.md`** -- Structural patterns for 12+ diagram types with SVG construction guidance
-- **`${CLAUDE_SKILL_DIR}/assets/svg-components.svg`** -- Reusable SVG `<defs>` block (gradients, shadows, markers, icons)
-
 ## Anti-Patterns
 
 - **Do not** default to layered-architecture for everything -- choose the diagram type that fits the content
@@ -212,3 +206,15 @@ SVG is token-expensive (~24x more tokens than Mermaid for equivalent diagrams). 
 - **Do not** reuse the same layout across different diagrams -- each should look distinct
 - **Do not** add detail the user did not ask for -- match the requested abstraction level
 - **Do not** skip the `<defs>` block -- inline styles waste tokens and break consistency
+
+---
+
+## SVG Design System Reference
+
+!`cat "${CLAUDE_SKILL_DIR}/references/svg-design-system.md"`
+
+---
+
+## Layout Patterns Reference
+
+!`cat "${CLAUDE_SKILL_DIR}/references/layout-patterns.md"`
