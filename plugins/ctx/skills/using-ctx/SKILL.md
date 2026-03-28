@@ -1,53 +1,51 @@
 ---
 name: using-ctx
 description: "MANDATORY persistent memory system. Use BEFORE responding when you've made decisions, discovered preferences, found patterns, or completed debugging. Use when the user references past discussions or asks about what you remember."
-whenToUse: "Any session where you make decisions, learn facts, debug issues, or establish conventions. This is automatic -- ctx hooks manage the lifecycle."
+whenToUse: "Any session where you make decisions, learn facts, debug issues, or establish conventions."
 whenNotToUse: "Trivial single-turn Q&A with no decisions or learnings. When the user explicitly says not to store something."
 ---
 
 # ctx: Your Persistent Memory
 
-You have persistent memory across conversations via `ctx`. Hooks automatically inject stored knowledge at session start and parse commands from your responses at session end.
+You have persistent memory across conversations via `ctx`. Stored knowledge is automatically injected at session start. You store and retrieve knowledge by calling the `ctx` binary directly via Bash.
 
 ## The Rule
 
 BEFORE completing any response where you:
-- Made or learned a **decision** --> store as `type="decision"`
-- Discovered a **preference** or convention --> store as `type="fact"`
-- Found a recurring **pattern** --> store as `type="pattern"`
-- Debugging revealed a **root cause** --> store as `type="observation"`
-- Had an idea worth revisiting --> store as `type="hypothesis"`
-- A question can't be answered now --> store as `type="open-question"`
+- Made or learned a **decision** --> store as `type decision`
+- Discovered a **preference** or convention --> store as `type fact`
+- Found a recurring **pattern** --> store as `type pattern`
+- Debugging revealed a **root cause** --> store as `type observation`
+- Had an idea worth revisiting --> store as `type hypothesis`
+- A question can't be answered now --> store as `type open-question`
 
 **This is not optional. You are a stateless AI. If you don't store it, it's gone.**
 
-## How to Store
+## How to Store (ctx add)
 
-Always include a `tier:` tag. **Key question:** Every session? --> `pinned`. Someday? --> `reference`. This task? --> `working`.
+Use the `ctx add` command via Bash. Always include a `tier:` tag.
 
-```xml
-<!-- Pinned: critical, needed every session -->
-<ctx:remember type="fact" tags="tier:pinned,project:myproject">
-Always run tests before committing. User preference.
-</ctx:remember>
+**Key question:** Every session? --> `tier:pinned`. Someday? --> `tier:reference`. This task? --> `tier:working`.
 
-<!-- Working: task-scoped, temporary -->
-<ctx:remember type="observation" tags="tier:working,project:myproject">
-Auth bug seems related to token refresh timing.
-</ctx:remember>
+```bash
+# Pinned: critical, needed every session
+ctx add --type fact --tag tier:pinned --tag project:myproject "Always run tests before committing."
 
-<!-- Reference: durable but not needed every session -->
-<ctx:remember type="decision" tags="tier:reference,project:myproject">
-Chose PostgreSQL for multi-tenant concurrent write access.
-</ctx:remember>
+# Working: task-scoped, temporary
+ctx add --type observation --tag tier:working --tag project:myproject "Auth bug seems related to token refresh timing."
+
+# Reference: durable but not needed every session
+ctx add --type decision --tag tier:reference --tag project:myproject "Chose PostgreSQL for multi-tenant concurrent write access."
 ```
+
+The command returns the created node ID, which you can use for linking.
 
 ### Tiers
 
 | Tier | Auto-Loaded? | Use For | Examples |
 |------|-------------|---------|----------|
 | `tier:pinned` | Yes | Critical facts, foundational decisions, active conventions | "Always test code", "Uses Three.js + vanilla TS" |
-| `tier:reference` | No (use recall) | Durable knowledge, past decisions, resolved issues | "Chose PostgreSQL for multi-tenant" |
+| `tier:reference` | No (use query) | Durable knowledge, past decisions, resolved issues | "Chose PostgreSQL for multi-tenant" |
 | `tier:working` | Yes | Current task context, debugging, scratch | "Token refresh fails on expired tokens" |
 | `tier:off-context` | No | Archived, rarely needed | Completed task logs, old debugging |
 
@@ -63,37 +61,62 @@ Chose PostgreSQL for multi-tenant concurrent write access.
 | "Debugging: token refresh fails on expired tokens" (in-progress) | `observation` | `working` |
 | "Maybe the race is in cache invalidation" | `hypothesis` | `working` |
 
-## Other Commands
+## How to Query (ctx query / ctx list)
 
-Recall (results injected on next prompt - use to access reference knowledge):
-```xml
-<ctx:recall query="type:decision AND tag:project:X"/>
+```bash
+# Find all decisions for a project
+ctx query 'type:decision AND tag:project:myproject'
+
+# Find all pinned nodes
+ctx query 'tag:tier:pinned'
+
+# List recent nodes
+ctx list --since 24h
+
+# List by type
+ctx list --type observation
+
+# List by tag
+ctx list --tag project:myproject
+
+# Full-text search
+ctx query 'content:authentication'
 ```
 
-Status check:
-```xml
-<ctx:status/>
+## How to Read a Specific Node
+
+```bash
+# Show full node content by short ID prefix
+ctx show 01KMSE4R
 ```
 
-Task boundaries:
-```xml
-<ctx:task name="feature-name" action="start"/>
-<ctx:task name="feature-name" action="end"/>
+## How to Compose Context
+
+```bash
+# Compose specific nodes for subagent injection
+ctx compose --ids "01KM1,01KM3" --format markdown
+
+# Compose by query with token budget
+ctx compose --query "tag:tier:pinned AND tag:project:myproject" --budget 5000
 ```
 
-Link nodes: `<ctx:link from="ID1" to="ID2" type="DEPENDS_ON"/>`
-Summarize: `<ctx:summarize nodes="ID1,ID2">Summary here.</ctx:summarize>`
-Supersede: `<ctx:supersede old="ID1" new="ID2"/>`
-Expand: `<ctx:expand node="ID1"/>`
+## Managing Nodes
 
-## Starting a Task
+```bash
+# Add a tag
+ctx tag 01KMSE4R tier:reference
 
-At the start of a task, recall relevant reference knowledge:
-```xml
-<ctx:recall query="type:decision AND tag:project:myproject"/>
+# Remove a tag
+ctx untag 01KMSE4R tier:working
+
+# Supersede an old node with new content
+ctx add --type decision --tag tier:pinned "New decision replacing old one."
+# Then link them:
+ctx link <new-id> <old-id> --type SUPERSEDES
+
+# Check status
+ctx status
 ```
-
-This brings in past decisions without them cluttering every session.
 
 ## Red Flags
 
@@ -108,43 +131,18 @@ This brings in past decisions without them cluttering every session.
 
 ## Rules
 
-- Commands in code blocks are ignored - only bare commands in your response text are processed
-- Commands are parsed on every user prompt (prompt-submit hook) and at session end (stop hook)
-- `recall` and `status` results are injected on the next user prompt
+- Use `ctx add` via Bash for writes -- this is immediate and reliable
+- Use `ctx query` or `ctx list` for reads during a session
+- Session-start hook automatically injects pinned + working nodes
 - Use `project:X` tags for cross-project organization
-
-## Remote Sync (Optional)
-
-ctx can sync knowledge to a remote server, enabling shared memory across devices. When configured:
-
-- **Auto-sync pull** runs on session start (before knowledge injection)
-- **Auto-sync push** runs on session end (after command parsing)
-- This is transparent — no changes needed to how you use ctx commands
-
-Setup commands (run by the user, not the agent):
-```bash
-ctx remote set https://server-url:8377
-ctx auth                    # Device flow authentication
-ctx sync push               # Manual push
-ctx sync pull               # Manual pull
-```
-
-Auto-sync is enabled by setting `auto_sync: true` in `~/.ctx/server.yaml` or `CTX_AUTO_SYNC=true`.
-
-You do NOT need to manage sync — hooks handle it automatically. Just use `<ctx:remember>`, `<ctx:recall>`, etc. as normal.
+- Always include a `tier:` tag on every node
 
 ## Coordination with MEMORY.md
 
-Claude Code has a built-in auto memory system (`MEMORY.md` in `~/.claude/projects/<project>/memory/`) that loads project-scoped notes into every conversation's system prompt. ctx is a separate structured knowledge graph. Both are loaded at session start, so duplicated content wastes context tokens.
+Claude Code has a built-in auto memory system (`MEMORY.md` in `~/.claude/projects/<project>/memory/`). ctx is a separate structured knowledge graph.
 
 **Division of labor:**
 - **MEMORY.md**: Concise project-level notes -- release rules, gotchas, conventions, short reminders. File-based, project-scoped, always loaded (first 200 lines).
 - **ctx**: Detailed typed knowledge -- decisions, patterns, observations, hypotheses. Structured, cross-project, tiered, queryable.
 
-**When you write to MEMORY.md, you MUST also evaluate ctx:**
-1. Is this knowledge already in ctx? If so, do NOT duplicate it in MEMORY.md -- keep it in one place only.
-2. Does this belong in ctx instead? If it's a decision, pattern, observation, or cross-project knowledge, store it in ctx and keep only a brief reference (or nothing) in MEMORY.md.
-3. Does an existing ctx node need updating or removing? If the MEMORY.md change supersedes something in ctx, update or remove the ctx node.
-4. Take action -- don't just consider, actually emit the ctx commands (remember/supersede/summarize) in the same response.
-
-**When you store in ctx, check MEMORY.md too:** If the same fact exists in MEMORY.md, remove it from MEMORY.md to avoid duplication. ctx is authoritative (structured and versioned).
+**Avoid duplication** between the two systems. If it's a decision, pattern, or observation, prefer ctx. If it's a quick one-line project convention, prefer MEMORY.md.

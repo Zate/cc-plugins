@@ -20,7 +20,7 @@ if [[ -z "$CTX_BIN" ]]; then
 fi
 
 # Minimum binary version required by this plugin
-MIN_BINARY_VERSION="0.3.1"
+MIN_BINARY_VERSION="0.6.0"
 BINARY_HINT=""
 if RAW_VERSION=$("$CTX_BIN" version 2>/dev/null); then
     CURRENT_VER=$(echo "$RAW_VERSION" | sed -n 's/ctx \([^ ]*\).*/\1/p' | sed 's/^v//')
@@ -41,8 +41,12 @@ if command -v git &>/dev/null; then
     [[ -n "$REPO_ROOT" ]] && PROJECT_NAME=$(basename "$REPO_ROOT" | tr '[:upper:]' '[:lower:]')
 fi
 
-# Get ctx hook output
-CTX_OUTPUT=$("$CTX_BIN" hook session-start --project="$PROJECT_NAME" 2>/dev/null || echo '{}')
+# Get ctx hook output (with plugin primer if available)
+PRIMER_ARGS=""
+if [[ -f "$PLUGIN_ROOT/primer.md" ]]; then
+    PRIMER_ARGS="--primer-file=$PLUGIN_ROOT/primer.md"
+fi
+CTX_OUTPUT=$("$CTX_BIN" hook session-start --project="$PROJECT_NAME" $PRIMER_ARGS 2>/dev/null || echo '{}')
 
 # Extract additionalContext
 CTX_CONTEXT=""

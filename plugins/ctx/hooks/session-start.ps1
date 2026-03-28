@@ -36,7 +36,7 @@ if (-not $ctxCmd) {
 }
 
 # --- Minimum binary version required by this plugin ---
-$minBinaryVersion = '0.3.1'
+$minBinaryVersion = '0.6.0'
 $binaryHint = ''
 try {
     $rawVersion = & $ctxCmd version 2>$null
@@ -105,10 +105,15 @@ try {
     }
 } catch {}
 
-# --- Get ctx hook output ---
+# --- Get ctx hook output (with plugin primer if available) ---
 $ctxOutput = '{}'
 try {
-    $ctxOutput = & $ctxCmd hook session-start --project="$projectName" 2>$null
+    $primerPath = Join-Path $pluginRoot 'primer.md'
+    $primerArgs = @()
+    if (Test-Path $primerPath) {
+        $primerArgs = @("--primer-file=$primerPath")
+    }
+    $ctxOutput = & $ctxCmd hook session-start --project="$projectName" @primerArgs 2>$null
     if (-not $ctxOutput) { $ctxOutput = '{}' }
 } catch {
     $ctxOutput = '{}'

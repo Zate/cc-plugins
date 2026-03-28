@@ -1,5 +1,5 @@
 {
-  "description": "ctx persistent memory hooks - session lifecycle and knowledge management",
+  "description": "ctx persistent memory - session-start injects stored knowledge, writes happen via ctx binary directly",
   "hooks": {
     "SessionStart": [
       {
@@ -9,29 +9,6 @@
             "type": "command",
             "command": "\"${CLAUDE_PLUGIN_ROOT}/hooks/run-hook.cmd\" session-start",
             "timeout": 15
-          }
-        ]
-      }
-    ],
-    "UserPromptSubmit": [
-      {
-        "matcher": ".*",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "\"${CLAUDE_PLUGIN_ROOT}/hooks/run-hook.cmd\" prompt-submit",
-            "timeout": 5
-          }
-        ]
-      }
-    ],
-    "Stop": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "\"${CLAUDE_PLUGIN_ROOT}/hooks/run-hook.cmd\" stop",
-            "timeout": 10
           }
         ]
       }
