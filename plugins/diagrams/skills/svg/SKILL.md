@@ -55,11 +55,11 @@ Before generating anything, establish:
 
 If the content could work as multiple types, choose the one that best highlights the **primary relationship** the reader needs to understand. When in doubt, ask the user.
 
-Consult [layout-patterns.md](${CLAUDE_SKILL_DIR}/references/layout-patterns.md) for structural guidance and SVG construction patterns for each type.
+Consult [layout-patterns.md](references/layout-patterns.md) for structural guidance and SVG construction patterns for each type.
 
 ### 3. Generate the SVG
 
-Build the SVG using the component library in [svg-design-system.md](${CLAUDE_SKILL_DIR}/references/svg-design-system.md). **Read the "Common SVG Mistakes" section first** -- it lists the most frequent errors. Core principles:
+Build the SVG using the component library in [svg-design-system.md](references/svg-design-system.md). **Read the "Common SVG Mistakes" section first** -- it lists the most frequent errors. Core principles:
 
 - **Always use `<defs>`** for gradients, shadows, markers -- define once, reference everywhere
 - **System fonts** -- `-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif`
@@ -210,6 +210,6 @@ SVG is token-expensive (~24x more tokens than Mermaid for equivalent diagrams). 
 
 ## Additional Resources
 
-- For SVG component toolkit (gradients, shadows, typography, icons, element patterns), see [svg-design-system.md](${CLAUDE_SKILL_DIR}/references/svg-design-system.md)
-- For structural patterns for 12+ diagram types with SVG construction guidance, see [layout-patterns.md](${CLAUDE_SKILL_DIR}/references/layout-patterns.md)
-- For reusable SVG `<defs>` block, see [svg-components.svg](${CLAUDE_SKILL_DIR}/assets/svg-components.svg)
+- For SVG component toolkit (gradients, shadows, typography, icons, element patterns), see [svg-design-system.md](references/svg-design-system.md)
+- For structural patterns for 12+ diagram types with SVG construction guidance, see [layout-patterns.md](references/layout-patterns.md)
+- For reusable SVG `<defs>` block, see [svg-components.svg](assets/svg-components.svg)

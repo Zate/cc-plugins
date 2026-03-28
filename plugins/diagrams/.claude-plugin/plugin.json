@@ -1,6 +1,6 @@
 {
   "name": "diagrams",
-  "version": "2.0.4",
+  "version": "2.0.5",
   "description": "Generate amazing diagrams using text-based formats (SVG, Mermaid, Excalidraw, D2) with intelligent format routing and a shared design system",
   "author": {
     "name": "Zate Berg",

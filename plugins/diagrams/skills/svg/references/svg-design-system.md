@@ -245,7 +245,7 @@ Define as `<symbol>` in `<defs>`, use via `<use href="#iconName" x="..." y="..."
 
 Icons should be **subtle** — small (24-28px), partially transparent (`opacity="0.4"` on the `<use>` element), positioned in the top-left corner of their parent box. They reinforce meaning without demanding attention.
 
-See `${CLAUDE_SKILL_DIR}/assets/svg-components.svg` for the full icon library.
+See `assets/svg-components.svg` (in this skill's directory) for the full icon library.
 
 ## Box Construction Patterns
 
