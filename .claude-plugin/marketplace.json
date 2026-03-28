@@ -7,7 +7,7 @@
   },
   "metadata": {
     "description": "A curated marketplace of Claude Code plugins and skills for enhanced development workflows",
-    "version": "0.10.1",
+    "version": "0.10.2",
     "pluginRoot": "./plugins"
   },
   "plugins": [
@@ -49,7 +49,7 @@
     {
       "name": "diagrams",
       "source": "./plugins/diagrams",
-      "description": "Generate amazing diagrams using text-based formats. Supports SVG, Mermaid, Excalidraw, D2, and more. 12+ diagram types including layered architecture, sequence, flow, threat model, state machine, and more with a full design system.",
+      "description": "Generate amazing diagrams using 4 text-based formats (SVG, Mermaid, Excalidraw, D2) with intelligent format routing, 20+ diagram types, a shared design system with color theory, WCAG accessibility, and composition rules.",
       "category": "development",
       "tags": ["diagrams", "svg", "mermaid", "excalidraw", "d2", "architecture", "visualization", "sequence-diagram", "flow-diagram", "threat-model"]
     }

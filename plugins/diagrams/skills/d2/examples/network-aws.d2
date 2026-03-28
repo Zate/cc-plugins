@@ -1,0 +1,56 @@
+aws: AWS us-east-1 {
+  vpc: VPC 10.0.0.0/16 {
+    style: {
+      fill: "#F8FAFC"
+      stroke: "#94A3B8"
+    }
+
+    public: Public Subnet {
+      style: {
+        fill: "#EFF6FF"
+        stroke: "#2563EB"
+      }
+      alb: Application Load Balancer {
+        shape: hexagon
+      }
+      nat: NAT Gateway
+    }
+
+    private-app: Private Subnet (App) {
+      style: {
+        fill: "#F0FDF4"
+        stroke: "#16A34A"
+      }
+      ecs: ECS Cluster {
+        api-1: API Task
+        api-2: API Task
+        worker: Worker Task
+      }
+    }
+
+    private-data: Private Subnet (Data) {
+      style: {
+        fill: "#FFF7ED"
+        stroke: "#D97706"
+      }
+      rds: RDS PostgreSQL {
+        shape: cylinder
+      }
+      elasticache: ElastiCache Redis {
+        shape: cylinder
+      }
+    }
+
+    public.alb -> private-app.ecs: Port 8080
+    private-app.ecs -> private-data.rds: Port 5432
+    private-app.ecs -> private-data.elasticache: Port 6379
+    private-app.ecs -> public.nat: Outbound
+  }
+}
+
+internet: Internet {
+  shape: cloud
+}
+
+internet -> aws.vpc.public.alb: HTTPS 443
+aws.vpc.public.nat -> internet: Outbound

@@ -1,0 +1,124 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1400 750"
+     font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif"
+     role="img" aria-labelledby="diagramTitle diagramDesc">
+  <title id="diagramTitle">OAuth2 Authorization Code Flow</title>
+  <desc id="diagramDesc">Sequence diagram showing the OAuth2 authorization code flow between Browser, App Server, and Auth Provider with token exchange.</desc>
+  <defs>
+    <linearGradient id="blueGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#3B82F6"/>
+      <stop offset="100%" stop-color="#1D4ED8"/>
+    </linearGradient>
+    <linearGradient id="greenGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#22C55E"/>
+      <stop offset="100%" stop-color="#15803D"/>
+    </linearGradient>
+    <linearGradient id="purpleGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#8B5CF6"/>
+      <stop offset="100%" stop-color="#6D28D9"/>
+    </linearGradient>
+    <filter id="shadow" x="-4%" y="-4%" width="108%" height="112%">
+      <feDropShadow dx="0" dy="3" stdDeviation="6" flood-color="#172B4D" flood-opacity="0.12"/>
+    </filter>
+    <marker id="arrowGray" markerWidth="12" markerHeight="8" refX="6" refY="4" orient="auto">
+      <path d="M0,0 L12,4 L0,8 L3,4 Z" fill="#505F79"/>
+    </marker>
+    <marker id="arrowBlue" markerWidth="12" markerHeight="8" refX="6" refY="4" orient="auto">
+      <path d="M0,0 L12,4 L0,8 L3,4 Z" fill="#1D4ED8"/>
+    </marker>
+  </defs>
+
+  <rect width="1400" height="750" fill="#FAFBFC"/>
+
+  <!-- Title -->
+  <text x="700" y="40" text-anchor="middle" font-size="22" font-weight="700" fill="#1E293B">OAuth2 Authorization Code Flow</text>
+
+  <!-- Participant Headers -->
+  <g filter="url(#shadow)">
+    <rect x="120" y="65" width="180" height="50" rx="8" fill="url(#blueGrad)"/>
+    <text x="210" y="95" text-anchor="middle" font-size="15" font-weight="600" fill="white">Browser</text>
+  </g>
+  <g filter="url(#shadow)">
+    <rect x="560" y="65" width="180" height="50" rx="8" fill="url(#greenGrad)"/>
+    <text x="650" y="95" text-anchor="middle" font-size="15" font-weight="600" fill="white">App Server</text>
+  </g>
+  <g filter="url(#shadow)">
+    <rect x="1000" y="65" width="180" height="50" rx="8" fill="url(#purpleGrad)"/>
+    <text x="1090" y="95" text-anchor="middle" font-size="15" font-weight="600" fill="white">Auth Provider</text>
+  </g>
+
+  <!-- Lifelines -->
+  <line x1="210" y1="115" x2="210" y2="700" stroke="#DFE1E6" stroke-width="1.5" stroke-dasharray="6,4"/>
+  <line x1="650" y1="115" x2="650" y2="700" stroke="#DFE1E6" stroke-width="1.5" stroke-dasharray="6,4"/>
+  <line x1="1090" y1="115" x2="1090" y2="700" stroke="#DFE1E6" stroke-width="1.5" stroke-dasharray="6,4"/>
+
+  <!-- Step 1: Login request -->
+  <circle cx="170" cy="170" r="12" fill="#1D4ED8"/>
+  <text x="170" y="174" text-anchor="middle" font-size="10" font-weight="700" fill="white">1</text>
+  <line x1="210" y1="170" x2="640" y2="170" stroke="#505F79" stroke-width="1.5" marker-end="url(#arrowGray)"/>
+  <text x="425" y="162" text-anchor="middle" font-size="12" font-weight="500" fill="#1E293B">GET /login</text>
+
+  <!-- Step 2: Redirect to auth -->
+  <circle cx="610" cy="220" r="12" fill="#15803D"/>
+  <text x="610" y="224" text-anchor="middle" font-size="10" font-weight="700" fill="white">2</text>
+  <line x1="650" y1="220" x2="220" y2="220" stroke="#505F79" stroke-width="1.5" stroke-dasharray="6,3" marker-end="url(#arrowGray)"/>
+  <text x="435" y="212" text-anchor="middle" font-size="12" fill="#505F79" font-style="italic">302 Redirect to Auth Provider</text>
+
+  <!-- Step 3: Auth request -->
+  <circle cx="170" cy="280" r="12" fill="#1D4ED8"/>
+  <text x="170" y="284" text-anchor="middle" font-size="10" font-weight="700" fill="white">3</text>
+  <line x1="210" y1="280" x2="1080" y2="280" stroke="#505F79" stroke-width="1.5" marker-end="url(#arrowGray)"/>
+  <text x="650" y="272" text-anchor="middle" font-size="12" font-weight="500" fill="#1E293B">GET /authorize?client_id=...&redirect_uri=...</text>
+
+  <!-- Step 4: Login form -->
+  <circle cx="1130" cy="340" r="12" fill="#6D28D9"/>
+  <text x="1130" y="344" text-anchor="middle" font-size="10" font-weight="700" fill="white">4</text>
+  <line x1="1090" y1="340" x2="220" y2="340" stroke="#505F79" stroke-width="1.5" stroke-dasharray="6,3" marker-end="url(#arrowGray)"/>
+  <text x="650" y="332" text-anchor="middle" font-size="12" fill="#505F79" font-style="italic">Login page</text>
+
+  <!-- Step 5: User authenticates -->
+  <circle cx="170" cy="400" r="12" fill="#1D4ED8"/>
+  <text x="170" y="404" text-anchor="middle" font-size="10" font-weight="700" fill="white">5</text>
+  <line x1="210" y1="400" x2="1080" y2="400" stroke="#505F79" stroke-width="1.5" marker-end="url(#arrowGray)"/>
+  <text x="650" y="392" text-anchor="middle" font-size="12" font-weight="500" fill="#1E293B">POST /authenticate (credentials)</text>
+
+  <!-- Step 6: Auth code redirect -->
+  <circle cx="1130" cy="460" r="12" fill="#6D28D9"/>
+  <text x="1130" y="464" text-anchor="middle" font-size="10" font-weight="700" fill="white">6</text>
+  <line x1="1090" y1="460" x2="220" y2="460" stroke="#505F79" stroke-width="1.5" stroke-dasharray="6,3" marker-end="url(#arrowGray)"/>
+  <text x="650" y="452" text-anchor="middle" font-size="12" fill="#505F79" font-style="italic">302 Redirect to callback?code=AUTH_CODE</text>
+
+  <!-- Activation bar on App Server for token exchange -->
+  <rect x="645" y="505" width="10" height="90" rx="3" fill="#15803D" fill-opacity="0.2"/>
+
+  <!-- Step 7: Exchange code -->
+  <circle cx="170" cy="520" r="12" fill="#1D4ED8"/>
+  <text x="170" y="524" text-anchor="middle" font-size="10" font-weight="700" fill="white">7</text>
+  <line x1="210" y1="520" x2="640" y2="520" stroke="#505F79" stroke-width="1.5" marker-end="url(#arrowGray)"/>
+  <text x="425" y="512" text-anchor="middle" font-size="12" font-weight="500" fill="#1E293B">GET /callback?code=AUTH_CODE</text>
+
+  <!-- Step 8: Token exchange (server to auth) -->
+  <circle cx="695" cy="560" r="12" fill="#15803D"/>
+  <text x="695" y="564" text-anchor="middle" font-size="10" font-weight="700" fill="white">8</text>
+  <line x1="660" y1="560" x2="1080" y2="560" stroke="#1D4ED8" stroke-width="1.5" marker-end="url(#arrowBlue)"/>
+  <text x="870" y="552" text-anchor="middle" font-size="12" font-weight="600" fill="#1D4ED8">POST /token (code + client_secret)</text>
+
+  <!-- Step 9: Access token response -->
+  <circle cx="1130" cy="600" r="12" fill="#6D28D9"/>
+  <text x="1130" y="604" text-anchor="middle" font-size="10" font-weight="700" fill="white">9</text>
+  <line x1="1090" y1="600" x2="660" y2="600" stroke="#1D4ED8" stroke-width="1.5" stroke-dasharray="6,3" marker-end="url(#arrowBlue)"/>
+  <text x="870" y="592" text-anchor="middle" font-size="12" fill="#1D4ED8" font-style="italic">{access_token, refresh_token}</text>
+
+  <!-- Step 10: Set session -->
+  <line x1="650" y1="650" x2="220" y2="650" stroke="#505F79" stroke-width="1.5" stroke-dasharray="6,3" marker-end="url(#arrowGray)"/>
+  <text x="435" y="642" text-anchor="middle" font-size="12" fill="#505F79" font-style="italic">Set session cookie, redirect to app</text>
+
+  <!-- Legend -->
+  <g transform="translate(50, 710)">
+    <line x1="0" y1="0" x2="30" y2="0" stroke="#505F79" stroke-width="1.5" marker-end="url(#arrowGray)"/>
+    <text x="38" y="4" font-size="11" fill="#64748B">Request</text>
+    <line x1="120" y1="0" x2="150" y2="0" stroke="#505F79" stroke-width="1.5" stroke-dasharray="6,3" marker-end="url(#arrowGray)"/>
+    <text x="158" y="4" font-size="11" fill="#64748B">Response</text>
+    <line x1="260" y1="0" x2="290" y2="0" stroke="#1D4ED8" stroke-width="1.5" marker-end="url(#arrowBlue)"/>
+    <text x="298" y="4" font-size="11" fill="#64748B">Server-to-server</text>
+  </g>
+</svg>

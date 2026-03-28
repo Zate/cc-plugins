@@ -1,0 +1,21 @@
+flowchart LR
+    subgraph Source
+        A[Developer] --> B[Git Push]
+    end
+
+    subgraph CI
+        B --> C[Build]
+        C --> D{Tests Pass?}
+        D -->|Yes| E[Docker Image]
+        D -->|No| F[Notify Dev]
+        F --> A
+    end
+
+    subgraph Deploy
+        E --> G{Environment?}
+        G -->|Staging| H[Deploy Staging]
+        G -->|Production| I[Deploy Prod]
+        H --> J{Smoke Tests?}
+        J -->|Pass| I
+        J -->|Fail| K[Rollback]
+    end

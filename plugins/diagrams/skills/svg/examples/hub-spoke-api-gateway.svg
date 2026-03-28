@@ -1,0 +1,134 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 900"
+     font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif"
+     role="img" aria-labelledby="diagramTitle diagramDesc">
+  <title id="diagramTitle">API Gateway Hub and Spoke</title>
+  <desc id="diagramDesc">Hub-and-spoke diagram showing an API Gateway at the center connected to six backend services arranged radially.</desc>
+  <defs>
+    <linearGradient id="hubGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#3B82F6"/>
+      <stop offset="100%" stop-color="#1D4ED8"/>
+    </linearGradient>
+    <linearGradient id="greenGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#22C55E"/>
+      <stop offset="100%" stop-color="#15803D"/>
+    </linearGradient>
+    <linearGradient id="purpleGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#8B5CF6"/>
+      <stop offset="100%" stop-color="#6D28D9"/>
+    </linearGradient>
+    <linearGradient id="tealGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#06B6D4"/>
+      <stop offset="100%" stop-color="#0E7490"/>
+    </linearGradient>
+    <linearGradient id="amberGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#F59E0B"/>
+      <stop offset="100%" stop-color="#B45309"/>
+    </linearGradient>
+    <linearGradient id="slateGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#64748B"/>
+      <stop offset="100%" stop-color="#334155"/>
+    </linearGradient>
+    <linearGradient id="redGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#EF4444"/>
+      <stop offset="100%" stop-color="#B91C1C"/>
+    </linearGradient>
+    <filter id="shadowLg" x="-3%" y="-3%" width="106%" height="110%">
+      <feDropShadow dx="0" dy="4" stdDeviation="10" flood-color="#172B4D" flood-opacity="0.15"/>
+    </filter>
+    <filter id="shadow" x="-4%" y="-4%" width="108%" height="112%">
+      <feDropShadow dx="0" dy="3" stdDeviation="6" flood-color="#172B4D" flood-opacity="0.1"/>
+    </filter>
+    <marker id="arrowIn" markerWidth="10" markerHeight="7" refX="1" refY="3.5" orient="auto">
+      <path d="M0,0 L10,3.5 L0,7 L2.5,3.5 Z" fill="#94A3B8"/>
+    </marker>
+    <marker id="arrowOut" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <path d="M0,0 L10,3.5 L0,7 L2.5,3.5 Z" fill="#94A3B8"/>
+    </marker>
+  </defs>
+
+  <rect width="1000" height="900" fill="#FAFBFC"/>
+
+  <!-- Title -->
+  <text x="500" y="42" text-anchor="middle" font-size="22" font-weight="700" fill="#1E293B">API Gateway</text>
+  <text x="500" y="66" text-anchor="middle" font-size="14" fill="#64748B">Centralized routing, auth, and rate limiting</text>
+
+  <!-- Connecting lines (drawn first, behind everything) -->
+  <!-- Auth (top-left) -->
+  <line x1="290" y1="280" x2="420" y2="380" stroke="#94A3B8" stroke-width="2" stroke-dasharray="6,4" marker-start="url(#arrowIn)" marker-end="url(#arrowOut)"/>
+  <!-- Users (top-right) -->
+  <line x1="710" y1="280" x2="580" y2="380" stroke="#94A3B8" stroke-width="2" stroke-dasharray="6,4" marker-start="url(#arrowIn)" marker-end="url(#arrowOut)"/>
+  <!-- Products (left) -->
+  <line x1="200" y1="470" x2="380" y2="450" stroke="#94A3B8" stroke-width="2" stroke-dasharray="6,4" marker-start="url(#arrowIn)" marker-end="url(#arrowOut)"/>
+  <!-- Orders (right) -->
+  <line x1="800" y1="470" x2="620" y2="450" stroke="#94A3B8" stroke-width="2" stroke-dasharray="6,4" marker-start="url(#arrowIn)" marker-end="url(#arrowOut)"/>
+  <!-- Payments (bottom-left) -->
+  <line x1="290" y1="660" x2="420" y2="520" stroke="#94A3B8" stroke-width="2" stroke-dasharray="6,4" marker-start="url(#arrowIn)" marker-end="url(#arrowOut)"/>
+  <!-- Notifications (bottom-right) -->
+  <line x1="710" y1="660" x2="580" y2="520" stroke="#94A3B8" stroke-width="2" stroke-dasharray="6,4" marker-start="url(#arrowIn)" marker-end="url(#arrowOut)"/>
+
+  <!-- Hub: API Gateway -->
+  <g filter="url(#shadowLg)">
+    <rect x="380" y="370" width="240" height="160" rx="16" fill="url(#hubGrad)"/>
+    <text x="500" y="430" text-anchor="middle" font-size="20" font-weight="700" fill="white">API Gateway</text>
+    <line x1="420" y1="445" x2="580" y2="445" stroke="white" stroke-width="1" stroke-opacity="0.3"/>
+    <text x="500" y="470" text-anchor="middle" font-size="12" fill="white" fill-opacity="0.85">Auth / Rate Limit / Route</text>
+    <text x="500" y="490" text-anchor="middle" font-size="12" fill="white" fill-opacity="0.85">TLS Termination</text>
+    <text x="500" y="510" text-anchor="middle" font-size="12" fill="white" fill-opacity="0.65">Kong / Envoy / NGINX</text>
+  </g>
+
+  <!-- Spoke 1: Auth Service (top-left) -->
+  <g filter="url(#shadow)">
+    <rect x="130" y="200" width="160" height="70" rx="10" fill="url(#greenGrad)"/>
+    <text x="210" y="235" text-anchor="middle" font-size="15" font-weight="600" fill="white">Auth Service</text>
+    <text x="210" y="255" text-anchor="middle" font-size="11" fill="white" fill-opacity="0.8">JWT / OAuth2</text>
+  </g>
+
+  <!-- Spoke 2: Users Service (top-right) -->
+  <g filter="url(#shadow)">
+    <rect x="710" y="200" width="160" height="70" rx="10" fill="url(#tealGrad)"/>
+    <text x="790" y="235" text-anchor="middle" font-size="15" font-weight="600" fill="white">Users Service</text>
+    <text x="790" y="255" text-anchor="middle" font-size="11" fill="white" fill-opacity="0.8">Profiles / Roles</text>
+  </g>
+
+  <!-- Spoke 3: Products Service (left) -->
+  <g filter="url(#shadow)">
+    <rect x="50" y="430" width="160" height="70" rx="10" fill="url(#purpleGrad)"/>
+    <text x="130" y="465" text-anchor="middle" font-size="15" font-weight="600" fill="white">Products</text>
+    <text x="130" y="485" text-anchor="middle" font-size="11" fill="white" fill-opacity="0.8">Catalog / Search</text>
+  </g>
+
+  <!-- Spoke 4: Orders Service (right) -->
+  <g filter="url(#shadow)">
+    <rect x="790" y="430" width="160" height="70" rx="10" fill="url(#amberGrad)"/>
+    <text x="870" y="465" text-anchor="middle" font-size="15" font-weight="600" fill="white">Orders</text>
+    <text x="870" y="485" text-anchor="middle" font-size="11" fill="white" fill-opacity="0.8">Cart / Checkout</text>
+  </g>
+
+  <!-- Spoke 5: Payments Service (bottom-left) -->
+  <g filter="url(#shadow)">
+    <rect x="130" y="620" width="160" height="70" rx="10" fill="url(#redGrad)"/>
+    <text x="210" y="655" text-anchor="middle" font-size="15" font-weight="600" fill="white">Payments</text>
+    <text x="210" y="675" text-anchor="middle" font-size="11" fill="white" fill-opacity="0.8">Stripe / Billing</text>
+  </g>
+
+  <!-- Spoke 6: Notifications (bottom-right) -->
+  <g filter="url(#shadow)">
+    <rect x="710" y="620" width="160" height="70" rx="10" fill="url(#slateGrad)"/>
+    <text x="790" y="655" text-anchor="middle" font-size="15" font-weight="600" fill="white">Notifications</text>
+    <text x="790" y="675" text-anchor="middle" font-size="11" fill="white" fill-opacity="0.8">Email / Push / SMS</text>
+  </g>
+
+  <!-- Protocol labels on connections -->
+  <text x="340" y="325" text-anchor="middle" font-size="10" fill="#64748B" transform="rotate(-30 340 325)">gRPC</text>
+  <text x="660" y="325" text-anchor="middle" font-size="10" fill="#64748B" transform="rotate(30 660 325)">REST</text>
+  <text x="280" y="460" text-anchor="middle" font-size="10" fill="#64748B">GraphQL</text>
+  <text x="720" y="460" text-anchor="middle" font-size="10" fill="#64748B">REST</text>
+  <text x="340" y="600" text-anchor="middle" font-size="10" fill="#64748B" transform="rotate(30 340 600)">gRPC</text>
+  <text x="660" y="600" text-anchor="middle" font-size="10" fill="#64748B" transform="rotate(-30 660 600)">AMQP</text>
+
+  <!-- Legend -->
+  <g transform="translate(350, 830)">
+    <line x1="0" y1="0" x2="30" y2="0" stroke="#94A3B8" stroke-width="2" stroke-dasharray="6,4"/>
+    <text x="38" y="4" font-size="11" fill="#64748B">Bidirectional communication</text>
+  </g>
+</svg>

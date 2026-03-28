@@ -1,0 +1,42 @@
+erDiagram
+    CUSTOMER ||--o{ ORDER : places
+    ORDER ||--|{ LINE_ITEM : contains
+    PRODUCT ||--o{ LINE_ITEM : "included in"
+    PRODUCT }o--|| CATEGORY : "belongs to"
+    ORDER ||--o| PAYMENT : "paid via"
+    CUSTOMER ||--o{ ADDRESS : has
+
+    CUSTOMER {
+        uuid id PK
+        string name
+        string email UK
+        timestamp created_at
+    }
+    ORDER {
+        uuid id PK
+        uuid customer_id FK
+        string status
+        decimal total
+        timestamp ordered_at
+    }
+    PRODUCT {
+        uuid id PK
+        string name
+        decimal price
+        int stock
+        uuid category_id FK
+    }
+    LINE_ITEM {
+        uuid id PK
+        uuid order_id FK
+        uuid product_id FK
+        int quantity
+        decimal unit_price
+    }
+    PAYMENT {
+        uuid id PK
+        uuid order_id FK
+        string provider
+        string status
+        decimal amount
+    }

@@ -1,0 +1,19 @@
+stateDiagram-v2
+    [*] --> Created
+
+    Created --> Confirmed: payment_received
+    Created --> Cancelled: user_cancels
+
+    Confirmed --> Processing: fulfillment_started
+    Processing --> Shipped: package_dispatched
+    Processing --> Failed: fulfillment_error
+
+    Shipped --> Delivered: delivery_confirmed
+    Shipped --> Returned: return_requested
+
+    Failed --> Processing: retry
+
+    Delivered --> [*]
+    Cancelled --> [*]
+    Returned --> Refunded
+    Refunded --> [*]

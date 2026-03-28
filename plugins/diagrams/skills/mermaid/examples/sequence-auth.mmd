@@ -1,0 +1,25 @@
+sequenceDiagram
+    participant C as Client
+    participant G as API Gateway
+    participant A as Auth Service
+    participant S as Resource Server
+
+    C->>G: POST /login (credentials)
+    activate G
+    G->>A: Validate credentials
+    activate A
+    A-->>G: JWT token
+    deactivate A
+    G-->>C: 200 OK + token
+    deactivate G
+
+    C->>G: GET /api/data (Bearer token)
+    activate G
+    G->>A: Verify token
+    A-->>G: Valid
+    G->>S: Forward request
+    activate S
+    S-->>G: Response data
+    deactivate S
+    G-->>C: 200 OK + data
+    deactivate G

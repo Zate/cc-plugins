@@ -1,0 +1,62 @@
+direction: right
+
+clients: Clients {
+  web: Web App
+  mobile: Mobile App
+  cli: CLI Tool
+}
+
+gateway: API Gateway {
+  shape: hexagon
+  style: {
+    fill: "#EFF6FF"
+    stroke: "#2563EB"
+    shadow: true
+  }
+}
+
+services: Backend Services {
+  auth: Auth Service {
+    style: {
+      fill: "#F0FDF4"
+      stroke: "#16A34A"
+    }
+  }
+  users: User Service
+  orders: Order Service
+  payments: Payment Service {
+    style: {
+      fill: "#FEF2F2"
+      stroke: "#DC2626"
+    }
+  }
+  notifications: Notification Service
+}
+
+data: Data Layer {
+  postgres: PostgreSQL {
+    shape: cylinder
+  }
+  redis: Redis Cache {
+    shape: cylinder
+  }
+  queue: Message Queue {
+    shape: queue
+  }
+}
+
+clients.web -> gateway: HTTPS
+clients.mobile -> gateway: HTTPS
+clients.cli -> gateway: gRPC
+
+gateway -> services.auth: Verify JWT
+gateway -> services.users: REST
+gateway -> services.orders: REST
+gateway -> services.payments: REST
+
+services.auth -> data.redis: Sessions
+services.users -> data.postgres: SQL
+services.orders -> data.postgres: SQL
+services.orders -> data.queue: Events
+services.payments -> data.postgres: SQL
+services.notifications -> data.queue: Subscribe

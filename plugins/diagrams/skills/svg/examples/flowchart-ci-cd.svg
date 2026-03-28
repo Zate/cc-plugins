@@ -1,0 +1,149 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1500 550"
+     font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif"
+     role="img" aria-labelledby="diagramTitle diagramDesc">
+  <title id="diagramTitle">CI/CD Pipeline</title>
+  <desc id="diagramDesc">Flow diagram showing a CI/CD pipeline from code push through build, test, and deployment stages with pass/fail decision points.</desc>
+  <defs>
+    <linearGradient id="blueGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#3B82F6"/>
+      <stop offset="100%" stop-color="#1D4ED8"/>
+    </linearGradient>
+    <linearGradient id="greenGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#22C55E"/>
+      <stop offset="100%" stop-color="#15803D"/>
+    </linearGradient>
+    <linearGradient id="purpleGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#8B5CF6"/>
+      <stop offset="100%" stop-color="#6D28D9"/>
+    </linearGradient>
+    <linearGradient id="amberGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#F59E0B"/>
+      <stop offset="100%" stop-color="#B45309"/>
+    </linearGradient>
+    <linearGradient id="redGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#EF4444"/>
+      <stop offset="100%" stop-color="#B91C1C"/>
+    </linearGradient>
+    <filter id="shadow" x="-4%" y="-4%" width="108%" height="112%">
+      <feDropShadow dx="0" dy="3" stdDeviation="5" flood-color="#172B4D" flood-opacity="0.1"/>
+    </filter>
+    <filter id="shadowSm" x="-2%" y="-4%" width="104%" height="112%">
+      <feDropShadow dx="0" dy="1" stdDeviation="3" flood-color="#172B4D" flood-opacity="0.08"/>
+    </filter>
+    <marker id="arrow" markerWidth="12" markerHeight="8" refX="6" refY="4" orient="auto">
+      <path d="M0,0 L12,4 L0,8 L3,4 Z" fill="#64748B"/>
+    </marker>
+    <marker id="arrowGreen" markerWidth="12" markerHeight="8" refX="6" refY="4" orient="auto">
+      <path d="M0,0 L12,4 L0,8 L3,4 Z" fill="#15803D"/>
+    </marker>
+    <marker id="arrowRed" markerWidth="12" markerHeight="8" refX="6" refY="4" orient="auto">
+      <path d="M0,0 L12,4 L0,8 L3,4 Z" fill="#B91C1C"/>
+    </marker>
+  </defs>
+
+  <rect width="1500" height="550" fill="#FAFBFC"/>
+
+  <!-- Title -->
+  <text x="750" y="38" text-anchor="middle" font-size="22" font-weight="700" fill="#1E293B">CI/CD Pipeline</text>
+
+  <!-- Stage labels -->
+  <text x="140" y="80" text-anchor="middle" font-size="11" font-weight="700" fill="#64748B" letter-spacing="1.5">SOURCE</text>
+  <text x="370" y="80" text-anchor="middle" font-size="11" font-weight="700" fill="#64748B" letter-spacing="1.5">BUILD</text>
+  <text x="640" y="80" text-anchor="middle" font-size="11" font-weight="700" fill="#64748B" letter-spacing="1.5">TEST</text>
+  <text x="960" y="80" text-anchor="middle" font-size="11" font-weight="700" fill="#64748B" letter-spacing="1.5">STAGE</text>
+  <text x="1210" y="80" text-anchor="middle" font-size="11" font-weight="700" fill="#64748B" letter-spacing="1.5">VERIFY</text>
+  <text x="1400" y="80" text-anchor="middle" font-size="11" font-weight="700" fill="#64748B" letter-spacing="1.5">PRODUCTION</text>
+
+  <!-- Main flow line (y=220) -->
+
+  <!-- 1. Code Push (start) -->
+  <g filter="url(#shadow)">
+    <rect x="70" y="190" width="140" height="60" rx="30" fill="url(#blueGrad)"/>
+    <text x="140" y="225" text-anchor="middle" font-size="14" font-weight="600" fill="white">Code Push</text>
+  </g>
+  <line x1="210" y1="220" x2="280" y2="220" stroke="#64748B" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- 2. Build -->
+  <g filter="url(#shadow)">
+    <rect x="290" y="190" width="160" height="60" rx="10" fill="url(#blueGrad)"/>
+    <text x="370" y="225" text-anchor="middle" font-size="14" font-weight="600" fill="white">Build &amp; Lint</text>
+  </g>
+  <line x1="450" y1="220" x2="520" y2="220" stroke="#64748B" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- 3. Unit Tests (decision) -->
+  <g filter="url(#shadow)" transform="translate(590, 220)">
+    <rect x="-50" y="-50" width="100" height="100" rx="6" fill="url(#amberGrad)" transform="rotate(45)"/>
+    <text x="0" y="-5" text-anchor="middle" font-size="12" font-weight="600" fill="white">Unit</text>
+    <text x="0" y="12" text-anchor="middle" font-size="12" font-weight="600" fill="white">Tests</text>
+  </g>
+
+  <!-- Unit Tests: Pass -->
+  <line x1="660" y1="220" x2="770" y2="220" stroke="#15803D" stroke-width="1.5" marker-end="url(#arrowGreen)"/>
+  <text x="715" y="212" text-anchor="middle" font-size="11" font-weight="600" fill="#15803D">Pass</text>
+
+  <!-- Unit Tests: Fail -->
+  <line x1="590" y1="290" x2="590" y2="380" stroke="#B91C1C" stroke-width="1.5" marker-end="url(#arrowRed)"/>
+  <text x="604" y="340" font-size="11" font-weight="600" fill="#B91C1C">Fail</text>
+
+  <!-- Fail box -->
+  <g filter="url(#shadowSm)">
+    <rect x="530" y="390" width="120" height="45" rx="8" fill="url(#redGrad)"/>
+    <text x="590" y="417" text-anchor="middle" font-size="13" font-weight="600" fill="white">Fix &amp; Retry</text>
+  </g>
+
+  <!-- 4. Integration Tests (decision) -->
+  <g filter="url(#shadow)" transform="translate(840, 220)">
+    <rect x="-50" y="-50" width="100" height="100" rx="6" fill="url(#amberGrad)" transform="rotate(45)"/>
+    <text x="0" y="-5" text-anchor="middle" font-size="12" font-weight="600" fill="white">Integ</text>
+    <text x="0" y="12" text-anchor="middle" font-size="12" font-weight="600" fill="white">Tests</text>
+  </g>
+
+  <!-- Integration: Pass -->
+  <line x1="910" y1="220" x2="1000" y2="220" stroke="#15803D" stroke-width="1.5" marker-end="url(#arrowGreen)"/>
+  <text x="955" y="212" text-anchor="middle" font-size="11" font-weight="600" fill="#15803D">Pass</text>
+
+  <!-- Integration: Fail -->
+  <line x1="840" y1="290" x2="840" y2="380" stroke="#B91C1C" stroke-width="1.5" marker-end="url(#arrowRed)"/>
+  <text x="854" y="340" font-size="11" font-weight="600" fill="#B91C1C">Fail</text>
+
+  <g filter="url(#shadowSm)">
+    <rect x="780" y="390" width="120" height="45" rx="8" fill="url(#redGrad)"/>
+    <text x="840" y="417" text-anchor="middle" font-size="13" font-weight="600" fill="white">Fix &amp; Retry</text>
+  </g>
+
+  <!-- 5. Deploy Staging -->
+  <g filter="url(#shadow)">
+    <rect x="1010" y="190" width="160" height="60" rx="10" fill="url(#purpleGrad)"/>
+    <text x="1090" y="218" text-anchor="middle" font-size="14" font-weight="600" fill="white">Deploy to</text>
+    <text x="1090" y="236" text-anchor="middle" font-size="14" font-weight="600" fill="white">Staging</text>
+  </g>
+  <line x1="1170" y1="220" x2="1240" y2="220" stroke="#64748B" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- 6. Smoke Tests -->
+  <g filter="url(#shadow)">
+    <rect x="1250" y="190" width="120" height="60" rx="10" fill="url(#amberGrad)"/>
+    <text x="1310" y="218" text-anchor="middle" font-size="13" font-weight="600" fill="white">Smoke</text>
+    <text x="1310" y="236" text-anchor="middle" font-size="13" font-weight="600" fill="white">Tests</text>
+  </g>
+  <line x1="1310" y1="250" x2="1310" y2="310" stroke="#15803D" stroke-width="1.5" marker-end="url(#arrowGreen)"/>
+  <text x="1324" y="285" font-size="11" font-weight="600" fill="#15803D">Pass</text>
+
+  <!-- 7. Deploy Production -->
+  <g filter="url(#shadow)">
+    <rect x="1240" y="320" width="140" height="60" rx="10" fill="url(#greenGrad)"/>
+    <text x="1310" y="348" text-anchor="middle" font-size="14" font-weight="600" fill="white">Deploy to</text>
+    <text x="1310" y="366" text-anchor="middle" font-size="14" font-weight="600" fill="white">Production</text>
+  </g>
+
+  <!-- Legend -->
+  <g transform="translate(50, 510)">
+    <rect x="0" y="-12" width="16" height="16" rx="3" fill="url(#blueGrad)"/>
+    <text x="22" y="0" font-size="11" fill="#64748B">Process step</text>
+    <rect x="130" y="-18" width="22" height="22" rx="3" fill="url(#amberGrad)" transform="rotate(45 141 -7)"/>
+    <text x="162" y="0" font-size="11" fill="#64748B">Decision point</text>
+    <rect x="290" y="-12" width="16" height="16" rx="3" fill="url(#greenGrad)"/>
+    <text x="312" y="0" font-size="11" fill="#64748B">Deploy</text>
+    <rect x="380" y="-12" width="16" height="16" rx="3" fill="url(#redGrad)"/>
+    <text x="402" y="0" font-size="11" fill="#64748B">Failure path</text>
+  </g>
+</svg>
