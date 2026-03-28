@@ -128,31 +128,11 @@ try {
     }
 } catch {}
 
-# --- Read skill content (strip frontmatter) ---
-$skillContent = ''
-$skillPath = Join-Path $pluginRoot 'skills\using-ctx\SKILL.md'
-if (Test-Path $skillPath) {
-    $lines = Get-Content $skillPath
-    $fenceCount = 0
-    $contentLines = @()
-    foreach ($line in $lines) {
-        if ($line -eq '---') {
-            $fenceCount++
-            continue
-        }
-        if ($fenceCount -ge 2) {
-            $contentLines += $line
-        }
-    }
-    $skillContent = ($contentLines -join "`n").TrimStart("`n")
-}
-
-# --- Combine context ---
+# --- Combine context (skill available via /ctx if needed) ---
 $parts = @()
 if ($binaryHint) { $parts += $binaryHint }
 if ($updateHint) { $parts += $updateHint }
 if ($ctxContext) { $parts += $ctxContext }
-if ($skillContent) { $parts += $skillContent }
 
 if ($parts.Count -eq 0) {
     Write-Output '{"suppressOutput":true,"systemMessage":"ctx: ready (empty context)"}'
