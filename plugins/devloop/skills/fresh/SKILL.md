@@ -2,7 +2,6 @@
 name: fresh
 description: Save current plan state and prepare for fresh context restart
 when_to_use: "Restarting context while preserving plan state"
-when_not_to_use: "Ongoing task execution with plenty of context remaining"
 disable-model-invocation: true
 argument-hint: none
 allowed-tools:

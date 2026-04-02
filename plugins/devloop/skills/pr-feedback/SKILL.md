@@ -2,7 +2,6 @@
 name: pr-feedback
 description: This skill should be used for integrating PR review comments back into devloop plan, parsing review feedback, addressing reviewer concerns
 when_to_use: "Integrating PR review comments, addressing reviewer concerns"
-when_not_to_use: "Initial development before PR"
 argument-hint: Optional PR number
 allowed-tools:
   - Read
@@ -101,20 +100,12 @@ AskUserQuestion:
       options:
         - label: "All blockers"
           description: "Add items 1-2"
-when_to_use: "Integrating PR review comments, addressing reviewer concerns"
-when_not_to_use: "Initial development before PR"
         - label: "Blockers + suggestions"
           description: "Add items 1-3"
-when_to_use: "Integrating PR review comments, addressing reviewer concerns"
-when_not_to_use: "Initial development before PR"
         - label: "All items"
           description: "Add everything"
-when_to_use: "Integrating PR review comments, addressing reviewer concerns"
-when_not_to_use: "Initial development before PR"
         - label: "Select individually"
           description: "Choose specific items"
-when_to_use: "Integrating PR review comments, addressing reviewer concerns"
-when_not_to_use: "Initial development before PR"
 ```
 
 ## Step 5: Update Plan
@@ -155,16 +146,10 @@ AskUserQuestion:
       options:
         - label: "Start fixing"
           description: "Work on first blocker"
-when_to_use: "Integrating PR review comments, addressing reviewer concerns"
-when_not_to_use: "Initial development before PR"
         - label: "Respond first"
           description: "Reply to questions"
-when_to_use: "Integrating PR review comments, addressing reviewer concerns"
-when_not_to_use: "Initial development before PR"
         - label: "Review plan"
           description: "See updated plan"
-when_to_use: "Integrating PR review comments, addressing reviewer concerns"
-when_not_to_use: "Initial development before PR"
 ```
 
 ---

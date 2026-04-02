@@ -2,7 +2,6 @@
 name: using-ctx
 description: "MANDATORY persistent memory system for decisions, facts, patterns, and observations."
 when_to_use: "Making decisions, learning facts, debugging issues, or establishing conventions."
-when_not_to_use: "Trivial single-turn Q&A with no learnings."
 paths: ["**/*"]
 ---
 

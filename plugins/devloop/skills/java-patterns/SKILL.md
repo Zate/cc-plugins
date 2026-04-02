@@ -2,7 +2,6 @@
 name: java-patterns
 description: This skill should be used for Java/Spring patterns, dependency injection, streams, Optional, Kotlin, Spring Boot, Maven, Gradle, JVM backend
 when_to_use: "Writing Java/Kotlin, Spring Boot, dependency injection"
-when_not_to_use: "Non-JVM projects"
 paths: "**/*.{java,kt,kts}"
 ---
 

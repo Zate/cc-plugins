@@ -2,7 +2,6 @@
 name: devloop-audit
 description: Audit devloop against Claude Code updates to identify integration opportunities. Use after Claude Code releases, monthly maintenance, or when exploring new features.
 when_to_use: Auditing devloop against Claude Code updates, maintenance checks, exploring new Claude Code features
-when_not_to_use: Regular development work, implementing features, writing code
 disable-model-invocation: true
 context: fork
 agent: Explore

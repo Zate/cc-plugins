@@ -2,7 +2,6 @@
 name: ship
 description: Devloop commit and PR creation with validation for completed plan work
 when_to_use: "Final validation, committing, and creating PRs for completed plans"
-when_not_to_use: "In-progress development, initial planning"
 disable-model-invocation: true
 argument-hint: Optional commit message or PR title
 allowed-tools:
@@ -46,20 +45,12 @@ AskUserQuestion:
       options:
         - label: "Full validation"
           description: "Run tests, review, then commit/PR"
-when_to_use: "Final validation, committing, and creating PRs for completed plans"
-when_not_to_use: "In-progress development, initial planning"
         - label: "Quick commit"
           description: "Skip validation, just commit"
-when_to_use: "Final validation, committing, and creating PRs for completed plans"
-when_not_to_use: "In-progress development, initial planning"
         - label: "PR only"
           description: "Changes already committed, create PR"
-when_to_use: "Final validation, committing, and creating PRs for completed plans"
-when_not_to_use: "In-progress development, initial planning"
         - label: "Atomic commits"
           description: "One commit per completed plan task"
-when_to_use: "Final validation, committing, and creating PRs for completed plans"
-when_not_to_use: "In-progress development, initial planning"
 ```
 
 ## Phase 2: Validation (if Full mode)
@@ -155,16 +146,10 @@ AskUserQuestion:
       options:
         - label: "Archive plan"
           description: "Move to archive, start fresh"
-when_to_use: "Final validation, committing, and creating PRs for completed plans"
-when_not_to_use: "In-progress development, initial planning"
         - label: "Wait for review"
           description: "PR created, wait for feedback"
-when_to_use: "Final validation, committing, and creating PRs for completed plans"
-when_not_to_use: "In-progress development, initial planning"
         - label: "Done"
           description: "Keep plan for reference"
-when_to_use: "Final validation, committing, and creating PRs for completed plans"
-when_not_to_use: "In-progress development, initial planning"
 ```
 
 Archive: `"${CLAUDE_PLUGIN_ROOT}/scripts/archive-plan.sh" .devloop/plan.md`

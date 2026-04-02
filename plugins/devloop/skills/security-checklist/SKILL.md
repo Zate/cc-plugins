@@ -2,7 +2,6 @@
 name: security-checklist
 description: This skill should be used for OWASP, security review, authentication, XSS, SQL injection prevention, CSRF, input validation, secure coding, vulnerability scanning
 when_to_use: "Security review, OWASP checks, auth code review, input validation"
-when_not_to_use: "Non-security work, initial prototyping"
 context: fork
 ---
 

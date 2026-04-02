@@ -3,7 +3,6 @@ name: plan
 description: Create a devloop workflow plan with autonomous exploration and task breakdown
 argument-hint: <topic> [--deep|--quick|--from-issue N]
 when_to_use: "Initial project setup, starting new features, designing bug fixes, architectural spikes"
-when_not_to_use: "Executing existing plans (use /devloop:run instead), routine development work"
 allowed-tools:
   - Read
   - Write

@@ -1,25 +1,14 @@
 {
-  "description": "ctx persistent memory - proactive context injection and persistent storage",
+  "description": "ctx persistent memory - session-start injects stored knowledge, writes happen via ctx binary directly",
   "hooks": {
     "SessionStart": [
       {
-        "matcher": "startup|compact|resume",
+        "matcher": "startup|resume|clear|compact",
         "hooks": [
           {
             "type": "command",
             "command": "\"${CLAUDE_PLUGIN_ROOT}/hooks/run-hook.cmd\" session-start",
             "timeout": 10
-          }
-        ]
-      }
-    ],
-    "UserPromptSubmit": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "\"${CLAUDE_PLUGIN_ROOT}/hooks/run-hook.cmd\" user-prompt-submit",
-            "timeout": 5
           }
         ]
       }
