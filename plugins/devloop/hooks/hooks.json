@@ -46,6 +46,16 @@
             "timeout": 5
           }
         ]
+      },
+      {
+        "if": "tool == 'Bash'",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"${CLAUDE_PLUGIN_ROOT}/hooks/run-hook.cmd\" post-tool-bash",
+            "timeout": 5
+          }
+        ]
       }
     ]
   }
