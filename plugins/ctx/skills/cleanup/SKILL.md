@@ -1,6 +1,8 @@
 ---
 name: cleanup
 description: "This skill should be used when the user asks to \"clean up memory\", \"sync ctx and memory\", \"review memory\", \"deduplicate nodes\", \"fix memory conflicts\", \"ctx cleanup\", \"memory maintenance\", \"reconcile memory systems\", or mentions stale nodes, memory bloat, or keeping ctx and MEMORY.md in sync."
+when_to_use: "Removing stale, redundant, or incorrect nodes from persistent memory"
+when_not_to_use: "Initial knowledge gathering, regular development"
 user-invocable: true
 argument-hint: "[project-name] [--global]"
 allowed-tools:
@@ -136,9 +138,17 @@ Present findings to the user in a structured report. Group by severity (high fir
 - header: "Remediation"
 - options:
   1. label: "Auto-fix all (Recommended)", description: "Apply all recommendations automatically"
+when_to_use: "Removing stale, redundant, or incorrect nodes from persistent memory"
+when_not_to_use: "Initial knowledge gathering, regular development"
   2. label: "Review each", description: "Walk through issues one by one for approval"
+when_to_use: "Removing stale, redundant, or incorrect nodes from persistent memory"
+when_not_to_use: "Initial knowledge gathering, regular development"
   3. label: "Fix high-severity only", description: "Auto-fix HIGH issues, skip medium and low"
+when_to_use: "Removing stale, redundant, or incorrect nodes from persistent memory"
+when_not_to_use: "Initial knowledge gathering, regular development"
   4. label: "Skip", description: "Just show the report, don't change anything"
+when_to_use: "Removing stale, redundant, or incorrect nodes from persistent memory"
+when_not_to_use: "Initial knowledge gathering, regular development"
 
 Do NOT proceed to Phase 4 without this user response. Do NOT present these options as text — use the AskUserQuestion tool.
 

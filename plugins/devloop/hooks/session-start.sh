@@ -170,67 +170,32 @@ PLAN=$(get_plan_status)
 FRESH=$(check_fresh_start)
 BRANCH=$(get_git_branch)
 GIT_WORKFLOW=$(get_git_workflow_config)
-PR_STATUS=$(get_pr_status)
-ISSUE_STATUS=$(get_linked_issue_status)
 STATUSLINE_STATUS=$(check_statusline_configured)
 
 # Build minimal context message
 # Read version from plugin.json
 DEVLOOP_VERSION=$(jq -r '.version // "3.x"' "${PLUGIN_ROOT}/.claude-plugin/plugin.json" 2>/dev/null || echo "3.x")
 
-CONTEXT="## devloop v${DEVLOOP_VERSION}
-
-**Project**: $PROJECT"
-[ "$LANG" != "unknown" ] && CONTEXT="$CONTEXT ($LANG)"
-[ -n "$BRANCH" ] && CONTEXT="$CONTEXT | branch: $BRANCH"
-
-if [ "$PLAN" != "none" ]; then
-    CONTEXT="$CONTEXT
-**Plan**: $PLAN tasks complete"
-fi
-
-# Show PR status if on feature branch with open PR
-if [ -n "$PR_STATUS" ]; then
-    CONTEXT="$CONTEXT
-**PR**: $PR_STATUS"
-fi
-
-# Show linked issue status if plan references an issue
-if [ -n "$ISSUE_STATUS" ]; then
-    CONTEXT="$CONTEXT
-**Linked**: $ISSUE_STATUS"
-fi
+CONTEXT="## devloop v${DEVLOOP_VERSION} ($PROJECT)
+"
+[ "$LANG" != "unknown" ] && CONTEXT="$CONTEXT- Lang: $LANG
+"
+[ -n "$BRANCH" ] && CONTEXT="$CONTEXT- Branch: $BRANCH
+"
+[ "$PLAN" != "none" ] && CONTEXT="$CONTEXT- Plan: $PLAN complete
+"
 
 if [ "$FRESH" = "true" ]; then
-    CONTEXT="$CONTEXT
-
-**⚡ Fresh start detected** → Run \`/devloop:run\` to resume"
+    CONTEXT="$CONTEXT- ⚡ Fresh start: Run \`/devloop:run\`
+"
 fi
 
-CONTEXT="$CONTEXT
-
-**Commands**: /devloop, /devloop:run, /devloop:plan, /devloop:fresh"
-
-# Add ship command if git workflow is configured
-if [ -n "$GIT_WORKFLOW" ]; then
-    CONTEXT="$CONTEXT, /devloop:ship"
-fi
-
-CONTEXT="$CONTEXT
-**Skills**: Load on demand with \`Skill: skill-name\` (see skills/INDEX.md)"
-
-# Add statusline hint if not configured
-if [ "$STATUSLINE_STATUS" = "none" ] || [ "$STATUSLINE_STATUS" = "unknown" ]; then
-    CONTEXT="$CONTEXT
-
-**Tip**: Run \`/devloop:statusline\` to enable the devloop statusline"
-fi
+CONTEXT="$CONTEXT- Skills: Load with \`Skill: skill-name\`"
 
 # Build status line
 STATUS="devloop: $PROJECT"
 [ "$LANG" != "unknown" ] && STATUS="$STATUS ($LANG)"
 [ "$PLAN" != "none" ] && STATUS="$STATUS | plan: $PLAN"
-[ -n "$PR_STATUS" ] && STATUS="$STATUS | $PR_STATUS"
 
 # Output JSON
 if command -v jq &> /dev/null; then
