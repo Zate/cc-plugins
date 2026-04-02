@@ -1,8 +1,8 @@
 ---
 name: testing-strategies
 description: This skill should be used for test coverage, test pyramid, unit/integration/E2E test design, TDD, BDD, mocking strategies, test doubles, test architecture
-whenToUse: "Test architecture, coverage strategy, TDD, mocking, test pyramid"
-whenNotToUse: "Quick fixes that don't need new tests"
+when_to_use: "Test architecture, coverage strategy, TDD, mocking, test pyramid"
+when_not_to_use: "Quick fixes that don't need new tests"
 ---
 
 # Testing Strategies

@@ -22,6 +22,7 @@ description: |
   </example>
 tools: Glob, Grep, Read, Write, Edit, Bash, TaskCreate, TaskUpdate, TaskList, WebSearch, AskUserQuestion
 model: sonnet
+effort: high
 memory: project
 color: blue
 skills:

@@ -1,8 +1,8 @@
 ---
 name: run-swarm
 description: Execute plan tasks via fresh-context subagents (swarm mode)
-whenToUse: "Plan with 10+ tasks, large implementation efforts, avoiding context bloat"
-whenNotToUse: "Small plans (< 5 tasks), tasks needing deep exploration, workers can't nest agents"
+when_to_use: "Plan with 10+ tasks, large implementation efforts, avoiding context bloat"
+when_not_to_use: "Small plans (< 5 tasks), tasks needing deep exploration, workers can't nest agents"
 disable-model-invocation: true
 argument-hint: "[--max-tasks N] [--dry-run]"
 allowed-tools:
