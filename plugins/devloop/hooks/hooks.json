@@ -1,36 +1,49 @@
 {
-  "description": "Devloop workflow hooks - session init, context guard, and project setup",
+  "description": "Devloop workflow hooks - optimized for token usage and speed",
   "hooks": {
     "SessionStart": [
       {
-        "matcher": "startup|resume|clear|compact",
+        "matcher": "startup|compact|resume",
         "hooks": [
           {
             "type": "command",
             "command": "\"${CLAUDE_PLUGIN_ROOT}/hooks/run-hook.cmd\" session-start",
+            "timeout": 15
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "if": "tool == 'Bash'",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"${CLAUDE_PLUGIN_ROOT}/hooks/run-hook.cmd\" pre-tool-bash",
+            "timeout": 5
+          }
+        ]
+      }
+    ],
+    "PreCompact": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"${CLAUDE_PLUGIN_ROOT}/hooks/run-hook.cmd\" pre-compact",
             "timeout": 10
           }
         ]
       }
     ],
-    "Stop": [
+    "PostToolUse": [
       {
+        "if": "tool == 'Write' || tool == 'Edit'",
         "hooks": [
           {
             "type": "command",
-            "command": "\"${CLAUDE_PLUGIN_ROOT}/hooks/run-hook.cmd\" context-guard"
-          }
-        ]
-      }
-    ],
-    "Setup": [
-      {
-        "matcher": "init",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "\"${CLAUDE_PLUGIN_ROOT}/scripts/run-script.cmd\" init-devloop",
-            "timeout": 30
+            "command": "\"${CLAUDE_PLUGIN_ROOT}/hooks/run-hook.cmd\" post-tool-write",
+            "timeout": 5
           }
         ]
       }
