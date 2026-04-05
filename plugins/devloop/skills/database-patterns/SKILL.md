@@ -1,6 +1,7 @@
 ---
 name: database-patterns
 description: This skill should be used for database schema design, indexes, query optimization, migrations, SQL, PostgreSQL, MySQL, ORM patterns, data modeling, database relationships
+when_to_use: "Schema design, query optimization, migrations, indexing"
 ---
 
 # Database Patterns

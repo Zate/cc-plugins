@@ -2,7 +2,7 @@
 
 > **A development workflow where Claude does the work and you stay in control.**
 
-[![Version](https://img.shields.io/badge/version-3.22.1-blue)](./CHANGELOG.md) [![Skills](https://img.shields.io/badge/skills-27-purple)](#skills) [![Agents](https://img.shields.io/badge/agents-5-green)](#agents)
+[![Version](https://img.shields.io/badge/version-3.23.0-blue)](./CHANGELOG.md) [![Skills](https://img.shields.io/badge/skills-27-purple)](#skills) [![Agents](https://img.shields.io/badge/agents-6-green)](#agents)
 
 **What devloop gives you:**
 - **Structured plans** that persist across sessions (`.devloop/plan.md`)
@@ -14,16 +14,19 @@
 
 ## Philosophy
 
-devloop v3 is simple: **Claude does the work directly.**
+devloop v3.23 is simple: **Claude does the work directly, optimized by model selection.**
 
-No routine agent spawning. No model selection. No token optimization. Just you, Claude, and the code.
+**What's new in v3.23:**
+- **Model-aware planning** — tasks annotated `[model:haiku]` for cheap work, `[model:sonnet]` for complex reasoning
+- **Parallel execution** — independent tasks grouped with `[parallel:X]` run concurrently
+- **Cost efficiency** — 3-5x savings on mechanical tasks (tests, docs, formatting)
 
 **Why this matters:**
-- 10x less overhead than agent-heavy approaches
 - Fresh context = better reasoning
-- Plans survive sessions - pick up where you left off
+- Plans survive sessions — pick up where you left off
+- Right model for the right task, automatically
 
-Agents exist only for parallel work, security scans, and large codebase exploration.
+Agents exist for parallel work, cost optimization, security scans, and large codebase exploration.
 
 ---
 
@@ -119,15 +122,16 @@ Choose the workflow that fits your task:
 
 ## Agents
 
-Five specialized agents for complex parallel work:
+Six specialized agents for parallel and cost-optimized work:
 
-| Agent | Purpose |
-|-------|---------|
-| `devloop:engineer` | Code exploration, architecture, refactoring, git, code review |
-| `devloop:qa-engineer` | Test generation, execution, bug tracking |
-| `devloop:security-scanner` | OWASP Top 10, secrets, injection risks |
-| `devloop:doc-generator` | READMEs, API docs, changelogs |
-| `devloop:swarm-worker` | Autonomous task execution for swarm mode |
+| Agent | Model | Purpose |
+|-------|-------|---------|
+| `devloop:engineer` | sonnet | Code exploration, architecture, refactoring, git, code review |
+| `devloop:qa-engineer` | sonnet | Test generation, execution, bug tracking |
+| `devloop:security-scanner` | haiku | OWASP Top 10, secrets, injection risks |
+| `devloop:doc-generator` | haiku | READMEs, API docs, changelogs |
+| `devloop:swarm-worker` | sonnet | Autonomous task execution for swarm mode |
+| `devloop:haiku-worker` | haiku | Lightweight executor for simple/mechanical tasks |
 
 ---
 

@@ -1,8 +1,7 @@
 ---
 name: local-config
 description: This skill should be used for configuring devloop project settings via .devloop/local.md, git workflow preferences, commit settings, review options
-whenToUse: Configuring devloop settings, .devloop/local.md, project preferences
-whenNotToUse: Regular development work, implementing features, exploring code
+when_to_use: Configuring devloop settings, .devloop/local.md, project preferences
 ---
 
 # Local Configuration
