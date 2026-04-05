@@ -1,0 +1,12 @@
+{
+  "name": "qx",
+  "version": "1.0.0",
+  "description": "Smart bash execution with LLM-filtered output. Runs shell commands and distills output to only the information needed, keeping context lean.",
+  "author": {
+    "name": "Zate",
+    "email": "zate75+claude-code-plugins@gmail.com"
+  },
+  "homepage": "https://github.com/Zate/cc-plugins",
+  "repository": "https://github.com/Zate/cc-plugins",
+  "license": "MIT"
+}

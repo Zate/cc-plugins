@@ -1,0 +1,15 @@
+{
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "echo '{\"suppressOutput\": true, \"systemMessage\": \"qx: loaded\", \"hookSpecificOutput\": {\"hookEventName\": \"SessionStart\", \"additionalContext\": \"qx agent available: When you need to answer a question by running bash commands and the output would be large or noisy, delegate to the qx agent instead of running bash yourself. The agent figures out the commands, runs them, and returns only the relevant information.\"}}'",
+            "async": false
+          }
+        ]
+      }
+    ]
+  }
+}
