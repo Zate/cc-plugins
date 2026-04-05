@@ -54,24 +54,13 @@ if command -v jq &> /dev/null; then
     CTX_CONTEXT=$(echo "$CTX_OUTPUT" | jq -r '.hookSpecificOutput.additionalContext // ""' 2>/dev/null || echo "")
 fi
 
-# Read using-ctx skill content (strip frontmatter)
-SKILL_CONTENT=""
-if [[ -f "$PLUGIN_ROOT/skills/using-ctx/SKILL.md" ]]; then
-    SKILL_CONTENT=$(awk 'BEGIN{skip=0} /^---$/{skip++; next} skip>=2{print}' "$PLUGIN_ROOT/skills/using-ctx/SKILL.md")
-fi
-
-# Combine hints + context + skill
+# Combine hints + context (skill is available via /ctx if needed)
 COMBINED=""
 [[ -n "$BINARY_HINT" ]] && COMBINED="$BINARY_HINT"
 if [[ -n "$CTX_CONTEXT" ]]; then
     [[ -n "$COMBINED" ]] && COMBINED="$COMBINED
 
 $CTX_CONTEXT" || COMBINED="$CTX_CONTEXT"
-fi
-if [[ -n "$SKILL_CONTENT" ]]; then
-    [[ -n "$COMBINED" ]] && COMBINED="$COMBINED
-
-$SKILL_CONTENT" || COMBINED="$SKILL_CONTENT"
 fi
 
 if [[ -z "$COMBINED" ]]; then
