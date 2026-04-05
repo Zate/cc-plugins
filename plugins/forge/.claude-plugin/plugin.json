@@ -1,0 +1,13 @@
+{
+  "name": "forge",
+  "version": "1.0.0",
+  "description": "Integration with Forge, a headless agent job runner. Submit jobs to LLM agents (Claude, Gemini, Ollama, LM Studio), track status, and retrieve output via MCP tools.",
+  "author": {
+    "name": "Zate",
+    "email": "zate75+claude-code-plugins@gmail.com"
+  },
+  "homepage": "https://github.com/Zate/cc-plugins",
+  "repository": "https://github.com/Zate/cc-plugins",
+  "license": "MIT",
+  "keywords": ["forge", "agent", "job-runner", "mcp", "headless", "dispatch"]
+}
