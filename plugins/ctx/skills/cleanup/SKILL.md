@@ -1,6 +1,7 @@
 ---
 name: cleanup
 description: "This skill should be used when the user asks to \"clean up memory\", \"sync ctx and memory\", \"review memory\", \"deduplicate nodes\", \"fix memory conflicts\", \"ctx cleanup\", \"memory maintenance\", \"reconcile memory systems\", or mentions stale nodes, memory bloat, or keeping ctx and MEMORY.md in sync."
+when_to_use: "Removing stale, redundant, or incorrect nodes from persistent memory"
 user-invocable: true
 argument-hint: "[project-name] [--global]"
 allowed-tools:

@@ -1,6 +1,7 @@
 ---
 name: setup
 description: Install, upgrade, or verify ctx persistent memory system
+when_to_use: "Installing or upgrading the ctx binary and database"
 argument-hint: None required
 user-invocable: true
 allowed-tools:
