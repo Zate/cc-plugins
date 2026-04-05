@@ -2,7 +2,10 @@
   "name": "plugin-lint",
   "version": "0.1.0",
   "description": "Static correctness linter and quality orchestrator for Claude Code plugins, skills, and hooks. Catches invalid hook schemas, bad frontmatter, YAML corruption, and token inefficiency. Delegates description quality to skill-creator.",
-  "author": "Zate",
+  "author": {
+    "name": "Zate",
+    "email": "zate75+claude-code-plugins@gmail.com"
+  },
   "homepage": "https://github.com/Zate/cc-plugins",
   "repository": "https://github.com/Zate/cc-plugins",
   "license": "MIT",
