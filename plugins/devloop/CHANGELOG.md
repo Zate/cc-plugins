@@ -5,6 +5,28 @@ All notable changes to the devloop plugin are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.23.0] - 2026-04-05
+
+### Added - Model-Aware Planning & Parallel Execution
+
+- **Model hints**: Plan tasks annotated with `[model:haiku]` or `[model:sonnet]` based on complexity
+  - haiku: tests from patterns, docs, formatting, linting, config (3-5x cost savings)
+  - sonnet: architecture, debugging, refactoring, security, performance
+  - No annotation: orchestrator executes inline
+- **Parallel groups**: `[parallel:X]` markers for concurrent task execution in run/run-swarm
+- **Dependency tracking**: `[depends:N.M]` for tasks requiring prior completion
+- **haiku-worker agent**: Lightweight autonomous executor (model: haiku, maxTurns: 15)
+- **Auto-archive**: `/devloop:plan` silently archives completed plans (grep count, no file read)
+
+### Improved
+
+- `fresh` skill: Read tool instead of `cat` for plan reading
+- `archive` skill: Read tool with `limit:20` instead of `head -20`, skip confirmation for complete plans
+- `check-devloop-state.sh`: jq for JSON parsing (grep/cut fallback)
+- `archive-plan.sh`: jq for JSON parsing (grep/cut fallback)
+- `plan-management` skill: Documented model hint markers and expanded parallelism guidelines
+- Updated README, component guide, and agent tables for v3.23
+
 ## [3.22.1] - 2026-03-14
 
 ### Improved - Superpowers Complement Strategy

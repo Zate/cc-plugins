@@ -1,6 +1,6 @@
 # Component Guide
 
-What's in devloop v3.21.
+What's in devloop v3.23.
 
 ---
 
@@ -27,19 +27,20 @@ What's in devloop v3.21.
 
 ---
 
-## Agents (5)
+## Agents (6)
 
-For parallel work and specialized scans.
+For parallel work, cost optimization, and specialized scans.
 
-| Agent | Purpose |
-|-------|---------|
-| `devloop:engineer` | Code exploration, architecture, git, code review |
-| `devloop:qa-engineer` | Test generation, execution, bugs |
-| `devloop:security-scanner` | OWASP Top 10, secrets |
-| `devloop:doc-generator` | READMEs, API docs, changelogs |
-| `devloop:swarm-worker` | Autonomous task execution for swarm mode |
+| Agent | Model | Purpose |
+|-------|-------|---------|
+| `devloop:engineer` | sonnet | Code exploration, architecture, git, code review |
+| `devloop:qa-engineer` | sonnet | Test generation, execution, bugs |
+| `devloop:security-scanner` | haiku | OWASP Top 10, secrets |
+| `devloop:doc-generator` | haiku | READMEs, API docs, changelogs |
+| `devloop:swarm-worker` | sonnet | Autonomous task execution for swarm mode |
+| `devloop:haiku-worker` | haiku | Lightweight executor for simple/mechanical tasks |
 
-**Remember**: Claude does work directly. Agents only for parallel tasks.
+**Remember**: Claude does work directly. Agents for parallel tasks and cost optimization.
 
 ---
 
