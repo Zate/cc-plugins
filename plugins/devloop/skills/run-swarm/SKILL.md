@@ -24,6 +24,8 @@ allowed-tools:
 
 Execute plan tasks via fresh-context subagents. **You are the orchestrator.**
 
+**Bash hygiene**: prefer quiet flags to minimize output (`npm install --silent`, `git status -sb`, pipe long output through `| tail -n 20`).
+
 ## Step 1: Check Plan State
 Run `check-plan-complete.sh .devloop/plan.md`.
 - **No plan**: Show entry points (`/devloop:plan`) and STOP.
@@ -38,30 +40,42 @@ Run `check-plan-complete.sh .devloop/plan.md`.
 Extract max 100 lines from `CLAUDE.md` (code style, patterns) and plan's Overview/Considerations. Store as shared context.
 
 ## Step 4: Task Execution Loop
-For each `- [ ]` task in `plan.md`:
 
-### 4a. Gather Task Context
-Run `gather-task-context.sh` or search (Grep/Glob) for relevant files (max 20).
+### 4a. Build Execution Plan
+Read all `- [ ]` tasks from plan.md. Group them:
+1. **Parallel groups**: Tasks sharing `[parallel:X]` markers → batch together
+2. **Dependent tasks**: Tasks with `[depends:N.M]` → schedule after dependency completes
+3. **Sequential tasks**: Everything else → run in order
 
-### 4b. Spawn Worker Agent
-Construct worker prompt:
-- **Task**: [Description]
-- **Context**: Phase, Plan info, Shared Project Conventions.
-- **Resources**: Relevant file list.
-- **Instructions**: Read files, implement, test, summary return. NO plan edits or commits.
+### 4b. For Each Batch (Parallel Group or Single Task)
 
-**Spawn**:
+#### Gather Context
+Run `gather-task-context.sh` or Grep/Glob for relevant files (max 20 per task).
+
+#### Select Model by Hint
+Parse `[model:X]` from the task line:
+- **`[model:haiku]`**: Spawn with `model: "haiku"`
+- **`[model:sonnet]`** or **no annotation**: Spawn with `model: "sonnet"` (default)
+
+#### Spawn Workers
+For a parallel batch, spawn all workers simultaneously (multiple Agent calls in a single message):
 ```yaml
 Agent:
-  subagent_type: "devloop:swarm-worker"
-  prompt: [Constructed prompt]
+  subagent_type: "devloop:swarm-worker"  # or devloop:haiku-worker for [model:haiku]
+  model: "haiku"  # or "sonnet" per annotation
+  prompt: |
+    Task: [description]
+    Phase: [phase name]
+    Context: [relevant files and conventions]
+    Instructions: Implement this task. Do NOT modify plan.md or commit.
 ```
 
 ### 4c. Record Progress
-1. Display `git diff --stat` and worker summary.
+1. Display `git diff --stat` and worker summary for each completed task.
 2. Mark task `[x]` in `plan.md` and update native task.
 3. If `auto_commit: true` and phase complete, commit changes.
 4. Pause if `--max-tasks` reached.
+5. Check `[depends:N.M]` — if a just-completed task unblocks dependent tasks, add them to the next batch.
 
 ## Step 5: Finalize
 When all `[x]`, **AskUserQuestion**: Ship it, Archive, or Review.

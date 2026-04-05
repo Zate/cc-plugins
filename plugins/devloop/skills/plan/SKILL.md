@@ -24,12 +24,25 @@ allowed-tools:
 
 Create actionable plan from topic. **Do the work directly.**
 
+**Bash hygiene**: prefer quiet flags to minimize output (`npm install --silent`, `git status -sb`, pipe long output through `| tail -n 20`).
+
 ## Step 1: Parse Input
 Extract topic from `$ARGUMENTS`. If missing, show usage: `/devloop:plan <topic> [--deep|--quick|--from-issue N]`.
 If `--from-issue N`: Fetch with `gh issue view $N --json number,title,body,url`. Use title as topic, body as context.
 
 ## Step 2: Check Existing Plan (Silent)
-Run `check-plan-complete.sh .devloop/plan.md`. If incomplete, prompt to replace or cancel.
+If `.devloop/plan.md` exists:
+1. Count tasks (no file read needed):
+   ```bash
+   done=$(grep -cE "^\s*- \[x\]" .devloop/plan.md 2>/dev/null || echo 0)
+   total=$(grep -cE "^\s*- \[[ x~!-]\]" .devloop/plan.md 2>/dev/null || echo 0)
+   ```
+2. If `done == total` and `total > 0`: auto-archive silently:
+   ```bash
+   "${CLAUDE_PLUGIN_ROOT}/scripts/archive-plan.sh" .devloop/plan.md --force
+   ```
+3. If incomplete (`done < total`): prompt to archive (force) or cancel.
+4. If no plan file or `total == 0`: continue to Step 3.
 
 ## Step 3: Route by Mode
 
@@ -63,6 +76,18 @@ Run `check-devloop-state.sh`. Detect tech stack and patterns from `CLAUDE.md`.
 ## Step 6: Plan Generation (Silent)
 Create `.devloop/plan.md` with: Overview, Approach, Considerations, and Phased Tasks.
 **Tasks**: Phased, specific, actionable, testable. (XS: 2-3 tasks, XL: 8-12 tasks).
+
+### Model Annotations
+Annotate each task with a model hint based on complexity:
+- `[model:haiku]` — Simple/mechanical: writing tests from existing patterns, documentation, formatting, linting, config changes, file renames
+- `[model:sonnet]` — Complex reasoning: architecture, debugging, multi-file refactoring, security, performance optimization
+- No annotation — Inline by orchestrator: single-line edits, running commands, status checks
+
+### Parallel Groups
+Identify tasks that can execute concurrently and assign `[parallel:X]` groups:
+- Tasks modifying different files with no data dependency → same parallel group
+- Within a phase, default to looking for parallelism
+- Add `[depends:N.M]` for tasks that require prior task output
 
 ## Step 7: Review Checkpoint
 Display Summary: Complexity, Task/Phase count, Key files, and Approach.

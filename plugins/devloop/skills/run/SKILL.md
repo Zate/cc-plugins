@@ -24,6 +24,8 @@ allowed-tools:
 
 Execute plan tasks autonomously. **Do the work directly.**
 
+**Bash hygiene**: prefer quiet flags to minimize output (`npm install --silent`, `git status -sb`, pipe long output through `| tail -n 20`).
+
 ## Step 1: Check Plan State
 Run `check-plan-complete.sh .devloop/plan.md`.
 - **No plan**: Show entry points (`/devloop:plan`) and STOP.
@@ -50,12 +52,34 @@ Unless `--interactive`, create `.claude/ralph-loop.local.md` with iteration limi
 **Optional**: Sync plan to native tasks with `sync-plan-to-tasks.sh`.
 
 ## Step 5: Execute Tasks
-Read plan, find next `- [ ]` task. 
-- Do work directly (Write/Edit/Bash). 
-- Use agents ONLY for large exploration or security scans.
-- Mark task `in_progress` via `TaskUpdate`.
+Read plan, find all `- [ ]` tasks.
 
-## Step 6: Update Progress
+### 5a. Detect Parallel Groups
+Scan pending tasks for `[parallel:X]` markers. If multiple pending tasks share the same group letter, they can run concurrently.
+
+### 5b. Model Selection Per Task
+Parse the `[model:X]` annotation from each task line:
+- **`[model:haiku]`**: Spawn Agent with `model: "haiku"` — use for simple/mechanical tasks
+- **`[model:sonnet]`**: Spawn Agent with `model: "sonnet"` — use for complex reasoning tasks
+- **No annotation**: Do the work inline — no agent spawn needed
+
+### 5c. Execute (Parallel or Sequential)
+**For parallel groups**: Spawn one Agent per task in the group simultaneously (multiple Agent calls in a single message). Each agent receives the task description, phase context, and relevant files.
+
+**For sequential tasks** (no parallel marker, or all group members not yet pending): Process one at a time.
+
+Agent spawn pattern:
+```yaml
+Agent:
+  model: "haiku"  # or "sonnet" per [model:X] annotation
+  prompt: |
+    Task: [description]
+    Phase: [phase name]
+    Context: [relevant files and conventions]
+    Instructions: Implement this task. Do NOT modify plan.md or commit.
+```
+
+### 5d. Update Progress
 1. Mark task `[x]` in `plan.md`.
 2. Update native task to `completed`.
 3. Check overall completion.

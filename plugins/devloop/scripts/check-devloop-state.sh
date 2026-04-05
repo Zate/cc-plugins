@@ -63,13 +63,20 @@ else
         if [ -z "$PLAN_STATUS" ] || echo "$PLAN_STATUS" | grep -q '"error"'; then
             PLAN_STATUS='{"complete": false, "total": 0, "done": 0, "pending": 0}'
         fi
-        PLAN_COMPLETE=$(echo "$PLAN_STATUS" | grep -o '"complete": *[^,}]*' | cut -d: -f2 | tr -d ' ')
-        PLAN_TOTAL=$(echo "$PLAN_STATUS" | grep -o '"total": *[0-9]*' | cut -d: -f2 | tr -d ' ')
-        PLAN_DONE=$(echo "$PLAN_STATUS" | grep -o '"done": *[0-9]*' | cut -d: -f2 | tr -d ' ')
-        PLAN_PENDING=$(echo "$PLAN_STATUS" | grep -o '"pending": *[0-9]*' | cut -d: -f2 | tr -d ' ')
+        if command -v jq &>/dev/null; then
+            PLAN_COMPLETE=$(echo "$PLAN_STATUS" | jq -r '.complete')
+            PLAN_TOTAL=$(echo "$PLAN_STATUS" | jq -r '.total')
+            PLAN_DONE=$(echo "$PLAN_STATUS" | jq -r '.done')
+            PLAN_PENDING=$(echo "$PLAN_STATUS" | jq -r '.pending')
+        else
+            PLAN_COMPLETE=$(echo "$PLAN_STATUS" | grep -o '"complete": *[^,}]*' | cut -d: -f2 | tr -d ' ')
+            PLAN_TOTAL=$(echo "$PLAN_STATUS" | grep -o '"total": *[0-9]*' | cut -d: -f2 | tr -d ' ')
+            PLAN_DONE=$(echo "$PLAN_STATUS" | grep -o '"done": *[0-9]*' | cut -d: -f2 | tr -d ' ')
+            PLAN_PENDING=$(echo "$PLAN_STATUS" | grep -o '"pending": *[0-9]*' | cut -d: -f2 | tr -d ' ')
+        fi
 
         # Get plan title
-        PLAN_TITLE=$(head -1 .devloop/plan.md | sed 's/^# //' | sed 's/^Devloop Plan: //')
+        PLAN_TITLE=$(head -1 .devloop/plan.md | sed 's/^# //;s/^Devloop Plan: //')
 
         # Get next task
         NEXT_TASK=$(grep -m1 '^\s*- \[ \]' .devloop/plan.md 2>/dev/null | sed 's/^[[:space:]]*- \[ \] //' || echo "")

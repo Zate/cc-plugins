@@ -17,9 +17,7 @@ Save the current devloop plan state for resuming after a context reset. **You do
 
 ## Step 1: Read Current Plan
 
-```bash
-cat .devloop/plan.md
-```
+Use the **Read** tool to read `.devloop/plan.md`.
 
 If no plan exists, tell user to run `/devloop` first.
 
