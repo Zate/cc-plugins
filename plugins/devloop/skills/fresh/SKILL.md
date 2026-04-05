@@ -1,6 +1,7 @@
 ---
 name: fresh
 description: Save current plan state and prepare for fresh context restart
+when_to_use: "Restarting context while preserving plan state"
 disable-model-invocation: true
 argument-hint: none
 allowed-tools:
@@ -16,9 +17,7 @@ Save the current devloop plan state for resuming after a context reset. **You do
 
 ## Step 1: Read Current Plan
 
-```bash
-cat .devloop/plan.md
-```
+Use the **Read** tool to read `.devloop/plan.md`.
 
 If no plan exists, tell user to run `/devloop` first.
 

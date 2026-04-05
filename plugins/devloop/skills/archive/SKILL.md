@@ -48,11 +48,7 @@ AskUserQuestion:
 
 ## Step 2: Show What Will Be Archived
 
-Read the plan header to show the user:
-
-```bash
-head -20 .devloop/plan.md
-```
+Use the **Read** tool with `limit: 20` on `.devloop/plan.md` to show the plan header.
 
 Display:
 ```
@@ -64,12 +60,17 @@ Plan to archive:
 Archive destination: .devloop/archive/YYYY-MM-DD-{slug}.md
 ```
 
-## Step 3: Confirm Archive
+## Step 3: Confirm or Auto-Archive
+
+**If plan is complete**: Skip confirmation — execute archive directly.
+**If plan is incomplete** (user chose "Archive anyway" in Step 1): Execute archive with `--force`.
+**If `--force` argument**: Skip confirmation — execute archive directly.
+**Otherwise**: Ask:
 
 ```yaml
 AskUserQuestion:
   questions:
-    - question: "Archive this completed plan?"
+    - question: "Archive this plan?"
       header: "Confirm"
       multiSelect: false
       options:
@@ -81,7 +82,7 @@ AskUserQuestion:
 
 ## Step 4: Execute Archive
 
-If confirmed (or --force in arguments):
+If confirmed (or auto-archiving complete plan, or --force):
 
 ```bash
 "${CLAUDE_PLUGIN_ROOT}/scripts/archive-plan.sh" .devloop/plan.md

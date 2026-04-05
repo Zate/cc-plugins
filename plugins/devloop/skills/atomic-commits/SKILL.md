@@ -1,8 +1,7 @@
 ---
 name: atomic-commits
 description: This skill should be used for guidance on commit size, scope, and creating reviewable commits, splitting large changes, commit hygiene
-whenToUse: Preparing to commit, reviewing commit size, splitting large changes, commit hygiene
-whenNotToUse: Reading code, exploring architecture, initial implementation
+when_to_use: Preparing to commit, reviewing commit size, splitting large changes, commit hygiene
 ---
 
 # Atomic Commits

@@ -42,10 +42,18 @@ ARCHIVE_DIR="$PLAN_DIR/archive"
 # Check if plan is complete (unless --force)
 if [ "$FORCE" = false ]; then
     COMPLETION_STATUS=$("$SCRIPT_DIR/check-plan-complete.sh" "$PLAN_FILE" 2>/dev/null) || true
-    IS_COMPLETE=$(echo "$COMPLETION_STATUS" | grep -o '"complete": *[^,}]*' | grep -o 'true\|false')
+    if command -v jq &>/dev/null; then
+        IS_COMPLETE=$(echo "$COMPLETION_STATUS" | jq -r '.complete')
+    else
+        IS_COMPLETE=$(echo "$COMPLETION_STATUS" | grep -o '"complete": *[^,}]*' | grep -o 'true\|false')
+    fi
 
     if [ "$IS_COMPLETE" != "true" ]; then
-        PENDING=$(echo "$COMPLETION_STATUS" | grep -o '"pending": *[0-9]*' | grep -o '[0-9]*')
+        if command -v jq &>/dev/null; then
+            PENDING=$(echo "$COMPLETION_STATUS" | jq -r '.pending')
+        else
+            PENDING=$(echo "$COMPLETION_STATUS" | grep -o '"pending": *[0-9]*' | grep -o '[0-9]*')
+        fi
         echo "{\"archived\": false, \"reason\": \"not_complete\", \"pending_tasks\": $PENDING, \"message\": \"Plan has pending tasks. Use --force to archive anyway.\"}"
         exit 1
     fi

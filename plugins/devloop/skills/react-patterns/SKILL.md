@@ -1,6 +1,8 @@
 ---
 name: react-patterns
 description: This skill should be used for React hooks, components, state management, performance, frontend TypeScript, Next.js, JSX/TSX, web UI components
+when_to_use: "React hooks, components, state management, Next.js, JSX/TSX"
+paths: "**/*.{ts,tsx,js,jsx}"
 ---
 
 # React Patterns

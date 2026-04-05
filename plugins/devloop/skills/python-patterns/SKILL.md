@@ -1,6 +1,8 @@
 ---
 name: python-patterns
 description: This skill should be used for Python idioms, type hints, async/await, pytest, Django, Flask, FastAPI, Python web frameworks, pandas, data processing
+when_to_use: "Writing Python, type hints, async/await, pytest, Django/FastAPI"
+paths: "**/*.py"
 ---
 
 # Python Patterns

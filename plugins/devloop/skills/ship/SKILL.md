@@ -1,6 +1,7 @@
 ---
 name: ship
 description: Devloop commit and PR creation with validation for completed plan work
+when_to_use: "Final validation, committing, and creating PRs for completed plans"
 disable-model-invocation: true
 argument-hint: Optional commit message or PR title
 allowed-tools:
@@ -20,6 +21,8 @@ allowed-tools:
 # Ship - Commit and PR
 
 Validate and ship changes with branch-aware workflow. **You do the work directly.**
+
+**Bash hygiene**: prefer quiet flags to minimize output (`npm install --silent`, `git status -sb`, pipe long output through `| tail -n 20`).
 
 ## Phase 1: Pre-flight Check
 
