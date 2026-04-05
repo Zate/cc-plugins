@@ -170,25 +170,52 @@ EOF
 
 ## Development Workflow
 
+### Git Branching (Required)
+
+**All plugin work MUST happen on a `feat/<plugin-name>` branch.** Never commit plugin changes directly to main.
+
+```bash
+# Creating a new plugin
+git checkout main && git pull
+git checkout -b feat/my-plugin
+
+# Updating an existing plugin
+git checkout feat/my-plugin
+git merge main                    # Pull in latest from main first
+# ... do your work ...
+
+# When done: merge back to main
+git checkout main && git pull
+git merge feat/my-plugin --no-ff  # Always use merge commit
+```
+
+**Rules:**
+- One branch per plugin: `feat/devloop`, `feat/forge`, `feat/ctx`, etc.
+- A plugin branch touches ONLY its own `plugins/<name>/` directory (+ marketplace.json entry)
+- Merge main into your branch before starting work (stay up to date)
+- Merge back to main only after docs, tests, and validation pass
+- Keep feature branches alive after merge for future work
+
 ### Creating a New Plugin
 
-1. Copy the plugin template from `templates/plugin-template/`
-2. Update `.claude-plugin/plugin.json` with your metadata
-3. Implement components in appropriate directories:
-   - Add commands to `commands/`
+1. Create branch: `git checkout -b feat/my-plugin main`
+2. Copy the plugin template from `templates/plugin-template/`
+3. Update `.claude-plugin/plugin.json` with your metadata (use object format for author)
+4. Implement components in appropriate directories:
    - Add agents to `agents/`
    - Add skills to `skills/skillname/SKILL.md`
    - Configure hooks if needed
    - Add MCP servers if integrating external tools
-4. Write comprehensive README with usage examples
-5. Test locally: `/plugin install /path/to/your/plugin`
-6. Submit PR to add plugin entry to `.claude-plugin/marketplace.json`
+5. Write comprehensive README with usage examples
+6. Add CHANGELOG.md (Keep a Changelog format)
+7. Add marketplace entry to `.claude-plugin/marketplace.json`
+8. Test locally: `/plugin install /path/to/your/plugin`
+9. Merge to main
 
 **Pro tip**: When creating skills, use the `skill-creator` skill to help design effective skills:
 ```bash
 /skill skill-creator
 ```
-This built-in skill provides guidance on creating high-quality skills with proper structure and best practices.
 
 ### Adding Plugin to Marketplace
 
@@ -200,6 +227,20 @@ Edit `.claude-plugin/marketplace.json` and add entry to `plugins` array:
   "source": "./plugins/your-plugin-name"
 }
 ```
+
+**Marketplace version bumping** (in `metadata.version`):
+- Bump **patch** when an existing plugin updates its version
+- Bump **minor** when a new plugin is added to the marketplace
+
+### Built-in Tools Over Bash
+
+In skill and agent instructions, prefer Claude Code built-in tools over Bash equivalents:
+- **Read** (with `limit`/`offset`) over `cat`/`head`/`tail`
+- **Glob** over `ls`/`find` for file discovery
+- **Grep** over `grep`/`rg` for content search
+- **Write/Edit** over `sed`/`awk`/`echo >` for file changes
+
+Use Bash only for: running project commands (test, build, lint), git operations, and calling plugin scripts.
 
 ### Local Testing
 

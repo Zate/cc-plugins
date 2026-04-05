@@ -75,8 +75,7 @@ if [ -d "$PLUGIN_DIR/commands" ]; then
         check_command_structure "$file"
     done
 else
-    echo -e "  ${RED}[FAIL]${NC} commands/ directory not found"
-    ((ERRORS++)) || true
+    echo -e "  ${GREEN}[SKIP]${NC} commands/ directory not found (legacy — devloop uses skills/)"
 fi
 
 # Summary
