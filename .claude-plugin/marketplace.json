@@ -16,63 +16,129 @@
       "source": "./plugins/devloop",
       "description": "Lightweight development workflow with plan/run/fresh pattern, git workflow integration (branch-per-plan, PR creation, PR feedback), on-demand skills, and specialized agents. Optimized for efficiency with minimal hooks and direct execution.",
       "category": "development",
-      "tags": ["feature-development", "workflow", "agents", "git", "pr-workflow", "fresh-start", "context-management", "go", "react", "java", "python"]
+      "tags": [
+        "feature-development",
+        "workflow",
+        "agents",
+        "git",
+        "pr-workflow",
+        "fresh-start",
+        "context-management",
+        "go",
+        "react",
+        "java",
+        "python"
+      ]
     },
     {
       "name": "security",
       "source": "./plugins/security",
       "description": "Hybrid security scanner: deterministic SAST tools (Semgrep, Gitleaks, Trivy) for detection, LLM for triage. Reproducible findings, provenance-labeled [Static]/[LLM], zero-dependency fallback mode, CWE-specialized false positive elimination.",
       "category": "security",
-      "tags": ["security", "sast", "semgrep", "gitleaks", "trivy", "vulnerability", "owasp", "cwe", "devsecops", "hooks"]
+      "tags": [
+        "security",
+        "sast",
+        "semgrep",
+        "gitleaks",
+        "trivy",
+        "vulnerability",
+        "owasp",
+        "cwe",
+        "devsecops",
+        "hooks"
+      ]
     },
     {
       "name": "ctx",
       "source": "./plugins/ctx",
       "description": "Persistent memory for Claude Code agents. Stores decisions, patterns, and knowledge in a structured graph database across sessions with auto-injection and enforcement.",
       "category": "development",
-      "tags": ["memory", "context", "persistence", "knowledge-graph", "sessions"]
+      "tags": [
+        "memory",
+        "context",
+        "persistence",
+        "knowledge-graph",
+        "sessions"
+      ]
     },
     {
       "name": "wsl-clipboard-fix",
       "source": "./plugins/wsl-clipboard-fix",
       "description": "Fixes image pasting in WSL2 by auto-converting BMP clipboard content to PNG. Runs a background clip2png daemon that monitors the Wayland clipboard during Claude Code sessions.",
       "category": "utilities",
-      "tags": ["wsl", "wsl2", "clipboard", "image-paste", "wayland", "bmp", "png"]
+      "tags": [
+        "wsl",
+        "wsl2",
+        "clipboard",
+        "image-paste",
+        "wayland",
+        "bmp",
+        "png"
+      ]
     },
     {
       "name": "blog-writer",
       "source": "./plugins/blog-writer",
       "description": "Conversational blog post creator that interviews you about your topic, captures your writing voice, drafts in your style, strips AI tells, and publishes as markdown or HTML.",
       "category": "content",
-      "tags": ["blog", "writing", "content", "voice", "de-ai", "markdown", "html"]
+      "tags": [
+        "blog",
+        "writing",
+        "content",
+        "voice",
+        "de-ai",
+        "markdown",
+        "html"
+      ]
     },
     {
       "name": "diagrams",
       "source": "./plugins/diagrams",
       "description": "Generate amazing diagrams using 4 text-based formats (SVG, Mermaid, Excalidraw, D2) with intelligent format routing, 20+ diagram types, a shared design system with color theory, WCAG accessibility, and composition rules.",
       "category": "development",
-      "tags": ["diagrams", "svg", "mermaid", "excalidraw", "d2", "architecture", "visualization", "sequence-diagram", "flow-diagram", "threat-model"]
+      "tags": [
+        "diagrams",
+        "svg",
+        "mermaid",
+        "excalidraw",
+        "d2",
+        "architecture",
+        "visualization",
+        "sequence-diagram",
+        "flow-diagram",
+        "threat-model"
+      ]
     },
     {
       "name": "plugin-lint",
       "source": "./plugins/plugin-lint",
       "description": "Static correctness linter and quality orchestrator for Claude Code plugins, skills, and hooks. Catches invalid hook schemas, bad frontmatter, YAML corruption, and token inefficiency using source-verified rules. Delegates description optimization to skill-creator.",
       "category": "development",
-      "tags": ["linting", "audit", "quality", "hooks", "skills", "plugin-development", "correctness", "static-analysis"]
-    },
-    {
-      "name": "qx",
-      "source": "./plugins/qx",
-      "description": "Smart bash execution with LLM-filtered output. Runs shell commands and distills output to only the requested information, keeping context lean. Use instead of raw Bash for information extraction from large or noisy command output.",
-      "category": "utilities",
-      "tags": ["bash", "context", "extraction", "filtering", "haiku", "efficiency"]
+      "tags": [
+        "linting",
+        "audit",
+        "quality",
+        "hooks",
+        "skills",
+        "plugin-development",
+        "correctness",
+        "static-analysis"
+      ]
     },
     {
       "name": "forge",
       "source": "./plugins/forge",
       "description": "Integration with Forge headless agent job runner. Submit jobs to LLM agents (Claude, Gemini, Ollama, LM Studio), track status, and retrieve output via MCP tools.",
       "category": "development",
-      "tags": ["forge", "agent", "job-runner", "mcp", "headless", "dispatch", "llm"]
+      "tags": [
+        "forge",
+        "agent",
+        "job-runner",
+        "mcp",
+        "headless",
+        "dispatch",
+        "llm"
+      ]
     }
   ]
 }
