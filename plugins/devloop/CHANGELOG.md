@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - Script references in run, run-swarm, and plan skills now use full `${CLAUDE_PLUGIN_ROOT}/scripts/` paths instead of bare filenames, fixing "No such file or directory" errors
+- Removed `disable-model-invocation: true` from 7 skills (run, run-swarm, fresh, ship, archive, statusline, devloop-audit) — this flag blocked the Skill tool entirely, including user-initiated `/devloop:run` calls
 
 ## [3.23.0] - 2026-04-05
 

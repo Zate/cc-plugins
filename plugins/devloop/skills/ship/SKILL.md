@@ -2,7 +2,6 @@
 name: ship
 description: Devloop commit and PR creation with validation for completed plan work
 when_to_use: "Final validation, committing, and creating PRs for completed plans"
-disable-model-invocation: true
 argument-hint: Optional commit message or PR title
 allowed-tools:
   - Read

@@ -6,23 +6,21 @@ Load skills on demand with `Skill: skill-name`. Don't preload.
 
 These are user-invocable slash commands (`/devloop:<name>`):
 
-| Skill | Purpose | User-only? |
-|-------|---------|------------|
-| `devloop` | Smart entry point - detects state, suggests actions | No |
-| `plan` | Create actionable plan with autonomous exploration | No |
-| `run` | Execute plan tasks autonomously | Yes |
-| `run-swarm` | Execute plan tasks via fresh-context subagents | Yes |
-| `fresh` | Save plan state for fresh context restart | Yes |
-| `ship` | Validate and commit/PR completed work | Yes |
-| `review` | Comprehensive code review | No |
-| `pr-feedback` | Fetch and integrate PR review comments | No |
-| `new` | Create GitHub issue (or local with --local) | No |
-| `issues` | List GitHub issues | No |
-| `archive` | Archive completed plan | Yes |
-| `help` | Interactive guide to devloop | No |
-| `statusline` | Configure devloop statusline | Yes |
-
-"User-only" = `disable-model-invocation: true` (won't auto-trigger, only via `/devloop:<name>`)
+| Skill | Purpose |
+|-------|---------|
+| `devloop` | Smart entry point - detects state, suggests actions |
+| `plan` | Create actionable plan with autonomous exploration |
+| `run` | Execute plan tasks autonomously |
+| `run-swarm` | Execute plan tasks via fresh-context subagents |
+| `fresh` | Save plan state for fresh context restart |
+| `ship` | Validate and commit/PR completed work |
+| `review` | Comprehensive code review |
+| `pr-feedback` | Fetch and integrate PR review comments |
+| `new` | Create GitHub issue (or local with --local) |
+| `issues` | List GitHub issues |
+| `archive` | Archive completed plan |
+| `help` | Interactive guide to devloop |
+| `statusline` | Configure devloop statusline |
 
 ## Core Reference Skills
 

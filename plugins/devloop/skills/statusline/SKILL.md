@@ -1,7 +1,6 @@
 ---
 name: statusline
 description: Configure the devloop statusline for Claude Code
-disable-model-invocation: true
 argument-hint: None required
 allowed-tools:
   - Read

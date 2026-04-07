@@ -2,7 +2,6 @@
 name: run
 description: Execute plan tasks autonomously until completion
 when_to_use: "Executing a prepared devloop plan autonomously"
-disable-model-invocation: true
 argument-hint: "[--max-iterations N] [--interactive] [--next-issue]"
 allowed-tools:
   - Read
