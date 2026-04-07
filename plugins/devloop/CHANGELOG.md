@@ -5,6 +5,12 @@ All notable changes to the devloop plugin are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.23.1] - 2026-04-07
+
+### Fixed
+
+- Script references in run, run-swarm, and plan skills now use full `${CLAUDE_PLUGIN_ROOT}/scripts/` paths instead of bare filenames, fixing "No such file or directory" errors
+
 ## [3.23.0] - 2026-04-05
 
 ### Added - Model-Aware Planning & Parallel Execution

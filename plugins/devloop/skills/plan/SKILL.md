@@ -66,7 +66,7 @@ Use for unclear requirements or architectural changes.
 ### Default Mode: Autonomous Planning (Steps 4-7)
 
 ## Step 4: Context Detection (Silent)
-Run `check-devloop-state.sh`. Detect tech stack and patterns from `CLAUDE.md`.
+Run `${CLAUDE_PLUGIN_ROOT}/scripts/check-devloop-state.sh`. Detect tech stack and patterns from `CLAUDE.md`.
 
 ## Step 5: Exploration (Silent)
 1. **Search**: Grep keywords, Glob patterns.

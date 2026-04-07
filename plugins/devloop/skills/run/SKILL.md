@@ -27,7 +27,7 @@ Execute plan tasks autonomously. **Do the work directly.**
 **Bash hygiene**: prefer quiet flags to minimize output (`npm install --silent`, `git status -sb`, pipe long output through `| tail -n 20`).
 
 ## Step 1: Check Plan State
-Run `check-plan-complete.sh .devloop/plan.md`.
+Run `${CLAUDE_PLUGIN_ROOT}/scripts/check-plan-complete.sh .devloop/plan.md`.
 - **No plan**: Show entry points (`/devloop:plan`) and STOP.
 - **Complete**: **AskUserQuestion**: Ship it, Archive, or Review. STOP.
 - **Pending**: Continue to Step 2.
@@ -49,7 +49,7 @@ If `.devloop/next-action.json` exists, load and resume.
 
 ## Step 4: Setup Execution
 Unless `--interactive`, create `.claude/ralph-loop.local.md` with iteration limits and completion promise: `<promise>ALL PLAN TASKS COMPLETE</promise>`.
-**Optional**: Sync plan to native tasks with `sync-plan-to-tasks.sh`.
+**Optional**: Sync plan to native tasks with `${CLAUDE_PLUGIN_ROOT}/scripts/sync-plan-to-tasks.sh`.
 
 ## Step 5: Execute Tasks
 Read plan, find all `- [ ]` tasks.

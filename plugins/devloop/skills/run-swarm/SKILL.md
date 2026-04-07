@@ -27,7 +27,7 @@ Execute plan tasks via fresh-context subagents. **You are the orchestrator.**
 **Bash hygiene**: prefer quiet flags to minimize output (`npm install --silent`, `git status -sb`, pipe long output through `| tail -n 20`).
 
 ## Step 1: Check Plan State
-Run `check-plan-complete.sh .devloop/plan.md`.
+Run `${CLAUDE_PLUGIN_ROOT}/scripts/check-plan-complete.sh .devloop/plan.md`.
 - **No plan**: Show entry points (`/devloop:plan`) and STOP.
 - **Complete**: **AskUserQuestion**: Ship it, Archive, or Review. STOP.
 - **Pending**: Continue to Step 2.
@@ -50,7 +50,7 @@ Read all `- [ ]` tasks from plan.md. Group them:
 ### 4b. For Each Batch (Parallel Group or Single Task)
 
 #### Gather Context
-Run `gather-task-context.sh` or Grep/Glob for relevant files (max 20 per task).
+Run `${CLAUDE_PLUGIN_ROOT}/scripts/gather-task-context.sh` or Grep/Glob for relevant files (max 20 per task).
 
 #### Select Model by Hint
 Parse `[model:X]` from the task line:
