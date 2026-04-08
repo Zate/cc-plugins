@@ -64,25 +64,25 @@ Agent:
 2. Run tests (unless `--skip-tests` or `test_command` is null).
    - Fail: **AskUserQuestion**: "Fix and retry" or "Skip tests".
 
-3. Commit: `git add` changed files, commit with `feat: phase N -- phase-name`.
+## Step 5: Commit & Advance
 
-## Step 5: Update State
+1. Commit: `git add` changed files, commit with `feat: phase N -- phase-name`.
+2. Update `epic.json`: mark phase `"complete"`, record commit hash, increment `current_phase`.
+3. Update `epic.md` Phase Tracker table.
+4. If all phases complete: Report done. **AskUserQuestion**: "Ship it" or "Review". STOP.
+5. Promote next phase: run `${CLAUDE_PLUGIN_ROOT}/scripts/promote-phase.sh --force`.
 
-Update `epic.json`: mark phase `"complete"`, record commit hash, increment `current_phase`. Update `epic.md` Phase Tracker table.
+Report:
+```
+Phase N complete and committed.
+Phase M loaded: "Phase Name" (X tasks)
+```
 
-If all phases complete: Report done. **AskUserQuestion**: "Ship it" or "Review". STOP.
+## Step 6: Pause Point
 
-## Step 6: Promote Next Phase
-
-Run `${CLAUDE_PLUGIN_ROOT}/scripts/promote-phase.sh --force`.
-
-Report: "Phase N complete. Phase M loaded (X tasks). Ready for next phase."
-
-## Step 7: Pause Point
-
-**AskUserQuestion**:
-- **Continue**: Loop to Step 3 (fresh subagent).
-- **Clear and continue**: "Run `/clear`, then `/devloop:run-epic`." STOP.
+The next phase is already loaded in plan.md. **AskUserQuestion**:
+- **Continue now**: Loop to Step 3 (fresh subagent, same session).
+- **Clear and run**: "Run `/clear`, then `/devloop:run-epic` to execute Phase M." STOP.
 
 ## Recovery
 
