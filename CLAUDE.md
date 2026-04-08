@@ -369,6 +369,56 @@ context_threshold: 80  # Context guard exit %
 
 See `plugins/devloop/skills/fresh/SKILL.md` for details.
 
+### The Epic → Run-Epic Loop (Multi-Phase Features)
+
+For large features spanning multiple sessions, use epics instead of plans:
+
+```
+┌──────────────────────────────────────────────────┐
+│  1. /devloop:epic "topic"                        │
+│     └─→ Background exploration + user questions  │
+│     └─→ End state, user stories, threat model    │
+│     └─→ Generates epic.json + epic.md            │
+│     └─→ Promotes Phase 1 to plan.md              │
+└─────────────────┬────────────────────────────────┘
+                  ↓
+┌──────────────────────────────────────────────────┐
+│  2. /devloop:run-epic                            │
+│     └─→ Spawns Sonnet subagent for current phase │
+│     └─→ Validates tests, commits, promotes next  │
+│     └─→ Pauses: "Continue or /clear?"            │
+└─────────────────┬────────────────────────────────┘
+                  │
+                  ↓
+            Context heavy?
+                  │
+                  ├─→ Yes: /clear → /devloop:run-epic
+                  └─→ No: Continue (fresh subagent)
+```
+
+**Key files:**
+- `.devloop/epic.json` — State machine (survives `/clear`)
+- `.devloop/epic.md` — Human-readable plan with all phases
+- `.devloop/plan.md` — Current phase (promoted from epic)
+
+**Example session:**
+```bash
+/devloop:epic "add user authentication"  # Plan all phases with TDD
+/devloop:run-epic                        # Execute phase 1 in subagent
+# -> tests pass, committed, phase 2 loaded
+# -> "Continue now?" or "Clear and run?"
+/clear                                   # Fresh context
+/devloop:run-epic                        # Resumes from phase 2
+```
+
+| Command | Behavior |
+|---------|----------|
+| `/devloop:epic "topic"` | Create multi-phase epic with TDD, user stories, threat model |
+| `/devloop:epic "topic" --no-tdd` | Epic without tests-first structure |
+| `/devloop:run-epic` | Execute current phase, validate, promote next |
+| `/devloop:run-epic --status` | Show epic progress |
+| `/devloop:run-epic --phase N` | Jump to specific phase |
+
 ### Deprecated Commands
 
 | Old Command | New Command |
