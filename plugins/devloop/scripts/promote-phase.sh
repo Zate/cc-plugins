@@ -1,17 +1,16 @@
 #!/bin/bash
-# promote-phase.sh - Promote next epic phase to plan.md
+# promote-phase.sh - Promote an epic phase to plan.md
 #
 # Usage:
-#   ./promote-phase.sh [epic-file] [--phase N] [--force]
+#   ./promote-phase.sh [--phase N] [--force]
 #
-# Reads epic.json for state, epic.md for task content.
-# Output (JSON):
-#   {"promoted": true, "phase": N, "phase_name": "...", "tasks": N, "plan_path": "..."}
+# Reads .devloop/epic.json for state, .devloop/epic.md for task content.
+# Writes .devloop/plan.md and updates both epic files.
 #
 # Exit codes:
-#   0 - Phase promoted successfully
+#   0 - Phase promoted
 #   1 - No pending phases
-#   2 - No epic file found
+#   2 - No epic found
 #   3 - Plan has incomplete tasks (use --force)
 
 set -euo pipefail
@@ -21,24 +20,22 @@ EPIC_JSON="$EPIC_DIR/epic.json"
 EPIC_MD="$EPIC_DIR/epic.md"
 TARGET_PHASE=""
 FORCE=false
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 
-# Parse args
 while [ $# -gt 0 ]; do
     case "$1" in
         --phase) TARGET_PHASE="$2"; shift 2 ;;
         --force) FORCE=true; shift ;;
-        *) EPIC_MD="$1"; shift ;;
+        *) shift ;;
     esac
 done
 
-# Check epic.json first (primary state), fall back to epic.md
-if [ ! -f "$EPIC_JSON" ] && [ ! -f "$EPIC_MD" ]; then
-    echo '{"error": "no_epic", "message": "No epic.json or epic.md found"}'
+if [ ! -f "$EPIC_JSON" ] || [ ! -f "$EPIC_MD" ]; then
+    echo '{"error": "no_epic", "message": "epic.json and epic.md are both required"}'
     exit 2
 fi
 
-# Check if plan.md has incomplete tasks
-SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+# Guard against overwriting incomplete plan
 if [ -f "$EPIC_DIR/plan.md" ] && [ "$FORCE" != "true" ]; then
     if ! "$SCRIPT_DIR/check-plan-complete.sh" "$EPIC_DIR/plan.md" >/dev/null 2>&1; then
         echo '{"error": "plan_incomplete", "message": "Plan has incomplete tasks. Use --force to override."}'
@@ -46,22 +43,12 @@ if [ -f "$EPIC_DIR/plan.md" ] && [ "$FORCE" != "true" ]; then
     fi
 fi
 
-# Determine target phase
+# Get target phase from epic.json
 if [ -z "$TARGET_PHASE" ]; then
-    if [ -f "$EPIC_JSON" ] && command -v jq &>/dev/null; then
+    if command -v jq &>/dev/null; then
         TARGET_PHASE=$(jq -r '.current_phase' "$EPIC_JSON")
-    elif [ -f "$EPIC_JSON" ]; then
-        TARGET_PHASE=$(grep -o '"current_phase": *[0-9]*' "$EPIC_JSON" | grep -o '[0-9]*')
     else
-        # Fall back to epic.md tracker table
-        TARGET_PHASE=$(grep -E "^\|[[:space:]]*[0-9]+" "$EPIC_MD" | while IFS='|' read -r _ num _ _ status _; do
-            num=$(echo "$num" | tr -d ' ')
-            status=$(echo "$status" | tr -d ' `' | tr '[:upper:]' '[:lower:]')
-            if [ "$status" = "pending" ] || [ "$status" = "in_progress" ]; then
-                echo "$num"
-                break
-            fi
-        done)
+        TARGET_PHASE=$(grep -o '"current_phase": *[0-9]*' "$EPIC_JSON" | grep -o '[0-9]*')
     fi
 fi
 
@@ -70,10 +57,8 @@ if [ -z "$TARGET_PHASE" ]; then
     exit 1
 fi
 
-# Extract epic title
+# Extract epic title and phase content from epic.md
 EPIC_TITLE=$(grep -m1 "^# " "$EPIC_MD" | sed 's/^# //' | sed 's/^Epic: //')
-
-# Extract phase content from epic.md
 PHASE_NAME=""
 PHASE_CONTENT=""
 IN_PHASE=false
@@ -98,18 +83,17 @@ if [ -z "$PHASE_NAME" ]; then
     exit 1
 fi
 
-# Count tasks in the phase
 TASK_COUNT=$(echo "$PHASE_CONTENT" | grep -cE "^\s*- \[[ x~!-]\]" 2>/dev/null) || TASK_COUNT=0
-
-# Generate plan.md
 TODAY=$(date +%Y-%m-%d)
+
+# Write plan.md
 cat > "$EPIC_DIR/plan.md" <<PLAN
 # Devloop Plan: Phase $TARGET_PHASE -- $PHASE_NAME
 
 **Created**: $TODAY
 **Updated**: $TODAY
 **Status**: In Progress
-**Epic**: .devloop/epic.json (Phase $TARGET_PHASE of $EPIC_TITLE)
+**Epic**: .devloop/epic.json
 **Phase**: $TARGET_PHASE
 
 ## Overview
@@ -123,28 +107,18 @@ $PHASE_CONTENT
 
 PLAN
 
-# Update epic.md tracker: mark phase as in_progress
-sed -i "s/^\(|[[:space:]]*$TARGET_PHASE[[:space:]]*|.*|\)[[:space:]]*\`*pending\`*[[:space:]]*|/\1 \`in_progress\` |/" "$EPIC_MD"
-
-# Update epic.json if it exists
-if [ -f "$EPIC_JSON" ]; then
-    if command -v jq &>/dev/null; then
-        # Use jq for reliable JSON updates
-        jq --argjson phase "$TARGET_PHASE" '
-            .current_phase = $phase |
-            .status = "in_progress" |
-            (.phases[] | select(.number == $phase)).status = "in_progress"
-        ' "$EPIC_JSON" > "$EPIC_JSON.tmp" && mv "$EPIC_JSON.tmp" "$EPIC_JSON"
-    else
-        # Fallback: simple sed replacements
-        sed -i "s/\"current_phase\": *[0-9]*/\"current_phase\": $TARGET_PHASE/" "$EPIC_JSON"
-        sed -i "s/\"status\": *\"planning\"/\"status\": \"in_progress\"/" "$EPIC_JSON"
-    fi
+# Update epic.json
+if command -v jq &>/dev/null; then
+    jq --argjson phase "$TARGET_PHASE" '
+        .current_phase = $phase |
+        .status = "in_progress" |
+        (.phases[] | select(.number == $phase)).status = "in_progress"
+    ' "$EPIC_JSON" > "$EPIC_JSON.tmp" && mv "$EPIC_JSON.tmp" "$EPIC_JSON"
 fi
 
-# Output JSON
-cat <<EOF
-{"promoted": true, "phase": $TARGET_PHASE, "phase_name": "$PHASE_NAME", "tasks": $TASK_COUNT, "plan_path": "$EPIC_DIR/plan.md", "epic": "$EPIC_JSON"}
-EOF
+# Update epic.md tracker (best-effort sed, agent can fix if needed)
+sed -i "s/^\(|[[:space:]]*$TARGET_PHASE[[:space:]]*|.*|\)[[:space:]]*\`*pending\`*[[:space:]]*|/\1 \`in_progress\` |/" "$EPIC_MD" 2>/dev/null || true
 
-exit 0
+cat <<EOF
+{"promoted": true, "phase": $TARGET_PHASE, "phase_name": "$PHASE_NAME", "tasks": $TASK_COUNT, "plan_path": "$EPIC_DIR/plan.md"}
+EOF

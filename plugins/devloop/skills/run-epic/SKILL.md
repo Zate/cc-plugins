@@ -13,119 +13,85 @@ allowed-tools:
   - Bash(${CLAUDE_PLUGIN_ROOT}/scripts/*.sh:*)
   - Agent
   - AskUserQuestion
-  - TaskCreate
-  - TaskUpdate
-  - TaskList
   - Skill
 ---
 
 # Devloop Run Epic
 
-Execute an epic phase-by-phase. Each phase runs in a fresh-context subagent to avoid context bloat. **You are the orchestrator -- stay lean, delegate execution.**
+Execute an epic phase-by-phase. Each phase runs in a fresh-context subagent. **You are the orchestrator -- stay lean, delegate execution.**
 
 ## Step 1: Load State
 
 Read `.devloop/epic.json`.
 
 - **No file**: "No epic found. Use `/devloop:epic <topic>` to create one." STOP.
-- **`--status`**: Display phase tracker from epic.json and STOP.
-- **`status: "complete"`**: "Epic already complete. All N phases done." STOP.
-- **`--phase N`**: Override current phase (set `current_phase` to N, promote that phase).
-
-Continue with the current phase from `epic.json`.
+- **`--status`**: Display phase tracker and STOP.
+- **`status: "complete"`**: "Epic already complete." STOP.
+- **`--phase N`**: Override current phase and re-promote.
 
 ## Step 2: Validate Plan
 
-Read `.devloop/plan.md`. Verify it matches the current phase:
-- Check `**Phase**:` frontmatter matches `epic.json.current_phase`.
-- If mismatch or no plan.md: run `${CLAUDE_PLUGIN_ROOT}/scripts/promote-phase.sh` to load the correct phase.
-- If plan.md shows all tasks `[x]`: this phase was already completed -- skip to Step 5.
+Read `.devloop/plan.md`. Verify `**Phase**:` matches `epic.json.current_phase`.
+- Mismatch or missing: run `${CLAUDE_PLUGIN_ROOT}/scripts/promote-phase.sh --force`.
+- All tasks `[x]`: skip to Step 5 (already completed).
 
 ## Step 3: Execute Phase
 
-Spawn a subagent to execute the current phase plan:
+Read `epic.json` for context (user_stories, invariants, negative_cases, test_command). Spawn a subagent:
 
 ```yaml
 Agent:
   model: "sonnet"
   description: "Execute epic phase N"
   prompt: |
-    You are executing a devloop plan. Read .devloop/plan.md and execute all tasks.
+    Execute the devloop plan in .devloop/plan.md.
+    Work through all tasks, respecting [depends:N.M] constraints.
+    Mark tasks [x] as you complete them.
+    Run tests after implementation tasks: {test_command}
+    Do NOT commit or modify epic.json/epic.md.
 
-    Rules:
-    - Work through tasks in order, respecting [depends:N.M] constraints
-    - For [parallel:A] groups, process them efficiently
-    - Mark each task [x] in plan.md as you complete it
-    - Run tests after implementation tasks to verify they pass
-    - Do NOT commit -- the orchestrator handles commits
-    - Do NOT modify .devloop/epic.json or .devloop/epic.md
-    - If stuck on a task, mark it [!] with a note and continue
-
-    Test command: {test_command from epic.json}
-
-    When all tasks are done, report a summary of what was implemented.
+    Context from the epic:
+    - User stories: {user_stories}
+    - Invariants: {invariants}
+    - Negative cases: {negative_cases}
 ```
 
-Wait for the agent to complete. Read its result.
+## Step 4: Validate Completion
 
-## Step 4: Validate Phase Completion
+1. Run `${CLAUDE_PLUGIN_ROOT}/scripts/check-plan-complete.sh .devloop/plan.md`.
+   - Incomplete: **AskUserQuestion**: "Retry" or "Skip remaining".
 
-1. **Check plan.md**: Run `${CLAUDE_PLUGIN_ROOT}/scripts/check-plan-complete.sh .devloop/plan.md`.
-   - If incomplete: Report which tasks remain. **AskUserQuestion**: "Retry phase" (spawn new agent with error context) or "Skip remaining" (mark `[-]`).
+2. Run tests (unless `--skip-tests` or `test_command` is null).
+   - Fail: **AskUserQuestion**: "Fix and retry" or "Skip tests".
 
-2. **Run tests** (unless `--skip-tests`):
-   - Read `test_command` from `epic.json`.
-   - If set: Run it via Bash. If tests fail: Report failures. **AskUserQuestion**: "Fix and retry" or "Skip tests".
-   - If null: Skip test validation.
+3. Commit: `git add` changed files, commit with `feat: phase N -- phase-name`.
 
-3. **Commit the phase**:
-   ```bash
-   git add -A
-   git commit -m "feat(epic-slug): phase N -- phase-name"
-   ```
-   Record the commit hash.
+## Step 5: Update State
 
-## Step 5: Update Epic State
+Update `epic.json`: mark phase `"complete"`, record commit hash, increment `current_phase`. Update `epic.md` Phase Tracker table.
 
-1. Update `epic.json`:
-   - Current phase: set `status` to `"complete"`, record `committed` hash.
-   - Increment `current_phase`.
-   - If all phases complete: set top-level `status` to `"complete"`.
-
-2. Update `epic.md`:
-   - Mark completed phase as `complete` in the Phase Tracker table.
-
-3. **If all phases complete**: Report "Epic complete! All N phases done." **AskUserQuestion**: "Ship it" (invoke `/devloop:ship`) or "Review". STOP.
+If all phases complete: Report done. **AskUserQuestion**: "Ship it" or "Review". STOP.
 
 ## Step 6: Promote Next Phase
 
-Run `${CLAUDE_PLUGIN_ROOT}/scripts/promote-phase.sh --force` to load the next phase into plan.md.
+Run `${CLAUDE_PLUGIN_ROOT}/scripts/promote-phase.sh --force`.
 
-Report:
-```
-Phase N complete (committed: abc1234)
-Phase M loaded: "Phase Name" (X tasks)
-
-Ready for next phase.
-```
+Report: "Phase N complete. Phase M loaded (X tasks). Ready for next phase."
 
 ## Step 7: Pause Point
 
 **AskUserQuestion**:
-- **Continue**: Loop back to Step 3 (fresh subagent, same orchestrator context).
-- **Clear and continue**: "Run /clear, then /devloop:run-epic to resume." STOP.
+- **Continue**: Loop to Step 3 (fresh subagent).
+- **Clear and continue**: "Run `/clear`, then `/devloop:run-epic`." STOP.
 
-This is the natural pause point. The orchestrator context is still lean (only state tracking), but if the user has been reviewing output or context feels heavy, clearing is safe -- epic.json preserves all state.
+## Recovery
 
----
+`run-epic` is resumable. `epic.json` is the source of truth:
+- Mid-phase: plan.md has partial progress, new agent picks up remaining tasks.
+- Post-phase: detects plan complete, skips to validation.
+- After `/clear`: reads epic.json, resumes from correct phase.
 
-## Error Recovery
-
-`run-epic` is resumable at any point:
-- **Mid-phase crash**: plan.md has partial progress. Re-running spawns a new agent that picks up from remaining `[ ]` tasks.
-- **Post-phase, pre-commit**: Changes are on disk but not committed. Re-running detects plan complete, goes straight to Step 4.
-- **Post-commit, pre-promote**: epic.json shows phase complete but current_phase not incremented. Re-running detects and promotes.
-- **After /clear**: epic.json is the source of truth. Re-running reads it and resumes from the correct phase.
+If the repo is in a broken state (e.g. orphaned changes, mismatched plan), run-epic will detect the mismatch in Step 2 and re-promote the correct phase. Tests in Step 4 catch implementation issues before committing.
 
 ---
 **Now**: Load epic state and begin.

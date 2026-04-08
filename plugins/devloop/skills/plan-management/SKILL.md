@@ -144,40 +144,16 @@ The number after `#` is parsed by archive-plan.sh for GitHub integration.
 
 ## Epic Format
 
-Primary: `.devloop/epic.md`
+Epics use two files: `.devloop/epic.json` (state machine) and `.devloop/epic.md` (human-readable plan).
 
 ### Epic Frontmatter in plan.md
 
-When a plan is promoted from an epic, it contains:
+When a plan is promoted from an epic:
 ```markdown
-**Epic**: .devloop/epic.md (Phase N of Epic Title)
+**Epic**: .devloop/epic.json
 **Phase**: N
 ```
 
-### Phase Tracker Table
-
-```markdown
-| Phase | Name | Tasks | Status |
-|-------|------|-------|--------|
-| 1 | Setup | 4 | `complete` |
-| 2 | Core | 6 | `in_progress` |
-| 3 | Polish | 3 | `pending` |
-```
-
-Status values: `pending`, `in_progress`, `complete`, `skipped`
-
 ### TDD Task Structure
 
-Default epic phases use TDD ordering:
-1. **Tests first**: `[parallel:A]` group, `[model:haiku]` -- write failing tests
-2. **Implementation**: `[depends:N.M]` on test tasks, `[model:sonnet]` -- make tests pass
-
-```markdown
-#### Tests (write first -- all should fail)
-- [ ] Task 1.1: Write test for X [model:haiku] [parallel:A]
-- [ ] Task 1.2: Write test for Y [model:haiku] [parallel:A]
-
-#### Implementation (make tests pass)
-- [ ] Task 1.3: Implement X [model:sonnet] [depends:1.1]
-- [ ] Task 1.4: Implement Y [model:haiku] [depends:1.2]
-```
+Default epic phases use TDD ordering: tests first (`[parallel:A]`, `[model:haiku]`), then implementation (`[depends:N.M]`, `[model:sonnet]`).

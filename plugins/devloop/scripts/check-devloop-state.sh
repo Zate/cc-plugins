@@ -118,8 +118,8 @@ fi
 
 # Check for active epic
 EPIC_INFO="{}"
-if [ -f ".devloop/epic.md" ]; then
-    EPIC_STATUS=$("$SCRIPT_DIR/check-epic-state.sh" .devloop/epic.md 2>/dev/null) || true
+if [ -f ".devloop/epic.json" ]; then
+    EPIC_STATUS=$("$SCRIPT_DIR/check-epic-state.sh" .devloop 2>/dev/null) || true
     if [ -n "$EPIC_STATUS" ] && ! echo "$EPIC_STATUS" | grep -q '"error"'; then
         EPIC_INFO="$EPIC_STATUS"
     fi

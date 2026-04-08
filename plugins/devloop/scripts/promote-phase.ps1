@@ -1,9 +1,8 @@
 $ErrorActionPreference = 'Stop'
 
-# promote-phase.ps1 - Promote next epic phase to plan.md
+# promote-phase.ps1 - Promote an epic phase to plan.md
 #
 # Usage: promote-phase.ps1 [--phase N] [--force]
-# Reads epic.json for state, epic.md for task content.
 
 $EpicDir = '.devloop'
 $EpicJson = Join-Path $EpicDir 'epic.json'
@@ -19,12 +18,12 @@ for ($i = 0; $i -lt $args.Count; $i++) {
     }
 }
 
-if (-not (Test-Path $EpicJson) -and -not (Test-Path $EpicMd)) {
-    Write-Output '{"error": "no_epic", "message": "No epic.json or epic.md found"}'
+if (-not (Test-Path $EpicJson) -or -not (Test-Path $EpicMd)) {
+    Write-Output '{"error": "no_epic", "message": "epic.json and epic.md are both required"}'
     exit 2
 }
 
-# Check plan completion
+# Guard against overwriting incomplete plan
 $planFile = Join-Path $EpicDir 'plan.md'
 if ((Test-Path $planFile) -and -not $Force) {
     $checkPlan = Join-Path $scriptDir 'check-plan-complete.ps1'
@@ -35,25 +34,9 @@ if ((Test-Path $planFile) -and -not $Force) {
     }
 }
 
-# Determine target phase from epic.json
-if (-not $TargetPhase -and (Test-Path $EpicJson)) {
-    $epic = Get-Content $EpicJson -Raw | ConvertFrom-Json
-    $TargetPhase = $epic.current_phase
-}
-
-if (-not $TargetPhase) {
-    # Fall back to epic.md tracker
-    $lines = Get-Content $EpicMd
-    foreach ($line in $lines) {
-        if ($line -match '^\|\s*(\d+)\s*\|([^|]+)\|([^|]+)\|([^|]+)\|') {
-            $status = $Matches[4].Trim().ToLower() -replace '`', ''
-            if ($status -eq 'pending' -or $status -eq 'in_progress') {
-                $TargetPhase = $Matches[1].Trim()
-                break
-            }
-        }
-    }
-}
+# Get target phase
+$epic = Get-Content $EpicJson -Raw | ConvertFrom-Json
+if (-not $TargetPhase) { $TargetPhase = $epic.current_phase }
 
 if (-not $TargetPhase) {
     Write-Output '{"error": "no_pending", "message": "No pending phases found"}'
@@ -67,9 +50,7 @@ $EpicTitle = ($lines | Where-Object { $_ -match '^# ' } | Select-Object -First 1
 $PhaseName = ''; $PhaseContent = @(); $InPhase = $false
 foreach ($line in $lines) {
     if ($line -match "^### Phase ${TargetPhase}: (.+)") {
-        $InPhase = $true
-        $PhaseName = $Matches[1]
-        continue
+        $InPhase = $true; $PhaseName = $Matches[1]; continue
     }
     if ($InPhase) {
         if ($line -match '^### Phase \d+:|^## ') { break }
@@ -92,7 +73,7 @@ $content = $PhaseContent -join "`n"
 **Created**: $Today
 **Updated**: $Today
 **Status**: In Progress
-**Epic**: .devloop/epic.json (Phase $TargetPhase of $EpicTitle)
+**Epic**: .devloop/epic.json
 **Phase**: $TargetPhase
 
 ## Overview
@@ -107,20 +88,16 @@ $content
 
 "@ | Set-Content $planFile
 
-# Update epic.md tracker
+# Update epic.json
+$epic.current_phase = [int]$TargetPhase
+$epic.status = 'in_progress'
+$phase = $epic.phases | Where-Object { $_.number -eq [int]$TargetPhase }
+if ($phase) { $phase.status = 'in_progress' }
+$epic | ConvertTo-Json -Depth 10 | Set-Content $EpicJson
+
+# Update epic.md tracker (best-effort)
 $epicContent = Get-Content $EpicMd -Raw
 $epicContent = $epicContent -replace "(\|\s*$TargetPhase\s*\|[^|]+\|[^|]+\|)\s*``?pending``?\s*\|", "`$1 ``in_progress`` |"
 Set-Content $EpicMd $epicContent
 
-# Update epic.json
-if (Test-Path $EpicJson) {
-    $epic = Get-Content $EpicJson -Raw | ConvertFrom-Json
-    $epic.current_phase = [int]$TargetPhase
-    $epic.status = 'in_progress'
-    $phase = $epic.phases | Where-Object { $_.number -eq [int]$TargetPhase }
-    if ($phase) { $phase.status = 'in_progress' }
-    $epic | ConvertTo-Json -Depth 10 | Set-Content $EpicJson
-}
-
-Write-Output "{`"promoted`": true, `"phase`": $TargetPhase, `"phase_name`": `"$PhaseName`", `"tasks`": $TaskCount, `"plan_path`": `"$planFile`", `"epic`": `"$EpicJson`"}"
-exit 0
+Write-Output "{`"promoted`": true, `"phase`": $TargetPhase, `"phase_name`": `"$PhaseName`", `"tasks`": $TaskCount, `"plan_path`": `"$planFile`"}"
