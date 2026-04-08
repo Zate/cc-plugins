@@ -12,6 +12,8 @@ These are user-invocable slash commands (`/devloop:<name>`):
 | `plan` | Create actionable plan with autonomous exploration |
 | `run` | Execute plan tasks autonomously |
 | `run-swarm` | Execute plan tasks via fresh-context subagents |
+| `epic` | Create multi-phase epic plan with TDD structure |
+| `promote` | Promote next epic phase to plan.md |
 | `fresh` | Save plan state for fresh context restart |
 | `ship` | Validate and commit/PR completed work |
 | `review` | Comprehensive code review |
@@ -67,7 +69,7 @@ These skills provide domain knowledge but don't auto-trigger. Load explicitly wi
 
 ---
 
-**Total**: 27 skills (13 workflow commands + 14 reference skills)
+**Total**: 29 skills (15 workflow commands + 14 reference skills)
 
 ## Superpowers Integration
 
@@ -106,6 +108,8 @@ Devloop and superpowers are complementary plugins with distinct lanes:
 /devloop             # Smart entry point
 /devloop:plan        # Create plan
 /devloop:run         # Execute plan
+/devloop:epic        # Multi-phase TDD epic
+/devloop:promote     # Promote next epic phase
 /devloop:ship        # Commit/PR
 
 # Reference skills (load on demand)

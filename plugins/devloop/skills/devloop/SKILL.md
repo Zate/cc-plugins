@@ -269,6 +269,8 @@ If `$ARGUMENTS` is provided and non-empty:
 | `/devloop:plan --quick` | Fast path for small tasks |
 | `/devloop:plan --from-issue N` | Start from GitHub issue |
 | `/devloop:run` | Execute plan autonomously |
+| `/devloop:epic` | Create multi-phase epic with TDD |
+| `/devloop:promote` | Promote next epic phase |
 | `/devloop:fresh` | Save state and exit cleanly |
 | `/devloop:new` | Create GitHub issue |
 | `/devloop:issues` | List GitHub issues |
@@ -277,7 +279,8 @@ If `$ARGUMENTS` is provided and non-empty:
 
 ## Files
 
-- `.devloop/plan.md` - Current task plan
+- `.devloop/plan.md` - Current task plan (or promoted epic phase)
+- `.devloop/epic.md` - Multi-phase epic plan
 - `.devloop/local.md` - Project settings (git workflow, etc.)
 - `.devloop/next-action.json` - Fresh start state
 - `.devloop/spikes/` - Spike reports (from --deep exploration)

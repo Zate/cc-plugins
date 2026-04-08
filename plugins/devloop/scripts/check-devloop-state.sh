@@ -116,6 +116,15 @@ else
     # Use `gh issue list` for issue tracking - local issues are deprecated
 fi
 
+# Check for active epic
+EPIC_INFO="{}"
+if [ -f ".devloop/epic.md" ]; then
+    EPIC_STATUS=$("$SCRIPT_DIR/check-epic-state.sh" .devloop/epic.md 2>/dev/null) || true
+    if [ -n "$EPIC_STATUS" ] && ! echo "$EPIC_STATUS" | grep -q '"error"'; then
+        EPIC_INFO="$EPIC_STATUS"
+    fi
+fi
+
 # If still clean, set default suggestions
 if [ "$STATE" = "clean" ]; then
     DETAILS='{"message": "Ready for new work"}'
@@ -129,6 +138,7 @@ cat <<EOF
   "state": "$STATE",
   "priority": $PRIORITY,
   "details": $DETAILS,
+  "epic": $EPIC_INFO,
   "suggestions": $SUGGESTIONS
 }
 EOF

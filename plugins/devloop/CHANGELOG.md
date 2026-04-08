@@ -5,6 +5,24 @@ All notable changes to the devloop plugin are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.24.0] - 2026-04-07
+
+### Added - Epic Planning & Phase Promotion
+
+- **`/devloop:epic <topic>`**: Create multi-phase epic plans with TDD structure
+  - Autonomous exploration, then generates phases with tests-first + implementation pattern
+  - Each phase: test tasks (`[parallel:A]`, `[model:haiku]`) then implementation tasks (`[depends:N.M]`)
+  - Supports `--phases N` (target count) and `--no-tdd` (skip TDD structure)
+  - Auto-promotes Phase 1 to plan.md and starts execution
+- **`/devloop:promote`**: Autonomous phase promotion cycle
+  - Verifies tests pass, commits phase, updates epic tracker, promotes next phase
+  - Supports `--status` (view progress) and `--skip` (skip remaining tasks)
+  - Full cycle: paste prompt, walk away, come back to committed phase with next one ready
+- **Scripts**: `check-epic-state.sh` and `promote-phase.sh` (with .ps1 companions)
+- **Epic-aware `/devloop:run`**: Offers "Promote next phase" at completion when running an epic phase
+- **Epic detection in `check-devloop-state.sh`**: State script reports epic context
+- **Plan-management docs**: Added epic format, phase tracker table, TDD task structure
+
 ## [3.23.1] - 2026-04-07
 
 ### Fixed
