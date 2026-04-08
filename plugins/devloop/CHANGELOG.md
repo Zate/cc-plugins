@@ -5,6 +5,12 @@ All notable changes to the devloop plugin are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.24.1] - 2026-04-08
+
+### Changed
+
+- Quality pass: simplified epic and run-epic skills (-329 lines), removed dead code from scripts, fixed no-jq fallback bug in check-epic-state.sh
+
 ## [3.24.0] - 2026-04-08
 
 ### Added - Epic Planning & Phase Execution
