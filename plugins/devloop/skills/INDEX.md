@@ -13,7 +13,7 @@ These are user-invocable slash commands (`/devloop:<name>`):
 | `run` | Execute plan tasks autonomously |
 | `run-swarm` | Execute plan tasks via fresh-context subagents |
 | `epic` | Create multi-phase epic plan with TDD structure |
-| `promote` | Promote next epic phase to plan.md |
+| `run-epic` | Execute epic phase-by-phase with fresh subagents |
 | `fresh` | Save plan state for fresh context restart |
 | `ship` | Validate and commit/PR completed work |
 | `review` | Comprehensive code review |
@@ -85,6 +85,7 @@ Devloop and superpowers are complementary plugins with distinct lanes:
 | Task | Use |
 |------|-----|
 | "Plan and implement feature X" | `/devloop:plan` -> `/devloop:run` |
+| "Large multi-phase feature with TDD" | `/devloop:epic` -> `/devloop:run-epic` |
 | "Write tests first, then implement" | `superpowers:test-driven-development` |
 | "Debug this failing test" | `superpowers:systematic-debugging` |
 | "Review my changes" | `/devloop:review` (quick) or `superpowers:requesting-code-review` (thorough) |
@@ -109,7 +110,7 @@ Devloop and superpowers are complementary plugins with distinct lanes:
 /devloop:plan        # Create plan
 /devloop:run         # Execute plan
 /devloop:epic        # Multi-phase TDD epic
-/devloop:promote     # Promote next epic phase
+/devloop:run-epic    # Execute epic phases
 /devloop:ship        # Commit/PR
 
 # Reference skills (load on demand)

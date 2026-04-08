@@ -22,7 +22,7 @@ allowed-tools:
 
 # Devloop Epic
 
-Create a multi-phase epic plan with TDD structure. **Do the work directly.**
+Create a multi-phase epic plan. Produces two files: `epic.md` (the full plan) and `epic.json` (the state machine for execution). **Do the work directly.**
 
 **Bash hygiene**: prefer quiet flags to minimize output.
 
@@ -32,10 +32,10 @@ Extract topic from `$ARGUMENTS`. If missing, show usage: `/devloop:epic <topic> 
 - `--no-tdd`: Skip TDD structure (no test-first tasks).
 
 ## Step 2: Check Existing Epic
-Run `${CLAUDE_PLUGIN_ROOT}/scripts/check-epic-state.sh`.
-- **All complete**: Auto-archive (move to `.devloop/archive/`). Continue.
-- **In progress**: Report status. **AskUserQuestion**: "Archive and replace" or "Cancel".
-- **No epic**: Continue.
+If `.devloop/epic.json` exists:
+- Read it. If `status` is `"complete"`: archive both files to `.devloop/archive/`. Continue.
+- If `status` is `"in_progress"`: Report progress. **AskUserQuestion**: "Archive and replace" or "Cancel".
+- If no epic: Continue.
 
 ## Step 3: Context Detection (Silent)
 Run `${CLAUDE_PLUGIN_ROOT}/scripts/check-devloop-state.sh`. Detect tech stack from `CLAUDE.md`.
@@ -46,15 +46,16 @@ Run `${CLAUDE_PLUGIN_ROOT}/scripts/check-devloop-state.sh`. Detect tech stack fr
 3. **Assess**: Complexity, affected areas, testing infrastructure.
 
 ## Step 5: Epic Generation (Silent)
-Create `.devloop/epic.md` with this structure:
+
+### 5a. Write `.devloop/epic.md`
+
+Full human-readable plan with all phase details:
 
 ```markdown
 # Epic: [Feature Name]
 
 **Created**: YYYY-MM-DD
-**Updated**: YYYY-MM-DD
 **Status**: Planning
-**Current Phase**: 1
 
 ## Overview
 
@@ -77,16 +78,10 @@ Brief description of the epic scope.
 - [ ] Task 1.1: Write test for X [model:haiku] [parallel:A]
   - Acceptance: Test exists and fails
   - Files: `path/to/test`
-- [ ] Task 1.2: Write test for Y [model:haiku] [parallel:A]
-  - Acceptance: Test exists and fails
-  - Files: `path/to/test`
 
 #### Implementation (make tests pass)
 - [ ] Task 1.3: Implement X [model:sonnet] [depends:1.1]
   - Acceptance: Test 1.1 passes
-  - Files: `path/to/source`
-- [ ] Task 1.4: Implement Y [model:haiku] [depends:1.2]
-  - Acceptance: Test 1.2 passes
   - Files: `path/to/source`
 
 ---
@@ -100,8 +95,37 @@ Each phase is **done** when:
 1. All tests pass (unit + E2E)
 2. No regressions -- all prior tests still pass
 3. Changes are committed
-4. Phase status in tracker is updated to `complete`
 ```
+
+### 5b. Write `.devloop/epic.json`
+
+State machine for execution:
+
+```json
+{
+  "title": "Feature Name",
+  "created": "YYYY-MM-DD",
+  "status": "planning",
+  "current_phase": 1,
+  "test_command": "npm test",
+  "phases": [
+    {
+      "number": 1,
+      "name": "Phase Name",
+      "status": "pending",
+      "tasks": 7,
+      "committed": null
+    }
+  ]
+}
+```
+
+**Detect `test_command`** from the project:
+- `package.json` with vitest/jest -> `npm test`
+- `Makefile` with `test` target -> `make test`
+- `go.mod` -> `go test ./...`
+- `pytest.ini` / `pyproject.toml` -> `pytest`
+- Fallback: `null` (skip test validation)
 
 ### TDD Structure Rules (default, skip with `--no-tdd`)
 Each phase contains two sections:
@@ -110,28 +134,20 @@ Each phase contains two sections:
 
 ### Phase Sizing Guidelines
 - 5-8 tasks per phase (including tests + implementation)
-- Each phase should be completable in one `/devloop:run` session
+- Each phase should be completable in one subagent session
 - Group related functionality into the same phase
 - Order phases by dependency: foundations first, polish last
 
-### Model Annotations
-Same rules as `/devloop:plan`:
-- `[model:haiku]` -- Tests, docs, simple implementation, config
-- `[model:sonnet]` -- Architecture, complex logic, multi-file coordination
-- No annotation -- Inline by orchestrator
+## Step 6: Promote Phase 1 to plan.md
+Run `${CLAUDE_PLUGIN_ROOT}/scripts/promote-phase.sh` to copy Phase 1 into `.devloop/plan.md`.
+Update `epic.json`: set `status` to `"in_progress"`, phase 1 status to `"in_progress"`.
 
-## Step 6: Review Checkpoint
-Display summary: phase count, total tasks, TDD structure.
+## Step 7: Review Checkpoint
+Display summary: phase count, total tasks, TDD structure, test command detected.
 **AskUserQuestion**:
-- **Save and promote Phase 1**: Write epic, promote Phase 1 to plan.md, start run.
-- **Save only**: Write epic, show path.
-- **Show full epic**: Review before saving.
-
-## Step 7: Auto-promote Phase 1
-If user chose "Save and promote":
-1. Write `.devloop/epic.md`.
-2. Run `${CLAUDE_PLUGIN_ROOT}/scripts/promote-phase.sh` to copy Phase 1 into plan.md.
-3. Invoke `/devloop:run` to begin execution.
+- **Run now**: Invoke `/devloop:run-epic` to begin execution.
+- **Review epic**: Show the full epic.md content.
+- **Stop here**: "Epic planned. Run `/devloop:run-epic` when ready."
 
 ---
 **Now**: Parse input and begin.

@@ -87,13 +87,6 @@ Agent:
 - **Checkpoints**: If `auto_commit: true`, commit at phase boundaries.
 
 ## Step 7: Finalize
-
-Check if this is an epic phase (plan.md contains `**Epic**:` frontmatter):
-
-**If epic phase**:
-**AskUserQuestion**: "Promote next phase" (invoke `/devloop:promote`), "Ship this phase", or "Review".
-
-**If standalone plan**:
 **AskUserQuestion**: Ship it, Archive, or Review.
 
 ---
