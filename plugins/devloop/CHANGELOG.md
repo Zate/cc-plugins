@@ -10,21 +10,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added - Epic Planning & Phase Execution
 
 - **`/devloop:epic <topic>`**: Create multi-phase epic plans with TDD structure
-  - Autonomous exploration, then generates phases with tests-first + implementation pattern
-  - Each phase: test tasks (`[parallel:A]`, `[model:haiku]`) then implementation tasks (`[depends:N.M]`)
-  - Supports `--phases N` (target count) and `--no-tdd` (skip TDD structure)
-  - Generates both `epic.md` (human-readable plan) and `epic.json` (state machine)
-  - Auto-promotes Phase 1 to plan.md
-- **`/devloop:run-epic`**: Phase-by-phase epic executor with fresh-context subagents
-  - Each phase runs in a Sonnet subagent (fresh context, no bloat)
-  - Orchestrator stays lean: validate state, spawn agent, verify tests, commit, promote
-  - Pause point after each phase: continue (new agent) or `/clear` and resume later
-  - Fully resumable: `epic.json` tracks all state, safe to `/clear` at any pause point
-  - Supports `--status`, `--skip-tests`, `--phase N`
+  - Background exploration + parallel requirements gathering (no dead time)
+  - User stories, threat modeling (invariants, negative cases, edge cases)
+  - Generates `epic.md` (plan) and `epic.json` (state machine)
+  - `--no-tdd` to skip tests-first structure
+- **`/devloop:run-epic`**: Phase-by-phase executor with fresh-context Sonnet subagents
+  - Orchestrator stays lean: validate -> spawn agent -> test -> commit -> promote
+  - Pause after each phase: continue or `/clear` and resume
+  - Fully resumable via `epic.json` state machine
+  - Self-correcting: detects mismatched plan state and re-promotes
 - **Scripts**: `check-epic-state.sh` and `promote-phase.sh` (with .ps1 companions)
-  - `epic.json` is primary state source, `epic.md` fallback
-- **Epic detection in `check-devloop-state.sh`**: State script reports epic context
-- **Plan-management docs**: Added epic format, phase tracker table, TDD task structure
 
 ## [3.23.1] - 2026-04-07
 
