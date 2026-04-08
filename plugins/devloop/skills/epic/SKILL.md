@@ -37,27 +37,37 @@ If `.devloop/epic.json` exists:
 - If `status` is `"in_progress"`: Report progress. **AskUserQuestion**: "Archive and replace" or "Cancel".
 - If no epic: Continue.
 
-## Step 3: Context Detection (Silent)
-Run `${CLAUDE_PLUGIN_ROOT}/scripts/check-devloop-state.sh`. Detect tech stack from `CLAUDE.md`.
+## Step 3: Explore & Ask in Parallel
 
-## Step 4: Exploration (Silent)
-1. **Search**: Grep keywords, Glob patterns related to the topic.
-2. **Read**: 5-10 key files to understand scope.
-3. **Assess**: Complexity, affected areas, testing infrastructure.
+Launch exploration in the background while starting the conversation with the user. This avoids dead time -- the user talks while the agent reads.
 
-## Step 5: Requirements Gathering
+### 3a. Launch Background Explorer
+Spawn an Agent with `run_in_background: true`:
+```yaml
+Agent:
+  subagent_type: "Explore"
+  run_in_background: true
+  description: "Explore codebase for epic"
+  prompt: |
+    Explore this codebase for context on: [topic]
+    1. Run check-devloop-state.sh for tech stack detection
+    2. Grep/Glob for keywords related to the topic
+    3. Read 5-10 relevant files (source, tests, configs)
+    4. Report: tech stack, testing framework, affected areas, existing patterns,
+       file structure, and any obvious complexity or risks.
+```
 
-Present what you learned from exploration, then ask the user to define the epic scope.
-
-### 5a. End State
+### 3b. While Explorer Runs -- Ask End State
 **AskUserQuestion**: "What does 'done' look like for this epic? Describe the end state -- what should the user/system be able to do when all phases are complete?"
 
 Use their answer to define the epic's completion criteria and scope boundaries.
 
-### 5b. User Stories
-Based on their end state description, draft 3-6 user stories in this format:
+## Step 4: User Stories
+
+Based on their end state and what you already know about the topic, draft 3-6 user stories:
 ```
 As a [role], I want to [action], so that [benefit].
+  - Acceptance: [measurable criteria]
 ```
 
 Present them and **AskUserQuestion**: "Here are the user stories I've identified. Add, remove, or modify any of these? (Or say 'looks good' to continue.)"
@@ -67,10 +77,31 @@ These user stories drive test design:
 - Story acceptance criteria become unit test assertions
 - Stories help sequence phases (foundational stories first)
 
-### 5c. Priorities & Constraints (optional)
-If the epic has more than 6 phases worth of scope, **AskUserQuestion**: "Any priorities or constraints I should know about? For example: must-have vs nice-to-have phases, performance targets, compatibility requirements, things to avoid."
+## Step 5: Threat Model & Gap Analysis
 
-Skip this question for smaller epics (6 phases or fewer) -- just note any obvious constraints from exploration.
+By now the background explorer should have returned. Combine what you learned from exploration with the user's end state and stories.
+
+### 5a. Identify
+From the user stories and codebase context, extract:
+- **Invariants**: Things that must always be true (e.g. "a reclaimer can only be on one raid at a time")
+- **Non-negotiables**: Hard requirements the user stated or that the codebase implies (e.g. "all API calls must be authenticated")
+- **Negative use cases**: Things the system must NOT do (e.g. "user cannot equip items belonging to another player")
+- **Edge cases**: Boundary conditions worth testing (e.g. "empty inventory", "max items reached", "concurrent requests")
+- **Gaps**: User stories that are missing coverage, unclear acceptance criteria, or assumptions that need validating
+
+### 5b. Present & Validate
+Present the findings grouped by category and **AskUserQuestion**: "Here's what I've identified as invariants, rules, edge cases, and potential gaps. Anything to add, correct, or flag as out of scope?"
+
+These feed directly into test design:
+- Invariants become assertion checks in unit tests
+- Negative use cases become explicit "should NOT" test cases
+- Edge cases become boundary tests
+- Gaps get addressed in the plan or flagged as known limitations
+
+### 5c. Priorities & Constraints (optional)
+If the epic has more than 6 phases worth of scope, **AskUserQuestion**: "Any priorities or constraints? Must-have vs nice-to-have phases, performance targets, compatibility requirements, things to avoid."
+
+Skip for smaller epics -- just note obvious constraints.
 
 ## Step 6: Epic Generation
 
@@ -97,6 +128,13 @@ Brief description of the epic scope.
 - As a [role], I want to [action], so that [benefit].
   - Acceptance: [criteria -- these become test assertions]
 - ...
+
+## Invariants & Rules
+
+- **Invariant**: [thing that must always be true]
+- **Non-negotiable**: [hard requirement]
+- **Must NOT**: [negative use case -- what the system must never do]
+- **Edge case**: [boundary condition to test]
 
 ## Phase Tracker
 
@@ -149,6 +187,12 @@ State machine for execution:
   "user_stories": [
     "As a [role], I want to [action], so that [benefit]"
   ],
+  "invariants": [
+    "thing that must always be true"
+  ],
+  "negative_cases": [
+    "thing the system must never do"
+  ],
   "phases": [
     {
       "number": 1,
@@ -173,12 +217,14 @@ Each phase contains two sections:
 1. **Tests (write first)**: Test tasks with `[parallel:A]` and `[model:haiku]`. These should all fail initially.
 2. **Implementation (make tests pass)**: Implementation tasks with `[depends:N.M]` linking to their test task. Use `[model:sonnet]` for complex work, `[model:haiku]` for simple.
 
-### Connecting User Stories to Tests
-- Each user story from Step 5b should map to at least one test task
-- E2E tests validate the full user story ("As a user, I want to X" -> Playwright/Cypress test that does X)
-- Component/unit tests validate acceptance criteria within the story
-- Reference the story in test task descriptions: "Write E2E test for story: [user can filter inventory by type]"
-- Stories that span multiple phases: test the phase's portion, with a note that the full story completes in a later phase
+### Connecting Requirements to Tests
+- Each **user story** maps to at least one E2E/integration test ("As a user, I want to X" -> test that does X)
+- Story **acceptance criteria** become unit test assertions
+- **Invariants** become assertion checks that run across multiple tests (e.g. "reclaimer count never exceeds max")
+- **Negative use cases** become explicit "should NOT" / "should reject" test cases
+- **Edge cases** become boundary tests (empty state, max values, concurrent access)
+- Reference the source in test descriptions: "Write test for story: [user can filter inventory]" or "Write test for invariant: [equipped items reduce from stash]"
+- Stories that span multiple phases: test the phase's portion, note full story completes later
 
 ### Phase Sizing Guidelines
 - 5-8 tasks per phase (including tests + implementation)
