@@ -1,27 +1,36 @@
 #!/usr/bin/env bash
 # ─────────────────────────────────────────────────────────────────────────────
-# SessionStart hook: Auto-run a queued command after /clear
+# SessionStart hook: Auto-run a queued command after programmatic /clear
 #
-# Called by Claude Code after every /clear and on session start.
-# Checks for a pending command left by claude-clear-and-run.sh and returns
-# it as an initialUserMessage so Claude executes it immediately.
+# Only fires on "clear" events (via matcher in settings.json).
+# Only acts when a lockfile exists (written by claude-clear-and-run.sh),
+# which distinguishes programmatic clears from manual /clear typed by user.
 #
-# The trigger file is consumed (deleted) on first read — one-shot by design.
+# The lockfile + trigger are consumed (deleted) on first read — one-shot.
 # ─────────────────────────────────────────────────────────────────────────────
 
 TRIGGER_DIR="${CLAUDE_AUTORUN_DIR:-$HOME/.cache/claude-autorun}"
 TRIGGER_FILE="$TRIGGER_DIR/pending-command"
+LOCK_FILE="$TRIGGER_DIR/autorun.lock"
 
-# No trigger file → nothing to do (normal /clear or session start)
+# No lockfile → this was a manual /clear, not a programmatic one. Do nothing.
+if [[ ! -f "$LOCK_FILE" ]]; then
+  exit 0
+fi
+
+# Lockfile exists → programmatic clear. Remove it immediately (one-shot).
+rm -f "$LOCK_FILE"
+
+# No trigger file → lockfile was stale or command wasn't written. Clean exit.
 if [[ ! -f "$TRIGGER_FILE" ]]; then
   exit 0
 fi
 
-# Read and atomically remove the trigger (one-shot, prevents double-fire)
+# Read and atomically remove the trigger (prevents double-fire)
 COMMAND="$(cat "$TRIGGER_FILE")"
 rm -f "$TRIGGER_FILE"
 
-# Empty command → nothing to do
+# Empty command → nothing to inject
 if [[ -z "$COMMAND" ]]; then
   exit 0
 fi
@@ -32,10 +41,11 @@ ESCAPED="${ESCAPED//\"/\\\"}"
 ESCAPED="${ESCAPED//$'\n'/\\n}"
 
 # Return the hookSpecificOutput JSON that Claude Code expects.
-# hookEventName MUST match "SessionStart" or Claude Code throws.
+# suppressOutput hides the raw JSON from verbose mode.
 # initialUserMessage becomes the first prompt in the new session.
 cat <<EOF
 {
+  "suppressOutput": true,
   "hookSpecificOutput": {
     "hookEventName": "SessionStart",
     "initialUserMessage": "${ESCAPED}"

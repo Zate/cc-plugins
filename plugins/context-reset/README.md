@@ -12,13 +12,17 @@ A two-phase approach using terminal injection + SessionStart hooks:
 
 ```
 External trigger (hook/cron/script)
-  → writes pending command to trigger file
+  → writes pending command to trigger file + lockfile
   → injects /clear via tmux send-keys (or tiocsti/xdotool)
   → Claude processes /clear, resets state
-  → SessionStart hook fires, reads trigger file
+  → SessionStart hook fires (matcher: clear only)
+  → checks for lockfile (no lockfile = manual /clear, exit)
+  → reads trigger file, removes both files
   → initialUserMessage injects the follow-up command
   → Claude executes it in a fresh session
 ```
+
+Manual `/clear` is never affected -- the hook only acts when the lockfile is present.
 
 ## Quick Start
 
@@ -52,6 +56,7 @@ The SessionStart hook (`hooks/session-start-autorun.sh`) outputs:
 
 ```json
 {
+  "suppressOutput": true,
   "hookSpecificOutput": {
     "hookEventName": "SessionStart",
     "initialUserMessage": "/the-command-to-run"
@@ -59,4 +64,6 @@ The SessionStart hook (`hooks/session-start-autorun.sh`) outputs:
 }
 ```
 
-This is consumed by Claude Code's `processSessionStartHooks()` which sets it as the first user prompt in the new session. Verified against Claude Code source (`src/utils/sessionStart.ts:150`, `src/utils/hooks.ts:629`).
+The hook only fires on `clear` events (via matcher) and only when `autorun.lock` exists (written by `claude-clear-and-run.sh`). Manual `/clear` commands are ignored.
+
+Verified against Claude Code source (`src/types/hooks.ts:84-86`).

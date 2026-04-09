@@ -3,6 +3,7 @@
     "SessionStart": [
       {
         "type": "command",
+        "matcher": "clear",
         "command": "bash ${CLAUDE_PLUGIN_ROOT}/hooks/session-start-autorun.sh"
       }
     ]

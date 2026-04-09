@@ -22,6 +22,7 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 TRIGGER_DIR="${CLAUDE_AUTORUN_DIR:-$HOME/.cache/claude-autorun}"
 TRIGGER_FILE="$TRIGGER_DIR/pending-command"
+LOCK_FILE="$TRIGGER_DIR/autorun.lock"
 
 RED='\033[0;31m'
 GREEN='\033[0;32m'
@@ -47,10 +48,12 @@ if [[ -z "$COMMAND" ]]; then
   exit 1
 fi
 
-# ── Phase 1: Write the trigger file ─────────────────────────────────────────
+# ── Phase 1: Write the trigger file + lockfile ─────────────────────────────
 mkdir -p "$TRIGGER_DIR"
 echo "$COMMAND" > "$TRIGGER_FILE"
+touch "$LOCK_FILE"
 echo -e "${DIM}Trigger written: $TRIGGER_FILE${NC}"
+echo -e "${DIM}Lockfile written: $LOCK_FILE${NC}"
 echo -e "${DIM}Command: $COMMAND${NC}"
 
 # ── Phase 2: Send /clear ────────────────────────────────────────────────────

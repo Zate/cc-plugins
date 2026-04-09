@@ -12,11 +12,13 @@ Clears the current Claude Code context and automatically runs a command in the f
 
 ## How It Works
 
-1. A trigger file is written with the follow-up command
+1. A trigger file is written with the follow-up command, plus a lockfile (`autorun.lock`)
 2. `/clear` is sent to Claude Code via terminal injection (tmux/tiocsti/xdotool)
-3. The SessionStart hook picks up the trigger and injects it as `initialUserMessage`
+3. The SessionStart hook (matcher: `clear` only) checks for the lockfile
+4. If the lockfile exists (programmatic clear), it reads the trigger and injects it as `initialUserMessage`
+5. If no lockfile (manual `/clear`), the hook does nothing
 
-This two-phase approach avoids fragile sleep-based timing — the hook fires deterministically after `/clear` completes.
+The lockfile distinguishes programmatic clears from manual ones. Both files are consumed on use (one-shot).
 
 ## Usage
 
@@ -63,7 +65,7 @@ The scripts auto-detect the best available method.
 | `CLAUDE_SEND_METHOD` | auto | Force: `tmux`, `tiocsti`, or `xdotool` |
 | `CLAUDE_SEND_DELAY` | `2` | Seconds between multi-command sends |
 | `CLAUDE_SEND_PID` | auto | Target a specific Claude Code PID |
-| `CLAUDE_AUTORUN_DIR` | `~/.cache/claude-autorun` | Trigger file directory |
+| `CLAUDE_AUTORUN_DIR` | `~/.cache/claude-autorun` | Trigger file and lockfile directory |
 
 ## Example: Auto-Cycle with a Stop Hook
 

@@ -38,27 +38,14 @@ If this fails, the user needs one of:
 
 ## Step 2: Verify the SessionStart hook
 
-The plugin's `settings.json` registers the hook automatically. Verify it's active:
-
-```bash
-cat ${CLAUDE_PLUGIN_ROOT}/settings.json
-```
+The plugin's `settings.json` registers the hook automatically. Verify it's active by reading the file `${CLAUDE_PLUGIN_ROOT}/settings.json` with the Read tool.
 
 ## Step 3: Test end-to-end
 
 From a **separate terminal** (not this Claude session):
 
 ```bash
-# Write a test trigger
-mkdir -p ~/.cache/claude-autorun
-echo "say 'context-reset is working'" > ~/.cache/claude-autorun/pending-command
-
-# Then in this Claude session, run /clear
-# After clear, Claude should automatically say the test message
-```
-
-Or use the full flow:
-
-```bash
 ${CLAUDE_PLUGIN_ROOT}/scripts/claude-clear-and-run.sh "say 'hello from context-reset'"
 ```
+
+This writes both the trigger file and a lockfile. The SessionStart hook only fires when the lockfile is present, so manual `/clear` commands are never affected.

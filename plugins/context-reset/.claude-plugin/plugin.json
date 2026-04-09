@@ -8,6 +8,5 @@
   },
   "homepage": "https://github.com/Zate/cc-plugins",
   "repository": "https://github.com/Zate/cc-plugins",
-  "license": "MIT",
-  "keywords": ["context", "clear", "reset", "automation", "hooks", "tmux", "session"]
+  "license": "MIT"
 }
