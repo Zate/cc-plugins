@@ -7,7 +7,7 @@
   },
   "metadata": {
     "description": "A curated marketplace of Claude Code plugins and skills for enhanced development workflows",
-    "version": "0.12.5",
+    "version": "0.13.0",
     "pluginRoot": "./plugins"
   },
   "plugins": [
@@ -138,6 +138,22 @@
         "headless",
         "dispatch",
         "llm"
+      ]
+    },
+    {
+      "name": "context-reset",
+      "source": "./plugins/context-reset",
+      "description": "Programmatic context clearing for Claude Code. Send /clear and auto-run a follow-up skill from hooks, cron, or scripts via terminal injection (tmux/tiocsti/xdotool) and SessionStart hook initialUserMessage.",
+      "category": "utilities",
+      "tags": [
+        "context",
+        "clear",
+        "reset",
+        "automation",
+        "hooks",
+        "tmux",
+        "session",
+        "terminal-injection"
       ]
     }
   ]

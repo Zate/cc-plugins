@@ -1,0 +1,13 @@
+{
+  "name": "context-reset",
+  "version": "0.1.0",
+  "description": "Programmatic context clearing for Claude Code. Send /clear and auto-run a follow-up skill from hooks, cron, or scripts — no binary patching required.",
+  "author": {
+    "name": "Zate",
+    "email": "zate75+claude-code-plugins@gmail.com"
+  },
+  "homepage": "https://github.com/Zate/cc-plugins",
+  "repository": "https://github.com/Zate/cc-plugins",
+  "license": "MIT",
+  "keywords": ["context", "clear", "reset", "automation", "hooks", "tmux", "session"]
+}
