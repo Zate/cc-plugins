@@ -13,6 +13,11 @@ allowed-tools:
   - Bash(${CLAUDE_PLUGIN_ROOT}/scripts/*.sh:*)
   - Agent
   - AskUserQuestion
+  - mcp__mdv__list_contexts
+  - mcp__mdv__navigate_to
+  - mcp__mdv__scroll_to_element
+  - mcp__mdv__get_document_outline
+  - mcp__mdv__add_annotation
 ---
 
 # Devloop Epic
@@ -36,6 +41,22 @@ Spawn an Explore agent with `run_in_background: true` to scan the codebase for c
 ### 3b. While Explorer Runs -- End State
 **AskUserQuestion**: "What does 'done' look like for this epic? What should the user/system be able to do when it's complete?"
 
+## Review Pattern (applies to Steps 4, 5, 8)
+
+`AskUserQuestion` truncates long content -- users cannot scroll inside it. **Never embed full content in the question.**
+
+### mdv Detection (once, before first review)
+
+Call `mcp__mdv__list_contexts`. If it succeeds, mdv is available -- remember this for all subsequent reviews. If the tool errors or is not found, mdv is unavailable -- skip all mdv calls for the rest of the session.
+
+### Presenting content for review
+
+1. **Write** the full content to `.devloop/draft/<name>.md` (create `.devloop/draft/` if needed)
+2. **Output** a concise summary as regular conversation text (this is scrollable)
+3. **mdv available**: call `mcp__mdv__navigate_to` to open the draft file. Use `scroll_to_element` or `add_annotation` to highlight areas needing attention if useful.
+4. **mdv unavailable**: tell the user: "Full content at `.devloop/draft/<name>.md` -- open it in your editor to review."
+5. **AskUserQuestion**: only the short prompt (e.g., "Add, remove, or modify any?"), never the content itself
+
 ## Step 4: User Stories
 
 Draft 3-6 user stories from the end state description:
@@ -44,20 +65,20 @@ As a [role], I want to [action], so that [benefit].
   - Acceptance: [measurable criteria]
 ```
 
-Present them. **AskUserQuestion**: "Add, remove, or modify any? (Or 'looks good')"
+**Write** the full user stories to `.devloop/draft/user-stories.md`. **Output** a one-line-per-story summary (role + action only). Follow the Review Pattern above. **AskUserQuestion**: "Add, remove, or modify any? (Or 'looks good')"
 
 ## Step 5: Threat Model & Gap Analysis
 
 By now the explorer should have returned. Combine codebase context with user stories.
 
-Identify and present:
+Identify:
 - **Invariants**: Things that must always be true
 - **Non-negotiables**: Hard requirements from the user or codebase
 - **Negative cases**: Things the system must NOT do
 - **Edge cases**: Boundary conditions worth testing
 - **Gaps**: Missing coverage or unclear assumptions
 
-**AskUserQuestion**: "Anything to add, correct, or flag as out of scope?"
+**Write** the full threat model to `.devloop/draft/threat-model.md`. **Output** a bullet-per-category summary (category name + count of items). Follow the Review Pattern. **AskUserQuestion**: "Anything to add, correct, or flag as out of scope?"
 
 If the scope is large, also ask about priorities and constraints.
 
@@ -114,7 +135,10 @@ User stories, invariants, and negative cases should inform what gets tested. Eac
 Run `${CLAUDE_PLUGIN_ROOT}/scripts/promote-phase.sh` to load Phase 1 into plan.md.
 
 ## Step 8: Review
-Display summary. **AskUserQuestion**:
+
+**Output** a brief summary: title, phase count, total tasks, test command. If mdv is available, navigate to `.devloop/epic.md` for the full view. Otherwise tell the user the file path.
+
+**AskUserQuestion**:
 - **Run now**: Invoke `/devloop:run-epic`.
 - **Review epic**: Show full epic.md.
 - **Stop here**: "Run `/devloop:run-epic` when ready."
