@@ -7,25 +7,23 @@ paths: ["**/*"]
 
 # ctx: Persistent Memory
 
-You are stateless. Use \`ctx\` to persist knowledge across sessions.
+You are stateless. Use `ctx` to persist knowledge across sessions.
 
-## Store (ctx add)
-Run via Bash BEFORE responding. Always include \`tier:\` and \`project:\` tags.
-- **Pinned** (\`tier:pinned\`): Critical, loaded every session. (Facts, foundational decisions).
-- **Working** (\`tier:working\`): Task-scoped, temporary. (Active debugging, current plan state).
-- **Reference** (\`tier:reference\`): Durable but not always needed. (Past decisions, resolved issues).
+For command syntax: `ctx --agent-help` (index) or `ctx --agent-help <command>` (detail).
 
-\`\`\`bash
-ctx add --type [decision|fact|pattern|observation|hypothesis] --tag tier:[pinned|working|reference] --tag project:NAME "content"
-\`\`\`
+## When to Store
+Run via Bash BEFORE responding. Store when you learn something that would be useful in a future session.
 
-## Retrieve (ctx query / show)
-- **Search**: \`ctx query 'type:decision AND tag:project:X'\`
-- **List**: \`ctx list --tag project:X --since 24h\`
-- **Read**: \`ctx show <id>\`
+## Tagging Convention
+Always include `tier:` and `project:` tags on every node.
+- **tier:pinned**: Critical, loaded every session. Facts, foundational decisions.
+- **tier:working**: Task-scoped, temporary. Active debugging, current plan state.
+- **tier:reference**: Durable but not always loaded. Past decisions, resolved issues.
+- **project:NAME**: Scope to current project (`basename` of git root, lowercase).
 
-## Coordination
-- **MEMORY.md**: Use for short, project-specific reminders and release rules.
-- **ctx**: Use for structured, typed knowledge (Decisions, Patterns, Observations).
+## Coordination with MEMORY.md
+- **MEMORY.md**: Short project-specific reminders, release rules, user preferences.
+- **ctx**: Structured, typed knowledge (decisions, patterns, observations, facts).
+- Don't duplicate across both. Check before writing.
 
 **If you don't store it, it's gone.**
