@@ -34,19 +34,56 @@ if RAW_VERSION=$("$CTX_BIN" version 2>/dev/null); then
     fi
 fi
 
-# Detect current project from git repo
-PROJECT_NAME=""
-if command -v git &>/dev/null; then
-    REPO_ROOT=$(git rev-parse --show-toplevel 2>/dev/null || echo "")
-    [[ -n "$REPO_ROOT" ]] && PROJECT_NAME=$(basename "$REPO_ROOT" | tr '[:upper:]' '[:lower:]')
+# Resolve the cwd Claude Code is actually running in. When the hook is invoked
+# by Claude Code, the session payload is piped in on stdin and contains a `cwd`
+# field. Fall back to $PWD only when stdin is a terminal (manual invocation).
+HOOK_INPUT=""
+if [[ ! -t 0 ]]; then
+    HOOK_INPUT=$(cat 2>/dev/null || true)
+fi
+STDIN_CWD=""
+if [[ -n "$HOOK_INPUT" ]] && command -v jq &>/dev/null; then
+    STDIN_CWD=$(echo "$HOOK_INPUT" | jq -r '.cwd // ""' 2>/dev/null || echo "")
+fi
+SEARCH_DIR="${STDIN_CWD:-$PWD}"
+
+# Project detection chain: explicit env var, then git repo at the hook cwd,
+# then basename of a non-git cwd. Anything else falls through to fail-closed.
+PROJECT_NAME="${CTX_PROJECT:-}"
+if [[ -z "$PROJECT_NAME" && -d "$SEARCH_DIR" ]]; then
+    if command -v git &>/dev/null; then
+        REPO_ROOT=$(git -C "$SEARCH_DIR" rev-parse --show-toplevel 2>/dev/null || echo "")
+        [[ -n "$REPO_ROOT" ]] && PROJECT_NAME=$(basename "$REPO_ROOT" | tr '[:upper:]' '[:lower:]')
+    fi
 fi
 
 # Get ctx hook output (with plugin primer if available)
-PRIMER_ARGS=""
+PRIMER_ARGS=()
 if [[ -f "$PLUGIN_ROOT/primer.md" ]]; then
-    PRIMER_ARGS="--primer-file=$PLUGIN_ROOT/primer.md"
+    PRIMER_ARGS+=("--primer-file=$PLUGIN_ROOT/primer.md")
 fi
-CTX_OUTPUT=$("$CTX_BIN" hook session-start --project="$PROJECT_NAME" $PRIMER_ARGS 2>/dev/null || echo '{}')
+# Fail closed: when no project could be determined, tell ctx to load zero
+# nodes rather than every pinned node across all projects.
+# --fail-closed landed after 0.6.2; use version check (CURRENT_VER already parsed above).
+FAIL_CLOSED_MIN="0.6.3"
+HAS_FAIL_CLOSED=false
+if [[ -n "$CURRENT_VER" && "$CURRENT_VER" != "dev" ]]; then
+    if printf '%s\n%s' "$FAIL_CLOSED_MIN" "$CURRENT_VER" | sort -V | head -1 | grep -q "^${FAIL_CLOSED_MIN}$"; then
+        HAS_FAIL_CLOSED=true
+    fi
+elif [[ "$CURRENT_VER" == "dev" ]]; then
+    HAS_FAIL_CLOSED=true
+fi
+if [[ -z "$PROJECT_NAME" ]]; then
+    if $HAS_FAIL_CLOSED; then
+        PRIMER_ARGS+=("--fail-closed")
+    else
+        # Binary too old for --fail-closed. Use a sentinel project name that
+        # won't match any real nodes so the filter still excludes everything.
+        PROJECT_NAME="__undetected__"
+    fi
+fi
+CTX_OUTPUT=$("$CTX_BIN" hook session-start --project="$PROJECT_NAME" "${PRIMER_ARGS[@]}" 2>/dev/null || echo '{}')
 
 # Extract additionalContext
 CTX_CONTEXT=""

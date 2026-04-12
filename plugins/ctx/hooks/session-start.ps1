@@ -96,14 +96,36 @@ if (-not (Test-Path $dbPath)) {
     try { & $ctxCmd init 2>&1 | Write-Host } catch {}
 }
 
-# --- Detect project from git repo ---
-$projectName = ''
+# --- Resolve cwd from Claude Code hook payload on stdin ---
+# When invoked by Claude Code, the session payload is piped in and contains a
+# `cwd` field. Fall back to $PWD only when stdin is a terminal.
+$stdinCwd = ''
 try {
-    $repoRoot = & git rev-parse --show-toplevel 2>$null
-    if ($repoRoot) {
-        $projectName = (Split-Path -Leaf $repoRoot).ToLower()
+    if (-not [Console]::IsInputRedirected) {
+        # interactive invocation -- nothing to read
+    } else {
+        $hookInput = [Console]::In.ReadToEnd()
+        if ($hookInput) {
+            $parsedInput = $hookInput | ConvertFrom-Json -ErrorAction SilentlyContinue
+            if ($parsedInput -and $parsedInput.cwd) {
+                $stdinCwd = $parsedInput.cwd
+            }
+        }
     }
 } catch {}
+$searchDir = if ($stdinCwd) { $stdinCwd } else { (Get-Location).Path }
+
+# --- Project detection chain: env var -> git repo at hook cwd -> fail closed ---
+$projectName = $env:CTX_PROJECT
+if (-not $projectName -and (Test-Path $searchDir)) {
+    try {
+        $repoRoot = & git -C $searchDir rev-parse --show-toplevel 2>$null
+        if ($repoRoot) {
+            $projectName = (Split-Path -Leaf $repoRoot).ToLower()
+        }
+    } catch {}
+}
+if (-not $projectName) { $projectName = '' }
 
 # --- Get ctx hook output (with plugin primer if available) ---
 $ctxOutput = '{}'
@@ -111,7 +133,27 @@ try {
     $primerPath = Join-Path $pluginRoot 'primer.md'
     $primerArgs = @()
     if (Test-Path $primerPath) {
-        $primerArgs = @("--primer-file=$primerPath")
+        $primerArgs += "--primer-file=$primerPath"
+    }
+    # Fail closed: without a project, load zero nodes instead of every pinned
+    # node across all projects.
+    # --fail-closed landed after 0.6.2; use version check ($currentVer already parsed above).
+    $hasFailClosed = $false
+    if ($currentVer -and $currentVer -ne 'dev') {
+        try {
+            if ([version]$currentVer -ge [version]'0.6.3') { $hasFailClosed = $true }
+        } catch {}
+    } elseif ($currentVer -eq 'dev') {
+        $hasFailClosed = $true
+    }
+    if (-not $projectName) {
+        if ($hasFailClosed) {
+            $primerArgs += '--fail-closed'
+        } else {
+            # Binary too old for --fail-closed. Use a sentinel project name that
+            # won't match any real nodes so the filter still excludes everything.
+            $projectName = '__undetected__'
+        }
     }
     $ctxOutput = & $ctxCmd hook session-start --project="$projectName" @primerArgs 2>$null
     if (-not $ctxOutput) { $ctxOutput = '{}' }
