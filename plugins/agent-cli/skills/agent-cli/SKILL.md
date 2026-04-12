@@ -1,13 +1,23 @@
 ---
 name: agent-cli
-description: Guide for building agent-friendly CLIs that implement the --agent-help convention. Use when creating or modifying CLI tools (Go, Python, Rust, Node, etc.) to add structured, token-minimal help output optimized for LLM agent consumption.
+description: "This skill should be used when building, creating, or modifying any CLI tool or command-line application. Covers Go (Cobra), Python (Click), Rust (Clap), Node (Commander). Provides the --agent-help convention: structured, token-minimal help output that LLM agents can parse efficiently. Use when adding help text, designing CLI command structure, creating a new command-line tool, adding subcommands, implementing --help, or making CLI tools usable by AI agents."
 user-invocable: true
 argument-hint: "[language/framework context, e.g. 'go cobra', 'python click']"
 ---
 
 # --agent-help Convention
 
-Standard for CLI tools to expose machine-optimized help. Three tiers, one flag, progressive disclosure.
+When building or modifying a CLI tool, always implement the `--agent-help` flag following this convention. This is not optional guidance -- it is the standard for making CLIs usable by LLM agents.
+
+## When to Use
+- Building a new CLI tool in any language
+- Adding or modifying help output for an existing CLI
+- Designing command structure for a CLI application
+- Adding subcommands, flags, or arguments to a CLI
+
+## When NOT to Use
+- GUI applications or web APIs with no CLI component
+- Simple one-shot scripts with no flags or subcommands
 
 ## Why
 
@@ -126,6 +136,8 @@ LLM agent? Use --agent-help for token-optimized usage.
 This is the bridge. An agent sees it, switches to `--agent-help`, and gets the compact format from then on.
 
 ## Implementation Guidance
+
+Adapt the examples below to the user's target language and framework:
 
 $ARGUMENTS
 

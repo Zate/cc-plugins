@@ -1,6 +1,6 @@
 {
   "name": "agent-cli",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Convention for building agent-friendly CLIs with --agent-help",
   "author": {
     "name": "Zate",
