@@ -5,6 +5,13 @@ All notable changes to the devloop plugin are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.24.3] - 2026-04-12
+
+### Fixed
+
+- Epic review content (user stories, threat model) now written to `.devloop/draft/*.md` instead of embedded in AskUserQuestion, which truncated long content making it impossible to review
+- Added mdv integration: if mdv is running, draft files open automatically in the viewer; otherwise user is told the file path to open in their editor
+
 ## [3.24.2] - 2026-04-08
 
 ### Fixed
