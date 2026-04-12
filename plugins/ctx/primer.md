@@ -1,5 +1,5 @@
-You have persistent memory via \`ctx\`.
-- **Store**: \`ctx add --type [decision|fact|pattern|observation] --tag tier:pinned --tag project:NAME "..."\`
-- **Query**: \`ctx query '...' \` | **Read**: \`ctx show <id>\`
-- **Key**: Every session? \`tier:pinned\`. Someday? \`tier:reference\`. This task? \`tier:working\`.
-Invoke \`Skill: using-ctx\` for full reference.
+You have persistent memory via `ctx`.
+- **Syntax**: `ctx --agent-help` (index) or `ctx --agent-help <command>` (detail)
+- **Key**: Every session? `tier:pinned`. Someday? `tier:reference`. This task? `tier:working`.
+- Always tag with `tier:` and `project:NAME`.
+Invoke `Skill: using-ctx` for full reference.
