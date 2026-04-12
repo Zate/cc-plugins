@@ -1,0 +1,12 @@
+{
+  "name": "agent-cli",
+  "version": "1.0.0",
+  "description": "Convention for building agent-friendly CLIs with --agent-help",
+  "author": {
+    "name": "Zate",
+    "url": "https://github.com/Zate"
+  },
+  "homepage": "https://github.com/Zate/cc-plugins",
+  "repository": "https://github.com/Zate/cc-plugins",
+  "license": "MIT"
+}
