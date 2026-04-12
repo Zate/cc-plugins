@@ -1,6 +1,6 @@
 ---
 name: agent-cli
-description: "This skill should be used when building, creating, or modifying any CLI tool or command-line application. Covers Go (Cobra), Python (Click), Rust (Clap), Node (Commander). Provides the --agent-help convention: structured, token-minimal help output that LLM agents can parse efficiently. Use when adding help text, designing CLI command structure, creating a new command-line tool, adding subcommands, implementing --help, or making CLI tools usable by AI agents."
+description: "This skill should be used when building, creating, or modifying any CLI tool or command-line application in any language or framework. The convention is language-agnostic. Reference implementations for Go (Cobra), Python (Click), Rust (Clap), Node (Commander) included but the pattern applies to any CLI framework (argparse, Thor, Picocli, Commander, etc.). Provides the --agent-help convention: structured, token-minimal help output that LLM agents can parse efficiently. Use when adding help text, designing CLI command structure, creating a new command-line tool, adding subcommands, implementing --help, or making CLI tools usable by AI agents."
 user-invocable: true
 argument-hint: "[language/framework context, e.g. 'go cobra', 'python click']"
 ---
@@ -137,7 +137,7 @@ This is the bridge. An agent sees it, switches to `--agent-help`, and gets the c
 
 ## Implementation Guidance
 
-Adapt the examples below to the user's target language and framework:
+Adapt the examples below to the user's target language and framework. The convention is language-agnostic -- if the user's framework isn't listed below, apply the same pattern: intercept a global `--agent-help` flag before dispatch, emit the compact format from the tier spec above.
 
 $ARGUMENTS
 
