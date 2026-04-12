@@ -5,6 +5,16 @@ All notable changes to the ctx plugin are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.2.2] - 2026-04-12
+
+### Fixed
+
+- Read cwd from Claude Code hook stdin payload instead of relying on shell cwd for project detection
+- Use `git -C` to run git against the resolved directory, not the hook process cwd
+- Fail closed when project detection fails: load zero nodes instead of every pinned node globally
+- Version-gated `--fail-closed` flag (ctx >= 0.6.3); older binaries use sentinel project name fallback
+- Support `CTX_PROJECT` env var override for explicit project scoping
+
 ## [1.2.1] - 2026-04-05
 
 ### Improved
