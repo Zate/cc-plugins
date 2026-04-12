@@ -7,7 +7,7 @@
   },
   "metadata": {
     "description": "A curated marketplace of Claude Code plugins and skills for enhanced development workflows",
-    "version": "0.12.5",
+    "version": "0.13.0",
     "pluginRoot": "./plugins"
   },
   "plugins": [
@@ -138,6 +138,19 @@
         "headless",
         "dispatch",
         "llm"
+      ]
+    },
+    {
+      "name": "agent-cli",
+      "source": "./plugins/agent-cli",
+      "description": "Convention for building agent-friendly CLIs with --agent-help. Token-minimal, progressive-disclosure help output optimized for LLM agents instead of humans.",
+      "category": "development",
+      "tags": [
+        "cli",
+        "agent-help",
+        "developer-tools",
+        "conventions",
+        "token-optimization"
       ]
     }
   ]
