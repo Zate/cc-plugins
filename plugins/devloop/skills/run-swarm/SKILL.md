@@ -2,7 +2,7 @@
 name: run-swarm
 description: Execute plan tasks via fresh-context subagents (swarm mode)
 when_to_use: "Plan with 10+ tasks, large implementation efforts, avoiding context bloat"
-argument-hint: "[--max-tasks N] [--dry-run]"
+argument-hint: "[--max-tasks N] [--dry-run] [--worktrees]"
 allowed-tools:
   - Read
   - Write
@@ -45,6 +45,14 @@ Run `${CLAUDE_PLUGIN_ROOT}/scripts/check-plan-complete.sh .devloop/plan.md`.
 ## Step 2: Parse Arguments
 - `--max-tasks N`: Max tasks before pausing.
 - `--dry-run`: List pending tasks and STOP.
+- `--worktrees`: Run each worker with `isolation: "worktree"`. Each worker gets an isolated git worktree; the orchestrator merges results back after each batch. Off by default.
+
+Also read the local config to detect `git.worktree_isolation`:
+```
+Bash: ${CLAUDE_PLUGIN_ROOT}/scripts/parse-local-config.sh
+```
+If `git.worktree_isolation` is `true` in the config, treat it as if `--worktrees` was passed.
+The CLI flag always wins: `--worktrees` enables isolation regardless of config.
 
 ## Step 3: Gather Shared Context
 Extract max 100 lines from `CLAUDE.md` (code style, patterns) and plan's Overview/Considerations. Store as shared context.
@@ -68,7 +76,9 @@ Parse `[model:X]` from the task line:
 - **`[model:sonnet]`** or **no annotation**: Spawn with `model: "sonnet"` (default)
 
 #### Spawn Workers
-For a parallel batch, spawn all workers simultaneously (multiple Agent calls in a single message):
+For a parallel batch, spawn all workers simultaneously (multiple Agent calls in a single message).
+
+**Without `--worktrees`** (default):
 ```yaml
 Agent:
   subagent_type: "devloop:swarm-worker"  # or devloop:haiku-worker for [model:haiku]
@@ -80,7 +90,49 @@ Agent:
     Instructions: Implement this task. Do NOT modify plan.md or commit.
 ```
 
-### 4c. Record Progress
+**With `--worktrees`** (or `git.worktree_isolation: true` in local.md):
+```yaml
+Agent:
+  subagent_type: "devloop:swarm-worker"  # or devloop:haiku-worker for [model:haiku]
+  model: "haiku"  # or "sonnet" per annotation
+  isolation: "worktree"
+  prompt: |
+    Task: [description]
+    Phase: [phase name]
+    Context: [relevant files and conventions]
+    Instructions: Implement this task. Do NOT modify plan.md or commit.
+    Note: You are running inside an isolated git worktree. Use relative paths in your
+    summary. Your changes will be merged back to the main branch by the orchestrator.
+```
+
+**After each batch completes in worktree mode**, perform merge-back (Step 4c).
+
+### 4c. Merge-Back (Worktree Mode Only)
+
+Skip this step if `--worktrees` was not used.
+
+After all workers in a batch complete:
+1. **Collect branch names**: Inspect each Agent result for a returned worktree branch name.
+   - If the result contains a branch name → worker made changes, merge needed.
+   - If no branch name in result → worker made no changes, worktree was auto-cleaned. Skip.
+2. **Merge each branch** (sequentially, to minimize conflicts):
+   ```bash
+   git merge <worktree-branch> --no-commit --no-ff
+   ```
+   The `--no-commit` flag stages the merged changes without creating a commit,
+   preserving the existing `auto_commit` flow.
+3. **On conflict**: Do NOT auto-resolve. Run `git merge --abort` and surface to user:
+   ```
+   AskUserQuestion: "Merge conflict from worktree branch <branch>. Options:
+   (a) Resolve manually and continue, (b) Skip this task's changes, (c) Stop swarm."
+   ```
+4. **After successful merge**: Delete the worktree branch:
+   ```bash
+   git branch -d <worktree-branch>
+   ```
+5. If no workers in the batch returned a branch (all made no changes), skip merge-back entirely.
+
+### 4d. Record Progress
 1. Display `git diff --stat` and worker summary for each completed task.
 2. Mark task `[x]` in `plan.md` and update native task.
 3. If `auto_commit: true` and phase complete, commit changes.

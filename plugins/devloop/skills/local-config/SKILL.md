@@ -19,6 +19,7 @@ git:
   branch-pattern: "feat/{slug}" # {slug}, {date}, {user}
   main-branch: main
   pr-on-complete: ask          # ask | always | never
+  worktree_isolation: false    # Isolate swarm workers in git worktrees (opt-in)
 
 commits:
   style: conventional          # conventional | simple
@@ -43,6 +44,7 @@ github:
 | `git.auto-branch` | true/false | false |
 | `git.branch-pattern` | Pattern with {slug}, {date}, {user} | feat/{slug} |
 | `git.pr-on-complete` | ask/always/never | ask |
+| `git.worktree_isolation` | true/false | false |
 | `commits.style` | conventional/simple | conventional |
 | `commits.sign` | true/false | false |
 | `review.before-commit` | ask/always/never | ask |
@@ -93,6 +95,31 @@ github:
   comment-on-complete: true
 ---
 ```
+
+## Worktree Isolation
+
+When running `/devloop:run-swarm` with many parallel tasks, you can enable git worktree
+isolation so each worker operates in its own isolated branch. This prevents workers from
+overwriting each other's in-progress changes.
+
+```yaml
+---
+git:
+  worktree_isolation: true   # Each swarm worker runs in an isolated git worktree
+---
+```
+
+**Effect**: Equivalent to passing `--worktrees` to every `/devloop:run-swarm` invocation.
+The orchestrator merges results back after each batch. Default is `false` — opt-in only.
+
+**When to enable**:
+- Large parallel plans (5+ concurrent workers) with overlapping file scopes
+- You want maximum isolation between workers at the cost of slightly more git overhead
+
+**When to leave off** (default):
+- Most plans: workers are already assigned non-overlapping tasks
+- Single-task or sequential plans
+- Environments where git worktrees are not supported
 
 ## Context & Performance
 

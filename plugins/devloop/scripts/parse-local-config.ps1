@@ -5,7 +5,7 @@ $ErrorActionPreference = 'Stop'
 $LocalMd = '.devloop/local.md'
 
 $defaultConfig = @{
-    git = @{ auto_branch = $false; branch_pattern = 'feat/{slug}'; main_branch = 'main'; pr_on_complete = 'ask' }
+    git = @{ auto_branch = $false; branch_pattern = 'feat/{slug}'; main_branch = 'main'; pr_on_complete = 'ask'; worktree_isolation = $false }
     commits = @{ style = 'conventional'; scope_from_plan = $true; sign = $false }
     review = @{ before_commit = 'ask'; use_plugin = $null }
     github = @{ link_issues = $false; auto_close = 'ask'; comment_on_complete = $true }

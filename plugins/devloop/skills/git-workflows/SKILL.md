@@ -80,6 +80,76 @@ refactor(utils): extract date formatting
 - **Squash merge**: Clean linear history (recommended for feature PRs)
 - **Rebase merge**: Linear, preserves commits
 
+## Worktree Patterns for Parallel Development
+
+Git worktrees let you check out multiple branches simultaneously in separate directories.
+devloop's `run-swarm` can leverage this natively for parallel task isolation.
+
+### When devloop uses worktrees automatically
+
+If you enable `git.worktree_isolation: true` in `.devloop/local.md` (or pass `--worktrees`
+to `/devloop:run-swarm`), each swarm worker runs in its own temporary worktree:
+
+```
+main-working-tree/      ← your normal session
+  .devloop/plan.md      ← orchestrator reads this
+  src/...               ← main state
+
+/tmp/claude-wt-abc123/  ← worker 1's isolated copy
+  src/feature-a.ts      ← only worker 1 touches this
+
+/tmp/claude-wt-def456/  ← worker 2's isolated copy
+  src/feature-b.ts      ← only worker 2 touches this
+```
+
+After workers complete, the orchestrator merges each worktree branch back to your current branch.
+
+### Configuration
+
+```yaml
+# .devloop/local.md
+---
+git:
+  worktree_isolation: true   # Isolate run-swarm workers (default: false)
+---
+```
+
+Or use the flag directly:
+```bash
+/devloop:run-swarm --worktrees
+```
+
+### Safe parallel development rules
+
+1. **Assign non-overlapping file scopes to parallel tasks** — even with worktrees,
+   overlapping edits to the same file require conflict resolution on merge-back.
+2. **Orchestrator owns merging** — never commit or merge from inside a worker.
+   Workers make changes; the orchestrator merges them.
+3. **Worktrees share the git object store** — large binary files or LFS are shared
+   efficiently; no duplication overhead.
+4. **Auto-cleanup** — Claude Code removes worktrees with no changes automatically.
+   Worktrees with changes persist until the orchestrator merges and deletes them.
+
+### Conflict handling
+
+When two parallel workers edit the same file, git detects the conflict during merge-back.
+devloop's orchestrator will:
+1. Abort the conflicting merge.
+2. Ask you how to proceed via `AskUserQuestion`.
+3. Options: resolve manually, skip the conflicting task's changes, or stop the swarm.
+
+**Best practice**: Design parallel task groups (`[parallel:X]`) so each task owns
+distinct files. This eliminates merge conflicts entirely.
+
+### Manual worktree inspection (advanced)
+
+If you need to inspect a worker's changes before merge-back:
+```bash
+git worktree list           # List all active worktrees
+git diff main..<wt-branch>  # Diff between main and a worktree branch
+git log <wt-branch>         # View worker's commits (if any)
+```
+
 ## Safety Rules
 
 Never on shared branches:
