@@ -10,7 +10,7 @@ description: |
   Context: The orchestrator is running devloop:run and encounters a [model:haiku] task
   assistant: "I'll spawn a haiku-worker for this simple task."
   </example>
-tools: Glob, Grep, Read, Write, Edit, Bash
+tools: Glob, Grep, Read, Write, Edit, Bash, Monitor
 disallowedTools: AskUserQuestion
 model: haiku
 maxTurns: 15

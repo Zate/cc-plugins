@@ -10,7 +10,7 @@ description: |
   Context: The orchestrator is running devloop:run-swarm and needs to execute a plan task
   assistant: "I'll spawn a swarm-worker to implement this task with fresh context."
   </example>
-tools: Glob, Grep, Read, Write, Edit, Bash
+tools: Glob, Grep, Read, Write, Edit, Bash, Monitor
 disallowedTools: AskUserQuestion
 model: sonnet
 maxTurns: 25

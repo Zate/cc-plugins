@@ -11,6 +11,7 @@ allowed-tools:
   - Glob
   - Bash
   - Bash(${CLAUDE_PLUGIN_ROOT}/scripts/*.sh:*)
+  - Monitor
   - Agent
   - AskUserQuestion
   - TaskCreate
@@ -24,6 +25,19 @@ allowed-tools:
 Execute plan tasks autonomously. **Do the work directly.**
 
 **Bash hygiene**: prefer quiet flags to minimize output (`npm install --silent`, `git status -sb`, pipe long output through `| tail -n 20`).
+
+**Monitor for long commands**: Use Monitor (not Bash) for test suites, builds, and full-codebase linting to stream output in real-time. Use Bash for all short commands (git ops, ls, devloop scripts).
+
+Long-running commands that warrant Monitor:
+- Test suites: `npm test`, `pytest`, `go test ./...`, `cargo test`, `make test`, `jest`, `vitest`, `mocha`
+- Builds: `npm run build`, `make`, `cargo build`, `go build`, `tsc`, `webpack`, `vite build`, `gradle`, `mvn`
+- Full-codebase linting: `eslint .`, `ruff check .`, `pylint src/`, `golangci-lint run`
+
+Monitor pattern (always include failure patterns in the filter):
+```
+Monitor({ description: "test run", command: "npm test 2>&1 | grep --line-buffered -E 'PASS|FAIL|Error|passed|failed'", timeout_ms: 300000, persistent: false })
+```
+Fallback: if Monitor errors or is unavailable, use Bash directly.
 
 ## Step 1: Check Plan State
 Run `${CLAUDE_PLUGIN_ROOT}/scripts/check-plan-complete.sh .devloop/plan.md`.

@@ -11,6 +11,7 @@ allowed-tools:
   - Glob
   - Bash
   - Bash(${CLAUDE_PLUGIN_ROOT}/scripts/*.sh:*)
+  - Monitor
   - Agent
   - AskUserQuestion
   - Skill
@@ -62,6 +63,13 @@ Agent:
    - Incomplete: **AskUserQuestion**: "Retry" or "Skip remaining".
 
 2. Run tests (unless `--skip-tests` or `test_command` is null).
+   Use Monitor for real-time streaming when `test_command` matches a known long-running pattern
+   (test suites: `npm test`, `pytest`, `go test`, `cargo test`, etc.; builds; full-codebase linting).
+   Example:
+   ```
+   Monitor({ description: "epic phase tests", command: "<test_command> 2>&1 | grep --line-buffered -E 'PASS|FAIL|Error|ok|error|passed|failed'", timeout_ms: 300000, persistent: false })
+   ```
+   Fallback: if Monitor errors, run `test_command` with Bash directly.
    - Fail: **AskUserQuestion**: "Fix and retry" or "Skip tests".
 
 ## Step 5: Commit & Advance

@@ -15,7 +15,7 @@ description: |
   user: "Run the tests"
   assistant: "I'll use devloop:qa-engineer to run tests and analyze results."
   </example>
-tools: Bash, Read, Write, Edit, Grep, Glob, LSP, TaskCreate, TaskUpdate, TaskList, AskUserQuestion
+tools: Bash, Read, Write, Edit, Grep, Glob, LSP, Monitor, TaskCreate, TaskUpdate, TaskList, AskUserQuestion
 model: sonnet
 maxTurns: 30
 color: green
@@ -37,6 +37,9 @@ Quality assurance for testing, bug tracking, and deployment validation.
 - Triggers: "Run the tests", "Check if tests pass"
 - Actions: Execute tests, analyze failures, suggest fixes
 - Commands: `npm test`, `go test ./...`, `pytest`
+- Use Monitor for real-time streaming of test output. Filter stdout to pass/fail lines only.
+  Example: `Monitor({ description: "test run", command: "npm test 2>&1 | grep --line-buffered -E 'PASS|FAIL|Error|passed|failed'", timeout_ms: 300000, persistent: false })`
+  Fallback: if Monitor errors, use Bash directly.
 
 ### Bug Tracker Mode
 - Triggers: "Log this bug", "Track this issue"

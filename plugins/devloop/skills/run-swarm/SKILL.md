@@ -11,6 +11,7 @@ allowed-tools:
   - Glob
   - Bash
   - Bash(${CLAUDE_PLUGIN_ROOT}/scripts/*.sh:*)
+  - Monitor
   - Agent
   - AskUserQuestion
   - TaskCreate
@@ -24,6 +25,16 @@ allowed-tools:
 Execute plan tasks via fresh-context subagents. **You are the orchestrator.**
 
 **Bash hygiene**: prefer quiet flags to minimize output (`npm install --silent`, `git status -sb`, pipe long output through `| tail -n 20`).
+
+**Monitor for validation commands**: When the orchestrator runs test or build commands to validate phase completion, use Monitor for real-time streaming. Worker agents (swarm-worker, haiku-worker) also have Monitor available and should use it for long-running commands within their tasks.
+
+Long-running commands that warrant Monitor: test suites (`npm test`, `pytest`, `go test ./...`, `cargo test`, `make test`), builds (`npm run build`, `make`, `cargo build`, `tsc`), and full-codebase linting (`eslint .`, `ruff check .`, `golangci-lint run`).
+
+Orchestrator validation example:
+```
+Monitor({ description: "swarm validation tests", command: "npm test 2>&1 | grep --line-buffered -E 'PASS|FAIL|Error|passed|failed'", timeout_ms: 300000, persistent: false })
+```
+Fallback: if Monitor errors, use Bash directly.
 
 ## Step 1: Check Plan State
 Run `${CLAUDE_PLUGIN_ROOT}/scripts/check-plan-complete.sh .devloop/plan.md`.
