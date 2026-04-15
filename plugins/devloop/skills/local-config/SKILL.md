@@ -34,6 +34,10 @@ github:
   link-issues: false           # Enable GH issue linking
   auto-close: ask              # ask | always | never
   comment-on-complete: true
+
+tokens:
+  token_budget: 4000           # Max tokens for gather-task-context.sh output (default: 4000)
+  cache_friendly_context: true # Order agent prompts for prompt cache hits (default: true)
 ---
 ```
 
@@ -54,6 +58,8 @@ github:
 | `github.comment-on-complete` | true/false | true |
 | `fresh_threshold` | 5-50 | 10 |
 | `context_threshold` | 50-95 | 70 |
+| `tokens.token_budget` | 1000-20000 | 4000 |
+| `tokens.cache_friendly_context` | true/false | true |
 
 ## Example Configurations
 
@@ -134,6 +140,42 @@ context_threshold: 70          # Exit ralph loop at this context % (default: 70)
 |---------|--------|---------|-------------|
 | `fresh_threshold` | 5-50 | 10 | Tasks completed before suggesting a fresh restart. Set higher (20-30) for 1M context models. |
 | `context_threshold` | 50-95 | 70 | Context usage % that triggers automatic ralph loop exit. |
+
+## Token Efficiency
+
+Control how devloop manages context size and prompt caching when spawning agents.
+
+```yaml
+---
+tokens:
+  token_budget: 4000           # Max tokens for context gathering (default: 4000)
+  cache_friendly_context: true # Order agent prompts for prompt cache hits (default: true)
+---
+```
+
+### token_budget
+
+Passed as `--token-budget N` to `gather-task-context.sh`. The script estimates file sizes (~4 chars per token) and stops collecting files once the budget is reached. Files are prioritized:
+1. Files directly mentioned in the task description (by name)
+2. Files matching keywords in content or filename
+
+**When to adjust**:
+- **Lower (1000-2000)**: Fast swarm runs where many small tasks run in parallel; you want lean context per worker.
+- **Default (4000)**: Standard single-task execution; balanced coverage.
+- **Higher (8000-16000)**: Complex tasks spanning many files; you want more context per task. Increase `fresh_threshold` when raising this, as heavier context exhausts session budget faster.
+
+### cache_friendly_context
+
+When `true` (default), agent prompts are structured with static content first (instructions, phase name, project conventions) and dynamic content last (task description, gathered file contents). This maximizes Claude's prompt cache hit rate when multiple agents are spawned in the same session.
+
+**Effect**: On the 2nd+ agent spawn in a parallel batch, the static prefix is already cached -- reducing latency and API cost. The first spawn always pays the full cost; subsequent spawns only pay for the dynamic suffix.
+
+**When to disable**: If you are debugging agent prompt content and need to see the exact prompt structure without reordering, set `cache_friendly_context: false`. This has no other effect.
+
+| Setting | Values | Default | Description |
+|---------|--------|---------|-------------|
+| `tokens.token_budget` | 1000-20000 | 4000 | Max tokens for `gather-task-context.sh`. Lower = faster/leaner; higher = more context. |
+| `tokens.cache_friendly_context` | true/false | true | Put static prompt content first for cache hits. Disable only for debugging. |
 
 ## Plugin Integration
 

@@ -41,6 +41,8 @@ Spawn an Explore agent with `run_in_background: true` to scan the codebase for c
 
 The agent should use `LSP.workspaceSymbol` to find topic-related symbols and `LSP.documentSymbol` to map affected file structure. If LSP errors or is unavailable, fall back to Grep + Glob for pattern-based discovery.
 
+> **Token efficiency**: Instruct the Explore agent to cap its report at ~500 words. It should report findings as concise bullet points (file paths + one-line description), not raw file contents. Filter out files unrelated to the epic topic before reporting. This keeps the exploration context lean so the planning phase receives signal, not noise.
+
 ### 3b. While Explorer Runs -- End State
 **AskUserQuestion**: "What does 'done' look like for this epic? What should the user/system be able to do when it's complete?"
 

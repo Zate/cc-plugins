@@ -40,6 +40,8 @@ Read `.devloop/plan.md`. Verify `**Phase**:` matches `epic.json.current_phase`.
 
 Read `epic.json` for context (user_stories, invariants, negative_cases, test_command). Spawn a subagent:
 
+> **Prompt caching**: Static instructions appear first so they are cached across phase restarts (same epic, multiple `/clear` cycles). Dynamic epic context (user_stories, invariants) follows -- it changes only per-epic, not per-phase, so it remains stable within a single epic run.
+
 ```yaml
 Agent:
   model: "sonnet"
@@ -48,13 +50,14 @@ Agent:
     Execute the devloop plan in .devloop/plan.md.
     Work through all tasks, respecting [depends:N.M] constraints.
     Mark tasks [x] as you complete them.
-    Run tests after implementation tasks: {test_command}
     Do NOT commit or modify epic.json/epic.md.
 
     Context from the epic:
     - User stories: {user_stories}
     - Invariants: {invariants}
     - Negative cases: {negative_cases}
+
+    Run tests after implementation tasks: {test_command}
 ```
 
 ## Step 4: Validate Completion

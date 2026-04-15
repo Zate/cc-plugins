@@ -74,6 +74,8 @@ Run `${CLAUDE_PLUGIN_ROOT}/scripts/check-devloop-state.sh`. Detect tech stack an
 2. **Read**: 3-5 files (Standard) or 8-10 (Deep). For affected files, use `LSP.documentSymbol` to map their structure -- fall back to Read + Grep if LSP unavailable.
 3. **Assess**: Affected files, dependencies, complexity (XS-XL), and risks.
 
+> **Token efficiency**: Read only what is needed for planning. After exploration, filter your findings to the most relevant 3-5 facts (affected files, key dependencies, main risk). Do NOT carry raw file contents into the plan generation step -- summarize findings instead. This keeps the planning context lean and improves prompt caching on subsequent runs.
+
 ## Step 6: Plan Generation (Silent)
 Create `.devloop/plan.md` with: Overview, Approach, Considerations, and Phased Tasks.
 **Tasks**: Phased, specific, actionable, testable. (XS: 2-3 tasks, XL: 8-12 tasks).

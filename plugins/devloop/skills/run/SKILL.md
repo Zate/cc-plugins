@@ -82,14 +82,19 @@ Parse the `[model:X]` annotation from each task line:
 **For sequential tasks** (no parallel marker, or all group members not yet pending): Process one at a time.
 
 Agent spawn pattern:
+
+> **Prompt caching**: Put STATIC content first (identical across spawns → cached), DYNAMIC content last (varies per task → not cached). This maximizes cache hits when multiple agents are spawned in the same session.
+
 ```yaml
 Agent:
   model: "haiku"  # or "sonnet" per [model:X] annotation
   prompt: |
-    Task: [description]
+    Instructions: Implement the task below. Do NOT modify plan.md or commit.
     Phase: [phase name]
-    Context: [relevant files and conventions]
-    Instructions: Implement this task. Do NOT modify plan.md or commit.
+    [STATIC: any shared project conventions or plan-level context here]
+
+    Task: [description]
+    Context: [relevant files and conventions -- dynamic, task-specific]
 ```
 
 ### 5d. Update Progress

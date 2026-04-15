@@ -78,16 +78,20 @@ Parse `[model:X]` from the task line:
 #### Spawn Workers
 For a parallel batch, spawn all workers simultaneously (multiple Agent calls in a single message).
 
+> **Prompt caching**: Static content (Instructions, Phase) goes FIRST -- it is identical across all workers in a batch and gets cached after the first spawn. Dynamic content (Task description, Context files) goes LAST -- it varies per worker and is not cached. This ordering maximizes cache hits when spawning multiple workers in a single batch.
+
 **Without `--worktrees`** (default):
 ```yaml
 Agent:
   subagent_type: "devloop:swarm-worker"  # or devloop:haiku-worker for [model:haiku]
   model: "haiku"  # or "sonnet" per annotation
   prompt: |
-    Task: [description]
+    Instructions: Implement the task below. Do NOT modify plan.md or commit.
     Phase: [phase name]
-    Context: [relevant files and conventions]
-    Instructions: Implement this task. Do NOT modify plan.md or commit.
+    [STATIC: shared project conventions from CLAUDE.md or plan Overview -- same for all workers]
+
+    Task: [description]
+    Context: [relevant files and conventions -- dynamic, task-specific]
 ```
 
 **With `--worktrees`** (or `git.worktree_isolation: true` in local.md):
@@ -97,12 +101,14 @@ Agent:
   model: "haiku"  # or "sonnet" per annotation
   isolation: "worktree"
   prompt: |
-    Task: [description]
-    Phase: [phase name]
-    Context: [relevant files and conventions]
-    Instructions: Implement this task. Do NOT modify plan.md or commit.
+    Instructions: Implement the task below. Do NOT modify plan.md or commit.
     Note: You are running inside an isolated git worktree. Use relative paths in your
     summary. Your changes will be merged back to the main branch by the orchestrator.
+    Phase: [phase name]
+    [STATIC: shared project conventions from CLAUDE.md or plan Overview -- same for all workers]
+
+    Task: [description]
+    Context: [relevant files and conventions -- dynamic, task-specific]
 ```
 
 **After each batch completes in worktree mode**, perform merge-back (Step 4c).
