@@ -5,6 +5,34 @@ All notable changes to the devloop plugin are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.25.0] - 2026-04-15
+
+### Added - Claude Code Native Integration
+
+- **LSP integration** in `engineer`, `qa-engineer`, and `security-scanner` agents
+  - `goToDefinition`, `findReferences`, `documentSymbol`, `workspaceSymbol`, `hover`, `incomingCalls`, `outgoingCalls`
+  - Each agent documents when to use LSP vs. Grep/Glob and includes explicit fallback patterns
+  - `plan` and `epic` skills use `LSP.workspaceSymbol` + `LSP.documentSymbol` for codebase exploration
+  - `devloop-audit` skill uses LSP for symbol-level audits
+
+- **Monitor integration** in `run`, `run-epic`, `run-swarm` skills and `swarm-worker`, `haiku-worker`, `qa-engineer` agents
+  - Real-time streaming for test suites, builds, and full-codebase linting
+  - Command-pattern heuristic: Monitor for long-running commands, Bash for short commands
+  - All usages include fallback to Bash if Monitor is unavailable
+
+- **Worktree isolation** for `run-swarm`
+  - `--worktrees` flag: each swarm worker runs in an isolated git worktree via Claude Code's native `isolation: "worktree"`
+  - `git.worktree_isolation: true` in `.devloop/local.md` for persistent opt-in
+  - Orchestrator merge-back after each batch with interactive conflict resolution
+  - `local-config` skill documents the new config option
+  - `git-workflows` skill documents worktree workflow
+
+- **Token efficiency** for `gather-task-context.sh` and agent spawning
+  - `--token-budget N` parameter in `gather-task-context.sh` (and `.ps1` companion) caps context by estimated token count (default: 4000)
+  - `tokens.token_budget` config in `.devloop/local.md` passes budget to context script
+  - `tokens.cache_friendly_context` config reorders agent spawn prompts for prompt cache hits
+  - Agent spawn prompts restructured: static content first, dynamic content last
+
 ## [3.24.3] - 2026-04-12
 
 ### Fixed

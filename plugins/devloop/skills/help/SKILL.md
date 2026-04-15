@@ -204,6 +204,18 @@ Load when needed: `Skill: skill-name`
 **Progress not saving:** Use `[x]` not `[X]`
 **Statusline missing:** `/devloop:statusline`, restart Claude Code
 
+## Claude Code Native Integrations
+
+**LSP tools in agents**: `engineer`, `qa-engineer`, and `security-scanner` agents use LSP for symbol navigation (`goToDefinition`, `findReferences`, `documentSymbol`). Gracefully falls back to Grep/Glob if no LSP server is configured.
+
+**Monitor for long commands**: `run`, `run-epic`, and `run-swarm` use Monitor (not Bash) for test suites, builds, and full-codebase linting to stream output in real-time. Falls back to Bash if Monitor is unavailable.
+
+**Worktree isolation**: `run-swarm --worktrees` runs each worker in an isolated git worktree. Enable via flag or `git.worktree_isolation: true` in `.devloop/local.md`. Off by default.
+
+**Token budget**: `tokens.token_budget` in `.devloop/local.md` caps how many tokens `gather-task-context.sh` collects per task (default: 4000). Lower for leaner context; raise for large codebases.
+
+**Cache-friendly context**: `tokens.cache_friendly_context: true` (default) reorders agent spawn prompts to maximize prompt cache hits, reducing API costs on repeated runs.
+
 ## Reset Everything
 
 ```bash

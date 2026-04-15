@@ -2,7 +2,7 @@
 
 > **A development workflow where Claude does the work and you stay in control.**
 
-[![Version](https://img.shields.io/badge/version-3.23.0-blue)](./CHANGELOG.md) [![Skills](https://img.shields.io/badge/skills-27-purple)](#skills) [![Agents](https://img.shields.io/badge/agents-6-green)](#agents)
+[![Version](https://img.shields.io/badge/version-3.25.0-blue)](./CHANGELOG.md) [![Skills](https://img.shields.io/badge/skills-27-purple)](#skills) [![Agents](https://img.shields.io/badge/agents-6-green)](#agents)
 
 **What devloop gives you:**
 - **Structured plans** that persist across sessions (`.devloop/plan.md`)
@@ -341,6 +341,66 @@ Run plan tasks automatically until completion with `/devloop:run`. Requires the 
 - Evolving requirements
 
 See `/devloop:help` → "Automation" for detailed documentation.
+
+---
+
+## Claude Code Native Integration
+
+devloop v3.25 integrates directly with Claude Code's native capabilities for better code navigation, real-time output, and parallel safety.
+
+### LSP (Language Server Protocol)
+
+The `engineer`, `qa-engineer`, and `security-scanner` agents use LSP tools for precise symbol navigation:
+
+```bash
+# These work automatically when an LSP server is configured for your language:
+# - LSP.goToDefinition / LSP.findReferences  (engineer, qa-engineer, security-scanner)
+# - LSP.documentSymbol  (map module structure before refactoring or writing tests)
+# - LSP.workspaceSymbol  (search symbols during planning)
+```
+
+Graceful fallback: if no LSP server is configured, agents silently fall back to `Grep`/`Glob`/`Read` — zero behavior change for users without LSP.
+
+### Monitor (Real-time Output Streaming)
+
+`run`, `run-epic`, and `run-swarm` use Monitor instead of Bash for long-running commands:
+
+```bash
+# These commands automatically use Monitor for real-time streaming:
+npm test, pytest, go test ./..., cargo test  # Test suites
+npm run build, tsc, make, cargo build        # Builds
+eslint ., ruff check ., golangci-lint run   # Full-codebase linting
+```
+
+All other commands (git ops, devloop scripts, quick checks) still use Bash. Fallback: if Monitor errors, Bash is used directly.
+
+### Worktree Isolation (run-swarm)
+
+For large parallel tasks, each swarm worker can run in its own git worktree to prevent conflicts:
+
+```bash
+# Enable via CLI flag (one-time):
+/devloop:run-swarm --worktrees
+
+# Or enable permanently in .devloop/local.md:
+git:
+  worktree_isolation: true
+```
+
+After each batch, the orchestrator merges worktree branches back and handles any conflicts interactively. Off by default — standard swarm behavior is unchanged.
+
+### Token Efficiency
+
+Configure context gathering in `.devloop/local.md`:
+
+```yaml
+tokens:
+  token_budget: 4000           # Max tokens per task context (default: 4000)
+  cache_friendly_context: true # Order prompts for cache hits (default: true)
+```
+
+- **`token_budget`**: Controls how much context `gather-task-context.sh` collects per task. Lower (1000-2000) for lean runs; higher (8000-20000) for large codebases where more context helps.
+- **`cache_friendly_context`**: Puts static prompt content first so repeated agent spawns get cache hits, reducing API costs.
 
 ---
 
