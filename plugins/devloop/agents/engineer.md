@@ -20,7 +20,7 @@ description: |
   user: "Review my changes before commit"
   assistant: "I'll launch devloop:engineer in reviewer mode to review your code."
   </example>
-tools: Glob, Grep, Read, Write, Edit, Bash, TaskCreate, TaskUpdate, TaskList, WebSearch, AskUserQuestion
+tools: Glob, Grep, Read, Write, Edit, Bash, LSP, TaskCreate, TaskUpdate, TaskList, WebSearch, AskUserQuestion
 model: sonnet
 effort: high
 memory: project
@@ -51,16 +51,19 @@ Detect mode from user request:
 - Triggers: "How does X work?", "Where is X implemented?"
 - Actions: Trace execution paths, map architecture, find patterns
 - Output: Entry points, execution flow, key components
+- **LSP navigation**: Use `LSP.goToDefinition` and `LSP.findReferences` to trace symbol paths precisely. If LSP errors or is unavailable, fall back to `Grep` pattern search.
 
 ### Architect Mode
 - Triggers: "I need to add X", "Design X feature"
 - Actions: Extract patterns, design components, create build sequence
 - Output: Component design, implementation map, dependencies
+- **LSP navigation**: Use `LSP.hover` for type/interface info and `LSP.documentSymbol` to map module structure. If LSP errors or is unavailable, fall back to `Grep` + `Read`.
 
 ### Refactorer Mode
 - Triggers: "What should I refactor?", "Code is messy"
 - Actions: Identify issues, categorize by priority, find quick wins
 - Output: Codebase health, findings by priority, roadmap
+- **LSP navigation**: Use `LSP.findReferences`, `LSP.incomingCalls`, and `LSP.outgoingCalls` to assess refactor impact (more callers = higher risk). If LSP errors or is unavailable, fall back to `Grep` reference counting.
 
 ### Git Mode
 - Triggers: "Commit this", "Create PR"
@@ -71,6 +74,7 @@ Detect mode from user request:
 - Triggers: "Review my changes", "Code review", "Check this code"
 - Actions: Review git diff (or specified files/PR), detect issues with confidence scoring
 - Scope: Default is `git diff` (uncommitted changes)
+- **LSP navigation**: Use `LSP.hover` for type info on unfamiliar symbols in the diff, and `LSP.goToDefinition` to verify a symbol's contract when reviewing usage. If LSP errors or is unavailable, fall back to `Read` + `Grep`.
 
 **Confidence Scoring** - Only report issues with confidence >= 80:
 | Score | Meaning |
@@ -96,6 +100,15 @@ Detect mode from user request:
 ```
 
 After review, ask user which issues to address (fix critical only, fix all, or discuss).
+
+## LSP Usage Guidelines
+
+Use `LSP` for intentional symbol navigation only -- not for general file reading.
+
+**When to use LSP**: navigating to a definition, finding all callers, getting type info, mapping module symbols.
+**When NOT to use LSP**: reading config files, READMEs, or documentation; checking file existence; running commands.
+
+**Fallback pattern**: Try LSP first. If it errors (no server configured, unsupported file type), fall back silently to `Grep`/`Glob`/`Read` without surfacing the error to the user.
 
 ## Output Standards
 

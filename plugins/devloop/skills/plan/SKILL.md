@@ -11,6 +11,7 @@ allowed-tools:
   - Glob
   - Bash
   - Bash(${CLAUDE_PLUGIN_ROOT}/scripts/*.sh:*)
+  - LSP
   - Agent
   - AskUserQuestion
   - WebSearch
@@ -69,8 +70,8 @@ Use for unclear requirements or architectural changes.
 Run `${CLAUDE_PLUGIN_ROOT}/scripts/check-devloop-state.sh`. Detect tech stack and patterns from `CLAUDE.md`.
 
 ## Step 5: Exploration (Silent)
-1. **Search**: Grep keywords, Glob patterns.
-2. **Read**: 3-5 files (Standard) or 8-10 (Deep).
+1. **Search**: Grep keywords, Glob patterns. For symbol-level searches, try `LSP.workspaceSymbol` for precise results -- fall back to Grep if LSP errors or is unavailable.
+2. **Read**: 3-5 files (Standard) or 8-10 (Deep). For affected files, use `LSP.documentSymbol` to map their structure -- fall back to Read + Grep if LSP unavailable.
 3. **Assess**: Affected files, dependencies, complexity (XS-XL), and risks.
 
 ## Step 6: Plan Generation (Silent)

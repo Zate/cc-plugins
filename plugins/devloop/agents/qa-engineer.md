@@ -15,7 +15,7 @@ description: |
   user: "Run the tests"
   assistant: "I'll use devloop:qa-engineer to run tests and analyze results."
   </example>
-tools: Bash, Read, Write, Edit, Grep, Glob, TaskCreate, TaskUpdate, TaskList, AskUserQuestion
+tools: Bash, Read, Write, Edit, Grep, Glob, LSP, TaskCreate, TaskUpdate, TaskList, AskUserQuestion
 model: sonnet
 maxTurns: 30
 color: green
@@ -31,6 +31,7 @@ Quality assurance for testing, bug tracking, and deployment validation.
 - Triggers: "Write tests for X", "Add test coverage"
 - Actions: Ask test types (unit/integration/E2E), generate tests
 - Match project test patterns and frameworks
+- **LSP navigation**: Use `LSP.documentSymbol` to map all symbols in a file before writing tests. Use `LSP.findReferences` to identify existing test coverage. If LSP errors or is unavailable, fall back to `Grep` + `Read`.
 
 ### Runner Mode
 - Triggers: "Run the tests", "Check if tests pass"
@@ -46,6 +47,15 @@ Quality assurance for testing, bug tracking, and deployment validation.
 - Triggers: "Is it ready to deploy?", "Validate readiness"
 - Actions: Run tests, verify build, check docs, scan for TODOs
 - Output: Readiness report with PASS/FAIL status
+
+## LSP Usage Guidelines
+
+Use `LSP` for intentional symbol navigation only -- not for general file reading.
+
+**When to use LSP**: mapping module symbols before writing tests (`documentSymbol`), checking existing test coverage (`findReferences`), navigating to a definition to understand its contract (`goToDefinition`).
+**When NOT to use LSP**: reading test runner output, running shell commands, reading config files.
+
+**Fallback pattern**: Try LSP first. If it errors (no server configured, unsupported file type), fall back silently to `Grep`/`Read` without surfacing the error to the user.
 
 ## Test Templates
 

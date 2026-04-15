@@ -11,6 +11,7 @@ allowed-tools:
   - Glob
   - Bash
   - Bash(${CLAUDE_PLUGIN_ROOT}/scripts/*.sh:*)
+  - LSP
   - Agent
   - AskUserQuestion
   - mcp__mdv__list_contexts
@@ -37,6 +38,8 @@ If `.devloop/epic.json` exists:
 
 ### 3a. Background Exploration
 Spawn an Explore agent with `run_in_background: true` to scan the codebase for context on the topic. Let it report back: tech stack, testing framework, affected areas, existing patterns, risks.
+
+The agent should use `LSP.workspaceSymbol` to find topic-related symbols and `LSP.documentSymbol` to map affected file structure. If LSP errors or is unavailable, fall back to Grep + Glob for pattern-based discovery.
 
 ### 3b. While Explorer Runs -- End State
 **AskUserQuestion**: "What does 'done' look like for this epic? What should the user/system be able to do when it's complete?"
