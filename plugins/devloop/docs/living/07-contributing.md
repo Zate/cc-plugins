@@ -58,7 +58,7 @@ Use conventional commits:
 ```
 feat(skills): add archive skill
 fix(hooks): handle missing plan
-docs(skills): update go-patterns
+docs(skills): update plan-management
 ```
 
 ---

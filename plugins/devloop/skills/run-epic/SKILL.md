@@ -1,6 +1,6 @@
 ---
 name: run-epic
-description: Execute an epic plan phase-by-phase using fresh-context subagents
+description: Execute an epic plan phase-by-phase, inline by default with opt-in worker spawns per task annotation
 argument-hint: "[--status] [--skip-tests] [--phase N]"
 when_to_use: "Running a multi-phase epic created by /devloop:epic"
 allowed-tools:
@@ -19,7 +19,7 @@ allowed-tools:
 
 # Devloop Run Epic
 
-Execute an epic phase-by-phase. Each phase runs in a fresh-context subagent. **You are the orchestrator -- stay lean, delegate execution.**
+Execute an epic phase-by-phase. Tasks run inline by default; subagents are spawned per task `[model:X]` annotation (same pattern as `/devloop:run`). **You are the orchestrator -- execute the phase, validate tests, commit, promote the next phase.**
 
 ## Step 1: Load State
 
@@ -38,27 +38,22 @@ Read `.devloop/plan.md`. Verify `**Phase**:` matches `epic.json.current_phase`.
 
 ## Step 3: Execute Phase
 
-Read `epic.json` for context (user_stories, invariants, negative_cases, test_command). Spawn a subagent:
+Read `epic.json` for context (user_stories, invariants, negative_cases, test_command). Keep this context in working memory while executing the phase.
 
-> **Prompt caching**: Static instructions appear first so they are cached across phase restarts (same epic, multiple `/clear` cycles). Dynamic epic context (user_stories, invariants) follows -- it changes only per-epic, not per-phase, so it remains stable within a single epic run.
+**Execute plan.md tasks inline**, following the same model-annotation pattern as `/devloop:run`:
 
-```yaml
-Agent:
-  model: "sonnet"
-  description: "Execute epic phase N"
-  prompt: |
-    Execute the devloop plan in .devloop/plan.md.
-    Work through all tasks, respecting [depends:N.M] constraints.
-    Mark tasks [x] as you complete them.
-    Do NOT commit or modify epic.json/epic.md.
+- **`[model:haiku]` tasks**: spawn `devloop:haiku-worker`.
+- **`[model:sonnet]` tasks**: spawn `devloop:swarm-worker` (sonnet).
+- **No annotation**: execute inline (no subagent). This is the default — most tasks should be inline.
+- Respect `[depends:N.M]` constraints and `[parallel:X]` groupings.
+- Do NOT commit or modify epic.json/epic.md during execution (that's Step 5).
 
-    Context from the epic:
-    - User stories: {user_stories}
-    - Invariants: {invariants}
-    - Negative cases: {negative_cases}
+Use the epic context to guide your work:
+- User stories anchor WHY the tasks exist.
+- Invariants / negative cases are testable constraints that must hold.
+- Run `test_command` after implementation tasks.
 
-    Run tests after implementation tasks: {test_command}
-```
+**Fallback (opt-in only)**: If the phase is very large (>15 tasks) *and* session context is already heavy, you MAY delegate the whole phase to a single sonnet subagent in a fresh context. This is a last-resort fresh-context reset, not the default path.
 
 ## Step 4: Validate Completion
 
@@ -92,13 +87,13 @@ Phase M loaded: "Phase Name" (X tasks)
 ## Step 6: Pause Point
 
 The next phase is already loaded in plan.md. **AskUserQuestion**:
-- **Continue now**: Loop to Step 3 (fresh subagent, same session).
+- **Continue now**: Loop to Step 3 in the same session.
 - **Clear and run**: "Run `/clear`, then `/devloop:run-epic` to execute Phase M." STOP.
 
 ## Recovery
 
 `run-epic` is resumable. `epic.json` is the source of truth:
-- Mid-phase: plan.md has partial progress, new agent picks up remaining tasks.
+- Mid-phase: plan.md has partial progress, execution picks up remaining tasks.
 - Post-phase: detects plan complete, skips to validation.
 - After `/clear`: reads epic.json, resumes from correct phase.
 

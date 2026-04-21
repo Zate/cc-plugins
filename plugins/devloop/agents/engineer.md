@@ -25,8 +25,6 @@ model: sonnet
 effort: high
 memory: project
 color: blue
-skills:
-  - security-checklist
 permissionMode: plan
 hooks:
   PostToolUse:

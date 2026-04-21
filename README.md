@@ -40,7 +40,7 @@ That's it. Claude does the work. You stay in control.
 
 | Plugin | Description | Components |
 |--------|-------------|------------|
-| **[devloop](plugins/devloop)** | Development workflow engine with autonomous planning and execution | 13 commands, 7 agents, 15 skills |
+| **[devloop](plugins/devloop)** | Development workflow engine with autonomous planning and execution | 15 commands, 6 agents, 19 skills |
 | **[ctx](plugins/ctx)** | Persistent memory for Claude across sessions | 3 skills |
 | **[security](plugins/security)** | OWASP ASVS-aligned security audits | 1 command, 17 agents |
 | **[diagrams](plugins/diagrams)** | Text-based diagram generation (SVG, Mermaid, Excalidraw, D2) | 6 skills |
@@ -72,7 +72,6 @@ The flagship plugin for professional software development. Simple workflow: plan
 - **Claude does the work directly** - No routine agent spawning
 - **Fresh context = better reasoning** - Clear after 5-10 tasks
 - **Plans survive sessions** - Pick up where you left off
-- **Language-aware skills** - Go, React, Java, Python patterns on demand
 - **GitHub integration** - Issue-to-PR workflow
 
 **v3.18 Highlights:**
@@ -93,7 +92,7 @@ Claude Code plugins extend your development environment with:
 |-----------|---------|---------|
 | **Commands** | Custom slash commands | `/devloop:quick Fix the bug` |
 | **Agents** | Specialized subagents | `code-reviewer`, `test-generator` |
-| **Skills** | Domain knowledge | `go-patterns`, `security-checklist` |
+| **Skills** | Domain knowledge | `plan-management`, `pr-feedback` |
 | **Hooks** | Event automation | Auto-detect project type on session start |
 | **MCP Servers** | External integrations | Connect to databases, APIs, services |
 

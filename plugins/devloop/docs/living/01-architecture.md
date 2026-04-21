@@ -22,7 +22,7 @@ plugins/devloop/
 │   ├── fresh/SKILL.md       # Save state for context clear
 │   ├── review/SKILL.md      # Code review
 │   ├── ship/SKILL.md        # Commit/PR
-│   └── [pattern]/SKILL.md   # Reference skills (go-patterns, etc.)
+│   └── plan-management/SKILL.md  # Reference skills
 ├── agents/                   # Specialized agents (rarely used)
 └── docs/living/             # Documentation
 ```
@@ -49,7 +49,9 @@ SKILL.md files with YAML frontmatter defining the command interface.
 
 Knowledge files loaded on-demand via `Skill: skill-name`.
 
-**Available (14):** plan-management, local-config, devloop-audit, git-workflows, atomic-commits, testing-strategies, go-patterns, python-patterns, react-patterns, java-patterns, api-design, architecture-patterns, database-patterns, security-checklist
+**Available (4):** plan-management, local-config, git-hygiene, devloop-audit.
+
+As of v3.25.1, language-pattern / design / quality reference skills were removed (token cost for ~zero invocations). `atomic-commits` and `git-workflows` were merged into `git-hygiene`.
 
 ### Agents
 

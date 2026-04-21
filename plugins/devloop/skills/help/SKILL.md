@@ -163,17 +163,9 @@ Load when needed: `Skill: skill-name`
 | Skill | Purpose |
 |-------|---------|
 | `plan-management` | Working with plan.md |
-| `go-patterns` | Go idioms, testing |
-| `python-patterns` | Python best practices |
-| `react-patterns` | React/TypeScript |
-| `java-patterns` | Java/Spring |
-| `git-workflows` | Git operations |
-| `atomic-commits` | Commit practices |
-| `testing-strategies` | Test design |
-| `api-design` | REST/GraphQL |
-| `database-patterns` | SQL, schema |
-| `architecture-patterns` | System design |
-| `security-checklist` | Security review |
+| `local-config` | Project settings via .devloop/local.md |
+| `pr-feedback` | Integrate PR review comments |
+| `devloop-audit` | Audit devloop against Claude Code updates |
 
 **Don't preload.** Claude loads automatically when needed.
 

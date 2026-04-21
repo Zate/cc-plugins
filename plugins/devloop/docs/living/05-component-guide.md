@@ -51,28 +51,13 @@ Load on-demand with `Skill: skill-name`.
 ### Core
 - `plan-management` - Plan file conventions
 - `local-config` - Project settings via .devloop/local.md
+- `git-hygiene` - Commit strategy, branch naming, PR workflow, merge decisions
 - `devloop-audit` - Audit against Claude Code updates
-
-### Workflow
-- `git-workflows` - Branching, commits, releases
-- `atomic-commits` - Commit strategy
-
-### Patterns
-- `go-patterns` - Go idioms
-- `python-patterns` - Python best practices
-- `react-patterns` - React/TypeScript patterns
-- `java-patterns` - Spring, streams, DI
-
-### Design
-- `api-design` - REST, GraphQL, versioning
-- `architecture-patterns` - System design
-- `database-patterns` - Schema, queries, migrations
-
-### Quality
-- `testing-strategies` - Test pyramid, coverage
-- `security-checklist` - OWASP, auth, secrets
+- `pr-feedback` - Integrate PR review comments
 
 See `skills/INDEX.md` for full catalog.
+
+**Note**: As of v3.25.1, language-pattern / design / quality reference skills (go-patterns, python-patterns, api-design, testing-strategies, security-checklist, etc.) were removed. `atomic-commits` and `git-workflows` were merged into `git-hygiene`. Generic language/design material is covered by Claude's training directly.
 
 ---
 

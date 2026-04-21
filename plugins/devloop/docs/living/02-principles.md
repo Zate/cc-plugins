@@ -49,8 +49,8 @@ Resume anytime with `/devloop:run`.
 Skills are catalogs loaded when needed.
 
 ```
-Skill: go-patterns
-Skill: testing-strategies
+Skill: plan-management
+Skill: local-config
 ```
 
 See `skills/INDEX.md` for the catalog.

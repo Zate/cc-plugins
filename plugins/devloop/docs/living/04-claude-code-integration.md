@@ -85,8 +85,8 @@ memory: project            # user, project, or local
 Domain knowledge loaded on-demand.
 
 ```
-Skill: go-patterns
-Skill: testing-strategies
+Skill: plan-management
+Skill: local-config
 ```
 
 Located in `skills/skill-name/SKILL.md`.

@@ -1,4 +1,4 @@
-# Devloop Skills Index v5.0
+# Devloop Skills Index v6.0
 
 Load skills on demand with `Skill: skill-name`. Don't preload.
 
@@ -13,7 +13,7 @@ These are user-invocable slash commands (`/devloop:<name>`):
 | `run` | Execute plan tasks autonomously |
 | `run-swarm` | Execute plan tasks via fresh-context subagents |
 | `epic` | Create multi-phase epic plan with TDD structure |
-| `run-epic` | Execute epic phase-by-phase with fresh subagents |
+| `run-epic` | Execute epic phase-by-phase |
 | `fresh` | Save plan state for fresh context restart |
 | `ship` | Validate and commit/PR completed work |
 | `review` | Comprehensive code review |
@@ -24,52 +24,20 @@ These are user-invocable slash commands (`/devloop:<name>`):
 | `help` | Interactive guide to devloop |
 | `statusline` | Configure devloop statusline |
 
-## Core Reference Skills
+## Reference Skills
 
 | Skill | Purpose |
 |-------|---------|
 | `plan-management` | Working with .devloop/plan.md |
 | `local-config` | Project settings via .devloop/local.md |
-
-## Maintenance
-
-| Skill | Purpose |
-|-------|---------|
+| `git-hygiene` | Commit strategy, branch naming, PR workflow, merge decisions |
 | `devloop-audit` | Audit devloop against Claude Code updates |
-
-## Explicit-Load Skills
-
-These skills provide domain knowledge but don't auto-trigger. Load explicitly with `Skill: skill-name` when needed.
-
-### Language Patterns
-
-| Skill | Purpose |
-|-------|---------|
-| `go-patterns` | Go idioms, error handling, testing |
-| `python-patterns` | Python best practices, pytest, Django/Flask/FastAPI |
-| `react-patterns` | React/TypeScript, hooks, components, Next.js |
-| `java-patterns` | Java/Spring patterns, Kotlin, Maven/Gradle |
-
-### Development
-
-| Skill | Purpose |
-|-------|---------|
-| `git-workflows` | Git operations, branching, merge strategies |
-| `atomic-commits` | Commit best practices, splitting PRs |
-| `testing-strategies` | Test design patterns, TDD, mocking |
-| `architecture-patterns` | System design, SOLID, refactoring |
-| `api-design` | REST/GraphQL API design, versioning |
-| `database-patterns` | Database design, SQL, ORM patterns |
-
-### Quality
-
-| Skill | Purpose |
-|-------|---------|
-| `security-checklist` | Security review, OWASP, vulnerability prevention |
 
 ---
 
-**Total**: 29 skills (15 workflow commands + 14 reference skills)
+**Total**: 19 skills (15 workflow commands + 4 reference skills).
+
+As of v3.25.1, low-use "knowledge" skills (language-pattern, design, security, testing) were removed — Claude's training covers that material and the auto-triggering skills were paying ~50 tokens each for ~0 invocations. `atomic-commits` and `git-workflows` were merged into `git-hygiene`. Use `/devloop:plan` for task-specific guidance instead.
 
 ## Superpowers Integration
 
@@ -91,15 +59,6 @@ Devloop and superpowers are complementary plugins with distinct lanes:
 | "Review my changes" | `/devloop:review` (quick) or `superpowers:requesting-code-review` (thorough) |
 | "Commit and create PR" | `/devloop:ship` |
 
-### Cross-references
-
-| Devloop Skill | Superpowers Skill | When to Use |
-|---------------|-------------------|-------------|
-| `testing-strategies` | `superpowers:test-driven-development` | Writing tests first, rigorous TDD |
-| `git-workflows` | `superpowers:using-git-worktrees` | Parallel feature development |
-| `git-workflows` | `superpowers:finishing-a-development-branch` | Completing work, merge decisions |
-| `architecture-patterns` | `superpowers:systematic-debugging` | Debugging complex issues |
-
 **Note**: Superpowers is NOT required. Devloop works fully standalone.
 
 ## Quick Reference
@@ -116,7 +75,5 @@ Devloop and superpowers are complementary plugins with distinct lanes:
 # Reference skills (load on demand)
 Skill: plan-management       # Plans
 Skill: local-config          # Project config
-Skill: go-patterns           # Go
-Skill: react-patterns        # React/TS
-Skill: git-workflows         # Git
+Skill: devloop-audit         # Plugin audit
 ```
