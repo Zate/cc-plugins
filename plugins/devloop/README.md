@@ -14,7 +14,7 @@
 
 ## Philosophy
 
-devloop v3.23 is simple: **Claude does the work directly, optimized by model selection.**
+devloop v3.25 is simple: **Claude does the work directly, optimized by model selection.**
 
 **What's new in v3.23:**
 - **Model-aware planning** — tasks annotated `[model:haiku]` for cheap work, `[model:sonnet]` for complex reasoning

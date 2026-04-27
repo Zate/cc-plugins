@@ -1,0 +1,29 @@
+{
+  "name": "pi-devloop",
+  "version": "1.0.0",
+  "description": "Devloop workflow engine for Pi",
+  "keywords": [
+    "pi-package"
+  ],
+  "main": "src/index.ts",
+  "dependencies": {
+    "typebox": "^1.1.0"
+  },
+  "peerDependencies": {
+    "@mariozechner/pi-ai": "*",
+    "@mariozechner/pi-coding-agent": "*",
+    "@mariozechner/pi-tui": "*"
+  },
+  "pi": {
+    "extensions": [
+      "src/index.ts"
+    ],
+    "skills": [
+      "skills"
+    ]
+  },
+  "devDependencies": {
+    "@types/node": "^25.6.0",
+    "typescript": "^6.0.3"
+  }
+}

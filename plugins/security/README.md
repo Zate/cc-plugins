@@ -113,12 +113,14 @@ The plugin includes PreToolUse hooks that validate code changes in real-time:
 - Warns about dangerous patterns (eval, shell=True with variables)
 - Validates bash commands for destructive operations
 
-## Commands
+## Skills (formerly Commands)
 
-| Command | Purpose |
-|---------|---------|
+Claude uses skills to manage security assessments:
+
+| Skill | Purpose |
+|-------|---------|
 | `/security:scan` | Run security assessment |
-| `/security:scan --quick` | Fast scan, tools only, no LLM |
+| `/security:scan --quick` | Fast scan, tools only, no LLMM |
 | `/security:scan --deep` | Comprehensive analysis |
 | `/security:scan --diff` | Scan only changed files vs main branch |
 | `/security:scan --suppress finding-003` | Suppress a false positive permanently |

@@ -40,11 +40,14 @@ That's it. Claude does the work. You stay in control.
 
 | Plugin | Description | Components |
 |--------|-------------|------------|
-| **[devloop](plugins/devloop)** | Development workflow engine with autonomous planning and execution | 15 commands, 6 agents, 19 skills |
-| **[ctx](plugins/ctx)** | Persistent memory for Claude across sessions | 3 skills |
-| **[security](plugins/security)** | OWASP ASVS-aligned security audits | 1 command, 17 agents |
+| **[agent-cli](plugins/agent-cli)** | Command-line interface for Claude Code agents | 1 skill |
+| **[blog-writer](plugins/blog-writer)** | Conversational blog post creator | 1 agent, 1 skill |
+| **[ctx](plugins/ctx)** | Persistent memory for Claude across sessions | 5 skills |
+| **[devloop](plugins/devloop)** | Development workflow engine with autonomous planning and execution | 6 agents, 19 skills |
 | **[diagrams](plugins/diagrams)** | Text-based diagram generation (SVG, Mermaid, Excalidraw, D2) | 6 skills |
-| **[blog-writer](plugins/blog-writer)** | Conversational blog post creator | 1 command, 2 agents |
+| **[forge](plugins/forge)** | Plugin development and scaffolding tool | 2 skills |
+| **[plugin-lint](plugins/plugin-lint)** | Linter for Claude Code plugins | 1 skill |
+| **[security](plugins/security)** | OWASP ASVS-aligned security audits | 1 agent, 12 skills |
 | **[wsl-clipboard-fix](plugins/wsl-clipboard-fix)** | WSL2 clipboard image paste fix | 1 skill, hooks |
 
 ---

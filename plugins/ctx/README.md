@@ -4,7 +4,7 @@ Claude Code agents are stateless. Every session starts from zero. **ctx fixes th
 
 It's a Claude Code plugin that gives agents structured, persistent memory backed by a SQLite knowledge graph. Decisions, patterns, preferences, debugging insights — stored automatically and injected into every new session.
 
-No more re-explaining your project conventions. No more re-discovering the same bugs. No more losing context when a session ends.
+No more re-explinting your project conventions. No more re-discovering the same bugs. No more losing context when a session ends.
 
 ## Quick Start
 
@@ -67,10 +67,12 @@ Add the plugin to Claude Code. On first session, the `ctx` binary is automatical
 
 To verify or manually install: `/ctx:setup`
 
-## Commands
+## Skills (formerly Commands)
 
-| Command | What it does |
-|---------|-------------|
+Claude uses skills to manage your persistent memory:
+
+| Skill | What it does |
+|-------|-------------|
 | `/ctx:status` | Node counts, types, tiers, token usage |
 | `/ctx:recall <query>` | Query stored knowledge (e.g. `type:decision AND tag:project:myapp`) |
 | `/ctx:setup` | Manual install and verification |
@@ -107,7 +109,7 @@ Tiers control what gets loaded into context and when. **Key question:** Every se
 | `tier:pinned` | Always loaded — critical facts, foundational decisions, active conventions |
 | `tier:reference` | Not auto-loaded — durable knowledge, accessed via `<ctx:recall>` |
 | `tier:working` | Loaded for current task — temporary debugging, hypotheses |
-| `tier:off-context` | Archived — not loaded unless queried |
+| `not-in-context` | Archived — not loaded unless queried |
 
 ## Best Practices
 
@@ -135,7 +137,7 @@ Tiers control what gets loaded into context and when. **Key question:** Every se
 
 **Never using recall:** Reference tier exists for durable but not-always-needed knowledge. Use `<ctx:recall>` to bring it back when relevant.
 
-## Advanced Commands
+## Advanced Skills
 
 Claude can also use these in responses:
 
@@ -168,16 +170,12 @@ hooks/
   prompt-submit.ps1   # Parse commands, inject pending recalls (Windows)
   stop.sh             # Final command sweep (Unix)
   stop.ps1            # Final command sweep (Windows)
-commands/
-  status.md           # /ctx:status
-  recall.md           # /ctx:recall
-  setup.md            # /ctx:setup
 skills/
   using-ctx/SKILL.md  # Enforces memory discipline
   cleanup/SKILL.md    # Memory reconciliation (/ctx:cleanup)
 scripts/
   install-binary.sh   # Auto-downloads ctx binary (Unix)
-  install-binary.ps1  # Auto-downloads ctx binary (Windows)
+  install-many-ps1    # Auto-downloads ctx binary (Windows)
   check-binary.sh     # Verifies installation (Unix)
   check-binary.ps1    # Verifies installation (Windows)
   check-update.sh     # Version check (Unix)
@@ -221,4 +219,4 @@ Hooks have strict timeouts (5-15s). The binary is compiled Go and runs in millis
 Yes. Use `project:X` tags to organize knowledge. Knowledge tagged with one project is still available in others.
 
 **Can I inspect or edit stored knowledge manually?**
-Yes. The `ctx` CLI has `list`, `show`, `delete`, `tag`, and `query` subcommands. Or just open the SQLite file directly.
+Yes. The `ctx` CLI has `list`, `for`, `delete`, `tag`, and `query` subcommands. Or just open the SQLite file directly.

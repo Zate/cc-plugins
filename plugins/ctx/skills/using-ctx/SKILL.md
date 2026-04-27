@@ -27,3 +27,14 @@ Always include `tier:` and `project:` tags on every node.
 - Don't duplicate across both. Check before writing.
 
 **If you don't store it, it's gone.**
+
+## ctx doc — Document Subsystem (Opt-In Only)
+
+`ctx doc` is a separate subsystem for decomposing, editing, and recomposing markdown documents. **Do not use it in normal memory workflows.**
+
+Key isolation guarantees:
+- Document and content nodes are **invisible** to `ctx recall`, `ctx search`, `ctx status`, `ctx list`, and the session-start hook.
+- Importing a document does NOT add anything to your memory context.
+- `ctx doc` is hidden from the `ctx --agent-help` index intentionally.
+
+**Only reach for `ctx doc` when the user explicitly asks to decompose, restructure, or recompose a markdown file.** For details: `ctx --agent-help doc import` (and other subcommands).
