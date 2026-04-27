@@ -63,7 +63,7 @@ Everything is stored in `~/.ctx/store.db` — a single SQLite file you own.
 
 ## Installation
 
-Add the plugin to Claude Code. On first session, the `ctx` binary is automatically downloaded from [GitHub releases](https://github.com/Zate/Memdown/releases) and the database is initialized. No manual setup required.
+Add the plugin to Claude Code. On first session, the `ctx` binary is automatically downloaded from [GitHub releases](https://github.com/Zate/ctx/releases) and the database is initialized. No manual setup required.
 
 To verify or manually install: `/ctx:setup`
 
@@ -184,7 +184,7 @@ scripts/
   check-update.ps1    # Version check (Windows)
 ```
 
-The `ctx` binary ([source](https://github.com/Zate/Memdown)) is a Go CLI that manages the SQLite database. All hooks go through `run-hook.cmd`, a polyglot script valid in both CMD.exe and bash. On Windows, CMD runs the `.ps1` scripts via PowerShell. On Unix, bash runs the `.sh` scripts directly.
+The `ctx` binary ([source](https://github.com/Zate/ctx)) is a Go CLI that manages the SQLite database. All hooks go through `run-hook.cmd`, a polyglot script valid in both CMD.exe and bash. On Windows, CMD runs the `.ps1` scripts via PowerShell. On Unix, bash runs the `.sh` scripts directly.
 
 ## Requirements
 

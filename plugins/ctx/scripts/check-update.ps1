@@ -5,7 +5,7 @@
 #   check-failed:<reason>
 $ErrorActionPreference = 'Stop'
 
-$repo = 'Zate/Memdown'
+$repo = 'Zate/ctx'
 
 # Find ctx binary
 $ctxCmd = Get-Command ctx -ErrorAction SilentlyContinue

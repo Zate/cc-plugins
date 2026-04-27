@@ -2,7 +2,7 @@
 # Download and install ctx binary from GitHub releases
 set -euo pipefail
 
-REPO="Zate/Memdown"
+REPO="Zate/ctx"
 BINARY_NAME="ctx"
 
 # Detect OS

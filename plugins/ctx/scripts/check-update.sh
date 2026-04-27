@@ -6,7 +6,7 @@
 #   check-failed:<reason>
 set -euo pipefail
 
-REPO="Zate/Memdown"
+REPO="Zate/ctx"
 
 # Get current installed version
 if ! command -v ctx &> /dev/null; then
