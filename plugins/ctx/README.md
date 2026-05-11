@@ -76,6 +76,31 @@ To verify or manually install: `/ctx:setup`
 | `/ctx:setup` | Manual install and verification |
 | `/ctx:cleanup` | Reconcile ctx and MEMORY.md — find duplicates, stale nodes, conflicts, bloat |
 
+### Direct CLI (in Bash tool)
+
+Agents can call the `ctx` binary directly for more control:
+
+```bash
+# Use --agent-out for dense AOF output (optimised for agent consumption)
+ctx recall 'type:decision AND tag:project:myapp' --agent-out
+ctx status --agent-out
+ctx list --agent-out
+
+# Recall with --inject queues results for injection at next prompt-submit
+ctx recall 'tag:tier:reference' --inject
+
+# doc subsystem — import markdown docs for agent-accessible decomposition
+ctx doc import README.md          # decompose into doc+content nodes
+ctx doc show <doc-id>             # show document metadata
+ctx doc search "migration"        # substring search over doc content (not FTS)
+ctx doc promote <node-id> --into-memory --type fact  # graduate content → memory
+ctx doc export <doc-id>           # recompose full markdown
+
+# Discover all commands and flags
+ctx --agent-help                  # index of all commands
+ctx <cmd> --agent-help            # detail for a specific command
+```
+
 ## What Gets Stored
 
 Claude stores knowledge using XML commands in its responses:
@@ -146,6 +171,26 @@ Claude can also use these in responses:
 - **`<ctx:summarize nodes="ID1,ID2">...</ctx:summarize>`** — condense multiple nodes
 - **`<ctx:supersede old="ID" new="ID"/>`** — replace outdated knowledge
 
+### Explicit Recall Command
+
+The `ctx recall` command (available from the CLI or `/ctx:recall` skill) runs a memory query immediately and prints results. Unlike the XML `<ctx:recall>` command, results are available in the current turn:
+
+```bash
+ctx recall 'type:decision AND tag:project:myapp'
+ctx recall 'tag:tier:reference' --inject   # also queue for next prompt
+```
+
+### Agent-Optimised Output
+
+Any command that returns results supports `--agent-out` for dense AOF (Agent Output Format) output — no markdown tables, no prose, just structured key=value records that don't waste tokens:
+
+```bash
+ctx status --agent-out
+ctx recall 'type:fact' --agent-out
+ctx list --agent-out
+ctx query 'type:decision' --agent-out
+```
+
 ## Query Language
 
 The recall command supports a query language with boolean operators:
@@ -203,8 +248,8 @@ Check that `<ctx:remember>` commands aren't inside code blocks. Only bare comman
 **Too much context being injected:**
 You have too many pinned nodes. Run `ctx list --tier pinned` to see what's loaded, then move older items to reference tier with `ctx tag <id> tier:reference`.
 
-**Recall not working:**
-Results are injected on the *next* prompt, not immediately. Send another message to see the results.
+**Recall not working (XML command):**
+Results from `<ctx:recall>` XML commands are injected on the *next* prompt, not immediately. Send another message to see the results. Alternatively, use `ctx recall <query>` directly in the Bash tool for immediate results in the current turn.
 
 **Database corrupted:**
 Delete `~/.ctx/store.db` and start fresh. Consider backing up this file periodically.

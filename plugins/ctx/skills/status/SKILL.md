@@ -14,7 +14,9 @@ Show a summary of stored knowledge.
 
 Run:
 ```bash
-ctx status
+ctx status --agent-out
 ```
+
+The `--agent-out` flag emits dense AOF output optimised for agent consumption. Omit it for human-readable output.
 
 Report to the user: total nodes, breakdown by type and tier, token counts, and database size.
