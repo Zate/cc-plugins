@@ -148,16 +148,7 @@ When you run `/devloop` (traditional full workflow), you'll see a structured con
 
 ## Working with Different Project Types
 
-devloop automatically detects your project type and loads relevant knowledge:
-
-| Project Type | What Gets Activated |
-|--------------|---------------------|
-| **React** | `react-patterns` skill, component best practices |
-| **Go** | `go-patterns` skill, interface and error handling patterns |
-| **Python** | `python-patterns` skill, type hints, pytest patterns |
-| **Java/Spring** | `java-patterns` skill, DI and Spring conventions |
-
-You don't need to configure this. devloop detects it from your codebase.
+devloop detects your project type and passes language/framework context to `/devloop:plan`. Claude applies its own language knowledge (Go, React, Python, Java, etc.) directly — there are no language-specific reference skills to install or configure.
 
 ---
 

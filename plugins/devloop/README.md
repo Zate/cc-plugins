@@ -2,7 +2,7 @@
 
 > **A development workflow where Claude does the work and you stay in control.**
 
-[![Version](https://img.shields.io/badge/version-3.25.0-blue)](./CHANGELOG.md) [![Skills](https://img.shields.io/badge/skills-27-purple)](#skills) [![Agents](https://img.shields.io/badge/agents-6-green)](#agents)
+[![Version](https://img.shields.io/badge/version-3.25.1-blue)](./CHANGELOG.md) [![Skills](https://img.shields.io/badge/skills-19-purple)](#skills) [![Agents](https://img.shields.io/badge/agents-6-green)](#agents)
 
 **What devloop gives you:**
 - **Structured plans** that persist across sessions (`.devloop/plan.md`)
@@ -137,17 +137,13 @@ Six specialized agents for parallel and cost-optimized work:
 
 ## Skills
 
-Load domain knowledge on demand with `Skill: skill-name`:
+Load on demand with `Skill: skill-name`:
 
-**Workflow**: plan-management, local-config, pr-feedback, git-workflows, atomic-commits
+**Reference**: plan-management, local-config, git-hygiene, pr-feedback, devloop-audit
 
-**Patterns**: go-patterns, python-patterns, react-patterns, java-patterns
+Workflow commands (`/devloop:*`) are also implemented as skills — see `skills/INDEX.md` for the full list.
 
-**Design**: api-design, architecture-patterns, database-patterns
-
-**Quality**: testing-strategies, security-checklist
-
-See `skills/INDEX.md` for full documentation.
+**Note**: As of v3.25.1, the language-pattern / design / quality skills (go-patterns, python-patterns, api-design, testing-strategies, security-checklist, etc.) have been removed. `atomic-commits` and `git-workflows` merged into `git-hygiene`. Generic language/design material is covered by Claude's training directly; task-specific guidance comes from `/devloop:plan`.
 
 ---
 

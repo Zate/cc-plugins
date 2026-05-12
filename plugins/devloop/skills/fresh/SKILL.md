@@ -69,7 +69,7 @@ The default `fresh_threshold` is 10 tasks. However, token-heavy workloads exhaus
 | Swarm (parallel workers) | 5-7 | Each spawn adds its full context; N parallel spawns = N× context cost |
 | Large `token_budget` (8000+) | 5 | Heavy context per task exhausts budget sooner |
 | 1M context model | 25-50 | Much larger budget; fresh restarts are less urgent |
-| Epic phases (run-epic) | per-phase | Each phase uses a fresh subagent already; fresh is less needed |
+| Epic phases (run-epic) | 10 (default) | Phases run inline like `/devloop:run`; pause at phase boundaries for `/clear` if context is heavy |
 
 **When to lower the threshold**:
 - Running `/devloop:run-swarm` with 5+ concurrent workers per batch

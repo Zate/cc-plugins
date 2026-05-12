@@ -5,6 +5,30 @@ All notable changes to the devloop plugin are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.25.1] - 2026-04-21
+
+### Changed - Hypermiling: Remove Low-Use Skills and Forced Subagent Spawn
+
+Evidence-based prune after a usage audit showed 17 low-use skills accounted for ~3 invocations combined across all history, and `run-epic` spawned a sonnet subagent on every phase regardless of size.
+
+- **Removed 9 knowledge skills** (auto-triggering reference skills with ~0 invocations over the audit window):
+  - Language patterns: `go-patterns`, `python-patterns`, `react-patterns`, `java-patterns`
+  - Design/quality: `api-design`, `architecture-patterns`, `database-patterns`, `testing-strategies`, `security-checklist`
+
+  That material is covered by Claude's training directly. Each skill paid ~50 tokens per turn (name + description + when_to_use + paths) for ~zero functional benefit.
+
+- **Merged `atomic-commits` + `git-workflows` → `git-hygiene`**: both were git-adjacent with real devloop-specific integration (`/devloop:ship`, `/devloop:pr-feedback`) but heavily overlapping. The new skill consolidates commit strategy, branch naming, conventional commits, PR workflow, and merge decisions. Worktree documentation was dropped — `run-swarm/SKILL.md` already covers it inline.
+
+- **`run-epic` Step 3**: removed forced `Agent: model: sonnet` spawn per phase. Now follows the same `[model:haiku]` / `[model:sonnet]` / inline annotation pattern as `/devloop:run`. Inline is the default; subagent is opt-in per task annotation or as a last-resort fresh-context fallback for very large phases.
+
+- **`engineer` agent**: removed `skills: [security-checklist]` frontmatter reference (skill no longer exists).
+
+- **Docs**: updated `skills/INDEX.md`, `help/SKILL.md`, plugin README, `docs/living/*`, and repo `CLAUDE.md` to reflect the 19-skill inventory (down from 29).
+
+### Rationale
+
+From `/usage`: "67% of your usage came from subagent-heavy sessions." Audit showed devloop agents were ~1.9% of total subagent spawns (the heavy cost was main Claude Code's `general-purpose` + `Explore` + `code-reviewer`). But the low-use knowledge skills and the unconditional run-epic spawn were clear-cut waste on the devloop side — token savings with ~zero functional loss.
+
 ## [3.25.0] - 2026-04-15
 
 ### Added - Claude Code Native Integration

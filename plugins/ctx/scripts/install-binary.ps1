@@ -1,7 +1,7 @@
 # Download and install ctx binary from GitHub releases (Windows)
 $ErrorActionPreference = 'Stop'
 
-$repo = 'Zate/Memdown'
+$repo = 'Zate/ctx'
 $binaryName = 'ctx'
 
 # Detect architecture

@@ -384,7 +384,8 @@ For large features spanning multiple sessions, use epics instead of plans:
                   ↓
 ┌──────────────────────────────────────────────────┐
 │  2. /devloop:run-epic                            │
-│     └─→ Spawns Sonnet subagent for current phase │
+│     └─→ Executes current phase inline            │
+│        (worker spawn per [model:X] annotation)   │
 │     └─→ Validates tests, commits, promotes next  │
 │     └─→ Pauses: "Continue or /clear?"            │
 └─────────────────┬────────────────────────────────┘
@@ -393,7 +394,7 @@ For large features spanning multiple sessions, use epics instead of plans:
             Context heavy?
                   │
                   ├─→ Yes: /clear → /devloop:run-epic
-                  └─→ No: Continue (fresh subagent)
+                  └─→ No: Continue in same session
 ```
 
 **Key files:**
@@ -404,7 +405,7 @@ For large features spanning multiple sessions, use epics instead of plans:
 **Example session:**
 ```bash
 /devloop:epic "add user authentication"  # Plan all phases with TDD
-/devloop:run-epic                        # Execute phase 1 in subagent
+/devloop:run-epic                        # Execute phase 1 inline
 # -> tests pass, committed, phase 2 loaded
 # -> "Continue now?" or "Clear and run?"
 /clear                                   # Fresh context

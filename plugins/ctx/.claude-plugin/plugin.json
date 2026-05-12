@@ -6,8 +6,8 @@
     "name": "Zate",
     "email": "zate75+claude-code-plugins@gmail.com"
   },
-  "homepage": "https://github.com/Zate/Memdown",
-  "repository": "https://github.com/Zate/Memdown",
+  "homepage": "https://github.com/Zate/ctx",
+  "repository": "https://github.com/Zate/ctx",
   "license": "MIT",
   "keywords": ["memory", "context", "knowledge-graph", "persistence", "sessions"]
 }

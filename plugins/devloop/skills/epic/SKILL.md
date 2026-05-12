@@ -131,7 +131,7 @@ User stories, invariants, and negative cases should inform what gets tested. Eac
 
 ### Phase Sizing
 - 5-8 tasks per phase (tests + implementation)
-- Each phase completable in one subagent session
+- Each phase completable in one session (pause at phase boundaries for `/clear` if context grows heavy)
 - Group related functionality together
 - Foundational work first, polish last
 - Each phase should deliver at least one user story when possible
