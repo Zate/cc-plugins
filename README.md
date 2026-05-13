@@ -1,8 +1,8 @@
 # CC-Plugins
 
-**A curated marketplace of high-quality Claude Code plugins for professional development workflows.**
+**A curated marketplace of Claude Code plugins and skills for development workflows.**
 
-[![Plugins](https://img.shields.io/badge/plugins-6-blue)](.claude-plugin/marketplace.json) [![Claude Code](https://img.shields.io/badge/Claude%20Code-compatible-green)](https://code.claude.com) [![License](https://img.shields.io/badge/license-MIT-purple)](LICENSE)
+[![Plugins](https://img.shields.io/badge/plugins-9-blue)](.claude-plugin/marketplace.json) [![Claude Code](https://img.shields.io/badge/Claude%20Code-compatible-green)](https://code.claude.com) [![License](https://img.shields.io/badge/license-MIT-purple)](LICENSE)
 
 ---
 
@@ -12,121 +12,119 @@
 # Add this marketplace
 /plugin marketplace add Zate/cc-plugins
 
-# Install plugins
-/plugin install devloop    # Workflow engine
-/plugin install ctx        # Persistent memory (optional but recommended)
+# Install the main workflow plugin
+/plugin install devloop
+
+# Optional but useful companions
+/plugin install ctx
+/plugin install security
 ```
 
-### The 4-Step Workflow
+Start new work with devloop:
 
 ```bash
-/devloop:plan "add user authentication"   # 1. Plan - explore and design
-/devloop:run                               # 2. Build - implement autonomously
-/devloop:ship                              # 3. Ship - commit and PR
-# Repeat                                   # 4. Start next feature
+/devloop:plan "add user authentication"
+/devloop:run
+/devloop:ship
 ```
 
-That's it. Claude does the work. You stay in control.
+For a larger investigation, use `/devloop:plan --deep "topic"`. When context gets heavy, use `/devloop:fresh`, then `/clear`, then `/devloop:run`.
 
-**Need deep exploration?** Use `/devloop:plan --deep "topic"` for comprehensive analysis.
-
-**Context getting heavy?** Use `/devloop:fresh && /clear && /devloop:run` every 5-10 tasks.
-
-**New to plugins?** Check out the [Getting Started Guide](docs/GETTING_STARTED.md) for a complete walkthrough.
+New to the marketplace? See [Getting Started](docs/GETTING_STARTED.md).
 
 ---
 
 ## Available Plugins
 
-| Plugin | Description | Components |
-|--------|-------------|------------|
-| **[devloop](plugins/devloop)** | Development workflow engine with autonomous planning and execution | 15 commands, 6 agents, 19 skills |
-| **[ctx](plugins/ctx)** | Persistent memory for Claude across sessions | 3 skills |
-| **[security](plugins/security)** | OWASP ASVS-aligned security audits | 1 command, 17 agents |
-| **[diagrams](plugins/diagrams)** | Text-based diagram generation (SVG, Mermaid, Excalidraw, D2) | 6 skills |
-| **[blog-writer](plugins/blog-writer)** | Conversational blog post creator | 1 command, 2 agents |
-| **[wsl-clipboard-fix](plugins/wsl-clipboard-fix)** | WSL2 clipboard image paste fix | 1 skill, hooks |
+| Plugin | What it does | Components |
+|--------|--------------|------------|
+| [devloop](plugins/devloop) | Lightweight plan/run/fresh development workflow with git and PR support | 19 skills, 6 agents, hooks, scripts |
+| [ctx](plugins/ctx) | Persistent memory backed by the external `ctx` SQLite knowledge graph | 5 skills, hooks, scripts |
+| [security](plugins/security) | Hybrid security scanner: deterministic tools detect, LLM triages | 14 skills, 1 agent, hooks, scripts |
+| [diagrams](plugins/diagrams) | Text-based diagram generation with SVG, Mermaid, Excalidraw, and D2 | 6 skills |
+| [forge](plugins/forge) | Integration with the Forge headless agent job runner via MCP | 2 skills, hooks |
+| [plugin-lint](plugins/plugin-lint) | Static correctness and quality linting for Claude Code plugins | 1 skill |
+| [agent-cli](plugins/agent-cli) | Convention for agent-friendly CLIs using `--agent-help` | 1 skill |
+| [blog-writer](plugins/blog-writer) | Interview-driven blog writing workflow with a de-AI editing agent | 1 skill, 1 agent |
+| [wsl-clipboard-fix](plugins/wsl-clipboard-fix) | WSL2 image paste fix that converts BMP clipboard content to PNG | 1 skill, hooks, script |
+
+The authoritative marketplace list lives in [.claude-plugin/marketplace.json](.claude-plugin/marketplace.json).
+
+---
+
+## How These Plugins Are Built
+
+This repository is now skill-first. Most user-facing entry points are `skills/*/SKILL.md` files, not legacy `commands/*.md` files. User-invocable skills expose slash-style commands such as `/devloop:plan`, `/ctx:status`, `/security:scan`, and `/plugin-lint:lint`.
+
+Common plugin components:
+
+| Component | Location | Purpose |
+|-----------|----------|---------|
+| Manifest | `.claude-plugin/plugin.json` | Plugin metadata used by Claude Code |
+| Skills | `skills/<name>/SKILL.md` | User-invocable commands and model-invoked expertise |
+| Agents | `agents/*.md` | Specialized subagents for delegated work |
+| Hooks | `hooks/hooks.json` plus scripts | Lifecycle automation |
+| MCP | `.mcp.json` | External tool integrations |
+| Scripts | `scripts/*` | Helper commands used by skills and hooks |
+
+`commands/` is still valid for old-style slash commands, but new plugins in this repo should prefer skills.
 
 ---
 
 ## Featured: devloop
 
-The flagship plugin for professional software development. Simple workflow: plan, build, ship, repeat.
+devloop is the main development workflow plugin.
 
 ```bash
 /plugin install devloop
 
-# The workflow
-/devloop:plan "add user authentication"   # Plan with autonomous exploration
-/devloop:run                               # Execute tasks autonomously
-/devloop:ship                              # Commit and create PR
-
-# Variations
-/devloop:plan --deep "should we use OAuth?"  # Deep exploration first
-/devloop:plan --quick "fix the typo"         # Skip planning for tiny tasks
-/devloop:plan --from-issue 42                # Start from GitHub issue
+/devloop:plan "add user authentication"       # Explore and create .devloop/plan.md
+/devloop:run                                  # Execute plan tasks
+/devloop:fresh && /clear && /devloop:run      # Reset context and continue
+/devloop:review                               # Review current changes
+/devloop:ship                                 # Validate, commit, and create PR
 ```
 
-**Why devloop?**
+Useful variants:
 
-- **Claude does the work directly** - No routine agent spawning
-- **Fresh context = better reasoning** - Clear after 5-10 tasks
-- **Plans survive sessions** - Pick up where you left off
-- **GitHub integration** - Issue-to-PR workflow
+```bash
+/devloop:plan --quick "fix typo in settings"
+/devloop:plan --deep "should we use OAuth or JWT?"
+/devloop:plan --from-issue 42
+/devloop:run --interactive
+```
 
-**v3.18 Highlights:**
-- Consolidated commands with flag-based modes
-- Autonomous execution with `/devloop:run`
-- Simplified agent set (7 focused agents)
-- 15 on-demand skills
-
-[Read the full devloop documentation →](plugins/devloop/README.md)
-
----
-
-## What Can Plugins Do?
-
-Claude Code plugins extend your development environment with:
-
-| Component | Purpose | Example |
-|-----------|---------|---------|
-| **Commands** | Custom slash commands | `/devloop:quick Fix the bug` |
-| **Agents** | Specialized subagents | `code-reviewer`, `test-generator` |
-| **Skills** | Domain knowledge | `plan-management`, `pr-feedback` |
-| **Hooks** | Event automation | Auto-detect project type on session start |
-| **MCP Servers** | External integrations | Connect to databases, APIs, services |
+Plans persist in `.devloop/plan.md`, so work can resume across sessions. See the [devloop README](plugins/devloop/README.md) for the full workflow.
 
 ---
 
 ## Installation Options
 
-### From Marketplace (Recommended)
+### From Marketplace
 
 ```bash
-# Add marketplace
 /plugin marketplace add Zate/cc-plugins
-
-# Install specific plugin
 /plugin install devloop
 ```
 
-### Direct Install
+Install any plugin by name after adding the marketplace:
 
 ```bash
-# Install from local path
-/plugin install /path/to/cc-plugins/plugins/devloop
+/plugin install ctx
+/plugin install security
+/plugin install diagrams
+```
 
-# Install from GitHub
-/plugin install https://github.com/Zate/cc-plugins/plugins/devloop
+### From a Local Checkout
+
+```bash
+/plugin install /absolute/path/to/cc-plugins/plugins/devloop
 ```
 
 ### Verify Installation
 
 ```bash
-# List installed plugins
 /plugin list
-
-# Check plugin details
 /plugin info devloop
 ```
 
@@ -134,69 +132,39 @@ Claude Code plugins extend your development environment with:
 
 ## For Plugin Developers
 
-Want to contribute a plugin? We maintain high quality standards.
-
-### Quick Start
+Start from the template:
 
 ```bash
-# Copy the template
 cp -r templates/plugin-template plugins/your-plugin-name
-
-# Update manifest
-vim plugins/your-plugin-name/.claude-plugin/plugin.json
-
-# Test locally
-/plugin install /absolute/path/to/plugins/your-plugin-name
 ```
 
-### Plugin Structure
+Required structure:
 
+```text
+plugins/your-plugin-name/
++-- .claude-plugin/
+|   +-- plugin.json
++-- skills/
+|   +-- your-skill/
+|       +-- SKILL.md
++-- agents/
++-- hooks/
++-- scripts/
++-- .mcp.json
++-- README.md
 ```
-your-plugin-name/
-├── .claude-plugin/
-│   └── plugin.json      # Required manifest
-├── commands/            # Slash commands (.md)
-├── agents/              # Specialized agents (.md)
-├── skills/              # Domain knowledge (subdirs with SKILL.md)
-├── hooks/               # Event handlers
-├── .mcp.json           # MCP server config
-└── README.md           # Documentation
-```
 
-### Quality Standards
+Only `.claude-plugin/plugin.json` is required. Add the component directories your plugin actually needs.
 
-All plugins in this marketplace must meet these standards:
+Before submitting:
 
-**Skills:**
-- Complete frontmatter (name, description)
-- "When NOT to Use" section
-- Version notes for language-specific patterns
+1. Keep the plugin focused and documented.
+2. Prefer skills over legacy `commands/`.
+3. Test local installation with `/plugin install /absolute/path/to/plugins/your-plugin-name`.
+4. Add an entry to [.claude-plugin/marketplace.json](.claude-plugin/marketplace.json).
+5. Run plugin linting when relevant: `/plugin-lint:lint plugins/your-plugin-name`.
 
-**Agents:**
-- Appropriate model selection (haiku/sonnet/opus)
-- Clear differentiation from similar agents
-- Tools list matching actual capabilities
-
-**Commands:**
-- Complete frontmatter including `argument-hint`
-- Consistent section ordering
-- Documented allowed-tools
-
-**Hooks:**
-- Proper JSON escaping for output
-- Graceful error handling
-- Performance-conscious implementation
-
-See [PLUGIN_CREATION_GUIDE.md](docs/PLUGIN_CREATION_GUIDE.md) for complete standards.
-
-### Submit Your Plugin
-
-1. Fork this repository
-2. Create your plugin in `plugins/your-plugin-name/`
-3. Add entry to `.claude-plugin/marketplace.json`
-4. Submit a pull request
-
-See [CONTRIBUTING.md](CONTRIBUTING.md) for detailed guidelines.
+See [Plugin Creation Guide](docs/PLUGIN_CREATION_GUIDE.md), [CONTRIBUTING.md](CONTRIBUTING.md), and [CLAUDE.md](CLAUDE.md) for the detailed development rules.
 
 ---
 
@@ -204,12 +172,12 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for detailed guidelines.
 
 | Resource | Description |
 |----------|-------------|
-| [Getting Started](docs/GETTING_STARTED.md) | New user guide - start here |
-| [Quick Reference](docs/QUICK_REFERENCE.md) | Command cheat sheet |
-| [devloop Documentation](plugins/devloop/README.md) | Full devloop plugin docs |
+| [Getting Started](docs/GETTING_STARTED.md) | First install and common workflows |
+| [Quick Reference](docs/QUICK_REFERENCE.md) | Copy-paste commands |
+| [Architecture](ARCHITECTURE.md) | Repository layout and component model |
+| [Plugin Creation Guide](docs/PLUGIN_CREATION_GUIDE.md) | How to create plugins in this repo |
 | [CONTRIBUTING.md](CONTRIBUTING.md) | Contribution guidelines |
-| [Plugin Creation Guide](docs/PLUGIN_CREATION_GUIDE.md) | Build your own plugins |
-| [Official Docs](https://code.claude.com/docs/en/plugins.md) | Claude Code plugin documentation |
+| [devloop README](plugins/devloop/README.md) | Full devloop documentation |
 
 ---
 
@@ -219,26 +187,6 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for detailed guidelines.
 - **Discussions**: [GitHub Discussions](https://github.com/Zate/cc-plugins/discussions)
 - **Official Docs**: [code.claude.com/docs](https://code.claude.com/docs)
 
----
-
 ## License
 
-Each plugin may have its own license. See individual plugin directories for details.
-
-The marketplace infrastructure is [MIT licensed](LICENSE).
-
----
-
-## Related Marketplaces
-
-Looking for more plugins? Check out these community marketplaces:
-
-- [jeremylongshore/claude-code-plugins-plus](https://github.com/jeremylongshore/claude-code-plugins-plus) - 240+ Agent Skills
-- [kivilaid/plugin-marketplace](https://github.com/kivilaid/plugin-marketplace) - 87 plugins from 10+ sources
-- [Dev-GOM/claude-code-marketplace](https://github.com/Dev-GOM/claude-code-marketplace) - Productivity and automation plugins
-
----
-
-<p align="center">
-  <strong>Built for developers who ship.</strong>
-</p>
+Each plugin may have its own license. See individual plugin manifests for details. The marketplace infrastructure is [MIT licensed](LICENSE).

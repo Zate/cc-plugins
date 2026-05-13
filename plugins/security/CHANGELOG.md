@@ -2,6 +2,27 @@
 
 All notable changes to the security plugin are documented in this file.
 
+## [3.2.0] - 2026-05-13
+
+### Added
+
+- `/security:baseline` creates `.security/profile.json`, initializes suppressions, and updates `.gitignore`.
+- `/security:fix` routes a triaged finding to the appropriate remediation skill and applies a focused fix.
+- Shared `data/triage-criteria.md` used by both `/security:scan` and `triage-agent`.
+- Deterministic `pre-tool-guard` hook scripts for Unix and Windows using current PreToolUse `permissionDecision` output.
+
+### Changed
+
+- `/security:scan` now documents the exact artifact pipeline and delegates triage consistently to `triage-agent`.
+- `triage-agent` now loads shared triage criteria plus matching CWE reference files.
+- `run-scanners.sh` supports `--path` and `--files` together.
+- `/security:setup` is approval-first and prefers user-scoped installers over global package installs.
+
+### Fixed
+
+- Removed duplicated scan-vs-agent triage rules that could drift.
+- Replaced prompt-based hook decisions with deterministic command hooks using the current hook schema.
+
 ## [3.1.0] - 2026-03-15
 
 ### Added — Workflow Features

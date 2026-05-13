@@ -1,185 +1,108 @@
 # CC-Plugins Architecture
 
-High-level overview of the plugin ecosystem. For implementation details, see individual plugin READMEs.
+This repository is a multi-plugin Claude Code marketplace. The root marketplace file points Claude Code at individual plugin directories under `plugins/`.
 
----
+## Repository Shape
 
-## The Big Picture
-
+```text
+cc-plugins/
++-- .claude-plugin/
+|   +-- marketplace.json
++-- plugins/
+|   +-- devloop/
+|   +-- ctx/
+|   +-- security/
+|   +-- diagrams/
+|   +-- forge/
+|   +-- plugin-lint/
+|   +-- agent-cli/
+|   +-- blog-writer/
+|   +-- wsl-clipboard-fix/
++-- templates/
++-- docs/
++-- tests/
 ```
-                              CC-Plugins Marketplace
-                                       |
-          +----------------------------+----------------------------+
-          |                            |                            |
-       devloop                        ctx                       security
-   (workflow engine)          (persistent memory)          (OWASP auditing)
-          |                            |
-          +------------+---------------+
-                       |
-               Your Development Session
-```
 
-**devloop** orchestrates your development workflow. **ctx** gives Claude memory across sessions. **security** audits for vulnerabilities. They work together but can be used independently.
+The marketplace registry is [.claude-plugin/marketplace.json](.claude-plugin/marketplace.json). Each plugin has its own `.claude-plugin/plugin.json` manifest.
 
----
+## Component Model
 
-## Core Philosophy
+The repo is skill-first. New capabilities generally live in `skills/<name>/SKILL.md`.
 
-**"Plan, Build, Validate, Ship, Repeat"**
+| Component | Location | Current role |
+|-----------|----------|--------------|
+| Skills | `skills/*/SKILL.md` | Primary unit for commands and domain knowledge |
+| Agents | `agents/*.md` | Specialized delegated workers |
+| Hooks | `hooks/hooks.json`, hook scripts | Session lifecycle automation |
+| Scripts | `scripts/*` | Helper executables for skills and hooks |
+| MCP | `.mcp.json` | External server integration |
+| Legacy commands | `commands/*.md` | Supported by Claude Code, but not the preferred repo pattern |
 
-```
-/devloop:plan "feature"     # Plan - explore and design
+User-facing slash commands in this repo mostly come from user-invocable skills. For example, `plugins/devloop/skills/plan/SKILL.md` provides `/devloop:plan`.
+
+## Plugin Inventory
+
+| Plugin | Primary purpose | Notable components |
+|--------|-----------------|--------------------|
+| `devloop` | Plan/run/fresh development workflow | 19 skills, 6 agents, hooks, scripts |
+| `ctx` | Persistent memory | 5 skills, hooks, installer/check scripts |
+| `security` | Hybrid security scanning | 14 skills, 1 triage agent, scanner scripts |
+| `diagrams` | Diagram generation | Router plus SVG, Mermaid, Excalidraw, D2 skills |
+| `forge` | Headless agent job runner integration | MCP setup/use skills and session hook |
+| `plugin-lint` | Plugin correctness linting | Static lint skill and reference data |
+| `agent-cli` | Agent-friendly CLI convention | `--agent-help` design skill |
+| `blog-writer` | Interview-driven blog creation | Blog skill plus de-AI editing agent |
+| `wsl-clipboard-fix` | WSL2 image paste fix | Session hooks and `clip2png` script |
+
+## Runtime Flow
+
+```text
+User prompt or slash command
         |
-/devloop:run                # Build - implement autonomously
+        v
+User-invocable skill or model-selected skill
         |
-/devloop:ship               # Ship - commit and PR
+        +--> reads plugin references
+        +--> calls scripts or MCP tools
+        +--> delegates to agents when useful
         |
-     Repeat                 # Start next feature
+        v
+Project files, generated artifacts, or session context
 ```
 
-This loop replaces complex multi-phase workflows with a simple, repeatable pattern.
+Hooks run around this flow for plugins that need lifecycle behavior. Examples:
 
----
+- `ctx` injects stored memory at session start and persists `<ctx:remember>` commands during the session.
+- `devloop` detects and preserves plan state.
+- `security` can scan or warn around tool use.
+- `wsl-clipboard-fix` starts and stops its clipboard conversion daemon on WSL2.
 
-## Component Flow
+## devloop and ctx
 
-```
-User Input
-    |
-    v
-+--------+     +---------+     +--------+     +-------+
-| Slash  | --> | Command | --> | Skills | --> | Tools |
-|Commands|     |   .md   |     |  .md   |     | (API) |
-+--------+     +---------+     +--------+     +-------+
-                   |               ^
-                   |               |
-                   v               |
-              +--------+       +------+
-              | Agents | ----> | Hooks|
-              |  .md   |       | .sh  |
-              +--------+       +------+
-                                  |
-                                  v
-                            ctx (memory)
-```
-
-| Component | Purpose | Location |
-|-----------|---------|----------|
-| Commands | User-invoked workflows | `commands/*.md` |
-| Agents | Parallel work, specialized tasks | `agents/*.md` |
-| Skills | Domain knowledge, patterns | `skills/*/SKILL.md` |
-| Hooks | Event-driven automation | `hooks/*.sh` |
-
----
-
-## How ctx Provides Memory
-
-Claude is stateless. Every session starts fresh. ctx fixes this:
-
-```
-Session 1                          ctx Database                    Session 2
-    |                                   |                               |
-Claude learns                     +------------+                   Claude knows
-"use gRPC for                     | Decisions  |                   about gRPC
- internal APIs"  -----store----> | Patterns   | -----load----->   decision
-    |                             | Facts      |                       |
-<ctx:remember>                    +------------+                   (auto-injected)
-```
-
-**Storage tiers:**
-- `tier:pinned` - Always loaded (critical facts, conventions)
-- `tier:working` - Current task context (debugging, hypotheses)
-- `tier:reference` - Query on demand via `<ctx:recall>`
-
----
-
-## Hook Lifecycle
-
-Hooks fire at key moments in a Claude Code session:
-
-```
-Session Start
-    |
-    v
-[SessionStart hook]     # ctx: inject stored knowledge
-    |                   # devloop: detect project state
-    v
-User Prompt
-    |
-    v
-[UserPromptSubmit]      # ctx: parse commands from last response
-    |
-    v
-Claude Response
-    |
-    v
-[Stop hook]             # ctx: final command sweep
-                        # ralph-loop: check completion promise
-```
-
----
-
-## Plugin Interaction
-
-devloop and ctx complement each other:
+`devloop` and `ctx` are complementary but independent.
 
 | devloop | ctx |
 |---------|-----|
-| Plans what to build | Remembers why you built it |
-| Tracks tasks | Stores patterns discovered |
-| Manages workflow | Preserves debugging insights |
-| Session-scoped | Cross-session |
-
-**Example flow:**
-
-1. `/devloop:plan "add auth"` - creates plan
-2. During work, Claude discovers OAuth quirk
-3. `<ctx:remember type="observation">` stores it
-4. Next session: ctx injects the observation
-5. Claude knows about the quirk immediately
-
----
-
-## File Structure
-
-```
-cc-plugins/
-+-- .claude-plugin/
-|   +-- marketplace.json      # Plugin registry
-+-- plugins/
-    +-- devloop/
-    |   +-- .claude-plugin/
-    |   |   +-- plugin.json   # Plugin manifest
-    |   +-- commands/         # 13 slash commands
-    |   +-- agents/           # 7 specialized agents
-    |   +-- skills/           # 15 domain skills
-    |   +-- hooks/            # Event handlers
-    |   +-- scripts/          # Helper scripts
-    +-- ctx/
-    |   +-- commands/         # 3 commands
-    |   +-- skills/           # 1 skill
-    |   +-- hooks/            # Memory lifecycle
-    +-- security/
-        +-- commands/         # Audit commands
-```
-
----
+| Tracks the work to do | Remembers facts, decisions, and patterns |
+| Persists plan state in `.devloop/plan.md` | Persists memory in `~/.ctx/store.db` |
+| Optimizes context with `/devloop:fresh` | Injects relevant memory at session start |
+| Handles git and PR workflows | Preserves cross-session knowledge |
 
 ## Design Principles
 
-1. **Claude does the work directly** - No routine agent spawning
-2. **Fresh context = better reasoning** - Clear after 5-10 tasks
-3. **Plans survive sessions** - Pick up where you left off
-4. **Skills load on demand** - No preloading bloat
-5. **Hooks are minimal** - Fast, focused, fail gracefully
-
----
+1. Prefer skills for new user-facing capabilities.
+2. Keep plugin manifests minimal and accurate.
+3. Put component directories at the plugin root, not inside `.claude-plugin/`.
+4. Keep hooks fast, quiet, and failure-tolerant.
+5. Use scripts for repeatable shell work and emit concise agent-friendly output.
+6. Document each plugin from the user workflow first, then implementation details.
 
 ## Learn More
 
-| Resource | What you'll learn |
-|----------|-------------------|
-| [devloop README](plugins/devloop/README.md) | Full workflow documentation |
-| [ctx README](plugins/ctx/README.md) | Persistent memory system |
-| [CLAUDE.md](CLAUDE.md) | Plugin development guide |
-| [skills/INDEX.md](plugins/devloop/skills/INDEX.md) | Available skills |
+| Resource | What it covers |
+|----------|----------------|
+| [README](README.md) | Marketplace overview and plugin list |
+| [Getting Started](docs/GETTING_STARTED.md) | Installation and first workflows |
+| [Plugin Creation Guide](docs/PLUGIN_CREATION_GUIDE.md) | Creating or updating plugins |
+| [CLAUDE.md](CLAUDE.md) | Maintainer guidance for agents |
+| [devloop README](plugins/devloop/README.md) | devloop workflow details |

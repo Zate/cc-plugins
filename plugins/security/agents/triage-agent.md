@@ -5,7 +5,7 @@ description: |
 
   Use when: Security scan has produced raw findings that need triage.
   Do NOT use when: User wants to explore code, write tests, or scan directly.
-tools: Read, Grep, Glob
+tools: Read, Write, Grep, Glob
 model: sonnet
 maxTurns: 15
 color: red
@@ -22,6 +22,11 @@ You receive correlated findings from static analysis tools and classify each one
 Read these files:
 1. `.security/correlated.json` (or `.security/artifacts/correlated.json`) - correlated findings
 2. `.security/recon.json` (or `.security/artifacts/recon.json`) - project context
+3. `.security/profile.json` if present - project-specific exposure and severity context
+4. `${CLAUDE_PLUGIN_ROOT}/data/triage-criteria.md` - shared decision tree
+5. `${CLAUDE_PLUGIN_ROOT}/data/cwe-criteria/cwe-*.md` files matching CWEs in correlated findings
+
+The shared triage criteria are the source of truth. If this file and `triage-criteria.md` disagree, follow `triage-criteria.md`.
 
 ## Process: For EACH Finding
 
@@ -31,79 +36,13 @@ Process findings in the ORDER they appear in correlated.json (already sorted by 
 
 For each finding, read the file at `line - 2` to `line + 2`. Do NOT read entire files. Do NOT read files with no findings.
 
-### Step 2: Apply the Decision Tree
+### Step 2: Apply Shared Decision Tree
 
-Follow this tree IN ORDER. Take the FIRST matching branch.
-
-```
-1. Is the file a test fixture or test data file?
-   (path contains: testdata/, fixtures/, test_fixtures/, __fixtures__/)
-   YES -> FALSE_POSITIVE, reason: "Test fixture data"
-
-2. Is the CWE-798 (hardcoded credential) finding in a .pem, .key, or .crt file
-   inside a testdata/ or test/ directory?
-   YES -> FALSE_POSITIVE, reason: "Test certificate/key file"
-
-3. Is the finding in a test file (*_test.*, test_*, *_spec.*, tests/, spec/, __tests__/)?
-   YES -> verdict depends on pattern:
-     - If the test is testing production code with real vulnerable patterns -> NEEDS_REVIEW, severity: LOW
-     - If the test uses obviously fake data (test123, example.com, dummy) -> FALSE_POSITIVE
-
-4. Is this a CWE-798 finding?
-   Apply credential-specific checks:
-   a. Value matches placeholder: changeme, xxx, your-*-here, TODO, REPLACE -> FALSE_POSITIVE
-   b. Value is in .env.example or .env.template -> FALSE_POSITIVE
-   c. Value looks like a hash (hex string 32+ chars, $2b$, $argon2) -> FALSE_POSITIVE
-   d. File is a public key (not private key) -> FALSE_POSITIVE
-   e. Value is loaded from env var at runtime -> FALSE_POSITIVE
-   f. Otherwise -> TRUE_POSITIVE
-
-5. Is the framework known to protect against this CWE by default?
-   (See Framework Protection Table below)
-   YES, and protection is NOT explicitly bypassed -> FALSE_POSITIVE
-   YES, but protection IS bypassed (|safe, raw(), shell=True, etc.) -> TRUE_POSITIVE
-
-6. Does user-controlled input reach the dangerous sink?
-   - Trace backwards from the flagged line: is there a request/input/argv parameter?
-   - NO evidence of user input -> FALSE_POSITIVE, reason: "No user input reaches sink"
-   - YES, user input reaches sink -> TRUE_POSITIVE
-   - CANNOT DETERMINE from 5 lines -> NEEDS_REVIEW
-
-7. Default: NEEDS_REVIEW
-```
-
-### Framework Protection Table
-
-| Framework | CWE | Default Protection | Bypass Indicators |
-|-----------|-----|-------------------|-------------------|
-| Django | CWE-89 | ORM parameterizes queries | `.raw()`, `.extra()`, `connection.cursor()` |
-| Django | CWE-79 | Template auto-escaping | `\|safe`, `mark_safe()`, `{% autoescape off %}` |
-| Django | CWE-352 | CSRF middleware | `@csrf_exempt` |
-| SQLAlchemy | CWE-89 | ORM parameterizes | `text()` with f-string, `.execute()` with string concat |
-| React | CWE-79 | JSX auto-escapes | `dangerouslySetInnerHTML` |
-| Rails | CWE-89 | ActiveRecord parameterizes | `.find_by_sql()`, `.execute()` |
-| Rails | CWE-79 | ERB auto-escapes | `.html_safe`, `raw()` |
-| Express | CWE-89 | None (no default ORM) | N/A - always check |
-| FastAPI | CWE-89 | None (depends on ORM) | N/A - check ORM usage |
-| Gin/Echo | CWE-89 | None | N/A - check ORM usage |
+Follow `${CLAUDE_PLUGIN_ROOT}/data/triage-criteria.md` in order. Take the first matching branch. Use the CWE-specific criteria file for additional checks when available.
 
 ### Step 3: Assign Severity
 
-Use this FIXED mapping. Do not improvise severity levels.
-
-| CWE | Base Severity | Upgrade If | Downgrade If |
-|-----|--------------|------------|--------------|
-| CWE-78 (Cmd Injection) | CRITICAL | - | CLI tool (operator=user): HIGH |
-| CWE-89 (SQLi) | HIGH | Public unauthenticated endpoint: CRITICAL | Internal-only: MEDIUM |
-| CWE-79 (XSS) | HIGH | Stored XSS: CRITICAL | Self-XSS only: LOW |
-| CWE-22 (Path Traversal) | HIGH | Reads arbitrary files: CRITICAL | Write-only, restricted: MEDIUM |
-| CWE-798 (Hardcoded Creds) | CRITICAL | Production API keys/passwords | Dev/staging creds: HIGH |
-| CWE-502 (Deserialization) | CRITICAL | Network input | Local cache: MEDIUM |
-| CWE-918 (SSRF) | HIGH | Can reach metadata/internal: CRITICAL | External only: MEDIUM |
-| CWE-352 (CSRF) | MEDIUM | State-changing (delete, transfer): HIGH | Read-only: LOW |
-| CWE-287 (Auth Bypass) | HIGH | Admin endpoint: CRITICAL | Non-sensitive: MEDIUM |
-| CWE-770 (Resource) | MEDIUM | Public + expensive op: HIGH | Internal: LOW |
-| Other | MEDIUM | Public endpoint: HIGH | Test/internal: LOW |
+Use the fixed severity table in `${CLAUDE_PLUGIN_ROOT}/data/triage-criteria.md`. Do not improvise severity levels.
 
 ### Step 4: Write Explanation (EXACTLY this format)
 

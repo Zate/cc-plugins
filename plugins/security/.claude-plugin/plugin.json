@@ -1,7 +1,7 @@
 {
   "name": "security",
-  "version": "3.1.0",
-  "description": "Hybrid security scanner: deterministic SAST tools (Semgrep, Gitleaks, Trivy) for detection, LLM for triage. Reproducible findings, provenance-labeled, zero-dependency fallback mode.",
+  "version": "3.2.0",
+  "description": "Hybrid security scanner: deterministic SAST tools (Semgrep, Gitleaks, Trivy) for detection, LLM for triage. Includes baselining, suppression workflow, profile-aware severity, and zero-dependency fallback mode.",
   "author": {
     "name": "Zate",
     "email": "zate75+claude-code-plugins@gmail.com"
@@ -9,5 +9,5 @@
   "homepage": "https://github.com/Zate/cc-plugins",
   "repository": "https://github.com/Zate/cc-plugins",
   "license": "MIT",
-  "keywords": ["security", "sast", "vulnerability", "semgrep", "gitleaks", "trivy", "owasp"]
+  "keywords": ["security", "sast", "vulnerability", "semgrep", "gitleaks", "trivy", "owasp", "baseline"]
 }

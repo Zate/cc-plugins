@@ -29,9 +29,8 @@ Thank you for your interest in contributing to the Claude Code plugin marketplac
    - Follow semantic versioning (0.1.0 for new plugins)
 
 4. **Implement your plugin**:
-   - Add commands to `commands/`
-   - Add agents to `agents/`
-   - Add skills to `skills/skillname/SKILL.md`
+   - Add user-facing entry points and domain knowledge as skills in `skills/skill-name/SKILL.md`
+   - Add agents to `agents/` only when delegated specialization is useful
    - Configure hooks if needed
    - Add MCP configuration if needed
    - Remove unused directories
@@ -78,7 +77,7 @@ Thank you for your interest in contributing to the Claude Code plugin marketplac
 ### Recommended
 
 - [ ] Skills include "when to use" and "when NOT to use" sections
-- [ ] Commands have clear descriptions
+- [ ] User-invocable skills have clear descriptions and argument hints
 - [ ] Error handling for edge cases
 - [ ] Security considerations documented
 - [ ] Examples for all major features

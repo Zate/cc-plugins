@@ -206,20 +206,19 @@ NOT type:hypothesis
 
 ```
 hooks/
-  run-hook.cmd        # Polyglot dispatcher (CMD → .ps1, bash → .sh)
+  run-hook.cmd        # Polyglot dispatcher (CMD -> .ps1, bash -> .sh)
   session-start.sh    # Compose + inject stored knowledge (Unix)
   session-start.ps1   # Compose + inject stored knowledge (Windows)
   prompt-submit.sh    # Parse commands, inject pending recalls (Unix)
   prompt-submit.ps1   # Parse commands, inject pending recalls (Windows)
   stop.sh             # Final command sweep (Unix)
   stop.ps1            # Final command sweep (Windows)
-commands/
-  status.md           # /ctx:status
-  recall.md           # /ctx:recall
-  setup.md            # /ctx:setup
 skills/
   using-ctx/SKILL.md  # Enforces memory discipline
-  cleanup/SKILL.md    # Memory reconciliation (/ctx:cleanup)
+  status/SKILL.md     # /ctx:status
+  recall/SKILL.md     # /ctx:recall
+  setup/SKILL.md      # /ctx:setup
+  cleanup/SKILL.md    # /ctx:cleanup
 scripts/
   install-binary.sh   # Auto-downloads ctx binary (Unix)
   install-binary.ps1  # Auto-downloads ctx binary (Windows)

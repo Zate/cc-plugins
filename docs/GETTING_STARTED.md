@@ -1,233 +1,148 @@
 # Getting Started with CC-Plugins
 
-**Install professional development plugins for Claude Code in under a minute.**
-
----
+Install the marketplace, add the plugins you need, then invoke the slash entry points provided by their skills.
 
 ## Prerequisites
 
-You need Claude Code installed and running. If you haven't installed it yet, visit [claude.ai/code](https://claude.ai/code).
+You need Claude Code installed and running. If needed, visit [claude.ai/code](https://claude.ai/code).
 
----
-
-## Quick Install
-
-Three commands to get started:
+## Install
 
 ```bash
-# 1. Add this marketplace to Claude Code
 /plugin marketplace add Zate/cc-plugins
-
-# 2. Install the devloop plugin (our flagship plugin)
 /plugin install devloop
-
-# 3. Start using it immediately
-/devloop Add user authentication with OAuth
 ```
 
-That's it. You're ready to go.
+Recommended extras:
 
----
-
-## What You Just Installed
-
-### devloop - Professional Feature Development
-
-devloop transforms how you build features. Instead of ad-hoc prompting, it guides you through a structured workflow:
-
-| Phase | What Happens |
-|-------|--------------|
-| **Discover** | Understand requirements, identify edge cases |
-| **Explore** | Analyze existing code, find patterns |
-| **Architect** | Design the right solution |
-| **Implement** | Build with full codebase context |
-| **Test & Review** | Catch bugs before they ship |
-| **Ship** | Clean commits and PR creation |
-
-**The key insight**: Different tasks need different AI capabilities. devloop automatically uses the right model—opus for architecture decisions, sonnet for implementation, haiku for simple tasks. You get better results without thinking about it.
-
----
-
-## Your First 5 Minutes
-
-### Try the recommended workflow:
-
-**The spike → fresh → continue loop** (best for any real work)
 ```bash
-# 1. Start with exploration
-/devloop:spike Add a dark mode toggle to the settings page
-
-# 2. Save state and clear context
-/devloop:fresh
-/clear
-
-# 3. Resume and work on tasks
-/devloop:continue
-
-# 4. After 5-10 tasks, repeat step 2-3
-/devloop:fresh
-/clear
-/devloop:continue
+/plugin install ctx
+/plugin install security
 ```
 
-**Other useful commands:**
+## First Workflow: devloop
 
-**Quick fix** (skip the ceremony for simple tasks)
-```bash
-/devloop:quick Fix the typo in the header component
-```
+devloop is the main development workflow plugin. The normal loop is:
 
-**Analyze codebase** (find tech debt and refactoring opportunities)
 ```bash
-/devloop:analyze
-```
-
-**Review code** (before committing)
-```bash
+/devloop:plan "add a dark mode toggle to settings"
+/devloop:run
 /devloop:review
+/devloop:ship
 ```
 
----
+For small fixes:
 
-## Common Commands Reference
-
-| What You Want | Command | When to Use |
-|---------------|---------|-------------|
-| Build a feature | `/devloop [description]` | New features, complex changes |
-| Quick fix | `/devloop:quick [fix]` | Small, well-defined tasks |
-| Explore feasibility | `/devloop:spike [question]` | Unknown if possible |
-| Review code | `/devloop:review` | Before commits |
-| Continue work | `/devloop:continue` | Resume from previous session |
-| Ship it | `/devloop:ship` | Ready to commit/PR |
-| Analyze codebase | `/devloop:analyze` | Find tech debt, large files |
-
----
-
-## Understanding the Workflow
-
-### The Recommended Pattern: Spike → Fresh → Continue Loop
-
-**Modern devloop usage follows this iterative cycle:**
-
-```
-┌─────────────────────────────────────────────┐
-│ 1. /devloop:spike                           │
-│    └─→ Explore problem, create plan         │
-└──────────────────┬──────────────────────────┘
-                   ↓
-┌─────────────────────────────────────────────┐
-│ 2. /devloop:fresh + /clear                  │
-│    └─→ Save state, reset context            │
-└──────────────────┬──────────────────────────┘
-                   ↓
-┌─────────────────────────────────────────────┐
-│ 3. /devloop:continue                        │
-│    └─→ Work on tasks with checkpoints       │
-└──────────────────┬──────────────────────────┘
-                   │
-                   ↓ After 5-10 tasks
-                   └─→ Loop back to step 2
+```bash
+/devloop:plan --quick "fix typo in the header"
+/devloop:run
 ```
 
-**Why this works:**
+For deeper exploration:
 
-- **Spike** creates a comprehensive plan with full context
-- **Fresh** keeps responses fast by clearing heavy context
-- **Continue** picks up exactly where you left off
-- **Loop** maintains momentum while staying efficient
+```bash
+/devloop:plan --deep "should this service use OAuth or JWT?"
+```
 
-### The Traditional Workflow
+When the session gets large:
 
-When you run `/devloop` (traditional full workflow), you'll see a structured conversation through 12 phases. However, **the spike → fresh → continue loop is now recommended** for better context management.
+```bash
+/devloop:fresh
+/clear
+/devloop:run
+```
 
-**You're in control**: devloop asks clarifying questions when needed. Answer them thoughtfully—it prevents rework later.
+Plans are stored in `.devloop/plan.md`, so `/devloop:run` can continue from a later session.
 
-**Plans are saved**: Your progress is stored in `.devloop/plan.md`. The fresh start mechanism ensures you can always resume with `/devloop:continue`.
+## Other Useful Plugins
 
----
+| Plugin | Install | Main use |
+|--------|---------|----------|
+| `ctx` | `/plugin install ctx` | Persistent memory across sessions |
+| `security` | `/plugin install security` | SAST-backed security scanning |
+| `diagrams` | `/plugin install diagrams` | Generate SVG, Mermaid, Excalidraw, or D2 diagrams |
+| `plugin-lint` | `/plugin install plugin-lint` | Validate plugins, skills, and hooks |
+| `agent-cli` | `/plugin install agent-cli` | Design CLIs with `--agent-help` |
+| `forge` | `/plugin install forge` | Submit headless background agent jobs |
+| `blog-writer` | `/plugin install blog-writer` | Create blog posts through an interview workflow |
+| `wsl-clipboard-fix` | `/plugin install wsl-clipboard-fix` | Fix image paste on WSL2 |
 
-## Working with Different Project Types
+## First Security Workflow
 
-devloop detects your project type and passes language/framework context to `/devloop:plan`. Claude applies its own language knowledge (Go, React, Python, Java, etc.) directly — there are no language-specific reference skills to install or configure.
+The security plugin combines deterministic scanners with LLM triage. Start by creating a project profile, then scan:
 
----
+```bash
+/security:setup       # Inspect available scanners; installs only with approval
+/security:baseline    # Create .security/profile.json and suppression policy
+/security:scan        # Standard scan with triage
+```
 
-## Tips for Best Results
+For pull request or local-change checks:
 
-### 1. Answer Clarifying Questions
+```bash
+/security:scan --diff
+```
 
-Phase 4 asks questions to prevent confusion later. Take time to answer thoughtfully—it saves rework.
+For a deeper pass:
 
-### 2. Use the Right Command
+```bash
+/security:scan --deep
+```
 
-| Situation | Use This |
-|-----------|----------|
-| Building something new and complex | `/devloop` |
-| Small fix, clear scope | `/devloop:quick` |
-| Not sure if it's possible | `/devloop:spike` |
-| Ready to commit | `/devloop:ship` |
+To handle findings:
 
-### 3. Trust the Workflow
+```bash
+/security:results
+/security:fix finding-003
+/security:scan --suppress finding-004
+```
 
-Each phase exists for a reason. Skipping exploration leads to wrong architecture. Skipping review leads to bugs.
+Scan output lives under `.security/`. The baseline workflow keeps policy files such as `.security/profile.json` and `.security/suppressions.json` separate from generated artifacts.
 
-### 4. Use Plan Files
+## Common Commands
 
-Save your plan. Resume later. Hand off to teammates. The plan file is your project's memory.
+| What you want | Command |
+|---------------|---------|
+| Start a development plan | `/devloop:plan "task"` |
+| Execute the current plan | `/devloop:run` |
+| Preserve state before clearing context | `/devloop:fresh` |
+| Review current changes | `/devloop:review` |
+| Validate, commit, and create a PR | `/devloop:ship` |
+| List GitHub issues | `/devloop:issues` |
+| Check persistent memory | `/ctx:status` |
+| Search memory | `/ctx:recall type:decision` |
+| Create security baseline | `/security:baseline` |
+| Run security scan | `/security:scan` |
+| Scan changed files | `/security:scan --diff` |
+| Fix a security finding | `/security:fix finding-003` |
+| Show latest security report | `/security:results` |
+| Lint a plugin | `/plugin-lint:lint plugins/devloop` |
 
----
+## How Plugins Work Here
+
+Most plugins in this repository expose capabilities through skills in `skills/<name>/SKILL.md`. Some skills are user-invocable and appear as slash commands, such as `/devloop:plan` or `/security:scan`. Other skills are loaded automatically when Claude needs their domain knowledge.
+
+Legacy `commands/` directories are not the main pattern in this repo.
 
 ## Troubleshooting
 
 ### "Plugin not found"
 
 ```bash
-# Make sure the marketplace is added
 /plugin marketplace add Zate/cc-plugins
-
-# Then install
 /plugin install devloop
 ```
 
 ### "Command not recognized"
 
-Restart Claude Code after installing plugins. Some commands need a fresh session.
+Restart Claude Code after installing or updating plugins.
 
-### "Skills not activating"
+### "A skill did not activate"
 
-Skills activate automatically based on context. Ask about specific topics (e.g., "How should I structure this React component?") to trigger relevant skills.
+Use the explicit slash form when available, for example `/devloop:plan`, `/ctx:status`, or `/security:scan`.
 
----
+## Next
 
-## What's Next?
-
-### Explore More Commands
-
-See the full [devloop documentation](../plugins/devloop/README.md) for:
-- All 11 commands
-- 17 specialized agents
-- 22 domain skills
-
-### Check Out Other Plugins
-
-Browse available plugins:
-```bash
-/plugin list
-```
-
-### Get Help
-
-- **Issues**: [GitHub Issues](https://github.com/Zate/cc-plugins/issues)
-- **Discussions**: [GitHub Discussions](https://github.com/Zate/cc-plugins/discussions)
-
----
-
-## Contributing
-
-Want to create your own plugin? See [CONTRIBUTING.md](../CONTRIBUTING.md) and the [Plugin Creation Guide](PLUGIN_CREATION_GUIDE.md).
-
----
-
-<p align="center">
-  <strong>Built for developers who ship.</strong>
-</p>
+- Read the [devloop README](../plugins/devloop/README.md)
+- Keep the [Quick Reference](QUICK_REFERENCE.md) handy
+- See [Plugin Creation Guide](PLUGIN_CREATION_GUIDE.md) if you are building a new plugin

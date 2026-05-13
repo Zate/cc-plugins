@@ -25,17 +25,15 @@ Or install directly from source:
 
 ## Usage
 
-### Commands
-
-If your plugin provides commands, document them here:
-
-```bash
-/your-command [arguments]
-```
-
 ### Skills
 
-If your plugin provides skills, describe when they're invoked and what they do.
+Document user-invocable skills and model-invoked skills here:
+
+```bash
+/your-plugin:skill [arguments]
+```
+
+Explain when each skill is invoked and what it does. Prefer skills for new user-facing capabilities.
 
 ### Agents
 
@@ -55,10 +53,10 @@ Provide concrete examples of using your plugin:
 
 ```bash
 # Example 1
-/your-command example
+/your-plugin:skill example
 
 # Example 2
-/your-command with arguments
+/your-plugin:skill with arguments
 ```
 
 ## Development

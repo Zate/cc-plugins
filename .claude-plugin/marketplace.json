@@ -7,7 +7,7 @@
   },
   "metadata": {
     "description": "A curated marketplace of Claude Code plugins and skills for enhanced development workflows",
-    "version": "0.13.6",
+    "version": "0.14.0",
     "pluginRoot": "./plugins"
   },
   "plugins": [
@@ -33,7 +33,7 @@
     {
       "name": "security",
       "source": "./plugins/security",
-      "description": "Hybrid security scanner: deterministic SAST tools (Semgrep, Gitleaks, Trivy) for detection, LLM for triage. Reproducible findings, provenance-labeled [Static]/[LLM], zero-dependency fallback mode, CWE-specialized false positive elimination.",
+      "description": "Hybrid security scanner: deterministic SAST tools (Semgrep, Gitleaks, Trivy) for detection, LLM for triage. Includes baselining, project profiles, suppressions, focused remediation, provenance-labeled findings, and zero-dependency fallback mode.",
       "category": "security",
       "tags": [
         "security",
@@ -45,7 +45,9 @@
         "owasp",
         "cwe",
         "devsecops",
-        "hooks"
+        "hooks",
+        "baseline",
+        "remediation"
       ]
     },
     {

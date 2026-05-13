@@ -9,21 +9,7 @@ TARGET="${1:-.}"
 TARGET=$(cd "$TARGET" && pwd)
 
 # --- Language detection by file extension ---
-declare -A lang_counts
-declare -A ext_to_lang=(
-    [py]=python [js]=javascript [ts]=typescript [tsx]=typescript [jsx]=javascript
-    [go]=go [rs]=rust [java]=java [rb]=ruby [php]=php [cs]=csharp
-    [swift]=swift [kt]=kotlin [scala]=scala [c]=c [cpp]=cpp [h]=c [hpp]=cpp
-    [sh]=shell [bash]=shell [zsh]=shell
-    [sql]=sql [r]=r [dart]=dart [lua]=lua [pl]=perl [ex]=elixir [exs]=elixir
-)
-
-while IFS= read -r ext; do
-    lang="${ext_to_lang[$ext]:-}"
-    if [ -n "$lang" ]; then
-        lang_counts[$lang]=$(( ${lang_counts[$lang]:-0} + 1 ))
-    fi
-done < <(
+lang_counts=$(
     find "$TARGET" -type f \
         -not -path '*/node_modules/*' \
         -not -path '*/vendor/*' \
@@ -33,40 +19,66 @@ done < <(
         -not -path '*/build/*' \
         -not -path '*/.venv/*' \
         -not -path '*/venv/*' \
-        2>/dev/null | sed -n 's/.*\.\([a-zA-Z0-9]*\)$/\1/p'
+        2>/dev/null |
+    awk '
+        function lang_for(ext) {
+            ext=tolower(ext)
+            if (ext=="py") return "python"
+            if (ext=="js" || ext=="jsx") return "javascript"
+            if (ext=="ts" || ext=="tsx") return "typescript"
+            if (ext=="go") return "go"
+            if (ext=="rs") return "rust"
+            if (ext=="java") return "java"
+            if (ext=="rb") return "ruby"
+            if (ext=="php") return "php"
+            if (ext=="cs") return "csharp"
+            if (ext=="swift") return "swift"
+            if (ext=="kt") return "kotlin"
+            if (ext=="scala") return "scala"
+            if (ext=="c" || ext=="h") return "c"
+            if (ext=="cpp" || ext=="hpp") return "cpp"
+            if (ext=="sh" || ext=="bash" || ext=="zsh") return "shell"
+            if (ext=="sql") return "sql"
+            if (ext=="r") return "r"
+            if (ext=="dart") return "dart"
+            if (ext=="lua") return "lua"
+            if (ext=="pl") return "perl"
+            if (ext=="ex" || ext=="exs") return "elixir"
+            return ""
+        }
+        {
+            n=split($0, parts, ".")
+            if (n > 1) {
+                lang=lang_for(parts[n])
+                if (lang != "") counts[lang]++
+            }
+        }
+        END {
+            for (lang in counts) print lang "=" counts[lang]
+        }
+    ' | sort -t= -k2 -nr
 )
 
-total_files=0
-for count in "${lang_counts[@]}"; do
-    total_files=$((total_files + count))
-done
+total_files=$(printf '%s\n' "$lang_counts" | awk -F= 'NF == 2 {sum += $2} END {print sum + 0}')
 
-# Build sorted languages array
 languages_json="["
 first=true
 if [ "$total_files" -gt 0 ]; then
-    # Sort by count descending
     while IFS='=' read -r lang count; do
+        [ -z "$lang" ] && continue
         pct=$((count * 100 / total_files))
         if [ "$first" = true ]; then first=false; else languages_json+=","; fi
         languages_json+="{\"name\":\"$lang\",\"files\":$count,\"percentage\":$pct}"
-    done < <(
-        for lang in "${!lang_counts[@]}"; do
-            echo "$lang=${lang_counts[$lang]}"
-        done | sort -t= -k2 -nr
-    )
+    done <<EOF_LANGS
+$lang_counts
+EOF_LANGS
 fi
 languages_json+="]"
 
-# Primary language
-primary_language="unknown"
-max_count=0
-for lang in "${!lang_counts[@]}"; do
-    if [ "${lang_counts[$lang]}" -gt "$max_count" ]; then
-        max_count=${lang_counts[$lang]}
-        primary_language="$lang"
-    fi
-done
+primary_language=$(printf '%s\n' "$lang_counts" | awk -F= 'NF == 2 {print $1; exit}')
+if [ -z "$primary_language" ]; then
+    primary_language="unknown"
+fi
 
 # --- Framework detection ---
 framework="unknown"
@@ -119,6 +131,9 @@ loc_estimate=$(find "$TARGET" -type f \
     -not -path '*/.venv/*' \
     -not -path '*/venv/*' \
     -print0 2>/dev/null | xargs -0 wc -l 2>/dev/null | tail -1 | awk '{print $1}') || loc_estimate=0
+if [ -z "$loc_estimate" ]; then
+    loc_estimate=0
+fi
 
 # --- Sensitive directories ---
 sensitive_dirs_json="["
@@ -126,7 +141,11 @@ first=true
 for dir_name in auth api middleware crypto admin config security secrets keys certs; do
     while IFS= read -r found_dir; do
         # Make relative to target
-        rel_dir="${found_dir#$TARGET/}"
+        if [ "$found_dir" = "$TARGET" ]; then
+            rel_dir="."
+        else
+            rel_dir="${found_dir#$TARGET/}"
+        fi
         if [ "$first" = true ]; then first=false; else sensitive_dirs_json+=","; fi
         sensitive_dirs_json+="\"$rel_dir\""
     done < <(find "$TARGET" -type d -name "$dir_name" \

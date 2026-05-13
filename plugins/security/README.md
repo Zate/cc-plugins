@@ -2,7 +2,7 @@
 
 > **Hybrid security scanning: deterministic tools detect, LLM triages.**
 
-[![Version](https://img.shields.io/badge/version-3.0.0-blue)](./CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-3.2.0-blue)](./CHANGELOG.md)
 
 ## Philosophy
 
@@ -34,10 +34,10 @@ Every finding is labeled with its source:
 ## How It Works
 
 ```
-Phase 0: Recon        Detect tech stack, available tools, estimate coverage
+Phase 0: Recon        Detect tech stack, available tools, profile, estimate coverage
 Phase 1: Scan         Run deterministic tools (Semgrep, Gitleaks, Trivy, etc.)
 Phase 2: Correlate    Dedup findings, cross-reference across tools
-Phase 3: Triage       LLM classifies: true positive / false positive / needs review
+Phase 3: Triage       Triage agent classifies using shared CWE criteria
 Phase 4: Report       Provenance-labeled findings with remediation
 ```
 
@@ -89,6 +89,8 @@ Results are saved to `.security/`:
 
 ```
 .security/
++-- profile.json            # Project security posture (created by /security:baseline)
++-- suppressions.json       # Persistent false positive overrides
 +-- recon.json              # Project analysis
 +-- artifacts/              # Raw tool outputs
 |   +-- semgrep.sarif.json
@@ -97,7 +99,6 @@ Results are saved to `.security/`:
 |   +-- regex-scan.json
 +-- correlated.json         # Deduplicated findings
 +-- triage.json             # LLM-assessed findings
-+-- suppressions.json       # Persistent false positive overrides
 +-- report.md               # Human-readable report
 ```
 
@@ -108,7 +109,7 @@ Add to `.gitignore`:
 
 ## Real-Time Protection
 
-The plugin includes PreToolUse hooks that validate code changes in real-time:
+The plugin includes deterministic PreToolUse hooks that validate code changes in real-time:
 - Blocks hardcoded secrets before they're written
 - Warns about dangerous patterns (eval, shell=True with variables)
 - Validates bash commands for destructive operations
@@ -123,7 +124,9 @@ The plugin includes PreToolUse hooks that validate code changes in real-time:
 | `/security:scan --diff` | Scan only changed files vs main branch |
 | `/security:scan --suppress finding-003` | Suppress a false positive permanently |
 | `/security:results` | View most recent scan report |
-| `/security:setup` | Install security tools |
+| `/security:baseline` | Create project profile, suppressions file, and gitignore entries |
+| `/security:fix finding-003` | Remediate one triaged finding |
+| `/security:setup` | Inspect and optionally install security tools |
 
 ## Author
 

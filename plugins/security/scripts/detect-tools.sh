@@ -10,10 +10,10 @@ get_version() {
     case "$tool" in
         semgrep)   semgrep --version 2>/dev/null | head -1 ;;
         gitleaks)  gitleaks version 2>/dev/null | sed 's/^v//' ;;
-        trivy)     trivy --version 2>/dev/null | grep -oP 'Version:\s*\K\S+' || trivy --version 2>/dev/null | head -1 | grep -oP '\d+\.\d+\.\d+' ;;
-        bandit)    bandit --version 2>/dev/null | grep -oP '\d+\.\d+\.\d+' | head -1 ;;
-        gosec)     gosec --version 2>/dev/null | grep -oP '\d+\.\d+\.\d+' | head -1 || echo "unknown" ;;
-        sg)        sg --version 2>/dev/null | head -1 | grep -oP '\d+\.\d+\.\d+' || sg --version 2>/dev/null | head -1 ;;
+        trivy)     trivy --version 2>/dev/null | sed -nE 's/^Version:[[:space:]]*([^[:space:]]+).*/\1/p; s/.*([0-9]+\.[0-9]+\.[0-9]+).*/\1/p' | head -1 ;;
+        bandit)    bandit --version 2>/dev/null | sed -nE 's/.*([0-9]+\.[0-9]+\.[0-9]+).*/\1/p' | head -1 ;;
+        gosec)     gosec --version 2>/dev/null | sed -nE 's/.*([0-9]+\.[0-9]+\.[0-9]+).*/\1/p' | head -1 || echo "unknown" ;;
+        sg)        sg --version 2>/dev/null | head -1 | sed -nE 's/.*([0-9]+\.[0-9]+\.[0-9]+).*/\1/p' || sg --version 2>/dev/null | head -1 ;;
     esac
 }
 
@@ -29,6 +29,9 @@ for tool in semgrep gitleaks trivy bandit gosec sg; do
 
     if command -v "$tool" &>/dev/null; then
         version=$(get_version "$tool" || echo "unknown")
+        if [ -z "$version" ]; then
+            version="unknown"
+        fi
         # Sanitize version string for JSON
         version=$(echo "$version" | tr -d '\n\r' | sed 's/"/\\"/g')
         tools_json+="\"$tool\":{\"available\":true,\"version\":\"$version\"}"
