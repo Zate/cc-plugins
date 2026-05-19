@@ -11,7 +11,7 @@
 #   ./tests/run-tests.sh --test <name>      # Run specific test
 #
 # Test Categories:
-#   - Fast: Structure validation, frontmatter checks (no Claude Code required)
+#   - Fast: Structure validation, portable skills checks, frontmatter checks (no Claude Code required)
 #   - Integration: Tests requiring Claude Code CLI
 #   - Explicit Skills: Tests that skills are invoked when explicitly named
 #   - Skill Triggering: Tests that skills auto-detect from context
@@ -87,6 +87,7 @@ while [[ $# -gt 0 ]]; do
             echo ""
             echo "Test Suites:"
             echo "  devloop                Plugin structure and command tests"
+            echo "  portable-skills        Portable Agent Skills structure tests"
             echo "  explicit-skills        Explicit skill invocation tests"
             echo "  skill-triggering       Skill auto-detection tests"
             echo ""
@@ -182,11 +183,16 @@ run_suite() {
 # Fast Tests (no Claude Code required)
 # ========================================
 
-if [ -z "$SPECIFIC_TEST" ] || [ "$SPECIFIC_TEST" = "devloop" ]; then
+if [ -z "$SPECIFIC_TEST" ] || [ "$SPECIFIC_TEST" = "devloop" ] || [ "$SPECIFIC_TEST" = "portable-skills" ]; then
     echo ""
     echo "----------------------------------------"
     echo " Fast Tests (no Claude Code required)"
     echo "----------------------------------------"
+
+    # Portable Agent Skills tests
+    if [ -z "$SPECIFIC_TEST" ] || [ "$SPECIFIC_TEST" = "portable-skills" ]; then
+        run_suite "Portable Agent Skills" "$SCRIPT_DIR/portable-skills/validate-structure.sh" false
+    fi
 
     # Devloop plugin tests
     if [ -f "$REPO_ROOT/plugins/devloop/tests/run-tests.sh" ]; then

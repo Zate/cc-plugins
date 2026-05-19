@@ -1,34 +1,20 @@
 # agent-cli
 
-A convention for building CLIs that are optimized for LLM agent consumption.
+Deprecated compatibility package for the older agent-friendly CLI convention.
 
-## The Problem
+Use [`agent-help`](../agent-help) for new work. `agent-help` supersedes `agent-cli` with the current AHF-based `--agent-help` convention and recommended `--agent-out` runtime result format.
 
-`--help` output is designed for humans: verbose prose, grouped sections, multiple examples, flag aliases. Agents parse this poorly, waste tokens on it, and still get invocations wrong.
+Existing direct installs of `plugins/agent-cli` remain usable as a compatibility bridge, but the Claude Code marketplace entry now points to `agent-help`.
 
-## The Solution
-
-`--agent-help` — a single flag that returns token-minimal, structured output optimized for agents. Three tiers of progressive disclosure:
-
-| Tier | Call | Purpose | Tokens |
-|------|------|---------|--------|
-| 1 | `tool --agent-help` | Command index | <300 |
-| 2 | `tool --agent-help cmd` | Command detail | <150 |
-| 3 | (on error) | Self-correction hint | <50 |
-
-## Usage
-
-Install the plugin, then use the skill when building any CLI:
-
-```
-/agent-cli
-```
-
-The skill provides the format spec, implementation patterns for Go/Python/Rust/Node, and the bootstrap breadcrumb convention for `--help`.
-
-## Install
+## Install The Replacement
 
 ```bash
 /plugin marketplace add Zate/cc-plugins
-/plugin install agent-cli
+/plugin install agent-help
+```
+
+For portable Agent Skills installation:
+
+```bash
+npx skills add . -g -a claude-code -a codex -a rovodev -a pi --skill agent-help
 ```

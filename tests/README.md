@@ -21,6 +21,7 @@ Comprehensive testing framework for Claude Code plugins, adapted from the [super
 
 Tests that validate plugin structure without invoking Claude Code:
 
+- **Portable Agent Skills Tests**: Top-level `skills/` structure and Claude adapter mirror checks
 - **Devloop Plugin Tests**: Command frontmatter validation, skill structure checks
 - **Plugin Structure Tests**: Validate plugin.json, directory organization
 
@@ -126,6 +127,8 @@ TOTALS:
 tests/
 ├── README.md                           # This file
 ├── run-tests.sh                        # Main test runner
+├── portable-skills/
+│   └── validate-structure.sh           # Agent Skills structure checks
 ├── claude-code/
 │   ├── analyze-token-usage.py          # Token analysis tool
 │   └── test-helpers.sh                 # Bash assertion library

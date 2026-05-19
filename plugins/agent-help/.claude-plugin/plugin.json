@@ -1,0 +1,12 @@
+{
+  "name": "agent-help",
+  "version": "0.1.0",
+  "description": "Agent Skills-compatible CLI convention for --agent-help and --agent-out",
+  "author": {
+    "name": "Zate",
+    "url": "https://github.com/Zate"
+  },
+  "homepage": "https://github.com/Zate/agent-help",
+  "repository": "https://github.com/Zate/cc-plugins",
+  "license": "Apache-2.0"
+}

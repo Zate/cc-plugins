@@ -44,7 +44,7 @@ New to the marketplace? See [Getting Started](docs/GETTING_STARTED.md).
 | [diagrams](plugins/diagrams) | Text-based diagram generation with SVG, Mermaid, Excalidraw, and D2 | 6 skills |
 | [forge](plugins/forge) | Integration with the Forge headless agent job runner via MCP | 2 skills, hooks |
 | [plugin-lint](plugins/plugin-lint) | Static correctness and quality linting for Claude Code plugins | 1 skill |
-| [agent-cli](plugins/agent-cli) | Convention for agent-friendly CLIs using `--agent-help` | 1 skill |
+| [agent-help](plugins/agent-help) | Agent Skills-compatible convention for agent-friendly CLIs using `--agent-help` and `--agent-out` | 1 skill |
 | [blog-writer](plugins/blog-writer) | Interview-driven blog writing workflow with a de-AI editing agent | 1 skill, 1 agent |
 | [wsl-clipboard-fix](plugins/wsl-clipboard-fix) | WSL2 image paste fix that converts BMP clipboard content to PNG | 1 skill, hooks, script |
 
@@ -68,6 +68,24 @@ Common plugin components:
 | Scripts | `scripts/*` | Helper commands used by skills and hooks |
 
 `commands/` is still valid for old-style slash commands, but new plugins in this repo should prefer skills.
+
+### Portable Agent Skills
+
+Portable, harness-neutral skills live under [`skills/`](skills). These are Agent Skills-format packages intended for installation with `npx skills` into Claude Code, Codex, RovoDev, Pi, and other compatible agents.
+
+```bash
+npx skills add . -g -a claude-code -a codex -a rovodev -a pi --skill '*'
+```
+
+Claude Code marketplace plugins remain under [`plugins/`](plugins) and may wrap or mirror the portable skills when Claude-specific packaging is useful. See [Portable Skills Plan](docs/PORTABLE_SKILLS_PLAN.md).
+
+When a Claude adapter mirrors a portable skill, regenerate it from the portable source:
+
+```bash
+CLAUDE_USER_INVOCABLE=true \
+CLAUDE_ARGUMENT_HINT="[language/framework context, e.g. 'go cobra', 'python click']" \
+  scripts/sync-portable-skill-adapter.sh agent-help
+```
 
 ---
 
@@ -119,6 +137,12 @@ Install any plugin by name after adding the marketplace:
 
 ```bash
 /plugin install /absolute/path/to/cc-plugins/plugins/devloop
+```
+
+### As Portable Agent Skills
+
+```bash
+npx skills add . -g -a claude-code -a codex -a rovodev -a pi --skill '*'
 ```
 
 ### Verify Installation

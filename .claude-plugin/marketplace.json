@@ -7,7 +7,7 @@
   },
   "metadata": {
     "description": "A curated marketplace of Claude Code plugins and skills for enhanced development workflows",
-    "version": "0.14.0",
+    "version": "0.15.0",
     "pluginRoot": "./plugins"
   },
   "plugins": [
@@ -143,13 +143,16 @@
       ]
     },
     {
-      "name": "agent-cli",
-      "source": "./plugins/agent-cli",
-      "description": "Convention for building agent-friendly CLIs with --agent-help. Token-minimal, progressive-disclosure help output optimized for LLM agents instead of humans.",
+      "name": "agent-help",
+      "source": "./plugins/agent-help",
+      "description": "Agent Skills-compatible convention for building agent-friendly CLIs with --agent-help and --agent-out. Uses AHF invocation help, AHF protocol envelopes, and TOON runtime result bodies.",
       "category": "development",
       "tags": [
         "cli",
         "agent-help",
+        "agent-skills",
+        "ahf",
+        "toon",
         "developer-tools",
         "conventions",
         "token-optimization"

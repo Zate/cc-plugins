@@ -96,14 +96,16 @@ npx skills add ~/projects/work-agent-skills \
   --skill '*'
 ```
 
-Installed locations are treated as generated/symlinked targets, for example:
+Installed locations are treated as generated/symlinked targets. Exact paths are owned by the current `skills` installer and may change by version; do not hard-code them in skill content. Example paths include:
 
 ```text
 ~/.agents/skills/       # universal/RovoDev-style agents
 ~/.claude/skills/       # Claude Code
-~/.codex/skills/        # Codex
-~/.pi/skills/           # Pi, if supported by installer/current environment
+~/.codex/skills/        # Codex in some installer versions
+~/.pi/agent/skills/     # Pi in some installer versions
 ```
+
+In a local verification run with `skills@1.5.7`, installing `agent-help` with `-g -a rovodev -a claude-code -a codex -a pi --copy` into a temporary `HOME` wrote copies to `.rovodev/skills/agent-help`, `.claude/skills/agent-help`, `.agents/skills/agent-help` for Codex, and `.pi/agent/skills/agent-help`.
 
 ## Skill authoring rules
 
@@ -232,17 +234,29 @@ Possible classifications:
 
 ### Phase 6: Add automation
 
+Automation:
+
+- `scripts/sync-portable-skill-adapter.sh` generates Claude adapter skill copies from portable source skills.
+- `tests/portable-skills/validate-structure.sh` checks top-level skill structure, marketplace exposure, and adapter drift for the pilot.
+
 Potential future automation:
 
 - CI validation for all `skills/*/SKILL.md` files.
 - A script to list portable skills and install examples.
 - A compatibility audit for existing Claude plugin skills.
-- Optional generation/symlinking from portable skills into Claude plugin directories.
 
-## Open questions
+## Current decisions
 
-- Should top-level `skills/` be added immediately, or introduced with the first pilot skill?
-- Should Claude plugin skill files be symlinks to top-level portable skills where possible?
+- Top-level `skills/` exists now and starts with `skills/agent-help/`.
+- Claude Code plugin packaging may mirror portable skill bodies when marketplace installation is useful.
+- `plugins/agent-help/` is the Claude Code marketplace adapter for the portable `agent-help` skill.
+- Claude adapters may add Claude-only frontmatter such as `user-invocable` and `argument-hint`; the portable top-level skill remains Agent Skills spec compliant.
+- Adapter skill content is generated with `scripts/sync-portable-skill-adapter.sh`; do not hand-edit mirrored adapter bodies.
+- `plugins/agent-cli/` remains only as a deprecated compatibility bridge for direct installs.
+- Initial validation uses `tests/portable-skills/validate-structure.sh`, `skills-ref validate ./skills/<skill-name>`, and `npx skills add . --list`.
+
+## Remaining open questions
+
 - How strict should CI be initially: warning-only or blocking?
 - Which private/work skills should remain local-only vs installable from private Git URLs?
 - How should harness-specific guidance be represented: separate references, compatibility notes, or adapter directories?
@@ -255,9 +269,6 @@ See [`docs/AGENT_HELP_SKILL_PLAN.md`](AGENT_HELP_SKILL_PLAN.md) for the focused 
 
 ## Near-term next steps
 
-1. Use `agent-help` as the first pilot public skill.
-2. Keep `~/projects/agent-help/SKILL.md` as the initial canonical source while the spec stabilizes.
-3. Validate with `skills-ref`.
-4. Install with `npx skills` into RovoDev, Claude Code, Codex, and Pi.
-5. Decide whether `cc-plugins` should vendor `skills/agent-help/`, add Claude plugin packaging under `plugins/agent-help/`, or only reference the separate `agent-help` repo.
-6. Repeat with one private/work skill from `rd-skills` or the future work skills repo.
+1. Validate `skills/agent-help` with `skills-ref`.
+2. Extend adapter generation and drift checks beyond the `agent-help` pilot when more portable skills are added.
+3. Repeat with one private/work skill from `rd-skills` or the future work skills repo.

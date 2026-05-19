@@ -175,7 +175,7 @@ After the portable skill is stable, choose one of these approaches:
 3. **Generated/synced copy**: a script syncs from `~/projects/agent-help/SKILL.md` into `cc-plugins`.
 4. **Claude adapter only**: `plugins/agent-help/` contains Claude Code marketplace packaging that wraps the canonical skill.
 
-Short-term recommendation: keep `~/projects/agent-help` canonical and do not duplicate until the spec stabilizes.
+Current repo decision: vendor a copy at `skills/agent-help/` so `cc-plugins` can be installed directly with `npx skills`, while treating `~/projects/agent-help` / `Zate/agent-help` as the upstream source for the specification and canonical project docs.
 
 ## Migration from `agent-cli`
 
@@ -183,13 +183,25 @@ Recommended staged migration:
 
 ### Stage 1: Deprecate conceptually
 
-- Document that `agent-cli` is superseded by `agent-help`.
-- Stop adding new features to `plugins/agent-cli`.
+- [x] Document that `agent-cli` is superseded by `agent-help`.
+- [x] Stop adding new features to `plugins/agent-cli`.
 
 ### Stage 2: Add new portable skill
 
-- Publish/install `agent-help` from the `agent-help` repo.
-- Test in RovoDev, Claude Code, Codex, and Pi.
+- [x] Add `skills/agent-help/` as the portable skill copy in this repo.
+- [x] Validate `skills/agent-help/` with `skills-ref`.
+- [x] Verify `npx skills add . --list` discovers `agent-help`.
+- [x] Test `npx skills add . --skill agent-help` in RovoDev, Claude Code, Codex, and Pi using a temporary `HOME`.
+
+Verified command:
+
+```bash
+env HOME=/private/tmp/cc-plugins-skills-test \
+  npx skills add . -g -a rovodev -a claude-code -a codex -a pi \
+  --skill agent-help --copy -y
+```
+
+With `skills@1.5.7`, the installer wrote copied skills to `.rovodev/skills/agent-help`, `.claude/skills/agent-help`, `.agents/skills/agent-help`, and `.pi/agent/skills/agent-help` under the temporary `HOME`.
 
 ### Stage 3: Add optional Claude packaging
 
@@ -204,12 +216,14 @@ plugins/agent-help/
 
 This should either wrap, symlink, or clearly mirror the canonical Agent Skills content.
 
+Current implementation: `plugins/agent-help/` mirrors the portable skill body for Claude Code marketplace installation and adds Claude-only invocation frontmatter. Regenerate the adapter with `scripts/sync-portable-skill-adapter.sh agent-help`.
+
 ### Stage 4: Compatibility bridge
 
 Options:
 
 - Keep `agent-cli` as-is but mark deprecated.
-- Replace `agent-cli` content with a short forwarding skill telling agents to use `agent-help`.
+- [x] Replace `agent-cli` content with a short forwarding skill telling agents to use `agent-help`.
 - Remove `agent-cli` only in a future breaking marketplace release.
 
 ## Launch checklist for next week
@@ -246,9 +260,9 @@ Options:
 
 ### `cc-plugins`
 
-- [ ] Decide whether to add `skills/agent-help/` here or only link to `Zate/agent-help`.
-- [ ] Decide whether to create `plugins/agent-help/` as Claude marketplace packaging.
-- [ ] Decide how to deprecate `plugins/agent-cli/`.
+- [x] Decide whether to add `skills/agent-help/` here or only link to `Zate/agent-help`.
+- [x] Decide whether to create `plugins/agent-help/` as Claude marketplace packaging.
+- [x] Decide how to deprecate `plugins/agent-cli/`.
 
 ## Open questions
 

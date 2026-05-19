@@ -1,7 +1,7 @@
 {
   "name": "agent-cli",
   "version": "1.0.2",
-  "description": "Convention for building agent-friendly CLIs with --agent-help",
+  "description": "Deprecated compatibility bridge for agent-help",
   "author": {
     "name": "Zate",
     "url": "https://github.com/Zate"
