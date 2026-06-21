@@ -2,7 +2,7 @@
 
 **A curated marketplace of Claude Code plugins and skills for development workflows.**
 
-[![Plugins](https://img.shields.io/badge/plugins-9-blue)](.claude-plugin/marketplace.json) [![Claude Code](https://img.shields.io/badge/Claude%20Code-compatible-green)](https://code.claude.com) [![License](https://img.shields.io/badge/license-MIT-purple)](LICENSE)
+[![Plugins](https://img.shields.io/badge/plugins-10-blue)](.claude-plugin/marketplace.json) [![Claude Code](https://img.shields.io/badge/Claude%20Code-compatible-green)](https://code.claude.com) [![License](https://img.shields.io/badge/license-MIT-purple)](LICENSE)
 
 ---
 
@@ -45,6 +45,7 @@ New to the marketplace? See [Getting Started](docs/GETTING_STARTED.md).
 | [forge](plugins/forge) | Integration with the Forge headless agent job runner via MCP | 2 skills, hooks |
 | [plugin-lint](plugins/plugin-lint) | Static correctness and quality linting for Claude Code plugins | 1 skill |
 | [agent-cli](plugins/agent-cli) | Convention for agent-friendly CLIs using `--agent-help` | 1 skill |
+| [hermes-tweet](plugins/hermes-tweet) | Hermes Agent X/Twitter guidance for social listening, public reads, and gated posting | 1 skill |
 | [blog-writer](plugins/blog-writer) | Interview-driven blog writing workflow with a de-AI editing agent | 1 skill, 1 agent |
 | [wsl-clipboard-fix](plugins/wsl-clipboard-fix) | WSL2 image paste fix that converts BMP clipboard content to PNG | 1 skill, hooks, script |
 

@@ -1,0 +1,20 @@
+{
+  "name": "hermes-tweet",
+  "version": "0.1.0",
+  "description": "Guidance for using Hermes Tweet, the native Hermes Agent plugin for X/Twitter reads, social listening, and gated posting.",
+  "author": {
+    "name": "Xquik",
+    "url": "https://github.com/Xquik-dev/hermes-tweet"
+  },
+  "homepage": "https://github.com/Xquik-dev/hermes-tweet",
+  "repository": "https://github.com/Xquik-dev/hermes-tweet",
+  "license": "MIT",
+  "keywords": [
+    "hermes-agent",
+    "x",
+    "twitter",
+    "social-media",
+    "social-listening",
+    "automation"
+  ]
+}
