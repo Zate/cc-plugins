@@ -154,6 +154,19 @@
         "conventions",
         "token-optimization"
       ]
+    },
+    {
+      "name": "hermes-tweet",
+      "source": "./plugins/hermes-tweet",
+      "description": "Native Hermes Agent X/Twitter plugin guidance for social listening, public reads, catalog discovery, and gated posting.",
+      "category": "integration",
+      "tags": [
+        "hermes-agent",
+        "x",
+        "twitter",
+        "social-media",
+        "social-listening"
+      ]
     }
   ]
 }
