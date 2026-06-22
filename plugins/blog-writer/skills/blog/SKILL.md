@@ -1,17 +1,10 @@
 ---
 name: blog
-description: Interview-driven blog post creator that writes in your voice and strips AI tells
+description: >-
+  Create blog posts through a guided interview workflow that captures your voice, writes in your tone, and strips AI patterns from the output. Use when the user wants to write a blog post, create blog content, draft an article, or says "blog", "write a post", "blog post".
 argument-hint: Optional topic or title for the blog post
 user-invocable: true
-allowed-tools:
-  - Read
-  - Write
-  - Edit
-  - AskUserQuestion
-  - Agent
-  - Bash
-  - Glob
-  - Grep
+allowed-tools: Read, Write, Edit, AskUserQuestion, Agent, Bash, Glob, Grep
 ---
 
 # Blog Writer
