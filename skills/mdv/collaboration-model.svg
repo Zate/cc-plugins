@@ -1,0 +1,151 @@
+<!-- Updated 2026-03-27 -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 430"
+     font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif">
+  <defs>
+    <linearGradient id="navyGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#344563"/>
+      <stop offset="100%" stop-color="#253858"/>
+    </linearGradient>
+    <linearGradient id="blueGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#0065FF"/>
+      <stop offset="100%" stop-color="#0747A6"/>
+    </linearGradient>
+    <linearGradient id="greenGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#00A76F"/>
+      <stop offset="100%" stop-color="#006644"/>
+    </linearGradient>
+    <linearGradient id="violetGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#8777D9"/>
+      <stop offset="100%" stop-color="#5243AA"/>
+    </linearGradient>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#F4F5F7"/>
+      <stop offset="100%" stop-color="#FAFBFC"/>
+    </linearGradient>
+    <filter id="shadowSm" x="-4%" y="-8%" width="108%" height="120%">
+      <feDropShadow dx="0" dy="1" stdDeviation="3" flood-color="#172B4D" flood-opacity="0.08"/>
+    </filter>
+    <filter id="shadow" x="-4%" y="-6%" width="108%" height="118%">
+      <feDropShadow dx="0" dy="3" stdDeviation="6" flood-color="#172B4D" flood-opacity="0.12"/>
+    </filter>
+    <filter id="shadowLg" x="-4%" y="-6%" width="108%" height="118%">
+      <feDropShadow dx="0" dy="4" stdDeviation="10" flood-color="#172B4D" flood-opacity="0.15"/>
+    </filter>
+    <marker id="arrowBlue" markerWidth="8" markerHeight="8" refX="7" refY="3.5" orient="auto">
+      <polygon points="0 0, 8 3.5, 0 7" fill="#0065FF"/>
+    </marker>
+    <marker id="arrowGray" markerWidth="8" markerHeight="8" refX="7" refY="3.5" orient="auto">
+      <polygon points="0 0, 8 3.5, 0 7" fill="#505F79"/>
+    </marker>
+    <marker id="arrowViolet" markerWidth="8" markerHeight="8" refX="7" refY="3.5" orient="auto">
+      <polygon points="0 0, 8 3.5, 0 7" fill="#8777D9"/>
+    </marker>
+  </defs>
+
+  <!-- Background -->
+  <rect width="960" height="430" fill="url(#bgGrad)"/>
+
+  <!-- Title bar -->
+  <rect x="0" y="0" width="960" height="52" fill="url(#navyGrad)"/>
+  <text x="480" y="30" text-anchor="middle" font-size="22" font-weight="700" fill="white" letter-spacing="-0.3">Shared Viewport</text>
+  <text x="480" y="46" text-anchor="middle" font-size="12" font-weight="400" fill="white" opacity="0.75" letter-spacing="0.3">Human and agent see the same rendered document — in real time</text>
+
+  <!-- Human panel -->
+  <g filter="url(#shadow)">
+    <rect x="40" y="80" width="200" height="280" rx="12" fill="url(#greenGrad)"/>
+    <rect x="46" y="86" width="188" height="268" rx="9" fill="none" stroke="rgba(255,255,255,0.2)" stroke-width="1.5"/>
+  </g>
+  <text x="140" y="116" text-anchor="middle" font-size="13" font-weight="700" fill="white" letter-spacing="1" opacity="0.7">HUMAN</text>
+  <!-- Human icon -->
+  <circle cx="140" cy="155" r="22" fill="none" stroke="white" stroke-width="2" opacity="0.9"/>
+  <circle cx="140" cy="148" r="9" fill="white" opacity="0.9"/>
+  <path d="M118 175 Q140 163 162 175" fill="white" opacity="0.9"/>
+  <!-- Human actions -->
+  <text x="140" y="206" text-anchor="middle" font-size="14" font-weight="700" fill="white">Directs</text>
+  <text x="140" y="222" text-anchor="middle" font-size="11" fill="white" opacity="0.8">intent &amp; feedback</text>
+  <line x1="100" y1="238" x2="180" y2="238" stroke="white" stroke-width="1" opacity="0.2"/>
+  <text x="140" y="258" text-anchor="middle" font-size="14" font-weight="700" fill="white">Views</text>
+  <text x="140" y="274" text-anchor="middle" font-size="11" fill="white" opacity="0.8">rendered output</text>
+  <line x1="100" y1="290" x2="180" y2="290" stroke="white" stroke-width="1" opacity="0.2"/>
+  <text x="140" y="310" text-anchor="middle" font-size="14" font-weight="700" fill="white">Requests</text>
+  <text x="140" y="326" text-anchor="middle" font-size="11" fill="white" opacity="0.8">or approves changes</text>
+
+  <!-- mdv viewport (center hero) -->
+  <g filter="url(#shadowLg)">
+    <rect x="290" y="72" width="380" height="296" rx="14" fill="white"/>
+  </g>
+  <!-- Window chrome -->
+  <rect x="290" y="72" width="380" height="36" rx="14" fill="url(#blueGrad)"/>
+  <rect x="290" y="90" width="380" height="18" fill="url(#blueGrad)"/>
+  <!-- Window dots -->
+  <circle cx="314" cy="90" r="5" fill="rgba(255,255,255,0.4)"/>
+  <circle cx="330" cy="90" r="5" fill="rgba(255,255,255,0.4)"/>
+  <circle cx="346" cy="90" r="5" fill="rgba(255,255,255,0.4)"/>
+  <!-- URL bar -->
+  <rect x="364" y="82" width="280" height="16" rx="8" fill="rgba(255,255,255,0.15)"/>
+  <text x="504" y="93" text-anchor="middle" font-size="11" fill="white" opacity="0.8">mdv · live preview</text>
+  <!-- Document content mockup -->
+  <rect x="306" y="116" width="348" height="236" rx="4" fill="#FAFBFC"/>
+  <!-- Doc heading -->
+  <rect x="318" y="128" width="180" height="10" rx="3" fill="#172B4D" opacity="0.8"/>
+  <!-- Doc body lines -->
+  <rect x="318" y="148" width="320" height="6" rx="2" fill="#DFE1E6"/>
+  <rect x="318" y="160" width="290" height="6" rx="2" fill="#DFE1E6"/>
+  <rect x="318" y="172" width="308" height="6" rx="2" fill="#DFE1E6"/>
+  <!-- Mini diagram block -->
+  <rect x="318" y="188" width="320" height="80" rx="6" fill="#DEEBFF" stroke="#0065FF" stroke-width="1" opacity="0.8"/>
+  <rect x="334" y="200" width="80" height="54" rx="6" fill="#0065FF" opacity="0.7"/>
+  <rect x="434" y="200" width="80" height="54" rx="6" fill="#0052CC" opacity="0.5"/>
+  <rect x="534" y="200" width="80" height="54" rx="6" fill="#0747A6" opacity="0.4"/>
+  <line x1="414" y1="227" x2="434" y2="227" stroke="#0052CC" stroke-width="1.5" marker-end="url(#arrowBlue)" opacity="0.8"/>
+  <line x1="514" y1="227" x2="534" y2="227" stroke="#0052CC" stroke-width="1.5" marker-end="url(#arrowBlue)" opacity="0.8"/>
+  <!-- More doc lines -->
+  <rect x="318" y="278" width="320" height="6" rx="2" fill="#DFE1E6"/>
+  <rect x="318" y="290" width="260" height="6" rx="2" fill="#DFE1E6"/>
+  <rect x="318" y="302" width="295" height="6" rx="2" fill="#DFE1E6"/>
+  <rect x="318" y="314" width="200" height="6" rx="2" fill="#DFE1E6"/>
+  <!-- LIVE indicator -->
+  <circle cx="628" cy="130" r="5" fill="#00A76F"/>
+  <text x="636" y="134" text-anchor="start" font-size="11" font-weight="600" fill="#006644">LIVE</text>
+  <!-- mdv label -->
+  <text x="480" y="385" text-anchor="middle" font-size="13" font-weight="700" fill="#0052CC">mdv</text>
+  <text x="480" y="400" text-anchor="middle" font-size="11" fill="#505F79">shared document viewport</text>
+
+  <!-- Agent panel -->
+  <g filter="url(#shadow)">
+    <rect x="720" y="80" width="200" height="280" rx="12" fill="url(#violetGrad)"/>
+    <rect x="726" y="86" width="188" height="268" rx="9" fill="none" stroke="rgba(255,255,255,0.2)" stroke-width="1.5"/>
+  </g>
+  <text x="820" y="116" text-anchor="middle" font-size="13" font-weight="700" fill="white" letter-spacing="1" opacity="0.7">AGENT</text>
+  <!-- Agent icon (circuit-style) -->
+  <rect x="805" y="133" width="30" height="30" rx="6" fill="none" stroke="white" stroke-width="2" opacity="0.9"/>
+  <circle cx="820" cy="148" r="7" fill="white" opacity="0.9"/>
+  <line x1="805" y1="141" x2="799" y2="141" stroke="white" stroke-width="1.5" opacity="0.7"/>
+  <line x1="805" y1="148" x2="799" y2="148" stroke="white" stroke-width="1.5" opacity="0.7"/>
+  <line x1="805" y1="155" x2="799" y2="155" stroke="white" stroke-width="1.5" opacity="0.7"/>
+  <line x1="835" y1="141" x2="841" y2="141" stroke="white" stroke-width="1.5" opacity="0.7"/>
+  <line x1="835" y1="148" x2="841" y2="148" stroke="white" stroke-width="1.5" opacity="0.7"/>
+  <line x1="835" y1="155" x2="841" y2="155" stroke="white" stroke-width="1.5" opacity="0.7"/>
+  <!-- Agent actions -->
+  <text x="820" y="206" text-anchor="middle" font-size="14" font-weight="700" fill="white">Edits</text>
+  <text x="820" y="222" text-anchor="middle" font-size="11" fill="white" opacity="0.8">source files directly</text>
+  <line x1="780" y1="238" x2="860" y2="238" stroke="white" stroke-width="1" opacity="0.2"/>
+  <text x="820" y="258" text-anchor="middle" font-size="14" font-weight="700" fill="white">Views</text>
+  <text x="820" y="274" text-anchor="middle" font-size="11" fill="white" opacity="0.8">rendered output via MCP</text>
+  <line x1="780" y1="290" x2="860" y2="290" stroke="white" stroke-width="1" opacity="0.2"/>
+  <text x="820" y="310" text-anchor="middle" font-size="14" font-weight="700" fill="white">Responds</text>
+  <text x="820" y="326" text-anchor="middle" font-size="11" fill="white" opacity="0.8">to visual feedback</text>
+
+  <!-- Arrows: human → mdv -->
+  <path d="M242 180 Q266 180 285 180" stroke="#00A76F" stroke-width="2" fill="none" marker-end="url(#arrowGray)" stroke-dasharray="5,3"/>
+  <text x="265" y="155" text-anchor="middle" font-size="11" fill="#006644" font-weight="700">Views</text>
+
+  <!-- Arrows: agent → mdv (edits source) -->
+  <path d="M718 180 Q694 180 675 180" stroke="#8777D9" stroke-width="2" fill="none" marker-end="url(#arrowGray)" stroke-dasharray="5,3"/>
+  <text x="697" y="154" text-anchor="middle" font-size="10" fill="#5243AA" font-weight="700">Edits /</text>
+  <text x="697" y="166" text-anchor="middle" font-size="10" fill="#5243AA" font-weight="700">Views</text>
+
+  <!-- Bidirectional feedback arrow at bottom -->
+  <path d="M242 310 Q480 345 718 310" stroke="#505F79" stroke-width="1.5" fill="none" stroke-dasharray="4,3" marker-end="url(#arrowGray)"/>
+  <text x="480" y="348" text-anchor="middle" font-size="11" fill="#505F79" font-weight="600">shared context · real-time feedback loop</text>
+</svg>

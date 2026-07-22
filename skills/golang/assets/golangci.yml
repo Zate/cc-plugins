@@ -1,0 +1,96 @@
+version: "2"
+
+run:
+  timeout: 5m
+  tests: true
+
+linters:
+  default: none
+  enable:
+    - bodyclose
+    - contextcheck
+    - copyloopvar
+    - errcheck
+    - errorlint
+    - exhaustive
+    - gocyclo
+    - godoclint
+    - gosec
+    - govet
+    - ineffassign
+    - misspell
+    - nilerr
+    - nilnil
+    - nolintlint
+    - prealloc
+    - revive
+    - rowserrcheck
+    - sloglint
+    - sqlclosecheck
+    - staticcheck
+    - unconvert
+    - unparam
+    - unused
+    - usestdlibvars
+    - wastedassign
+  settings:
+    errcheck:
+      check-type-assertions: true
+    exhaustive:
+      default-signifies-exhaustive: true
+    gocyclo:
+      min-complexity: 15
+    govet:
+      enable-all: true
+      disable:
+        - fieldalignment
+        - shadow
+    revive:
+      rules:
+        - name: blank-imports
+        - name: context-as-argument
+        - name: dot-imports
+        - name: error-return
+        - name: error-strings
+        - name: exported
+        - name: file-length-limit
+          arguments:
+            - max: 350
+              skipComments: true
+              skipBlankLines: true
+        - name: function-length
+          arguments:
+            - 50   # max statements
+            - 80   # max lines
+        - name: increment-decrement
+        - name: indent-error-flow
+        - name: range
+        - name: receiver-naming
+        - name: time-naming
+        - name: unexported-return
+        - name: unreachable-code
+        - name: unused-parameter
+        - name: var-declaration
+        - name: var-naming
+    staticcheck:
+      checks:
+        - all
+        - -ST1000
+  exclusions:
+    presets:
+      - common-false-positives
+      - legacy
+      - std-error-handling
+    rules:
+      - path: _test\.go
+        linters:
+          - gosec
+
+formatters:
+  enable:
+    - gofmt
+    - goimports
+
+issues:
+  max-issues-per-linter: 0
+  max-same-issues: 0

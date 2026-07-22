@@ -1,0 +1,116 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 580"
+     font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif">
+  <defs>
+    <linearGradient id="navyGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#344563"/>
+      <stop offset="100%" stop-color="#253858"/>
+    </linearGradient>
+    <linearGradient id="blueGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#0065FF"/>
+      <stop offset="100%" stop-color="#0747A6"/>
+    </linearGradient>
+    <linearGradient id="violetGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#8777D9"/>
+      <stop offset="100%" stop-color="#5243AA"/>
+    </linearGradient>
+    <linearGradient id="greenGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#00A76F"/>
+      <stop offset="100%" stop-color="#006644"/>
+    </linearGradient>
+    <linearGradient id="tealGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#00B8D9"/>
+      <stop offset="100%" stop-color="#008DA6"/>
+    </linearGradient>
+    <linearGradient id="amberGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#FFAB00"/>
+      <stop offset="100%" stop-color="#FF8B00"/>
+    </linearGradient>
+    <filter id="shadow" x="-8%" y="-12%" width="116%" height="136%">
+      <feDropShadow dx="0" dy="3" stdDeviation="6" flood-color="#172B4D" flood-opacity="0.12"/>
+    </filter>
+    <filter id="shadowSm" x="-6%" y="-12%" width="112%" height="134%">
+      <feDropShadow dx="0" dy="1" stdDeviation="3" flood-color="#172B4D" flood-opacity="0.08"/>
+    </filter>
+  </defs>
+
+  <rect width="960" height="580" fill="#FAFBFC"/>
+
+  <rect x="0" y="0" width="960" height="52" fill="url(#navyGrad)"/>
+  <text x="480" y="30" text-anchor="middle" font-size="22" font-weight="700" fill="white" letter-spacing="-0.3">Edit · Render · Review Loop</text>
+  <text x="480" y="46" text-anchor="middle" font-size="12" font-weight="400" fill="white" opacity="0.75" letter-spacing="0.3">mdv live-reloads on every file save — no refresh, no manual steps</text>
+
+  <!-- Arrow: step 1 → step 2 -->
+  <path d="M 573 155 Q 635 155 635 211" stroke="#0065FF" stroke-width="28" fill="none" stroke-linecap="butt" opacity="0.75"/>
+  <polygon points="635,227 613,211 657,211" fill="#0065FF" opacity="0.75"/>
+  <text x="660" y="135" text-anchor="middle" font-size="13" fill="#0065FF" font-weight="700" dominant-baseline="middle">auto</text>
+  <text x="660" y="152" text-anchor="middle" font-size="13" fill="#0065FF" font-weight="700" dominant-baseline="middle">refresh</text>
+  <!-- Arrow: step 2 → step 3 -->
+  <path d="M 635 393 Q 635 465 589 465" stroke="#00B8D9" stroke-width="28" fill="none" stroke-linecap="butt" opacity="0.75"/>
+  <polygon points="573,465 589,443 589,487" fill="#00B8D9" opacity="0.75"/>
+  <text x="665" y="468" text-anchor="middle" font-size="13" fill="#00B8D9" font-weight="700" dominant-baseline="middle">MCP</text>
+  <text x="665" y="485" text-anchor="middle" font-size="13" fill="#00B8D9" font-weight="700" dominant-baseline="middle">Tools</text>
+  <!-- Arrow: step 3 → step 4 -->
+  <path d="M 387 465 Q 325 465 325 409" stroke="#8777D9" stroke-width="28" fill="none" stroke-linecap="butt" opacity="0.75"/>
+  <polygon points="325,393 347,409 303,409" fill="#8777D9" opacity="0.75"/>
+  <text x="295" y="445" text-anchor="middle" font-size="13" fill="#8777D9" font-weight="700" dominant-baseline="middle">chat</text>
+  <!-- Arrow: step 4 → step 1 -->
+  <path d="M 325 227 Q 325 155 371 155" stroke="#00A76F" stroke-width="28" fill="none" stroke-linecap="butt" opacity="0.75"/>
+  <polygon points="387,155 371,177 371,133" fill="#00A76F" opacity="0.75"/>
+  <text x="308" y="145" text-anchor="middle" font-size="13" fill="#00A76F" font-weight="700" dominant-baseline="middle">iterate</text>
+
+  <!-- STEP 1: Edit -->
+  <g filter="url(#shadow)">
+    <rect x="405" y="90" width="150" height="130" rx="12" fill="url(#blueGrad)"/>
+    <rect x="409" y="94" width="142" height="122" rx="9" fill="none" stroke="rgba(255,255,255,0.2)" stroke-width="1.5"/>
+  </g>
+  <text x="480" y="115" text-anchor="middle" font-size="10" font-weight="700" fill="white" letter-spacing="1.5" opacity="0.7">STEP 1</text>
+  <text x="480" y="139" text-anchor="middle" font-size="22" font-weight="700" fill="white">Edit</text>
+  <text x="480" y="157" text-anchor="middle" font-size="11" fill="white" opacity="0.8">source file</text>
+  <text x="480" y="187" text-anchor="middle" font-size="10" fill="white" opacity="0.6">find_and_replace_code</text>
+  <text x="480" y="199" text-anchor="middle" font-size="10" fill="white" opacity="0.6">create_file · bash</text>
+
+  <!-- STEP 2: Render -->
+  <g filter="url(#shadow)">
+    <rect x="560" y="245" width="150" height="130" rx="12" fill="url(#tealGrad)"/>
+    <rect x="564" y="249" width="142" height="122" rx="9" fill="none" stroke="rgba(255,255,255,0.2)" stroke-width="1.5"/>
+  </g>
+  <text x="635" y="270" text-anchor="middle" font-size="10" font-weight="700" fill="white" letter-spacing="1.5" opacity="0.7">STEP 2</text>
+  <text x="635" y="294" text-anchor="middle" font-size="22" font-weight="700" fill="white">Render</text>
+  <text x="635" y="312" text-anchor="middle" font-size="11" fill="white" opacity="0.8">mdv live-reloads</text>
+  <text x="635" y="342" text-anchor="middle" font-size="10" fill="white" opacity="0.6">filesystem watcher</text>
+  <text x="635" y="354" text-anchor="middle" font-size="10" fill="white" opacity="0.6">instant · no refresh</text>
+
+  <!-- STEP 3: Review -->
+  <g filter="url(#shadow)">
+    <rect x="405" y="400" width="150" height="130" rx="12" fill="url(#violetGrad)"/>
+    <rect x="409" y="404" width="142" height="122" rx="9" fill="none" stroke="rgba(255,255,255,0.2)" stroke-width="1.5"/>
+  </g>
+  <text x="480" y="425" text-anchor="middle" font-size="10" font-weight="700" fill="white" letter-spacing="1.5" opacity="0.7">STEP 3</text>
+  <text x="480" y="449" text-anchor="middle" font-size="22" font-weight="700" fill="white">Review</text>
+  <text x="480" y="467" text-anchor="middle" font-size="11" fill="white" opacity="0.8">agent views output</text>
+  <text x="480" y="497" text-anchor="middle" font-size="10" fill="white" opacity="0.6">get_screenshot</text>
+  <text x="480" y="509" text-anchor="middle" font-size="10" fill="white" opacity="0.6">get_current_context</text>
+
+  <!-- STEP 4: Discuss -->
+  <g filter="url(#shadow)">
+    <rect x="250" y="245" width="150" height="130" rx="12" fill="url(#greenGrad)"/>
+    <rect x="254" y="249" width="142" height="122" rx="9" fill="none" stroke="rgba(255,255,255,0.2)" stroke-width="1.5"/>
+  </g>
+  <text x="325" y="270" text-anchor="middle" font-size="10" font-weight="700" fill="white" letter-spacing="1.5" opacity="0.7">STEP 4</text>
+  <text x="325" y="294" text-anchor="middle" font-size="22" font-weight="700" fill="white">Discuss</text>
+  <text x="325" y="312" text-anchor="middle" font-size="11" fill="white" opacity="0.8">propose · confirm</text>
+  <text x="325" y="342" text-anchor="middle" font-size="10" fill="white" opacity="0.6">"looks good" → done</text>
+  <text x="325" y="354" text-anchor="middle" font-size="10" fill="white" opacity="0.6">"change X" → loop</text>
+
+  <!-- Done off-ramp from Discuss -->
+  <path d="M 232 310 Q 145 310 145 198" stroke="#FF8B00" stroke-width="28" fill="none" stroke-linecap="butt" opacity="0.75"/>
+  <polygon points="145,182 167,198 123,198" fill="#FF8B00" opacity="0.75"/>
+  <text x="95" y="300" text-anchor="middle" font-size="12" fill="#FF8B00" font-weight="700">looks good</text>
+
+  <g filter="url(#shadowSm)">
+    <rect x="85" y="96" width="120" height="68" rx="16" fill="url(#amberGrad)"/>
+  </g>
+  <text x="145" y="126" text-anchor="middle" font-size="20" font-weight="700" fill="white">Done</text>
+  <text x="145" y="148" text-anchor="middle" font-size="12" fill="white" opacity="0.9">ship it ✓</text>
+
+</svg>
